@@ -1,0 +1,44 @@
+.loginContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #3a507f;
+}
+
+.loginBox {
+    width: 350px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.loginBox h2 {
+    margin-bottom: 20px;
+    color: #333333;
+}
+
+.loginForm {
+    width: 100%;
+}
+
+.loginFormButton {
+    width: 100%;
+    background-color: #3a8bfa;
+    border-color: #3a8bfa;
+}
+
+.loginFormForgot,
+.loginForm a {
+    display: block;
+    text-align: right;
+    color: #1890ff;
+    margin-top: 10px;
+}
+
+.loginFormForgot:hover,
+.loginForm a:hover {
+    color: #40a9ff;
+}
