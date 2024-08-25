@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import styles from './LoginForm.module.scss';
-import { useGetAuthUserQuery, useLazyGetAuthUserQuery, useLoginMutation } from 'modules/auth/redux/api';
+import { useLazyGetAuthUserQuery, useLoginMutation } from 'modules/auth/redux/api';
 import { useDispatch } from 'react-redux';
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
 
@@ -13,11 +13,13 @@ export const LoginForm = () => {
 
   const onFinish = async (values: { email: string; password: string }) => {
     try {
-      const response = await login(values).unwrap().then(() => {
-        getAuthUser()
-      });
+      const response = await login(values)
+      // .unwrap().then(() => {
+      //   getAuthUser()
+      // });
+
       // @ts-ignore
-      const { access: token, refresh: refreshToken } = response;
+      const { access: token, refresh: refreshToken } = response.data;
 
       dispatch(authActions.setToken({ token, refreshToken }));
       message.success('Login successful!');

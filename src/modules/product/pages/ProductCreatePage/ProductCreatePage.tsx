@@ -4,6 +4,7 @@ import { useCreateProductMutation } from '../../redux/api';
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './ProductCreatePage.module.scss';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type TCreateProductForm = {
   name: string;
@@ -14,13 +15,21 @@ type TCreateProductForm = {
 
 export const ProductCreatePage = () => {
   const { companyId } = useParams<{ companyId: string }>();
+  const { user } = useTypedSelector((state) => state.auth);
+
   const navigate = useNavigate()
   const { Content } = Layout;
   const { control, handleSubmit, formState: { errors } } = useForm<TCreateProductForm>();
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
 
   const onSubmit = (payload: TCreateProductForm) => {
-    createProduct({ ...payload, companyId: Number(companyId) }).unwrap().then((response) => {
+    const updatedData = {
+      ...payload,
+      author: user?.profile.id,
+      companyId: companyId ? companyId : ''
+    };
+
+    createProduct(updatedData).unwrap().then((response) => {
       navigate(`/company/${response.id}`)
     })
   };

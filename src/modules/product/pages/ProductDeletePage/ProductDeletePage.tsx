@@ -18,7 +18,7 @@ export const ProductDeletePage = () => {
 
   const handleDeleteProduct = () => {
     if (company) {
-      deleteCompany(Number(product?.id)).unwrap().then(() => {
+      deleteCompany(product?.id ? product?.id : '').unwrap().then(() => {
         navigate(`/company/${company?.id}`);
       });
     }
@@ -43,6 +43,7 @@ export const ProductDeletePage = () => {
                 </Button>
                 <Button
                   type="default"
+                  style={{ color: '#faad14', borderColor: '#faad14' }}
                   onClick={() => {
                     navigate(`/company/${company?.id}`)
                   }}

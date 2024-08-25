@@ -4,6 +4,7 @@ import { useUpdateCompanyMutation, useGetCompanyByIdQuery, useGetCompanyListQuer
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './CompanyUpdatePage.module.scss';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type TUpdateCompanyForm = {
   id: number;
@@ -14,6 +15,8 @@ type TUpdateCompanyForm = {
 
 export const CompanyUpdatePage = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useTypedSelector((state) => state.auth);
+
   const { data: company } = useGetCompanyByIdQuery(id || '');
   const navigate = useNavigate()
   const { Content } = Layout;
@@ -29,8 +32,13 @@ export const CompanyUpdatePage = () => {
   const { refetch: refetchCompanyList } = useGetCompanyListQuery();
 
   const onSubmit = (payload: TUpdateCompanyForm) => {
+    const updatedData = {
+      ...payload,
+      author: user?.profile.id,
+    };
+
     if (company) {
-      updateCompany({ ...payload, id: company.id }).unwrap().then((response) => {
+      updateCompany({ ...updatedData, id: company.id }).unwrap().then((response) => {
         navigate(`/company/${response.id}`);
       });
     }
@@ -99,6 +107,7 @@ export const CompanyUpdatePage = () => {
                     </Button>
                     <Button
                       type="default"
+                      style={{ color: '#faad14', borderColor: '#faad14' }}
                       onClick={() => {
                         navigate(`/company/${company?.id}`)
                       }}

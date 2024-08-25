@@ -1,17 +1,25 @@
 import React from 'react';
 import styles from './UserInfo.module.scss';
-import { useGetProfilesQuery } from '../../../modules/account/redux/api';
 import avatar from '../../../assets/avatar.png';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const UserInfo: React.FC = () => {
-  const { data } = useGetProfilesQuery();
+  const { user } = useTypedSelector((state) => state.auth);
+
+  const baseURL = 'http://195.49.210.209';
+
+  const profileImage = user?.profile.picture ? `${baseURL}${user.profile.picture}` : avatar;
 
   return (
     <div className={styles.userInfo}>
-      <img src={data && data[0].picture ? data[0].picture : avatar} alt={data ? data[0].user.username : '-'} className={styles.avatar} />
+      <img
+        src={profileImage}
+        alt={user ? user.profile.user.first_name : '-'}
+        className={styles.avatar}
+      />
       <div className={styles.details}>
-        <div className={styles.name}>{data ? data[0].user.username : '-'}</div>
-        <div className={styles.email}>{data ? data[0].user.email : '-'}</div>
+        <div className={styles.name}>{user ? user.profile.user.first_name : '-'}</div>
+        <div className={styles.email}>{user ? user.profile.user.email : '-'}</div>
       </div>
     </div>
   );

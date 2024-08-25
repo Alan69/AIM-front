@@ -1,7 +1,7 @@
 import baseApi from '../../../../redux/api';
 
-type TCompanyData = {
-  id: number;
+export type TCompanyData = {
+  id: string;
   name: string;
   slug?: string;
   scope: string;
@@ -9,7 +9,7 @@ type TCompanyData = {
   time_create: string;
   time_update: string;
   active: boolean;
-  author: number;
+  author: string;
 }
 
 type TCreateCompany = {
@@ -18,17 +18,17 @@ type TCreateCompany = {
   scope: string;
   comment?: string;
   active?: boolean;
-  author?: number;
+  author?: string;
 }
 
 type TUpdateCompany = {
-  id: number;
+  id: string;
   name: string;
   slug?: string;
   scope: string;
   comment?: string;
   active?: boolean;
-  author?: number;
+  author?: string;
 }
 
 export const companyApi = baseApi.injectEndpoints({
@@ -48,34 +48,34 @@ export const companyApi = baseApi.injectEndpoints({
 			transformResponse: (response: TCompanyData) => response,
     }),
     createCompany: build.mutation<TCompanyData, TCreateCompany>({
-      query: ({ name, scope, comment }) => ({
+      query: ({ name, scope, comment, author }) => ({
         url: '/companies/',
         method: 'POST',
         body: {
           name,
           scope,
           comment,
-          author: 1,
+          author
         }
       }),
 			transformResponse: (response: TCompanyData) => response,
       extraOptions: { showErrors: false }
     }),
     updateCompany: build.mutation<TCompanyData, TUpdateCompany>({
-      query: ({ id, name, scope, comment }) => ({
+      query: ({ id, name, scope, comment, author }) => ({
         url: `/companies/${id}/`,
         method: 'PUT',
         body: {
           name,
           scope,
           comment,
-          author: 1,
+          author
         }
       }),
 			transformResponse: (response: TCompanyData) => response,
       extraOptions: { showErrors: false }
     }),
-    deleteCompany: build.mutation<number, number>({
+    deleteCompany: build.mutation<string, string>({
       query: (id) => ({
         url: `companies/${id}/`,
         method: 'DELETE'

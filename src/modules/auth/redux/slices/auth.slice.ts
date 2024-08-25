@@ -1,14 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
+import { TProfileData } from 'modules/account/redux/api';
 
 interface AuthState {
   token: string | null;
   refreshToken: string | null;
+  user: TProfileData | null; // Add user field
 }
 
 const initialState: AuthState = {
   token: Cookies.get('token') || null,
   refreshToken: Cookies.get('refreshToken') || null,
+  user: null,
 };
 
 const authSlice = createSlice({
@@ -29,11 +32,14 @@ const authSlice = createSlice({
         Cookies.set('refreshToken', refreshToken, { expires: 7 });
       }
     },
-    logout: (state) => {
+    setUser: (state, { payload }: PayloadAction<TProfileData | null>) => {
+      state.user = payload;
+    },
+    logOut: (state) => {
       state.token = null;
       state.refreshToken = null;
+      state.user = null;
 
-      // Remove tokens from cookies
       Cookies.remove('token');
       Cookies.remove('refreshToken');
     },

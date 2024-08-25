@@ -1,24 +1,25 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetCompanyByIdQuery, useGetCompanyListQuery, useDeleteCompanyMutation } from '../../redux/api';
+import { useDeletePostMutation, useGetPostByIdQuery } from '../../redux/api';
 import { Layout, Button } from 'antd';
-import styles from './CompanyDeletePage.module.scss';
+import styles from './PostDeletePage.module.scss';
 import Title from 'antd/es/typography/Title';
+import { useGetCompanyListQuery } from 'modules/company/redux/api';
 
-export const CompanyDeletePage = () => {
+export const PostDeletePage = () => {
   const { Content } = Layout;
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate()
-  const { data: company } = useGetCompanyByIdQuery(id || '');
+  const { data: post, error, isLoading, refetch } = useGetPostByIdQuery(id || '');
 
-  const [deleteCompany, { isLoading: isUpdating }] = useDeleteCompanyMutation();
+  const [deletePost, { isLoading: isUpdating }] = useDeletePostMutation();
   const { refetch: refetchCompanyList } = useGetCompanyListQuery();
 
-  const handleDeleteCompany = () => {
-    if (company) {
-      deleteCompany(company?.id).unwrap().then((response) => {
-        navigate(`/company/${company?.id}`);
+  const handleDeletePost = () => {
+    if (post) {
+      deletePost(post?.id).unwrap().then((response) => {
+        navigate(`/post-query/${post?.post_query}`);
         // refetchCompanyList();
       });
     }
@@ -27,17 +28,17 @@ export const CompanyDeletePage = () => {
   return (
     <Layout>
       <Content style={{ padding: '24px', minHeight: '100vh' }}>
-        <h1>Удаление компании</h1>
+        <h1>Удаление поста</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
-              <Title level={4} >Вы подтверждаете удаление компании "{company?.name}"?</Title>
+              <Title level={4} >Вы подтверждаете удаление продукта "{post?.title}"?</Title>
               <div className={styles.buttons}>
                 <Button
                   type="primary"
                   danger
                   loading={isUpdating}
-                  onClick={handleDeleteCompany}
+                  onClick={handleDeletePost}
                 >
                   Удалить
                 </Button>
@@ -45,7 +46,7 @@ export const CompanyDeletePage = () => {
                   type="default"
                   style={{ color: '#faad14', borderColor: '#faad14' }}
                   onClick={() => {
-                    navigate(`/company/${company?.id}`)
+                    navigate(`/post-query/${post?.post_query}`)
                   }}
                   loading={isUpdating}>
                   Отмена

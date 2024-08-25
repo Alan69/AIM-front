@@ -8,8 +8,6 @@ import { SignUpPage } from 'modules/auth/pages/SignUpPage/SignUpPage';
 import { LoginPage } from 'modules/auth/pages/LoginPage/LoginPage';
 import { AccountPage } from 'modules/account/pages/AccountPage/AccountPage';
 import { OfferPage } from 'modules/offer/pages/OfferPage/OfferPage';
-import { PostCreatePage } from 'modules/post/pages/PostCreatePage';
-import { PostListPage } from 'modules/post/pages/PostListPage';
 import { CompanyCreatePage } from 'modules/company/pages/CompanyCreatePage/CompanyCreatePage';
 import { CompanyDetailsPage } from 'modules/company/pages/CompanyDetailsPage/CompanyDetailsPage';
 import { CompanyUpdatePage } from 'modules/company/pages/CompanyUpdatePage/CompanyUpdatePage';
@@ -18,18 +16,70 @@ import { OffersPage } from 'modules/account/pages/OffersPage/OffersPage';
 import { ProductCreatePage } from 'modules/product/pages/ProductCreatePage/ProductCreatePage';
 import { ProductUpdatePage } from 'modules/product/pages/ProductUpdatePage/ProductUpdatePage';
 import { ProductDeletePage } from 'modules/product/pages/ProductDeletePage/ProductDeletePage';
+import { useDispatch } from 'react-redux';
+import { authActions } from 'modules/auth/redux/slices/auth.slice';
+import Cookies from 'js-cookie';
+import { PostQueryListPage } from 'modules/post-query/pages/PostQueryListPage';
+import { PostQueryCreatePage } from 'modules/post-query/pages/PostQueryCreatePage/PostQueryCreatePage';
+import { PostQueryDetailsPage } from 'modules/post-query/pages/PostQueryDetailsPage/PostQueryDetailsPage';
+import { PostUpdatePage } from 'modules/post/pages/PostUpdatePage/PostUpdatePage';
+import { PostDeletePage } from 'modules/post/pages/PostDeletePage/PostDeletePage';
+import { PostDetailsPage } from 'modules/post/pages/PostDetailsPage/PostDetailsPage';
+import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
+import { ContentPlanPage } from 'modules/content-plan/pages/ContentPlanPage/ContentPlanPage';
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
 const AppRoutes: FC = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  const { token } = useTypedSelector((state) => state.auth)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { token } = useTypedSelector((state) => state.auth);
+  const [getAuthUser] = useLazyGetAuthUserQuery()
 
   useEffect(() => {
     if (!token) {
       navigate('/login', { replace: true });
+    } else {
+      getAuthUser()
     }
-  }, [token, navigate]);
+  }, [token, navigate, getAuthUser, location.pathname]);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const resetTimeout = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => {
+        handleLogout();
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    const handleLogout = () => {
+      dispatch(authActions.logOut());
+      Cookies.remove('token');
+      Cookies.remove('refreshToken');
+      navigate('/login', { replace: true });
+      // alert('Session has expired due to inactivity.');
+    };
+
+    const events = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+
+    events.forEach((event) => {
+      window.addEventListener(event, resetTimeout);
+    });
+
+    resetTimeout();
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach((event) => {
+        window.removeEventListener(event, resetTimeout);
+      });
+    };
+  }, [dispatch, navigate]);
 
   if (!token) {
     return (
@@ -44,7 +94,7 @@ const AppRoutes: FC = () => {
   }
 
   if (location.pathname === '/') {
-    navigate('/post')
+    navigate('/post-query')
   }
 
   return (
@@ -53,19 +103,23 @@ const AppRoutes: FC = () => {
         <Route path='/account/profile/edit' element={<AccountPage />} />
         <Route path='/account/offers' element={<OffersPage />} />
         <Route path='/offer' element={<OfferPage />} />
-        <Route path="/post" element={<PostListPage />} />
-        <Route path="/post/list" element={<PostListPage />} />
-        <Route path="/post/create" element={<PostCreatePage />} />
+        <Route path="/post-query" element={<PostQueryListPage />} />
+        <Route path="/post-query/list" element={<PostQueryListPage />} />
+        <Route path="/post-query/create" element={<PostQueryCreatePage />} />
+        <Route path="/post-query/:id" element={<PostQueryDetailsPage />} />
         <Route path="/company/create" element={<CompanyCreatePage />} />
-        <Route path="/company/:id/" element={<CompanyDetailsPage />} />
-        <Route path="/company/:id//update" element={<CompanyUpdatePage />} />
-        <Route path="/company/:id//delete" element={<CompanyDeletePage />} />
-        <Route path="/product/:companyId/:id/create" element={<ProductCreatePage />} />
+        <Route path="/company/:id" element={<CompanyDetailsPage />} />
+        <Route path="/company/:id/update" element={<CompanyUpdatePage />} />
+        <Route path="/company/:id/delete" element={<CompanyDeletePage />} />
+        <Route path="/product/:companyId/create" element={<ProductCreatePage />} />
         <Route path="/product/:companyId/:id/update" element={<ProductUpdatePage />} />
         <Route path="/product/:companyId/:id/delete" element={<ProductDeletePage />} />
-        <Route path="/content-plan" element={<ProductDeletePage />} />
+        <Route path="/post/:postQueryId/:id" element={<PostDetailsPage />} />
+        <Route path="/post/:postQueryId/:id/update" element={<PostUpdatePage />} />
+        <Route path="/post/:postQueryId/:id/delete" element={<PostDeletePage />} />
+        <Route path="/content-plan" element={<ContentPlanPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/post" replace />} />
+      <Route path="*" element={<Navigate to="/post-query" replace />} />
     </Routes>
   )
 }

@@ -1,7 +1,7 @@
 import baseApi from '../../../../redux/api';
 
 export type TProductData = {
-  id: number;
+  id: string;
   name: string;
   slug?: string;
   scope: string;
@@ -9,8 +9,8 @@ export type TProductData = {
   time_create: string;
   time_update: string;
   active: boolean;
-  author: number
-  company: 2
+  author: string;
+  company: string
 }
 
 type TCreateProduct = {
@@ -19,26 +19,26 @@ type TCreateProduct = {
   scope: string;
   comment?: string;
   active?: boolean;
-  author?: number;
-  companyId: number;
+  author?: string;
+  companyId: string;
 }
 
 type TUpdateProduct = {
-  id: number;
+  id: string;
   name: string;
   slug?: string;
   scope: string;
   comment?: string;
   active?: boolean;
-  author?: number;
-  companyId: number
+  author?: string;
+  companyId: string;
 }
 
 export const productApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-		getProductList: build.query<TProductData[], void>({
-			query: () => ({
-				url: '/pbs/',
+		getProductListByCompanyId: build.query<TProductData[], string>({
+			query: (company_id) => ({
+				url: `/company/${company_id}/pbs/`,
 				method: 'GET'
 			}),
 			transformResponse: (response: TProductData[]) => response,
@@ -51,36 +51,36 @@ export const productApi = baseApi.injectEndpoints({
 			transformResponse: (response: TProductData) => response,
     }),
     createProduct: build.mutation<TProductData, TCreateProduct>({
-      query: ({ name, scope, comment, companyId }) => ({
+      query: ({ name, scope, comment, companyId, author }) => ({
         url: '/pbs/',
         method: 'POST',
         body: {
           name,
           scope,
           comment,
-          author: 1,
-          company: companyId
+          company: companyId,
+          author
         }
       }),
 			transformResponse: (response: TProductData) => response,
       extraOptions: { showErrors: false }
     }),
     updateProduct: build.mutation<TProductData, TUpdateProduct>({
-      query: ({ id, name, scope, comment, companyId }) => ({
+      query: ({ id, name, scope, comment, companyId, author }) => ({
         url: `/pbs/${id}/`,
         method: 'PUT',
         body: {
           name,
           scope,
           comment,
-          author: 1,
-          company: companyId
+          company: companyId,
+          author
         }
       }),
 			transformResponse: (response: TProductData) => response,
       extraOptions: { showErrors: false }
     }),
-    deleteProduct: build.mutation<number, number>({
+    deleteProduct: build.mutation<string, string>({
       query: (id) => ({
         url: `pbs/${id}/`,
         method: 'DELETE'
@@ -91,7 +91,8 @@ export const productApi = baseApi.injectEndpoints({
 });
 
 export const {
-    useGetProductListQuery,
+    useGetProductListByCompanyIdQuery,
+    useLazyGetProductListByCompanyIdQuery,
     useGetProductByIdQuery,
     useCreateProductMutation,
     useUpdateProductMutation,

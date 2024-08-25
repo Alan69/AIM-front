@@ -1,28 +1,44 @@
 import baseApi from '../../../../redux/api';
 
-type PostData = {
-  id: number,
-  slug?: string,
-  content: string,
-  post_prompt: string,
-  time_create: string,
-  time_update: string,
-  company: number,
-  product: number,
-  post_type: number,
-  text_style: number,
-  lang: number,
-  author: number
+export type TPostData = {
+  id: string;
+  title: string;
+  slug?: string;
+  img_prompt: string;
+  txt_prompt?: string;
+  main_text: string;
+  hashtags: string;
+  like?: boolean;
+  picture?: string;
+  time_create?: string;
+  time_update?: string;
+  active?: boolean;
+  img_style?: string;
+  post_query: string;
+  author: string;
 }
 
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getPostList: build.query<PostData[], void>({
+    getPostList: build.query<TPostData[], void>({
       query: () => ({
-        url: '/post_queries/',
+        url: '/posts/',
         method: 'GET'
       }),
-      transformResponse: (response: PostData[]) => response,
+      transformResponse: (response: TPostData[]) => response,
+    }),
+    getPostById: build.query<TPostData, string>({
+      query: (id) => ({
+        url: `/posts/${id}`,
+        method: 'GET'
+      }),
+      transformResponse: (response: TPostData) => response,
+    }),
+    deletePost: build.mutation<string, string>({
+      query: (id) => ({
+        url: `posts/${id}/`,
+        method: 'DELETE'
+      })
     }),
   }),
   overrideExisting: false,
@@ -30,4 +46,6 @@ export const postApi = baseApi.injectEndpoints({
 
 export const {
   useGetPostListQuery,
+  useGetPostByIdQuery,
+  useDeletePostMutation
 } = postApi;

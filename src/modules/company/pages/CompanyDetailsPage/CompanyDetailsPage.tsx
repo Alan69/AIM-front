@@ -9,7 +9,7 @@ import {
   PlusCircleOutlined
 } from '@ant-design/icons';
 import styles from './CompanyDetailsPage.module.scss';
-import { TProductData, useGetProductListQuery } from '../../../product/redux/api';
+import { TProductData, useGetProductListByCompanyIdQuery } from '../../../product/redux/api';
 
 interface DataType {
   key: string;
@@ -24,7 +24,7 @@ export const CompanyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: company, error, isLoading, refetch } = useGetCompanyByIdQuery(id || '');
   // @ts-ignore
-  const { data: productList } = useGetProductListQuery(company?.id || '');
+  const { data: productListByCompanyId } = useGetProductListByCompanyIdQuery(company?.id || '');
 
   const { Content } = Layout;
 
@@ -47,7 +47,7 @@ export const CompanyDetailsPage = () => {
     },
   ];
 
-  const data: DataType[] = productList?.map((product: TProductData) => ({
+  const data: DataType[] = productListByCompanyId?.map((product: TProductData) => ({
     key: product.id.toString(),
     product_name: product.name,
     product_assignment: product.scope,
@@ -90,7 +90,7 @@ export const CompanyDetailsPage = () => {
           </h2>
           <Content >
             <div className={styles.companyDescr}>
-              {!productList?.length ? <div style={{ paddingBottom: '12px' }}>
+              {!productListByCompanyId?.length ? <div style={{ paddingBottom: '12px' }}>
                 <Text >На данный момент отсутствуют продукты или бренды. Вы можете добавить новый продукт или бренд.</Text>
               </div> : ''}
               <Table columns={columns} dataSource={data} pagination={false} />

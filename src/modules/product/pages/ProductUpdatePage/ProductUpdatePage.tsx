@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './ProductUpdatePage.module.scss';
 import { useGetCompanyByIdQuery } from '../../../company/redux/api';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type TUpdateProductForm = {
   id: number;
@@ -15,6 +16,8 @@ type TUpdateProductForm = {
 
 export const ProductUpdatePage = () => {
   const { Content } = Layout;
+  const { user } = useTypedSelector((state) => state.auth);
+
   const { id, companyId } = useParams<{ id: string, companyId: string }>();
   const { data: company } = useGetCompanyByIdQuery(companyId || '');
   const { data: product } = useGetProductByIdQuery(id || '');
@@ -31,7 +34,14 @@ export const ProductUpdatePage = () => {
 
   const onSubmit = (payload: TUpdateProductForm) => {
     if (product) {
-      updateProduct({ ...payload, id: product.id, companyId: Number(companyId) }).unwrap().then(() => {
+      const updatedData = {
+        ...payload,
+        id: product.id,
+        companyId: companyId ? companyId : '',
+        author: user?.profile.id,
+      };
+
+      updateProduct(updatedData).unwrap().then(() => {
         navigate(`/company/${company?.id}`);
       });
     }
@@ -99,6 +109,7 @@ export const ProductUpdatePage = () => {
                     </Button>
                     <Button
                       type="default"
+                      style={{ color: '#faad14', borderColor: '#faad14' }}
                       onClick={() => {
                         navigate(`/company/${company?.id}`)
                       }}

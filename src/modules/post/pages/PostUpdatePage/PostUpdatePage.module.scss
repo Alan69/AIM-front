@@ -1,0 +1,43 @@
+.postDescr {
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    &__title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    &__icons {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+}
+
+.container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.picture,
+.pictureBlock {
+    border-radius: 16px;
+    div {
+        border-radius: 16px;
+    }
+}
+
+.postLike {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.postActions {
+    display: flex;
+    gap: 16px;
+}

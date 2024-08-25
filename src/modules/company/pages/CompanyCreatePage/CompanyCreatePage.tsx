@@ -4,6 +4,7 @@ import { useCreateCompanyMutation, useGetCompanyListQuery } from '../../redux/ap
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './CompanyCreatePage.module.scss';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type TCreateCompanyForm = {
   name: string;
@@ -13,13 +14,19 @@ type TCreateCompanyForm = {
 
 export const CompanyCreatePage = () => {
   const navigate = useNavigate()
+  const { user } = useTypedSelector((state) => state.auth);
   const { Content } = Layout;
   const { control, handleSubmit, formState: { errors } } = useForm<TCreateCompanyForm>();
   const [createCompany, { isLoading: isCreating }] = useCreateCompanyMutation();
   const { refetch: refetchCompanyList } = useGetCompanyListQuery();
 
   const onSubmit = (payload: TCreateCompanyForm) => {
-    createCompany(payload).unwrap().then((response) => {
+    const updatedData = {
+      ...payload,
+      author: user?.profile.id,
+    };
+
+    createCompany(updatedData).unwrap().then((response) => {
       navigate(`/company/${response.id}`)
       // refetchCompanyList();
     })

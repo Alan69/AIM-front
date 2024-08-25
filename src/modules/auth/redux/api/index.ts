@@ -1,4 +1,6 @@
+import { TUserData } from 'modules/account/redux/api';
 import baseApi from '../../../../redux/api';
+import { authActions } from '../slices/auth.slice';
 
 type TLogin = {
   email: string;
@@ -6,22 +8,32 @@ type TLogin = {
 }
 
 type TLoginResponse = {
-  access: string;
-  refresh: string;
+  data: {
+    access: string;
+    refresh: string;
+  }
 }
 
 export const authApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-    getAuthUser: build.query<void, void>({
+    getAuthUser: build.query<TUserData, void>({
       query: () => ({
-        url: '/auth-user/',
+        url: '/auth/user/',
           method: 'GET'
         }),
-      // transformResponse: (response: TProfilesData[]) => response,
+      transformResponse: (response: TUserData) => response,
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(authActions.setUser(data));
+        } catch (err) {
+          console.error('Failed to fetch user data', err);
+        }
+      },
     }),
     login: build.mutation<TLoginResponse, TLogin>({
       query: ({ email, password }) => ({
-        url: 'user/login/',
+        url: '/token/',
         method: 'POST',
         body: {
           email,

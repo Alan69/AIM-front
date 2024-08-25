@@ -3,25 +3,33 @@ import {
   UnorderedListOutlined,
   AppstoreAddOutlined,
   ProductOutlined,
-  PlusCircleOutlined
+  PlusCircleOutlined,
+  CalendarOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Menu } from 'antd';
+import { Button, Menu } from 'antd';
 import styles from './Menu.module.scss';
 import UserInfo from '../UserInfo/Userinfo';
 import { Link } from 'react-router-dom';
 import { useGetCompanyListQuery } from '../../../modules/company/redux/api';
 import OfferInfo from '../OfferInfo/OfferInfo';
+import { authActions } from 'modules/auth/redux/slices/auth.slice';
+import { useDispatch } from 'react-redux';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const MenuNav: React.FC = () => {
+  const dispatch = useDispatch();
   const { data } = useGetCompanyListQuery()
 
   const companyItems = data?.map((company) => ({
     key: `company-${company.id}`,
     label: <Link to={`/company/${company.id}`}>{company.name}</Link>,
   })) || [];
+
+  const logOut = () => {
+    dispatch(authActions.logOut());
+  }
 
   const items: MenuItem[] = [
     {
@@ -34,13 +42,17 @@ const MenuNav: React.FC = () => {
     },
     {
       key: '3',
-      icon: <AppstoreAddOutlined />,
-      label: <Link to="/post/create">Создать пост</Link>,
+      label: <div className={styles.logOutBtn}><Button type='primary' onClick={logOut}>Выход</Button></div>,
     },
     {
       key: '4',
+      icon: <AppstoreAddOutlined />,
+      label: <Link to="/post-query/create">Создать пост</Link>,
+    },
+    {
+      key: '5',
       icon: <UnorderedListOutlined />,
-      label: <Link to="/post">История</Link>,
+      label: <Link to="/post-query">История</Link>,
     },
     {
       key: 'sub1',
@@ -50,6 +62,11 @@ const MenuNav: React.FC = () => {
         { key: '6', label: <Link to="/company/create"><PlusCircleOutlined /> Добавить</Link> },
         ...companyItems,
       ],
+    },
+    {
+      key: '6',
+      icon: < CalendarOutlined />,
+      label: <Link to="/content-plan">Контент план</Link>,
     },
     // {
     //   key: 'sub2',

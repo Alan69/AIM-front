@@ -1,80 +1,114 @@
 import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useUpdateProfilesMutation, useGetProfilesQuery } from '../../redux/api';
+import { TUpdateProfilesData, useUpdateProfilesMutation } from '../../redux/api';
 import { Layout, Button, Form, Input, Upload, Select, Image } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import { useGetJobTypesListQuery } from '../../../../redux/api/jobTypes/jobTypesApi';
+import { useGetContriesListQuery } from '../../../../redux/api/contries/contriesApi';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type TUpdateProfilesForm = {
-  username: string;
+  user: string;
   first_name?: string;
   last_name?: string;
   email?: string;
   bd_year: number;
-  job?: string;
-  location?: string;
+  job?: {
+    id: string;
+    name: string;
+  }
+  location?: {
+    id: string;
+    name: string;
+  }
   picture?: string | null;
 };
 
 export const AccountPage = () => {
   const { Content } = Layout;
-  const { data: profiles } = useGetProfilesQuery();
+  const { user } = useTypedSelector((state) => state.auth);
+  const baseURL = 'http://195.49.210.209';
+
+  const profileImage = user?.profile.picture ? `${baseURL}${user.profile.picture}` : '';
+
   const [updateProfiles, { isLoading: isUpdating }] = useUpdateProfilesMutation();
+  const { data: jobTypesList, isLoading: isJobTypesListUpdating } = useGetJobTypesListQuery()
+  const { data: contriesList, isLoading: isContriesListUpdating } = useGetContriesListQuery()
   const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<TUpdateProfilesForm>({
     defaultValues: {
-      username: '',
       first_name: '',
       last_name: '',
       email: '',
       bd_year: 0,
-      job: '',
-      location: '',
-      picture: null,
+      job: {
+        id: '',
+        name: ''
+      },
+      location: {
+        id: '',
+        name: ''
+      },
+      picture: '',
     }
   });
 
   useEffect(() => {
-    if (profiles && profiles.length > 0) {
-      const profile = profiles[0];
+    if (user) {
       reset({
-        username: profile.user.username,
-        first_name: profile.user.first_name || '',
-        last_name: profile.user.last_name || '',
-        email: profile.user.email || '',
-        bd_year: profile.bd_year,
-        job: profile.job || '',
-        location: profile.location || '',
-        picture: profile.picture || null,
+        first_name: user.profile.user.first_name || '',
+        last_name: user.profile.user.last_name || '',
+        email: user.profile.user.email || '',
+        bd_year: user.profile.bd_year,
+        job: {
+          id: user.profile.job?.id || '',
+          name: user.profile.job?.name || ''
+        },
+        location: {
+          id: user.profile.location?.id || '',
+          name: user.profile.location?.name || ''
+        },
+        picture: user.profile.picture || '',
       });
     }
-  }, [profiles, reset]);
+  }, [user, reset]);
 
   const onSubmit = (data: TUpdateProfilesForm) => {
-    if (profiles && profiles.length > 0) {
-      const profile = profiles[0];
-      updateProfiles({ ...data, user: profile.user });
+    if (user) {
+      let pictureUrl = data.picture;
+
+      // If the picture field is a string (a path), convert it to a full URL if necessary
+      if (typeof pictureUrl === 'string' && !pictureUrl.startsWith('http')) {
+        pictureUrl = `${baseURL}${pictureUrl}`;
+      }
+
+      const updatedData = {
+        ...data,
+        picture: pictureUrl, // Ensure the picture field is correctly formatted
+        location: data.location?.id,
+        job: data.job?.id,
+        id: user.profile.id,
+      };
+
+      // @ts-ignore
+      updateProfiles(updatedData);
     }
   };
 
   const handleFileChange = (info: any) => {
-    if (info.file.status === 'done' || info.file.status === 'removed') {
-      setValue('picture', info.file.originFileObj ? URL.createObjectURL(info.file.originFileObj) : null);
+    const fileList = info.fileList;
+
+    if (fileList.length > 0) {
+      const lastFile = fileList[fileList.length - 1];
+      setValue('picture', lastFile.originFileObj); // Store the file object
+    } else {
+      setValue('picture', null);
     }
   };
-
   return (
     <Layout>
       <Content style={{ padding: '24px', minHeight: '100vh' }}>
         <h1>Профиль</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-          <Form.Item label="Логин" validateStatus={errors.username ? 'error' : ''} help={errors.username && 'Заполните это поле.'}>
-            <Controller
-              name="username"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => <Input {...field} />}
-            />
-          </Form.Item>
-
           <Form.Item label="Email" validateStatus={errors.email ? 'error' : ''} help={errors.email && 'Заполните это поле.'}>
             <Controller
               name="email"
@@ -103,11 +137,16 @@ export const AccountPage = () => {
 
           <Form.Item label="Работа">
             <Controller
-              name="job"
+              name="job.id"
               control={control}
+              disabled={isJobTypesListUpdating}
               render={({ field }) => (
                 <Select {...field}>
-                  <Select.Option value="Developer">Developer</Select.Option>
+                  {jobTypesList?.map((job) => (
+                    <Select.Option key={job.id} value={job.id}>
+                      {job.name}
+                    </Select.Option>
+                  ))}
                 </Select>
               )}
             />
@@ -115,20 +154,24 @@ export const AccountPage = () => {
 
           <Form.Item label="Страна">
             <Controller
-              name="location"
+              name="location.id"
               control={control}
+              disabled={isContriesListUpdating}
               render={({ field }) => (
                 <Select {...field}>
-                  <Select.Option value="Kazakhstan">Kazakhstan</Select.Option>
-                  <Select.Option value="Russia">Russia</Select.Option>
+                  {contriesList?.map((contry) => (
+                    <Select.Option key={contry.id} value={contry.id}>
+                      {contry.name}
+                    </Select.Option>
+                  ))}
                 </Select>
               )}
             />
           </Form.Item>
 
           <Form.Item label="Фото">
-            {profiles && profiles.length > 0 && profiles[0].picture && (
-              <Image width={200} src={profiles[0].picture} alt="Profile Picture" />
+            {user && (
+              <Image width={200} src={profileImage} alt={user.profile.picture ? user.profile.picture : 'Аватар'} />
             )}
             <Controller
               name="picture"
