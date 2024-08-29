@@ -28,13 +28,13 @@ export const CompanyCreatePage = () => {
 
     createCompany(updatedData).unwrap().then((response) => {
       navigate(`/company/${response.id}`)
-      // refetchCompanyList();
+      refetchCompanyList();
     })
   };
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Добавление компании</h1>
         <Layout>
           <Content>

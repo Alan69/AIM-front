@@ -1,31 +1,49 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostByIdQuery } from '../../redux/api';
+import { useGetPostByIdQuery, useUpdatePostMutation } from '../../redux/api';
 import { Layout, Image, Button, Checkbox, Form, Input, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import styles from './PostUpdatePage.module.scss';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 export const PostUpdatePage = () => {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const { data: post, error, isLoading, refetch } = useGetPostByIdQuery(id || '');
-
   const { Content } = Layout;
+  const navigate = useNavigate();
+  const { user } = useTypedSelector((state) => state.auth);
+
+  const { id } = useParams<{ id: string }>();
+  const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
+  const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
 
   useEffect(() => {
     refetch();
   }, [refetch]);
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.toString()}</div>;
 
   const onFinish = (values: any) => {
-    console.log('Form values:', values);
+    if (post) {
+      const updatedData = {
+        ...values,
+        img_prompt: values.picture,
+        txt_prompt: post.txt_prompt,
+        active: post.active,
+        img_style: post.img_style?.id,
+        post_query: post.post_query.id,
+        id: post.id,
+        author: user?.profile.id,
+      };
+
+      updatePost(updatedData).unwrap().then((response) => {
+        navigate(`/post/${response.post_query.id}/${response.id}`);
+        refetch();
+      });
+    }
   };
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <Layout>
           <Content>
             <div className={styles.postDescr}>
@@ -74,13 +92,14 @@ export const PostUpdatePage = () => {
 
                   <Form.Item>
                     <div className={styles.postActions}>
-                      <Button type="primary" htmlType="submit">
+                      <Button type="primary" htmlType="submit" loading={isUpdating}>
                         Сохранить
                       </Button>
                       <Button
                         htmlType="button"
                         style={{ color: '#faad14', borderColor: '#faad14' }}
                         onClick={() => navigate(-1)}
+                        loading={isUpdating}
                       >
                         Отменить
                       </Button>

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { useCreateProductMutation } from '../../redux/api';
+import { useCreateProductMutation, useGetProductListByCompanyIdQuery } from '../../redux/api';
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './ProductCreatePage.module.scss';
@@ -21,6 +21,7 @@ export const ProductCreatePage = () => {
   const { Content } = Layout;
   const { control, handleSubmit, formState: { errors } } = useForm<TCreateProductForm>();
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
+  const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(companyId || '');
 
   const onSubmit = (payload: TCreateProductForm) => {
     const updatedData = {
@@ -29,14 +30,19 @@ export const ProductCreatePage = () => {
       companyId: companyId ? companyId : ''
     };
 
-    createProduct(updatedData).unwrap().then((response) => {
-      navigate(`/company/${response.id}`)
+    createProduct(updatedData).unwrap().then(() => {
+      navigate(`/company/${companyId}`);
+      refetchProductList();
     })
   };
 
+  useEffect(() => {
+    refetchProductList();
+  }, [refetchProductList])
+
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Добавление продукта</h1>
         <Layout>
           <Content>

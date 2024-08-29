@@ -20,9 +20,9 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const MenuNav: React.FC = () => {
   const dispatch = useDispatch();
-  const { data } = useGetCompanyListQuery()
+  const { data: companyList } = useGetCompanyListQuery()
 
-  const companyItems = data?.map((company) => ({
+  const companyItems = companyList?.map((company) => ({
     key: `company-${company.id}`,
     label: <Link to={`/company/${company.id}`}>{company.name}</Link>,
   })) || [];

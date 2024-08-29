@@ -26,7 +26,7 @@ export const ProductDeletePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Удаление продукта</h1>
         <Layout>
           <Content>

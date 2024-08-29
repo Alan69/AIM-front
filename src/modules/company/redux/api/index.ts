@@ -3,7 +3,6 @@ import baseApi from '../../../../redux/api';
 export type TCompanyData = {
   id: string;
   name: string;
-  slug?: string;
   scope: string;
   comment: string;
   time_create: string;
@@ -14,7 +13,6 @@ export type TCompanyData = {
 
 type TCreateCompany = {
   name: string;
-  slug?: string;
   scope: string;
   comment?: string;
   active?: boolean;
@@ -24,7 +22,6 @@ type TCreateCompany = {
 type TUpdateCompany = {
   id: string;
   name: string;
-  slug?: string;
   scope: string;
   comment?: string;
   active?: boolean;

@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './CompanyUpdatePage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
 
 type TUpdateCompanyForm = {
   id: number;
@@ -40,9 +41,9 @@ export const CompanyUpdatePage = () => {
     if (company) {
       updateCompany({ ...updatedData, id: company.id }).unwrap().then((response) => {
         navigate(`/company/${response.id}`);
+        refetchCompanyList();
       });
     }
-    // refetchCompanyList();
   };
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export const CompanyUpdatePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Редактирование данных</h1>
         <Layout>
           <Content>

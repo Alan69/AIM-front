@@ -11,7 +11,7 @@ export const PostDeletePage = () => {
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate()
-  const { data: post, error, isLoading, refetch } = useGetPostByIdQuery(id || '');
+  const { data: post } = useGetPostByIdQuery(id || '');
 
   const [deletePost, { isLoading: isUpdating }] = useDeletePostMutation();
   const { refetch: refetchCompanyList } = useGetCompanyListQuery();
@@ -20,14 +20,14 @@ export const PostDeletePage = () => {
     if (post) {
       deletePost(post?.id).unwrap().then((response) => {
         navigate(`/post-query/${post?.post_query}`);
-        // refetchCompanyList();
+        refetchCompanyList();
       });
     }
   };
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Удаление поста</h1>
         <Layout>
           <Content>

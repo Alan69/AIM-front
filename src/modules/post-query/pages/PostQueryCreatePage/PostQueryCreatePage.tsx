@@ -22,7 +22,6 @@ export const PostQueryCreatePage = () => {
   const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<TPostQueryData>({
     defaultValues: {
       content: '',
-      post_prompt: '',
       company: null,
       product: null,
       post_type: null,
@@ -35,7 +34,6 @@ export const PostQueryCreatePage = () => {
   useEffect(() => {
     reset({
       content: '',
-      post_prompt: '',
       company: null,
       product: null,
       post_type: null,
@@ -62,7 +60,7 @@ export const PostQueryCreatePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Запрос</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item label="Компания" validateStatus={errors.company ? 'error' : ''} help={errors.company && 'Заполните это поле.'}>

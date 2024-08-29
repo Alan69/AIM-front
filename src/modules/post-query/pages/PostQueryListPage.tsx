@@ -88,7 +88,7 @@ export const PostQueryListPage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>История запросов</h1>
         {/* @ts-ignore */}
         <Table columns={columns} dataSource={data} pagination={false} />

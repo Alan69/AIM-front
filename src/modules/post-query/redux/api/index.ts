@@ -13,9 +13,7 @@ export type TPostQueryData = {
   text_style: TTextStylesData | null;
   lang: TLanguagesData | null;
   author: string;
-  slug?: string;
   content: string;
-  post_prompt: string;
   time_create?: string;
   time_update?: string;
 }
@@ -37,12 +35,11 @@ export const postQueryApi = baseApi.injectEndpoints({
       transformResponse: (response: TPostQueryData) => response,
     }),
     createPostQuery: build.mutation<TPostQueryData, TPostQueryData>({
-      query: ({ content, post_prompt, company, product, post_type, text_style, lang, author }) => ({
+      query: ({ content, company, product, post_type, text_style, lang, author }) => ({
         url: '/post_queries/',
         method: 'POST',
         body: {
           content,
-          post_prompt,
           company,
           product,
           post_type,

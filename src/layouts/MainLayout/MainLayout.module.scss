@@ -7,3 +7,13 @@
 .body {
     width: calc(100% - 300px);
 }
+
+.footerContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.socialMedias {
+    display: flex;
+    gap: 8px;
+}

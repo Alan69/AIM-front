@@ -22,8 +22,7 @@ const { Title, Text } = Typography;
 
 export const CompanyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: company, error, isLoading, refetch } = useGetCompanyByIdQuery(id || '');
-  // @ts-ignore
+  const { data: company, isLoading, refetch } = useGetCompanyByIdQuery(id || '');
   const { data: productListByCompanyId } = useGetProductListByCompanyIdQuery(company?.id || '');
 
   const { Content } = Layout;
@@ -61,14 +60,13 @@ export const CompanyDetailsPage = () => {
 
   useEffect(() => {
     refetch()
-  }, [])
+  }, [refetch])
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.toString()}</div>;
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Компания: {company?.name}</h1>
         <Layout>
           <Content>

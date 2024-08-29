@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { useUpdateProductMutation, useGetProductByIdQuery } from '../../redux/api';
+import { useUpdateProductMutation, useGetProductByIdQuery, useGetProductListByCompanyIdQuery } from '../../redux/api';
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './ProductUpdatePage.module.scss';
@@ -20,7 +20,9 @@ export const ProductUpdatePage = () => {
 
   const { id, companyId } = useParams<{ id: string, companyId: string }>();
   const { data: company } = useGetCompanyByIdQuery(companyId || '');
-  const { data: product } = useGetProductByIdQuery(id || '');
+  const { data: product, refetch: refetchProduct } = useGetProductByIdQuery(id || '');
+  const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(company?.id || '');
+
   const navigate = useNavigate()
   const { control, handleSubmit, reset, formState: { errors } } = useForm<TUpdateProductForm>({
     defaultValues: {
@@ -43,6 +45,8 @@ export const ProductUpdatePage = () => {
 
       updateProduct(updatedData).unwrap().then(() => {
         navigate(`/company/${company?.id}`);
+        refetchProductList();
+        refetchProduct();
       });
     }
   };
@@ -57,9 +61,14 @@ export const ProductUpdatePage = () => {
     }
   }, [product, reset]);
 
+  useEffect(() => {
+    refetchProductList();
+    refetchProduct();
+  }, [refetchProductList, refetchProduct])
+
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Редактирование данных</h1>
         <Layout>
           <Content>

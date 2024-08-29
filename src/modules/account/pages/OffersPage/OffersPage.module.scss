@@ -3,15 +3,27 @@
     background-color: #f0f2f5;
 }
 
-.account-info {
+.whatsappInfo {
     margin-top: 20px;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    text-align: center;
 }
 
-.whatsapp-info {
+.accountInfo {
     margin-top: 20px;
-    text-align: center;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+}
+
+.whatsappButton {
+    color: #198754;
+    background: #fff;
+    border-color: #198754;
+    transition: 0.3s all;
+    &:hover,
+    &:focus {
+        color: #fff !important;
+        background: #198754 !important;
+        border-color: #fff !important;
+        transition: 0.3s all;
+    }
 }

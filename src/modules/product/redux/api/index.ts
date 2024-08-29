@@ -3,7 +3,6 @@ import baseApi from '../../../../redux/api';
 export type TProductData = {
   id: string;
   name: string;
-  slug?: string;
   scope: string;
   comment: string;
   time_create: string;
@@ -15,7 +14,6 @@ export type TProductData = {
 
 type TCreateProduct = {
   name: string;
-  slug?: string;
   scope: string;
   comment?: string;
   active?: boolean;
@@ -26,7 +24,6 @@ type TCreateProduct = {
 type TUpdateProduct = {
   id: string;
   name: string;
-  slug?: string;
   scope: string;
   comment?: string;
   active?: boolean;
@@ -59,7 +56,7 @@ export const productApi = baseApi.injectEndpoints({
           scope,
           comment,
           company: companyId,
-          author
+          author,
         }
       }),
 			transformResponse: (response: TProductData) => response,

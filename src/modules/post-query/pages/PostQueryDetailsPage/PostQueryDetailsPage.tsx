@@ -8,7 +8,6 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import styles from './PostQueryDetailsPage.module.scss';
-import { useGetProductListByCompanyIdQuery } from '../../../product/redux/api';
 import { TPostData, useGetPostListQuery } from 'modules/post/redux/api';
 
 interface DataType {
@@ -19,17 +18,13 @@ interface DataType {
   post_actions?: ReactNode;
 }
 
-const { Title, Text } = Typography;
-
 export const PostQueryDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const { data: postQuery, error, isLoading, refetch } = useGetPostQueriesByIdQuery(id || '');
-  // @ts-ignore
-  const { data: productListByCompanyId } = useGetProductListByCompanyIdQuery(postQuery?.id || '');
-
-  const { data: posts } = useGetPostListQuery()
-
+  const { Title, Text } = Typography;
   const { Content } = Layout;
+
+  const { id } = useParams<{ id: string }>();
+  const { data: postQuery, isLoading, refetch } = useGetPostQueriesByIdQuery(id || '');
+  const { data: posts } = useGetPostListQuery(postQuery?.id || '')
 
   const columns: TableProps<DataType>['columns'] = [
     {
@@ -64,20 +59,17 @@ export const PostQueryDetailsPage = () => {
     },
   ];
 
-  // const data: DataType[] = productListByCompanyId?.map((post: TProductData) => ({
-  //   key: post.id.toString(),
-  //   product_name: post.name,
-  //   product_assignment: post.scope,
-  //   product_action: (
-  //     <div className={styles.companyDescr__icons}>
-  //       <Link to={`/post/${postQuery?.id}/${post?.id}/update`}><EditOutlined /></Link>
-  //       <Link to={`/post/${postQuery?.id}/${post?.id}/delete`}><DeleteOutlined /></Link>
-  //     </div>
-  //   ),
-  // })) || [];
-
   const formatDate = (dateString: string | undefined) => {
-    const date = new Date(dateString ? dateString : '');
+    if (!dateString) {
+      return 'Invalid date';
+    }
+
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+
     return new Intl.DateTimeFormat('ru-RU', {
       day: 'numeric',
       month: 'long',
@@ -102,15 +94,14 @@ export const PostQueryDetailsPage = () => {
 
   useEffect(() => {
     refetch()
-  }, [])
+  }, [refetch])
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.toString()}</div>;
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: '100vh' }}>
-        <h1>{postQuery?.company?.name + ' - ' + postQuery?.product?.name}</h1>
+      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
+        <h1>{(postQuery?.company?.name ? postQuery?.company?.name : '-') + ' - ' + (postQuery?.product?.name ? postQuery?.product?.name : '-')}</h1>
         <Layout>
           <Content>
             <div className={styles.postQueryDescr}>
@@ -135,10 +126,9 @@ export const PostQueryDetailsPage = () => {
           </h2>
           <Content >
             <div className={styles.postQueryDescr}>
-              {!productListByCompanyId?.length ? <div style={{ paddingBottom: '12px' }}>
+              {!posts?.length ? <div style={{ paddingBottom: '12px' }}>
                 <Text >No posts</Text>
-              </div> : ''}
-              <Table columns={columns} dataSource={data} pagination={false} />
+              </div> : <Table columns={columns} dataSource={data} pagination={false} />}
             </div>
           </Content>
         </Layout>

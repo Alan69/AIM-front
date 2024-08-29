@@ -3,6 +3,9 @@ import styles from './OfferInfo.module.scss';
 import coins from '../../../assets/coins.jpeg';
 import { Link } from 'react-router-dom';
 import { Tooltip } from 'antd';
+import {
+  QuestionCircleOutlined
+} from '@ant-design/icons';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const OfferInfo: React.FC = () => {
@@ -13,9 +16,11 @@ const OfferInfo: React.FC = () => {
       <div className={styles.offerInfo}>
         <img src={coins} alt="User Avatar" className={styles.avatar} />
         <div className={styles.details}>
-          <div className={styles.name}>Монет: {user?.profile.coins} <Tooltip title="1 монета = 1 генерация">
-            <span>sds</span>
-          </Tooltip></div>
+          <div className={styles.name}>Монет: {user?.profile.coins}
+            <Tooltip title="1 монета = 1 генерация">
+              <span style={{ marginLeft: '4px' }}><QuestionCircleOutlined /></span>
+            </Tooltip>
+          </div>
           <Link to="/account/offers" className={styles.link}>Купить тарифный план</Link>
         </div>
       </div>
