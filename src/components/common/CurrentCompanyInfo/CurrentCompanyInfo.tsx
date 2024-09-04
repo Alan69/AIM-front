@@ -2,7 +2,7 @@ import React from 'react';
 import { PlusCircleOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import styles from './CurrentCompanyInfo.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useGetCompanyListQuery, useUpdateCurrentCompanyMutation } from 'modules/company/redux/api';
 import { Dropdown, Space, Menu, Button } from 'antd';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
@@ -16,17 +16,20 @@ const CurrentCompanyInfo: React.FC = () => {
 
   const companyItems = companyList?.map((company) => ({
     key: company.id,
-    label: <Button
-      type="text"
-      onClick={() => {
-        navigate(`/company/${company.id}`)
-        updateCurrentCompany(company.id).unwrap().then(() => {
-          getAuthUser()
-        }).catch((err) => {
-          console.log(err);
-        })
-      }}>{company.name}
-    </Button>,
+    label:
+      <Button
+        type="text"
+        className={styles.companyBtn}
+        onClick={() => {
+          navigate(`/company/${company.id}`)
+          updateCurrentCompany(company.id).unwrap().then(() => {
+            getAuthUser()
+          }).catch((err) => {
+            console.log(err);
+          })
+        }}>
+        {company.name}
+      </Button>,
   })) || [];
 
   const { current_company } = useTypedSelector((state) => state.auth);

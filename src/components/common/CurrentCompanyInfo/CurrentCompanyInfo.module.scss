@@ -27,6 +27,19 @@
     gap: 8px;
 }
 
+.companyBtn {
+    width: 100%;
+    outline: none !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    &:hover,
+    &:focus {
+        outline: none !important;
+        background: transparent !important;
+        border-color: transparent !important;
+    }
+}
+
 .linkAdd {
     display: flex;
     align-items: center;

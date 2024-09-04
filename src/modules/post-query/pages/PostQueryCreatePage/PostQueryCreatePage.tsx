@@ -62,7 +62,7 @@ export const PostQueryCreatePage = () => {
         author: user?.profile.id,
       };
       createPost(updatedData).unwrap().then((response) => {
-        dispatch(postActions.setPostCreated(true));
+        // dispatch(postActions.setPostCreated(true));
         navigate(`/post/${response.post_id}`);
       });
     }
