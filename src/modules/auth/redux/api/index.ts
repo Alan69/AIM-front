@@ -1,4 +1,4 @@
-import { TUserData } from 'modules/account/redux/api';
+import { TProfileData, TUserData } from 'modules/account/redux/api';
 import baseApi from '../../../../redux/api';
 import { authActions } from '../slices/auth.slice';
 
@@ -16,16 +16,18 @@ type TLoginResponse = {
 
 export const authApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-    getAuthUser: build.query<TUserData, void>({
+    getAuthUser: build.query<TProfileData, void>({
       query: () => ({
         url: '/auth/user/',
           method: 'GET'
         }),
-      transformResponse: (response: TUserData) => response,
+      transformResponse: (response: TProfileData) => response,
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
+          // @ts-ignore
           dispatch(authActions.setUser(data));
+          dispatch(authActions.setCurrentCompany(data.profile.user.current_company));
         } catch (err) {
           console.error('Failed to fetch user data', err);
         }

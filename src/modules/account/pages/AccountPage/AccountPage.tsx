@@ -27,9 +27,8 @@ type TUpdateProfilesForm = {
 export const AccountPage = () => {
   const { Content } = Layout;
   const { user } = useTypedSelector((state) => state.auth);
-  const baseURL = 'http://195.49.210.209';
 
-  const profileImage = user?.profile.picture ? `${baseURL}${user.profile.picture}` : '';
+  const profileImage = user?.profile.picture ? `${user.profile.picture}` : '';
 
   const [updateProfiles, { isLoading: isUpdating }] = useUpdateProfilesMutation();
   const { data: jobTypesList, isLoading: isJobTypesListUpdating } = useGetJobTypesListQuery()
@@ -76,14 +75,13 @@ export const AccountPage = () => {
     if (user) {
       let pictureUrl = data.picture;
 
-      // If the picture field is a string (a path), convert it to a full URL if necessary
       if (typeof pictureUrl === 'string' && !pictureUrl.startsWith('http')) {
-        pictureUrl = `${baseURL}${pictureUrl}`;
+        pictureUrl = `${pictureUrl}`;
       }
 
       const updatedData = {
         ...data,
-        picture: pictureUrl, // Ensure the picture field is correctly formatted
+        picture: pictureUrl,
         location: data.location?.id,
         job: data.job?.id,
         id: user.profile.id,
@@ -99,7 +97,7 @@ export const AccountPage = () => {
 
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      setValue('picture', lastFile.originFileObj); // Store the file object
+      setValue('picture', lastFile.originFileObj);
     } else {
       setValue('picture', null);
     }

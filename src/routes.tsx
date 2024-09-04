@@ -114,6 +114,7 @@ const AppRoutes: FC = () => {
         <Route path="/product/:companyId/create" element={<ProductCreatePage />} />
         <Route path="/product/:companyId/:id/update" element={<ProductUpdatePage />} />
         <Route path="/product/:companyId/:id/delete" element={<ProductDeletePage />} />
+        <Route path="/post/:id" element={<PostDetailsPage />} />
         <Route path="/post/:postQueryId/:id" element={<PostDetailsPage />} />
         <Route path="/post/:postQueryId/:id/update" element={<PostUpdatePage />} />
         <Route path="/post/:postQueryId/:id/delete" element={<PostDeletePage />} />

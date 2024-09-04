@@ -2,19 +2,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TPostSerializer } from 'modules/content-plan/types';
 
 interface ContentPlanState {
-  post: TPostSerializer | null;
+  selectedPost: TPostSerializer | null | undefined;
 }
 
 const initialState: ContentPlanState = {
-  post: null,
+  selectedPost: undefined,
 };
 
 const contentPlanSlice = createSlice({
   name: 'contentPlan',
   initialState,
   reducers: {
-    setPost: (state, { payload }: PayloadAction<TPostSerializer | null>) => {
-      state.post = payload;
+    setSelectedPost: (state, { payload }: PayloadAction<TPostSerializer | null | undefined>) => {
+      state.selectedPost = payload;
     },
   },
 });

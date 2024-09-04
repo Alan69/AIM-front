@@ -6,9 +6,7 @@ import { useTypedSelector } from 'hooks/useTypedSelector';
 const UserInfo: React.FC = () => {
   const { user } = useTypedSelector((state) => state.auth);
 
-  const baseURL = 'http://195.49.210.209';
-
-  const profileImage = user?.profile.picture ? `${baseURL}${user.profile.picture}` : avatar;
+  const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
 
   return (
     <div className={styles.userInfo}>

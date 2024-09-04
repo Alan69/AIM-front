@@ -4,11 +4,18 @@ import { CalendarOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-
 import styles from './ContentPlanPage.module.scss';
 import { ContentPlanCalendar } from '../../components/ContentPlanCalendar/ContentPlanCalendar';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { contentPlanActions } from 'modules/content-plan/redux/slices/contentPlan.slice';
+import { useDispatch } from 'react-redux';
+import { useGetSchedulersQuery } from 'modules/content-plan/redux/api';
+import { ContentPlanAddModal } from 'modules/content-plan/components/ContentPlanAddModal/ContentPlanAddModal';
 
 export const ContentPlanPage = () => {
   const { Content } = Layout;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { post } = useTypedSelector((state) => state.contentPlan);
+  const { selectedPost } = useTypedSelector((state) => state.contentPlan);
+  const { data: postList } = useGetSchedulersQuery()
+
+  const dispatch = useDispatch();
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -26,7 +33,7 @@ export const ContentPlanPage = () => {
     {
       key: '1',
       label: 'Календарь',
-      children: <ContentPlanCalendar showModal={showModal} />,
+      children: <ContentPlanCalendar showModal={showModal} selectedPost={selectedPost} postList={postList} />,
       icon: <CalendarOutlined />
     },
     {
@@ -42,6 +49,12 @@ export const ContentPlanPage = () => {
       icon: <UnorderedListOutlined />
     },
   ];
+
+  useEffect(() => {
+    return () => {
+      dispatch(contentPlanActions.setSelectedPost(null));
+    }
+  }, [])
 
   return (
     <>
@@ -62,11 +75,7 @@ export const ContentPlanPage = () => {
           </Layout>
         </Content>
       </Layout>
-      <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Modal>
+      <ContentPlanAddModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </>
   )
 }

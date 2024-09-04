@@ -52,7 +52,7 @@ export const postApi = baseApi.injectEndpoints({
     }),
     updatePost: build.mutation<TPostData, TUpdatePost>({
       query: ({ id, title, img_prompt, txt_prompt, main_text, hashtags, like, active, img_style, post_query, author }) => ({
-        url: `/pbs/${id}/`,
+        url: `/posts/${id}/`,
         method: 'PUT',
         body: {
           title,

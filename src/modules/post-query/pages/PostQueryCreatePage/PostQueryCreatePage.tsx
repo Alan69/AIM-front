@@ -8,9 +8,16 @@ import { useGetLanguagesListQuery } from '../../../../redux/api/languages/langua
 import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
 import { TPostQueryData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { postActions } from 'modules/post/redux/slices/post.slice';
+
+const { Content } = Layout;
 
 export const PostQueryCreatePage = () => {
-  const { Content } = Layout;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { user } = useTypedSelector((state) => state.auth);
   const [selectedCompany, setSelectedCompany] = useState();
   const { data: companyList, isLoading: isCompanyListLoading } = useGetCompanyListQuery()
@@ -54,7 +61,10 @@ export const PostQueryCreatePage = () => {
         ...data,
         author: user?.profile.id,
       };
-      createPost(updatedData);
+      createPost(updatedData).unwrap().then((response) => {
+        dispatch(postActions.setPostCreated(true));
+        navigate(`/post/${response.post_id}`);
+      });
     }
   };
 
@@ -73,6 +83,7 @@ export const PostQueryCreatePage = () => {
                 <Select
                   {...field}
                   loading={isCompanyListLoading}
+                  disabled={isPostCreating}
                   onChange={(value) => {
                     field.onChange(value);
                     // @ts-ignore
@@ -97,7 +108,7 @@ export const PostQueryCreatePage = () => {
               rules={{ required: true }}
               disabled={isProductListLoading}
               render={({ field }) => (
-                <Select {...field} loading={isProductListLoading}>
+                <Select {...field} loading={isProductListLoading} disabled={isPostCreating}>
                   {productList?.map((product) => (
                     <Select.Option key={product.id} value={product.id}>
                       {product.name}
@@ -115,7 +126,7 @@ export const PostQueryCreatePage = () => {
               rules={{ required: true }}
               disabled={isPostTypesListLoading}
               render={({ field }) => (
-                <Select {...field}>
+                <Select {...field} disabled={isPostCreating}>
                   {postTypesList?.map((postType) => (
                     <Select.Option key={postType.id} value={postType.id}>
                       {postType.name}
@@ -133,7 +144,7 @@ export const PostQueryCreatePage = () => {
               rules={{ required: true }}
               disabled={isTextStylesListLoading}
               render={({ field }) => (
-                <Select {...field}>
+                <Select {...field} disabled={isPostCreating}>
                   {textStylesList?.map((textStyle) => (
                     <Select.Option key={textStyle.id} value={textStyle.id}>
                       {textStyle.name}
@@ -151,7 +162,7 @@ export const PostQueryCreatePage = () => {
               rules={{ required: true }}
               disabled={isLanguagesListLoading}
               render={({ field }) => (
-                <Select {...field}>
+                <Select {...field} disabled={isPostCreating}>
                   {languagesList?.map((language) => (
                     <Select.Option key={language.id} value={language.id}>
                       {language.name}
@@ -167,7 +178,7 @@ export const PostQueryCreatePage = () => {
               name="content"
               control={control}
               rules={{ required: true }}
-              render={({ field }) => <Input.TextArea rows={4} {...field} />}
+              render={({ field }) => <Input.TextArea rows={4} {...field} disabled={isPostCreating} />}
             />
           </Form.Item>
 

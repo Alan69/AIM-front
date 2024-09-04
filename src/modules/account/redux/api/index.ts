@@ -1,3 +1,4 @@
+import { TCompanyData } from 'modules/company/redux/api';
 import baseApi from '../../../../redux/api';
 import { TLocationTypesData } from 'redux/api/contries/contriesApi';
 import { TJobTypesData } from 'redux/api/jobTypes/jobTypesApi';
@@ -8,6 +9,7 @@ export type TUserData = {
   first_name?: string;
   last_name?: string;
   email?: string;
+  current_company: TCompanyData | null;
 }
 
 export type TProfileData = {
@@ -39,13 +41,13 @@ export type TUpdateProfilesData = {
 
 export const profilesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getProfiles: build.query<TUserData[], void>({
-      query: () => ({
-        url: '/profiles/',
-          method: 'GET'
-        }),
-      transformResponse: (response: TUserData[]) => response,
-    }),
+    // getProfiles: build.query<TUserData[], void>({
+    //   query: () => ({
+    //     url: '/profiles/',
+    //       method: 'GET'
+    //     }),
+    //   transformResponse: (response: TUserData[]) => response,
+    // }),
     updateProfiles: build.mutation<TUpdateProfilesData, TUpdateProfilesData>({
       query: ({ location, job, bd_year, picture, email, first_name, last_name, id }) => ({
         url: `/profiles/${id}/`,

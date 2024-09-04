@@ -7,7 +7,7 @@ import {
   CalendarOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Button, Menu } from 'antd';
+import { Button, Divider, Menu } from 'antd';
 import styles from './Menu.module.scss';
 import UserInfo from '../UserInfo/Userinfo';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,7 @@ import { useGetCompanyListQuery } from '../../../modules/company/redux/api';
 import OfferInfo from '../OfferInfo/OfferInfo';
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
 import { useDispatch } from 'react-redux';
+import CurrentCompanyInfo from '../CurrentCompanyInfo/CurrentCompanyInfo';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -46,25 +47,29 @@ const MenuNav: React.FC = () => {
     },
     {
       key: '4',
+      label: <CurrentCompanyInfo />,
+    },
+    {
+      key: '5',
       icon: <AppstoreAddOutlined />,
       label: <Link to="/post-query/create">Создать пост</Link>,
     },
     {
-      key: '5',
+      key: '6',
       icon: <UnorderedListOutlined />,
       label: <Link to="/post-query">История</Link>,
     },
+    // {
+    //   key: 'sub1',
+    //   label: 'Мои компании',
+    //   icon: <ProductOutlined />,
+    //   children: [
+    //     { key: '6', label: <Link to="/company/create"><PlusCircleOutlined /> Добавить</Link> },
+    //     ...companyItems,
+    //   ],
+    // },
     {
-      key: 'sub1',
-      label: 'Мои компании',
-      icon: <ProductOutlined />,
-      children: [
-        { key: '6', label: <Link to="/company/create"><PlusCircleOutlined /> Добавить</Link> },
-        ...companyItems,
-      ],
-    },
-    {
-      key: '6',
+      key: '7',
       icon: < CalendarOutlined />,
       label: <Link to="/content-plan">Контент план</Link>,
     },

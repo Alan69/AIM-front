@@ -4,7 +4,7 @@ import { RootState } from 'redux/rootReducer';
 const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://195.49.210.209/api/',
+    baseUrl: 'https://api.aimmagic.com/api/',
     // baseUrl: process.env.REACT_MAIN_DOMEN + '/api/',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;

@@ -78,6 +78,12 @@ export const companyApi = baseApi.injectEndpoints({
         method: 'DELETE'
       })
     }),
+    updateCurrentCompany: build.mutation<string, string>({
+      query: (company_id) => ({
+        url: `auth/user/update-current-company/${company_id}/`,
+        method: 'PUT'
+      }),
+    }),
 	}),
 	overrideExisting: false,
 });
@@ -87,5 +93,6 @@ export const {
   useGetCompanyByIdQuery,
   useCreateCompanyMutation,
   useUpdateCompanyMutation,
-  useDeleteCompanyMutation
+  useDeleteCompanyMutation,
+  useUpdateCurrentCompanyMutation
 } = companyApi;

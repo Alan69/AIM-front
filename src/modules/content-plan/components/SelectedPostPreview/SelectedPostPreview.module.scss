@@ -1,9 +1,8 @@
 .postDescr {
+    height: 100%;
     padding: 24px;
     background: #fff;
     border-radius: 12px;
-    display: flex;
-    justify-content: center;
     &__title {
         display: flex;
         justify-content: space-between;
@@ -17,23 +16,9 @@
 }
 
 .container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-}
-
-.mainBlock {
-    width: 50%;
-    max-width: 450px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-
-.editBlock {
-    width: 50%;
-    max-width: 450px;
 }
 
 .picture,
@@ -60,48 +45,6 @@
 .postActions {
     display: flex;
     gap: 16px;
-}
-
-.pictureBlock {
-    position: relative;
-}
-
-.reloadButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-}
-
-.parameters {
-    margin-top: 50px;
-}
-
-.radioGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.textArea {
-    margin: 12px 0;
-}
-
-.submitButton {
-    margin-top: 12px;
-}
-
-.loader {
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    font-size: 100px;
 }
 
 // user-info
