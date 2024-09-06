@@ -6,8 +6,9 @@ import { UploadOutlined } from '@ant-design/icons';
 import styles from './PostUpdatePage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 
+const { Content } = Layout;
+
 export const PostUpdatePage = () => {
-  const { Content } = Layout;
   const navigate = useNavigate();
   const { user } = useTypedSelector((state) => state.auth);
 

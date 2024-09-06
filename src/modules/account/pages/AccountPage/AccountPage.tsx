@@ -24,8 +24,9 @@ type TUpdateProfilesForm = {
   picture?: string | null;
 };
 
+const { Content } = Layout;
+
 export const AccountPage = () => {
-  const { Content } = Layout;
   const { user } = useTypedSelector((state) => state.auth);
 
   const profileImage = user?.profile.picture ? `${user.profile.picture}` : '';

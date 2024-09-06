@@ -10,9 +10,9 @@ import {
 import MenuNav from '../../components/common/Menu/Menu';
 import styles from './MainLayout.module.scss';
 
-export const MainLayout = memo(function MainLayout() {
-  const { Text } = Typography;
+const { Text } = Typography;
 
+export const MainLayout = memo(function MainLayout() {
   return (
     <div className={styles.layoutBody}>
       {/* <Header /> */}

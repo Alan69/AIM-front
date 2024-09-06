@@ -13,12 +13,13 @@ type TCreateProductForm = {
   company: string
 };
 
+const { Content } = Layout;
+
 export const ProductCreatePage = () => {
   const { companyId } = useParams<{ companyId: string }>();
   const { user } = useTypedSelector((state) => state.auth);
 
   const navigate = useNavigate()
-  const { Content } = Layout;
   const { control, handleSubmit, formState: { errors } } = useForm<TCreateProductForm>();
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
   const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(companyId || '');

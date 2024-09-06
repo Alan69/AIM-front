@@ -5,7 +5,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './CompanyUpdatePage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import { useGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
 
 type TUpdateCompanyForm = {
   id: number;
@@ -14,13 +13,14 @@ type TUpdateCompanyForm = {
   comment?: string;
 };
 
+const { Content } = Layout;
+
 export const CompanyUpdatePage = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useTypedSelector((state) => state.auth);
 
   const { data: company } = useGetCompanyByIdQuery(id || '');
   const navigate = useNavigate()
-  const { Content } = Layout;
   const { control, handleSubmit, reset, formState: { errors } } = useForm<TUpdateCompanyForm>({
     defaultValues: {
       name: '',

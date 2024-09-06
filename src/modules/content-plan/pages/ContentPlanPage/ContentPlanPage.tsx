@@ -9,10 +9,13 @@ import { useDispatch } from 'react-redux';
 import { useGetSchedulersQuery } from 'modules/content-plan/redux/api';
 import { ContentPlanAddModal } from 'modules/content-plan/components/ContentPlanAddModal/ContentPlanAddModal';
 
+const { Content } = Layout;
+
 export const ContentPlanPage = () => {
-  const { Content } = Layout;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedPost } = useTypedSelector((state) => state.contentPlan);
+  const { current_company } = useTypedSelector((state) => state.auth);
+
   const { data: postList } = useGetSchedulersQuery()
 
   const dispatch = useDispatch();
@@ -60,7 +63,7 @@ export const ContentPlanPage = () => {
     <>
       <Layout>
         <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-          <h1>Контент план</h1>
+          <h1>Контент план - {current_company?.name}</h1>
           <Layout>
             <Content>
               <div className={styles.container}>

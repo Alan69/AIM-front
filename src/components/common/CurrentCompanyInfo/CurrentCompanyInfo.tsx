@@ -4,14 +4,16 @@ import styles from './CurrentCompanyInfo.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useNavigate } from 'react-router-dom';
 import { useGetCompanyListQuery, useUpdateCurrentCompanyMutation } from 'modules/company/redux/api';
-import { Dropdown, Space, Menu, Button } from 'antd';
+import { Dropdown, Space, Menu, Button, Divider, Typography } from 'antd';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
+
+const { Title, Text } = Typography;
 
 const CurrentCompanyInfo: React.FC = () => {
   const navigate = useNavigate()
+  const { current_company } = useTypedSelector((state) => state.auth);
   const { data: companyList } = useGetCompanyListQuery();
   const [getAuthUser] = useLazyGetAuthUserQuery()
-
   const [updateCurrentCompany] = useUpdateCurrentCompanyMutation()
 
   const companyItems = companyList?.map((company) => ({
@@ -32,8 +34,6 @@ const CurrentCompanyInfo: React.FC = () => {
       </Button>,
   })) || [];
 
-  const { current_company } = useTypedSelector((state) => state.auth);
-
   const menu = (
     <Menu
       items={[
@@ -43,27 +43,34 @@ const CurrentCompanyInfo: React.FC = () => {
   );
 
   return (
-    <div className={styles.infoBlock}>
-      <div className={styles.details}>
-        <div className={styles.name}>
-          {current_company ? current_company.name : '-'}
-        </div>
-        <div className={styles.actions}>
-          <Dropdown overlay={menu} trigger={['hover']} className={styles.dropdown} placement="bottom">
-            <Space>
-              <UnorderedListOutlined className={styles.addIcon} />
-            </Space>
-          </Dropdown>
-          <Button
-            type="primary"
-            shape="circle"
-            className={styles.addButton}
-            icon={<PlusCircleOutlined className={styles.addIcon} />}
-            onClick={() => navigate('/company/create')}
-          />
+    <>
+      <div className={styles.upperDivider}>
+        <Text className={styles.dividerText}>Текущая компания</Text>
+        <Divider className={styles.divider} />
+      </div>
+      <div className={styles.infoBlock}>
+        <div className={styles.details}>
+          <div className={styles.name}>
+            {current_company ? current_company.name : '-'}
+          </div>
+          <div className={styles.actions}>
+            <Dropdown overlay={menu} trigger={['hover']} className={styles.dropdown} placement="bottom">
+              <Space>
+                <UnorderedListOutlined className={styles.addIcon} />
+              </Space>
+            </Dropdown>
+            <Button
+              type="primary"
+              shape="circle"
+              className={styles.addButton}
+              icon={<PlusCircleOutlined className={styles.addIcon} />}
+              onClick={() => navigate('/company/create')}
+            />
+          </div>
         </div>
       </div>
-    </div>
+      <Divider className={styles.divider} />
+    </>
   );
 };
 

@@ -14,8 +14,9 @@ type TUpdateProductForm = {
   comment?: string;
 };
 
+const { Content } = Layout;
+
 export const ProductUpdatePage = () => {
-  const { Content } = Layout;
   const { user } = useTypedSelector((state) => state.auth);
 
   const { id, companyId } = useParams<{ id: string, companyId: string }>();

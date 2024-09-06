@@ -94,7 +94,7 @@ const AppRoutes: FC = () => {
   }
 
   if (location.pathname === '/') {
-    navigate('/post-query')
+    navigate('/post-query/create')
   }
 
   return (

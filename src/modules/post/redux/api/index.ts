@@ -1,7 +1,7 @@
 import { TPostQueryData } from 'modules/post-query/redux/api';
 import baseApi from '../../../../redux/api';
 import { TUserData } from 'modules/account/redux/api';
-import { TTextStylesData } from 'redux/api/textStyles/textStylesApi';
+import { TImgStylesData } from 'redux/api/imgStyles/imgStylesApi';
 
 export type TPostData = {
   id: string;
@@ -15,7 +15,7 @@ export type TPostData = {
   time_create?: string;
   time_update?: string;
   active?: boolean;
-  img_style?: TTextStylesData;
+  img_style?: TImgStylesData;
   post_query: TPostQueryData;
   author: TUserData;
 }

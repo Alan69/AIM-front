@@ -18,10 +18,10 @@ interface DataType {
   post_actions?: ReactNode;
 }
 
-export const PostQueryDetailsPage = () => {
-  const { Title, Text } = Typography;
-  const { Content } = Layout;
+const { Title, Text } = Typography;
+const { Content } = Layout;
 
+export const PostQueryDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: postQuery, isLoading, refetch } = useGetPostQueriesByIdQuery(id || '');
   const { data: posts } = useGetPostListQuery(postQuery?.id || '')

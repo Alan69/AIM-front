@@ -1,8 +1,9 @@
-import { TPostSerializer } from 'modules/content-plan/types'
 import React from 'react'
+import { TPostSerializer } from 'modules/content-plan/types'
 import { Layout, Typography, Image, Collapse } from 'antd';
 import {
-  HeartOutlined
+  HeartOutlined,
+  HeartTwoTone
 } from '@ant-design/icons';
 import styles from './SelectedPostPreview.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -62,7 +63,7 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
             </div>
 
             <div className={styles.postLike}>
-              <HeartOutlined />
+              {selectedPost?.like ? <HeartTwoTone twoToneColor="#eb2f96" /> : <HeartOutlined />}
               <Text>Лайк</Text>
             </div>
           </div>

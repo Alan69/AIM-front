@@ -6,6 +6,8 @@ import styles from './ProductDeletePage.module.scss';
 import { useGetCompanyByIdQuery } from '../../../company/redux/api';
 import Title from 'antd/es/typography/Title';
 
+const { Content } = Layout;
+
 export const ProductDeletePage = () => {
   const { id, companyId } = useParams<{ id: string, companyId: string }>();
   const navigate = useNavigate();
@@ -13,8 +15,6 @@ export const ProductDeletePage = () => {
   const { data: company } = useGetCompanyByIdQuery(companyId || '');
   const { data: product } = useGetProductByIdQuery(id || '');
   const [deleteCompany, { isLoading: isUpdating }] = useDeleteProductMutation();
-
-  const { Content } = Layout;
 
   const handleDeleteProduct = () => {
     if (company) {

@@ -4,8 +4,9 @@ import type { TableProps } from 'antd';
 import { TPostQueryData, useGetPostQueriesListQuery } from '../redux/api';
 import { Link } from 'react-router-dom';
 
+const { Content } = Layout;
+
 export const PostQueryListPage = () => {
-  const { Content } = Layout;
   const { data: postQueriesList } = useGetPostQueriesListQuery();
 
   const columns: TableProps<TPostQueryData>['columns'] = [

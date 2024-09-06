@@ -104,6 +104,15 @@
     font-size: 100px;
 }
 
+.imageStyleBlock {
+    cursor: pointer;
+    img {
+        width: 150px;
+        height: auto;
+        border-radius: 16px;
+    }
+}
+
 // user-info
 .userInfo {
     display: flex;

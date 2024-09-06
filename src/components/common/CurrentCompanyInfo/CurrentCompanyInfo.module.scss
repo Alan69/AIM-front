@@ -28,6 +28,9 @@
 }
 
 .companyBtn {
+    display: flex;
+    justify-content: left;
+    padding-left: 0;
     width: 100%;
     outline: none !important;
     background: transparent !important;
@@ -56,5 +59,17 @@
     svg {
         height: 16px;
         width: 16px;
+    }
+}
+
+.upperDivider {
+    display: flex;
+    align-items: center;
+}
+
+.divider {
+    margin: 0 !important;
+    &Text {
+        padding-right: 8px;
     }
 }

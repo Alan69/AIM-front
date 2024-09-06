@@ -1,0 +1,16 @@
+.imgStylesList {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.imgStylesItem {
+    width: calc(50% - 12px);
+    img {
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        object-fit: cover;
+        cursor: pointer;
+    }
+}

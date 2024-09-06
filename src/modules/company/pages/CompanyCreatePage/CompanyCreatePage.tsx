@@ -12,10 +12,11 @@ type TCreateCompanyForm = {
   comment?: string;
 };
 
+const { Content } = Layout;
+
 export const CompanyCreatePage = () => {
   const navigate = useNavigate()
   const { user } = useTypedSelector((state) => state.auth);
-  const { Content } = Layout;
   const { control, handleSubmit, formState: { errors } } = useForm<TCreateCompanyForm>();
   const [createCompany, { isLoading: isCreating }] = useCreateCompanyMutation();
   const { refetch: refetchCompanyList } = useGetCompanyListQuery();

@@ -19,14 +19,18 @@ export const PostQueryCreatePage = () => {
   const dispatch = useDispatch();
 
   const { user } = useTypedSelector((state) => state.auth);
+  const { current_company } = useTypedSelector((state) => state.auth);
+
   const [selectedCompany, setSelectedCompany] = useState();
-  const { data: companyList, isLoading: isCompanyListLoading } = useGetCompanyListQuery()
+
+  const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] = useLazyGetProductListByCompanyIdQuery();
-  const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery()
-  const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery()
-  const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery()
-  const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation()
-  const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<TPostQueryData>({
+  const { data: companyList, isLoading: isCompanyListLoading } = useGetCompanyListQuery();
+  const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery();
+  const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
+  const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
+
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQueryData>({
     defaultValues: {
       content: '',
       company: null,
@@ -39,15 +43,13 @@ export const PostQueryCreatePage = () => {
   });
 
   useEffect(() => {
-    reset({
-      content: '',
-      company: null,
-      product: null,
-      post_type: null,
-      text_style: null,
-      author: ''
-    });
-  }, [reset]);
+    if (current_company) {
+      // @ts-ignore
+      setValue('company', current_company.id);
+      // @ts-ignore
+      setSelectedCompany(current_company.id);
+    }
+  }, [current_company, setValue]);
 
   useEffect(() => {
     if (selectedCompany) {
@@ -82,6 +84,7 @@ export const PostQueryCreatePage = () => {
               render={({ field }) => (
                 <Select
                   {...field}
+                  value={field.value || selectedCompany}
                   loading={isCompanyListLoading}
                   disabled={isPostCreating}
                   onChange={(value) => {
@@ -163,11 +166,20 @@ export const PostQueryCreatePage = () => {
               disabled={isLanguagesListLoading}
               render={({ field }) => (
                 <Select {...field} disabled={isPostCreating}>
-                  {languagesList?.map((language) => (
-                    <Select.Option key={language.id} value={language.id}>
-                      {language.name}
-                    </Select.Option>
-                  ))}
+                  {languagesList
+                    ?.slice() // Создаем копию массива
+                    ?.sort((a, b) => {
+                      const aIsStarred = a.name.startsWith('*');
+                      const bIsStarred = b.name.startsWith('*');
+                      if (aIsStarred && !bIsStarred) return -1;
+                      if (!aIsStarred && bIsStarred) return 1;
+                      return a.name.localeCompare(b.name);
+                    })
+                    .map((language) => (
+                      <Select.Option key={language.id} value={language.id}>
+                        {language.name}
+                      </Select.Option>
+                    ))}
                 </Select>
               )}
             />

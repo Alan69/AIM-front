@@ -6,9 +6,9 @@ import styles from './PostDeletePage.module.scss';
 import Title from 'antd/es/typography/Title';
 import { useGetCompanyListQuery } from 'modules/company/redux/api';
 
-export const PostDeletePage = () => {
-  const { Content } = Layout;
+const { Content } = Layout;
 
+export const PostDeletePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate()
   const { data: post } = useGetPostByIdQuery(id || '');

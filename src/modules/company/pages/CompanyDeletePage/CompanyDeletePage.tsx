@@ -5,9 +5,9 @@ import { Layout, Button } from 'antd';
 import styles from './CompanyDeletePage.module.scss';
 import Title from 'antd/es/typography/Title';
 
-export const CompanyDeletePage = () => {
-  const { Content } = Layout;
+const { Content } = Layout;
 
+export const CompanyDeletePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate()
   const { data: company } = useGetCompanyByIdQuery(id || '');
