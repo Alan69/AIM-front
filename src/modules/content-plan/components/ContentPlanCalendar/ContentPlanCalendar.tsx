@@ -17,15 +17,17 @@ import { TSchedulesrData } from 'modules/content-plan/redux/api';
 moment.locale('ru');
 
 type TProps = {
-  showModal: () => void
+  handleShowContentPlanAddPostModal: () => void
   selectedPost: TPostSerializer | null | undefined
   postList: TSchedulesrData[] | undefined
 }
 
-export const ContentPlanCalendar = ({ showModal, selectedPost, postList }: TProps) => {
+export const ContentPlanCalendar = ({ handleShowContentPlanAddPostModal, selectedPost, postList }: TProps) => {
   const dispatch = useDispatch();
   const localizer = momentLocalizer(moment);
   const DnDCalendar = withDragAndDrop(Calendar);
+
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const events = postList?.map((postItem) => ({
     id: postItem.id,
@@ -58,12 +60,11 @@ export const ContentPlanCalendar = ({ showModal, selectedPost, postList }: TProp
   };
 
   const handleSelectEvent = (event: any) => {
-    // if (selectedPost === null || selectedPost === undefined) {
-    //   dispatch(contentPlanActions.setSelectedPost(event));
-    // } else {
-    //   dispatch(contentPlanActions.setSelectedPost(null));
-    // }
-    dispatch(contentPlanActions.setSelectedPost(event));
+    if (selectedPost && selectedPost.id === event.id) {
+      dispatch(contentPlanActions.setSelectedPost(null));
+    } else {
+      dispatch(contentPlanActions.setSelectedPost(event));
+    }
   };
 
   const EventComponent = ({ event }: { event: any }) => {
@@ -88,10 +89,16 @@ export const ContentPlanCalendar = ({ showModal, selectedPost, postList }: TProp
 
   const CustomToolbar = (toolbar: any) => {
     const goToBack = () => {
+      const prevDate = new Date(currentDate);
+      prevDate.setMonth(prevDate.getMonth() - 1);
+      setCurrentDate(prevDate);
       toolbar.onNavigate('PREV');
     };
 
     const goToNext = () => {
+      const nextDate = new Date(currentDate);
+      nextDate.setMonth(nextDate.getMonth() + 1);
+      setCurrentDate(nextDate);
       toolbar.onNavigate('NEXT');
     };
 
@@ -124,7 +131,7 @@ export const ContentPlanCalendar = ({ showModal, selectedPost, postList }: TProp
 
   return (
     <div>
-      <Button type="primary" onClick={showModal}>
+      <Button type="primary" onClick={handleShowContentPlanAddPostModal}>
         Добавить контент
       </Button>
       <div className={styles.container}>
@@ -132,6 +139,8 @@ export const ContentPlanCalendar = ({ showModal, selectedPost, postList }: TProp
           className={cn(styles.calendar, selectedPost === null ? styles.calendarIsFull : '')}
           localizer={localizer}
           events={events}
+          date={currentDate} // Передаем текущее состояние даты в календарь
+          onNavigate={setCurrentDate} // Обновляем дату при переключении
           draggableAccessor={(event) => true}
           style={{ height: 1000 }}
           popup

@@ -38,7 +38,7 @@ export const contentPlanApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
 		getSchedulers: build.query<TSchedulesrData[], void>({
 			query: () => ({
-				url: '/schedulers/',
+				url: '/schedulers/by-current-company/',
 				method: 'GET'
 			}),
 			transformResponse: (response: TSchedulesrData[]) => response,

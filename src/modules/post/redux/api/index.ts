@@ -32,6 +32,19 @@ export type TUpdatePost = {
   img_style?: string;
   post_query: string;
   author: string;
+  picture?: string;
+}
+
+export type TRecreatePostImage = {
+  id: string | undefined;
+  img_prompt: string;
+  img_style?: string;
+}
+
+export type TRecreatePostText = {
+  id: string | undefined;
+  txt_prompt: string;
+  main_text?: string;
 }
 
 export const postApi = baseApi.injectEndpoints({
@@ -50,29 +63,67 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TPostData) => response,
     }),
+    getPostListByCompanyId: build.query<TPostData[], string | undefined>({
+      query: (company_id) => ({
+        url: `/posts/${company_id}/posts/`,
+        method: 'GET'
+      }),
+      transformResponse: (response: TPostData[]) => response,
+    }),
     updatePost: build.mutation<TPostData, TUpdatePost>({
-      query: ({ id, title, img_prompt, txt_prompt, main_text, hashtags, like, active, img_style, post_query, author }) => ({
-        url: `/posts/${id}/`,
-        method: 'PUT',
+      query: ({ id, title, img_prompt, txt_prompt, main_text, hashtags, like, active, img_style, post_query, author, picture }) => {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('img_prompt', img_prompt || '');
+        formData.append('txt_prompt', txt_prompt || '');
+        formData.append('main_text', main_text || '');
+        formData.append('hashtags', hashtags || '');
+        like && formData.append('like', like.toString());
+        active && formData.append('active', active.toString());
+        formData.append('img_style', img_style || '');
+        formData.append('post_query', post_query.toString());
+        formData.append('author', author.toString());
+        
+        if (picture) {
+          formData.append('picture', picture);
+        }
+    
+        return {
+          url: `/posts/${id}/`,
+          method: 'PUT',
+          body: formData,
+        };
+      },
+      transformResponse: (response: TPostData) => response,
+      extraOptions: { showErrors: false },
+    }),
+    recreatePostImage: build.mutation<TRecreatePostImage, TRecreatePostImage>({
+      query: ({ id, img_prompt, img_style }) => ({
+        url: `/posts/image/update/${id}/`,
+        method: 'PATCH',
         body: {
-          title,
           img_prompt,
-          txt_prompt,
-          main_text,
-          hashtags,
-          like,
-          active,
-          img_style,
-          post_query,
-          author
+          img_style
         }
       }),
-			transformResponse: (response: TPostData) => response,
+			transformResponse: (response: TRecreatePostImage) => response,
+      extraOptions: { showErrors: false }
+    }),
+    recreatePostText: build.mutation<TRecreatePostText, TRecreatePostText>({
+      query: ({ id, txt_prompt, main_text }) => ({
+        url: `/posts/text/update/${id}/`,
+        method: 'PATCH',
+        body: {
+          txt_prompt,
+          main_text
+        }
+      }),
+			transformResponse: (response: TRecreatePostText) => response,
       extraOptions: { showErrors: false }
     }),
     deletePost: build.mutation<string, string>({
       query: (id) => ({
-        url: `posts/${id}/`,
+        url: `/posts/${id}/`,
         method: 'DELETE'
       })
     }),
@@ -83,6 +134,9 @@ export const postApi = baseApi.injectEndpoints({
 export const {
   useGetPostListQuery,
   useGetPostByIdQuery,
+  useGetPostListByCompanyIdQuery,
   useUpdatePostMutation,
+  useRecreatePostImageMutation,
+  useRecreatePostTextMutation,
   useDeletePostMutation
 } = postApi;

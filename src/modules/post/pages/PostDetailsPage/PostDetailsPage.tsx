@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostByIdQuery } from '../../redux/api';
+import { useGetPostByIdQuery, useRecreatePostImageMutation, useRecreatePostTextMutation } from '../../redux/api';
 import { Layout, Typography, Image, Button, Collapse, Checkbox, Radio, Input } from 'antd';
 import {
   ReloadOutlined,
@@ -10,7 +10,6 @@ import styles from './PostDetailsPage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import avatar from '../../../../assets/avatar.png';
 import { Controller, useForm } from 'react-hook-form';
-import { postActions } from 'modules/post/redux/slices/post.slice';
 import { useDispatch } from 'react-redux';
 import { ModalImageStylesList } from 'modules/post-query/components/ModalImageStylesList/ModalImageStylesList';
 import { TImgStylesData, useGetImgStylesListQuery } from '../../../../redux/api/imgStyles/imgStylesApi';
@@ -27,12 +26,18 @@ export const PostDetailsPage = () => {
 
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
   const { data: imgStylesList } = useGetImgStylesListQuery();
+  const [recreatePostImage, { isLoading: isRecreatePostImageLoading }] = useRecreatePostImageMutation();
+  const [recreatePostText, { isLoading: isRecreatePostTextLoading }] = useRecreatePostTextMutation();
+
+  console.log('post', post);
 
   const { user } = useTypedSelector((state) => state.auth);
 
   const [isEditBlockShow, setIsEditBlockShow] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImgStyle, setCurrentImgStyle] = useState(post?.img_style);
+
+  console.log('currentImgStyle', currentImgStyle);
 
   const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
 
@@ -45,6 +50,7 @@ export const PostDetailsPage = () => {
     },
   });
 
+  const formValues = watch();
   const imageOption = watch('imageOption');
   const textOption = watch('textOption');
 
@@ -59,17 +65,31 @@ export const PostDetailsPage = () => {
 
   // @ts-ignore
   const onSubmit = (data) => {
-    console.log('Form data:', data);
+    if (formValues.imageOption !== 'keepImage') {
+      recreatePostImage({
+        id: post?.id,
+        img_prompt: data.imageDescription,
+        img_style: currentImgStyle?.id
+      }).unwrap().then(() => refetch())
+    }
+    if (formValues.textOption !== 'keepText') {
+      recreatePostText({
+        id: post?.id,
+        txt_prompt: data.textDescription,
+        main_text: post?.main_text
+      }).unwrap().then(() => refetch())
+    }
   };
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     if (post) {
-      const { main_text, title, hashtags, picture, img_prompt, txt_prompt } = post;
+      const { main_text, title, hashtags, picture, img_prompt, txt_prompt, img_style } = post;
 
       setValue('imageDescription', img_prompt || '');
       setValue('textDescription', txt_prompt || '');
+      setCurrentImgStyle(img_style);
 
       if (!main_text || !title || !hashtags || picture?.includes('no_img')) {
         interval = setInterval(() => {
@@ -153,12 +173,25 @@ export const PostDetailsPage = () => {
                         Редактировать
                       </Button>
                       <Button
+                        type="primary"
+                      >
+                        Опубликовать
+                      </Button>
+                      <Button
+                        type="primary"
+                      >
+                        В планировщик
+                      </Button>
+                      <Button
                         htmlType="button"
                         style={{ color: '#faad14', borderColor: '#faad14' }}
                         onClick={() => navigate(-1)}
                       >
                         Отменить
                       </Button>
+                    </div>
+                    <div className={styles.postActions}>
+
                     </div>
                   </div>
                   {isEditBlockShow && (
@@ -174,15 +207,19 @@ export const PostDetailsPage = () => {
                                 {...field}
                                 className={styles.radioGroup}
                               >
-                                <Radio value="keepImage">Оставить без изменения</Radio>
-                                <Radio value="newImage">Создать заново</Radio>
-                                <Radio value="newDescriptionImage">Создать с новым описанием</Radio>
+                                <Radio value="keepImage" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Оставить без изменения</Radio>
+                                <Radio value="newImage" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать заново</Radio>
+                                <Radio value="newDescriptionImage" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать с новым описанием</Radio>
                               </Radio.Group>
                             )}
                           />
                           {imageOption === 'newDescriptionImage' && (
                             <div className={styles.imageBlock}>
-                              <div className={styles.imageStyleBlock} onClick={handleOpenModal}>
+                              <div className={styles.imageStyleBlock} onClick={() => {
+                                if (!isRecreatePostImageLoading || !isRecreatePostTextLoading) {
+                                  handleOpenModal()
+                                }
+                              }}>
                                 <Title level={4} >Стиль рисунка: {currentImgStyle?.name}</Title>
                                 <img src={currentImgStyle?.picture} alt={currentImgStyle?.name} />
                               </div>
@@ -195,6 +232,7 @@ export const PostDetailsPage = () => {
                                     rows={6}
                                     placeholder="Введите описание изображения..."
                                     className={styles.textArea}
+                                    disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}
                                   />
                                 )}
                               />
@@ -209,9 +247,9 @@ export const PostDetailsPage = () => {
                                 {...field}
                                 className={styles.radioGroup}
                               >
-                                <Radio value="keepText">Оставить без изменения</Radio>
-                                <Radio value="newText">Создать заново</Radio>
-                                <Radio value="newDescriptionText">Создать с новым описанием</Radio>
+                                <Radio value="keepText" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Оставить без изменения</Radio>
+                                <Radio value="newText" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать заново</Radio>
+                                <Radio value="newDescriptionText" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать с новым описанием</Radio>
                               </Radio.Group>
                             )}
                           />
@@ -225,12 +263,18 @@ export const PostDetailsPage = () => {
                                   rows={6}
                                   placeholder="Введите описание текста..."
                                   className={styles.textArea}
+                                  disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}
                                 />
                               )}
                             />
                           )}
                         </div>
-                        <Button type="primary" htmlType="submit" className={styles.submitButton} disabled={imageOption === 'keepImage' && textOption === 'keepText'}>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          className={styles.submitButton}
+                          disabled={isRecreatePostImageLoading || isRecreatePostTextLoading || (imageOption === 'keepImage' && textOption === 'keepText')}
+                        >
                           Отправить запрос
                         </Button>
                       </form>
@@ -240,9 +284,14 @@ export const PostDetailsPage = () => {
               </div>
             </Content>
           </Layout>
-        </Content>
-      </Layout>
-      <ModalImageStylesList isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} imgStylesList={imgStylesList} handleChangeCurrentImgStyle={handleChangeCurrentImgStyle} />
+        </Content >
+      </Layout >
+      <ModalImageStylesList
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        imgStylesList={imgStylesList}
+        handleChangeCurrentImgStyle={handleChangeCurrentImgStyle}
+      />
     </>
   );
 };

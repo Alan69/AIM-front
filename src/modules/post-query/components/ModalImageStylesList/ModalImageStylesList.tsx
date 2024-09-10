@@ -21,6 +21,8 @@ export const ModalImageStylesList = ({ isModalOpen, setIsModalOpen, imgStylesLis
       open={isModalOpen}
       footer={null}
       onClose={() => setIsModalOpen(false)}
+      onOk={() => setIsModalOpen(false)}
+      onCancel={() => setIsModalOpen(false)}
     >
       <Divider />
       <div className={styles.imgStylesList}>

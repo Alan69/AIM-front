@@ -103,6 +103,7 @@ export const AccountPage = () => {
       setValue('picture', null);
     }
   };
+
   return (
     <Layout>
       <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>

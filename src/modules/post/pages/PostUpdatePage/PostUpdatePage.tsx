@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetPostByIdQuery, useUpdatePostMutation } from '../../redux/api';
 import { Layout, Image, Button, Checkbox, Form, Input, Upload } from 'antd';
@@ -16,23 +16,34 @@ export const PostUpdatePage = () => {
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
   const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
 
+  const [file, setFile] = useState<File | null>(null);
+
   useEffect(() => {
     refetch();
   }, [refetch]);
 
-  if (isLoading) return <div>Loading...</div>;
+  const handleFileChange = (info: any) => {
+    const fileList = info.fileList;
+    if (fileList.length > 0) {
+      const lastFile = fileList[fileList.length - 1];
+      setFile(lastFile.originFileObj);
+    } else {
+      setFile(null);
+    }
+  };
 
   const onFinish = (values: any) => {
     if (post) {
       const updatedData = {
         ...values,
-        img_prompt: values.picture,
+        img_prompt: post.img_prompt,
         txt_prompt: post.txt_prompt,
         active: post.active,
         img_style: post.img_style?.id,
-        post_query: post.post_query.id,
-        id: post.id,
+        post_query: post.post_query,
+        id: id,
         author: user?.profile.id,
+        picture: file
       };
 
       updatePost(updatedData).unwrap().then((response) => {
@@ -41,6 +52,8 @@ export const PostUpdatePage = () => {
       });
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <Layout>
@@ -70,7 +83,7 @@ export const PostUpdatePage = () => {
                   }}
                 >
                   <Form.Item name="picture" label="Загрузить новое изображение">
-                    <Upload name="picture" listType="picture" maxCount={1} beforeUpload={() => false}>
+                    <Upload name="picture" listType="picture" maxCount={1} beforeUpload={() => false} onChange={handleFileChange}>
                       <Button icon={<UploadOutlined />}>Выберите файл</Button>
                     </Upload>
                   </Form.Item>

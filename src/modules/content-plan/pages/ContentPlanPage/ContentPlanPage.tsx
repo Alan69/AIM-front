@@ -7,36 +7,57 @@ import { useTypedSelector } from 'hooks/useTypedSelector';
 import { contentPlanActions } from 'modules/content-plan/redux/slices/contentPlan.slice';
 import { useDispatch } from 'react-redux';
 import { useGetSchedulersQuery } from 'modules/content-plan/redux/api';
-import { ContentPlanAddModal } from 'modules/content-plan/components/ContentPlanAddModal/ContentPlanAddModal';
+import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
+import { ContentPlanPostsListModal } from 'modules/content-plan/components/ContentPlanPostsListModal/ContentPlanPostsListModal';
+import { TPostData, useGetPostListByCompanyIdQuery } from 'modules/post/redux/api';
 
 const { Content } = Layout;
 
 export const ContentPlanPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] = useState(false);
+  const [isContentPlanPostsListModalOpen, setIsContentPlanPostsListModalOpen] = useState(false);
+  const [selectNewPost, setSelectNewPost] = useState<TPostData | null>(null);
+
   const { selectedPost } = useTypedSelector((state) => state.contentPlan);
   const { current_company } = useTypedSelector((state) => state.auth);
 
-  const { data: postList } = useGetSchedulersQuery()
+  const { data: postList } = useGetSchedulersQuery();
+  const { data: postListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
 
   const dispatch = useDispatch();
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const handleShowContentPlanAddPostModal = () => {
+    setIsContentPlanAddPostModalOpen(true);
+  };
+
+  const handleShowContentPlanPostsListModal = () => {
+    setIsContentPlanPostsListModalOpen(true);
   };
 
   const handleOk = () => {
-    setIsModalOpen(false);
+    setIsContentPlanAddPostModalOpen(false);
   };
 
   const handleCancel = () => {
-    setIsModalOpen(false);
+    setIsContentPlanAddPostModalOpen(false);
   };
+
+  const handleSelectNewPost = (post: TPostData) => {
+    setSelectNewPost(post);
+  }
+
+  console.log('selectNewPost', selectNewPost);
 
   const items: TabsProps['items'] = [
     {
       key: '1',
       label: 'Календарь',
-      children: <ContentPlanCalendar showModal={showModal} selectedPost={selectedPost} postList={postList} />,
+      children:
+        <ContentPlanCalendar
+          handleShowContentPlanAddPostModal={handleShowContentPlanAddPostModal}
+          selectedPost={selectedPost}
+          postList={postList}
+        />,
       icon: <CalendarOutlined />
     },
     {
@@ -78,7 +99,19 @@ export const ContentPlanPage = () => {
           </Layout>
         </Content>
       </Layout>
-      <ContentPlanAddModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <ContentPlanAddPostModal
+        isModalOpen={isContentPlanAddPostModalOpen}
+        setIsModalOpen={setIsContentPlanAddPostModalOpen}
+        handleShowContentPlanPostsListModal={handleShowContentPlanPostsListModal}
+        selectNewPost={selectNewPost}
+      />
+      <ContentPlanPostsListModal
+        isModalOpen={isContentPlanPostsListModalOpen}
+        setIsModalOpen={setIsContentPlanPostsListModalOpen}
+        postListByCompanyId={postListByCompanyId}
+        handleSelectNewPost={handleSelectNewPost}
+        selectNewPost={selectNewPost}
+      />
     </>
   )
 }

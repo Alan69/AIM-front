@@ -7,16 +7,19 @@ import {
 import React, { useState } from 'react';
 import moment from 'moment';
 import 'moment/locale/ru';
-import styles from './ContentPlanAddModal.module.scss'
+import styles from './ContentPlanAddPostModal.module.scss'
+import { TPostData } from 'modules/post/redux/api';
 
 moment.locale('ru');
 
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleShowContentPlanPostsListModal: () => void
+  selectNewPost: TPostData | null
 };
 
-export const ContentPlanAddModal = ({ isModalOpen, setIsModalOpen }: TProps) => {
+export const ContentPlanAddPostModal = ({ isModalOpen, setIsModalOpen, handleShowContentPlanPostsListModal, selectNewPost }: TProps) => {
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<moment.Moment | null>(null);
   const [selectedTime, setSelectedTime] = useState<moment.Moment | null>(null);
@@ -91,11 +94,13 @@ export const ContentPlanAddModal = ({ isModalOpen, setIsModalOpen }: TProps) => 
     >
       <Divider />
       <div className={styles.addBtns}>
-        <Button icon={<PictureOutlined />}>Пост</Button>
+        <Button icon={<PictureOutlined />} onClick={handleShowContentPlanPostsListModal}>Пост</Button>
         <Button icon={<VideoCameraOutlined />} disabled>Reels</Button>
         <Button icon={<PlayCircleOutlined />} disabled>Stories</Button>
       </div>
       <Divider />
+
+      <div>{selectNewPost?.title}</div>
 
       <Button onClick={handleDatePickerSwitcher}>Выбрать дату и время</Button>
 
