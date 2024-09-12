@@ -133,7 +133,7 @@ export const ContentPlanAddPostModal = ({
               borderRadius: '0',
               width: '33.33%',
             }}
-            disabled={!selectedDate && !selectedTime && !selectNewPost && !selectNewSocialMedia}
+            disabled={!selectedDate || !selectedTime || !selectNewPost || !selectNewSocialMedia}
           >
             В планировщик
           </Button>

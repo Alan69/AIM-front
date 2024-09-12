@@ -6,17 +6,14 @@ import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTy
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
 import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
-import { TPostQueryData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
+import { TPostQuerCreateData, TPostQueryData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { postActions } from 'modules/post/redux/slices/post.slice';
 
 const { Content } = Layout;
 
 export const PostQueryCreatePage = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const { user } = useTypedSelector((state) => state.auth);
   const { current_company } = useTypedSelector((state) => state.auth);
@@ -30,15 +27,14 @@ export const PostQueryCreatePage = () => {
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
 
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQueryData>({
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQuerCreateData>({
     defaultValues: {
       content: '',
-      company: null,
-      product: null,
-      post_type: null,
-      text_style: null,
-      lang: null,
-      author: ''
+      company: '',
+      product: '',
+      post_type: '',
+      text_style: '',
+      lang: ''
     }
   });
 
@@ -57,11 +53,11 @@ export const PostQueryCreatePage = () => {
     }
   }, [selectedCompany, getProductListByCompanyId]);
 
-  const onSubmit = (data: TPostQueryData) => {
+  const onSubmit = (data: TPostQuerCreateData) => {
     if (user) {
       const updatedData = {
         ...data,
-        author: user?.profile.id,
+        company: current_company?.id,
       };
       createPost(updatedData).unwrap().then((response) => {
         // dispatch(postActions.setPostCreated(true));

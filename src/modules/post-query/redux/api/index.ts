@@ -18,6 +18,15 @@ export type TPostQueryData = {
   time_update?: string;
 }
 
+export type TPostQuerCreateData = {
+  company: string | undefined;
+  product: string;
+  post_type: string; 
+  text_style: string;
+  lang: string;
+  content: string;
+}
+
 export type TPostQueryDataResponse = {
   id: string;
   post_id: string;
@@ -48,8 +57,8 @@ export const postQueryApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TPostQueryData) => response,
     }),
-    createPostQuery: build.mutation<TPostQueryDataResponse, TPostQueryData>({
-      query: ({ content, company, product, post_type, text_style, lang, author }) => ({
+    createPostQuery: build.mutation<TPostQueryDataResponse, TPostQuerCreateData>({
+      query: ({ content, company, product, post_type, text_style, lang }) => ({
         url: '/post_queries/',
         method: 'POST',
         body: {
@@ -59,7 +68,6 @@ export const postQueryApi = baseApi.injectEndpoints({
           post_type,
           text_style,
           lang,
-          author
         }
       }),
       transformResponse: (response: TPostQueryDataResponse) => response,

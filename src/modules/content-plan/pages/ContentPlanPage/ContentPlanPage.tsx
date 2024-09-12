@@ -90,6 +90,10 @@ export const ContentPlanPage = () => {
     }
   }, [])
 
+  useEffect(() => {
+    dispatch(contentPlanActions.setSelectedPost(null));
+  }, [current_company])
+
   return (
     <>
       <Layout>
