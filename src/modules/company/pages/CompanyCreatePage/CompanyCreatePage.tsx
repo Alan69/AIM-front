@@ -1,10 +1,11 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useCreateCompanyMutation, useGetCompanyListQuery } from '../../redux/api';
+import { useCreateCompanyMutation, useGetCompanyListQuery, useUpdateCurrentCompanyMutation } from '../../redux/api';
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input } from 'antd';
 import styles from './CompanyCreatePage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 
 type TCreateCompanyForm = {
   name: string;
@@ -19,7 +20,9 @@ export const CompanyCreatePage = () => {
   const { user } = useTypedSelector((state) => state.auth);
   const { control, handleSubmit, formState: { errors } } = useForm<TCreateCompanyForm>();
   const [createCompany, { isLoading: isCreating }] = useCreateCompanyMutation();
-  const { refetch: refetchCompanyList } = useGetCompanyListQuery();
+  const { refetch: refetchCompanyList } = useGetCompanyListQuery(user?.profile.id);
+  const [updateCurrentCompany] = useUpdateCurrentCompanyMutation();
+  const [getAuthUser] = useLazyGetAuthUserQuery();
 
   const onSubmit = (payload: TCreateCompanyForm) => {
     const updatedData = {
@@ -28,8 +31,11 @@ export const CompanyCreatePage = () => {
     };
 
     createCompany(updatedData).unwrap().then((response) => {
-      navigate(`/company/${response.id}`)
-      refetchCompanyList();
+      updateCurrentCompany(response.id).unwrap().then(() => {
+        navigate(`/company/${response.id}`);
+        refetchCompanyList();
+        getAuthUser();
+      });
     })
   };
 

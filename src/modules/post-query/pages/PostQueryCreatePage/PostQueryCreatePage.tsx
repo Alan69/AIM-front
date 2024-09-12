@@ -25,7 +25,7 @@ export const PostQueryCreatePage = () => {
 
   const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] = useLazyGetProductListByCompanyIdQuery();
-  const { data: companyList, isLoading: isCompanyListLoading } = useGetCompanyListQuery();
+  const { data: companyList, isLoading: isCompanyListLoading } = useGetCompanyListQuery(user?.profile.id);
   const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery();
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
@@ -80,25 +80,17 @@ export const PostQueryCreatePage = () => {
               name="company"
               control={control}
               rules={{ required: true }}
-              disabled={isCompanyListLoading}
+              disabled
               render={({ field }) => (
                 <Select
                   {...field}
                   value={field.value || selectedCompany}
                   loading={isCompanyListLoading}
-                  disabled={isPostCreating}
-                  onChange={(value) => {
-                    field.onChange(value);
-                    // @ts-ignore
-                    setSelectedCompany(value);
-                    setValue('product', null);
-                  }}
+                  disabled
                 >
-                  {companyList?.map((company) => (
-                    <Select.Option key={company.id} value={company.id}>
-                      {company.name}
-                    </Select.Option>
-                  ))}
+                  <Select.Option key={current_company?.id} value={current_company?.id}>
+                    {current_company?.name}
+                  </Select.Option>
                 </Select>
               )}
             />

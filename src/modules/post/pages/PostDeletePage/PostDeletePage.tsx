@@ -5,16 +5,18 @@ import { Layout, Button } from 'antd';
 import styles from './PostDeletePage.module.scss';
 import Title from 'antd/es/typography/Title';
 import { useGetCompanyListQuery } from 'modules/company/redux/api';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const { Content } = Layout;
 
 export const PostDeletePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate()
-  const { data: post } = useGetPostByIdQuery(id || '');
+  const { user } = useTypedSelector((state) => state.auth);
 
+  const { data: post } = useGetPostByIdQuery(id || '');
   const [deletePost, { isLoading: isUpdating }] = useDeletePostMutation();
-  const { refetch: refetchCompanyList } = useGetCompanyListQuery();
+  const { refetch: refetchCompanyList } = useGetCompanyListQuery(user?.profile.id);
 
   const handleDeletePost = () => {
     if (post) {

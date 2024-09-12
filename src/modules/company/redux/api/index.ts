@@ -1,4 +1,5 @@
 import baseApi from '../../../../redux/api';
+import { RootState } from '../../../../redux/rootReducer';
 
 export type TCompanyData = {
   id: string;
@@ -30,9 +31,9 @@ type TUpdateCompany = {
 
 export const companyApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-		getCompanyList: build.query<TCompanyData[], void>({
-			query: () => ({
-				url: '/companies/',
+		getCompanyList: build.query<TCompanyData[], string | undefined>({
+			query: (user_id) => ({
+				url: `/companies/by-user/${user_id}/`,
 				method: 'GET'
 			}),
 			transformResponse: (response: TCompanyData[]) => response,

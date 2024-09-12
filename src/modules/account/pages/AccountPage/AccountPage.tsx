@@ -1,11 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { TUpdateProfilesData, useUpdateProfilesMutation } from '../../redux/api';
+import { useUpdateProfilesMutation } from '../../redux/api';
 import { Layout, Button, Form, Input, Upload, Select, Image } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useGetJobTypesListQuery } from '../../../../redux/api/jobTypes/jobTypesApi';
 import { useGetContriesListQuery } from '../../../../redux/api/contries/contriesApi';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
+import avatar from '../../../../assets/avatar.png';
+import { useNavigate } from 'react-router-dom';
+import styles from './AccountPage.module.scss'
 
 type TUpdateProfilesForm = {
   user: string;
@@ -27,14 +31,17 @@ type TUpdateProfilesForm = {
 const { Content } = Layout;
 
 export const AccountPage = () => {
+  const navigate = useNavigate();
   const { user } = useTypedSelector((state) => state.auth);
+  const [file, setFile] = useState<File | null>(null);
 
-  const profileImage = user?.profile.picture ? `${user.profile.picture}` : '';
+  const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
 
+  const [getAuthUser] = useLazyGetAuthUserQuery();
   const [updateProfiles, { isLoading: isUpdating }] = useUpdateProfilesMutation();
   const { data: jobTypesList, isLoading: isJobTypesListUpdating } = useGetJobTypesListQuery()
   const { data: contriesList, isLoading: isContriesListUpdating } = useGetContriesListQuery()
-  const { control, handleSubmit, reset, setValue, formState: { errors } } = useForm<TUpdateProfilesForm>({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<TUpdateProfilesForm>({
     defaultValues: {
       first_name: '',
       last_name: '',
@@ -72,35 +79,37 @@ export const AccountPage = () => {
     }
   }, [user, reset]);
 
+  useEffect(() => {
+    getAuthUser();
+  }, []);
+
   const onSubmit = (data: TUpdateProfilesForm) => {
     if (user) {
-      let pictureUrl = data.picture;
-
-      if (typeof pictureUrl === 'string' && !pictureUrl.startsWith('http')) {
-        pictureUrl = `${pictureUrl}`;
-      }
-
       const updatedData = {
         ...data,
-        picture: pictureUrl,
-        location: data.location?.id,
-        job: data.job?.id,
+        picture: file,
+        location: data.location,
+        job: data.job,
         id: user.profile.id,
       };
 
       // @ts-ignore
-      updateProfiles(updatedData);
+      updateProfiles(updatedData).unwrap().then(() => {
+        getAuthUser().refetch();
+        navigate('/post-query/create');
+      });
     }
   };
 
+  const currentYear = new Date().getFullYear();
+
   const handleFileChange = (info: any) => {
     const fileList = info.fileList;
-
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      setValue('picture', lastFile.originFileObj);
+      setFile(lastFile.originFileObj);
     } else {
-      setValue('picture', null);
+      setFile(null);
     }
   };
 
@@ -109,6 +118,29 @@ export const AccountPage = () => {
       <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
         <h1>Профиль</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+          <Form.Item label="Фото">
+            <div className={styles.photo}>
+              {user && (
+                <Image width={200} src={profileImage} alt={user.profile.picture ? user.profile.picture : 'Аватар'} />
+              )}
+              <Controller
+                name="picture"
+                control={control}
+                render={({ field }) => (
+                  <Upload
+                    {...field}
+                    listType="picture"
+                    maxCount={1}
+                    beforeUpload={() => false}
+                    onChange={handleFileChange}
+                  >
+                    <Button icon={<UploadOutlined />}>Выберите файл</Button>
+                  </Upload>
+                )}
+              />
+            </div>
+          </Form.Item>
+
           <Form.Item label="Email" validateStatus={errors.email ? 'error' : ''} help={errors.email && 'Заполните это поле.'}>
             <Controller
               name="email"
@@ -126,12 +158,26 @@ export const AccountPage = () => {
             <Controller name="last_name" control={control} render={({ field }) => <Input {...field} />} />
           </Form.Item>
 
-          <Form.Item label="Год рождения" validateStatus={errors.bd_year ? 'error' : ''} help={errors.bd_year && 'Заполните это поле.'}>
+          <Form.Item label="Год рождения" validateStatus={errors.bd_year ? 'error' : undefined} help={errors.bd_year?.message}>
             <Controller
               name="bd_year"
               control={control}
-              rules={{ required: true }}
-              render={({ field }) => <Input {...field} />}
+              rules={{
+                required: 'Год рождения обязателен.',
+                min: {
+                  value: 1964,
+                  message: 'Год рождения не может быть меньше 1964.'
+                },
+                max: {
+                  value: currentYear,
+                  message: `Год рождения не может быть больше ${currentYear}.`
+                },
+                pattern: {
+                  value: /^\d{4}$/,
+                  message: 'Год рождения должен содержать ровно четыре цифры.'
+                }
+              }}
+              render={({ field }) => <Input {...field} type="number" />}
             />
           </Form.Item>
 
@@ -165,27 +211,6 @@ export const AccountPage = () => {
                     </Select.Option>
                   ))}
                 </Select>
-              )}
-            />
-          </Form.Item>
-
-          <Form.Item label="Фото">
-            {user && (
-              <Image width={200} src={profileImage} alt={user.profile.picture ? user.profile.picture : 'Аватар'} />
-            )}
-            <Controller
-              name="picture"
-              control={control}
-              render={({ field }) => (
-                <Upload
-                  {...field}
-                  listType="picture"
-                  maxCount={1}
-                  beforeUpload={() => false}
-                  onChange={handleFileChange}
-                >
-                  <Button icon={<UploadOutlined />}>Выберите файл</Button>
-                </Upload>
               )}
             />
           </Form.Item>

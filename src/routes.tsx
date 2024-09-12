@@ -25,61 +25,52 @@ import { PostQueryDetailsPage } from 'modules/post-query/pages/PostQueryDetailsP
 import { PostUpdatePage } from 'modules/post/pages/PostUpdatePage/PostUpdatePage';
 import { PostDeletePage } from 'modules/post/pages/PostDeletePage/PostDeletePage';
 import { PostDetailsPage } from 'modules/post/pages/PostDetailsPage/PostDetailsPage';
-import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
+import { useLazyGetAuthUserQuery, useRefreshTokenMutation } from 'modules/auth/redux/api';
 import { ContentPlanPage } from 'modules/content-plan/pages/ContentPlanPage/ContentPlanPage';
+import { SocialMediaAddPage } from 'modules/social-media/pages/SocialMediaAddPage/SocialMediaAddPage';
 
-const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+const REFRESH_TOKEN_INTERVAL = 20 * 60 * 1000;
 
 const AppRoutes: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { token } = useTypedSelector((state) => state.auth);
-  const [getAuthUser] = useLazyGetAuthUserQuery()
+  const { token, refreshToken } = useTypedSelector((state) => state.auth);
+  const [getAuthUser] = useLazyGetAuthUserQuery();
+  const [refreshTokenMutation] = useRefreshTokenMutation();
 
   useEffect(() => {
     if (!token) {
       navigate('/login', { replace: true });
     } else {
-      getAuthUser()
+      getAuthUser();
     }
   }, [token, navigate, getAuthUser, location.pathname]);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const resetTimeout = () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+    const refreshAccessToken = async () => {
+      try {
+        if (refreshToken) {
+          const response = await refreshTokenMutation({ refresh: refreshToken }).unwrap();
+          dispatch(authActions.setToken({ token: response.access, refreshToken }));
+          Cookies.set('token', response.access, { expires: 7 });
+        } else {
+          throw new Error('No refresh token found');
+        }
+      } catch (error) {
+        dispatch(authActions.logOut());
+        navigate('/login', { replace: true });
       }
-      timeoutId = setTimeout(() => {
-        handleLogout();
-      }, INACTIVITY_TIMEOUT);
     };
 
-    const handleLogout = () => {
-      dispatch(authActions.logOut());
-      Cookies.remove('token');
-      Cookies.remove('refreshToken');
-      navigate('/login', { replace: true });
-      // alert('Session has expired due to inactivity.');
-    };
-
-    const events = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'];
-
-    events.forEach((event) => {
-      window.addEventListener(event, resetTimeout);
-    });
-
-    resetTimeout();
+    const intervalId = setInterval(() => {
+      refreshAccessToken();
+    }, REFRESH_TOKEN_INTERVAL);
 
     return () => {
-      clearTimeout(timeoutId);
-      events.forEach((event) => {
-        window.removeEventListener(event, resetTimeout);
-      });
+      clearInterval(intervalId);
     };
-  }, [dispatch, navigate]);
+  }, [refreshToken, dispatch, navigate, refreshTokenMutation, location.pathname]);
 
   if (!token) {
     return (
@@ -119,6 +110,7 @@ const AppRoutes: FC = () => {
         <Route path="/post/:postQueryId/:id/update" element={<PostUpdatePage />} />
         <Route path="/post/:postQueryId/:id/delete" element={<PostDeletePage />} />
         <Route path="/content-plan" element={<ContentPlanPage />} />
+        <Route path="/social-media/:companyId/add" element={<SocialMediaAddPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/post-query" replace />} />
     </Routes>

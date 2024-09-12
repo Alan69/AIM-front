@@ -1,7 +1,7 @@
 import { Modal, Button, Divider, List, Image, Typography } from 'antd';
 import cn from 'classnames'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'moment/locale/ru';
 import styles from './ContentPlanPostsListModal.module.scss'
 import { TPostData } from 'modules/post/redux/api';
@@ -39,6 +39,7 @@ export const ContentPlanPostsListModal = ({
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
+      width={600}
       footer={[
         <Button
           key="schedule"
@@ -52,7 +53,8 @@ export const ContentPlanPostsListModal = ({
             width: '100%',
           }}
         >
-          Выбрать <b>{selectCurrentPost?.title}</b>
+          Выбрать
+          {/* <b>{selectCurrentPost?.title}</b> */}
         </Button>
       ]}
     >
@@ -71,13 +73,16 @@ export const ContentPlanPostsListModal = ({
               description={
                 <>
                   <Paragraph
+                    className={styles.text}
                     ellipsis={!expandedKeys[index] ? { rows: 4, expandable: false } : false}
                   >
                     {item.main_text}
                   </Paragraph>
-                  <Button type="link" onClick={() => toggleExpand(index)}>
-                    {expandedKeys[index] ? 'Скрыть' : 'Развернуть'}
-                  </Button>
+                  <div className={styles.expandBtn}>
+                    <Button type="link" onClick={() => toggleExpand(index)}>
+                      {expandedKeys[index] ? 'Скрыть' : 'Развернуть'}
+                    </Button>
+                  </div>
                 </>
               }
             />

@@ -26,7 +26,6 @@ export const ContentPlanCalendar = ({ handleShowContentPlanAddPostModal, selecte
   const dispatch = useDispatch();
   const localizer = momentLocalizer(moment);
   const DnDCalendar = withDragAndDrop(Calendar);
-
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const events = postList?.map((postItem) => ({
@@ -40,8 +39,6 @@ export const ContentPlanCalendar = ({ handleShowContentPlanAddPostModal, selecte
     time: moment(postItem.scheduled_time).format('HH:mm'),
     picture: postItem.post.picture,
   })) || [];
-
-  console.log('events', events);
 
   const messages = {
     allDay: 'Весь день',

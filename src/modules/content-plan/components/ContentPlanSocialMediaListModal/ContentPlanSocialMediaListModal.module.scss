@@ -1,16 +1,26 @@
 .item {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     margin: 8px 0;
     padding: 8px !important;
-    cursor: pointer;
     border: 1px solid transparent;
     border-radius: 8px;
     transition: 0.3s all;
+    cursor: pointer;
     &:hover,
     &__isActive {
         border: 1px solid #1890ff;
         border-block-end: 1px solid #1890ff !important;
         transition: 0.3s all;
     }
+}
+
+.itemList {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .expandBtn {
@@ -21,4 +31,8 @@
         height: 24px !important;
         outline: none !important;
     }
+}
+
+.username {
+    margin-bottom: 0 !important;
 }

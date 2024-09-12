@@ -30,7 +30,7 @@ export const CompanyUpdatePage = () => {
   });
 
   const [updateCompany, { isLoading: isUpdating }] = useUpdateCompanyMutation();
-  const { refetch: refetchCompanyList } = useGetCompanyListQuery();
+  const { refetch: refetchCompanyList } = useGetCompanyListQuery(user?.profile.id);
 
   const onSubmit = (payload: TUpdateCompanyForm) => {
     const updatedData = {

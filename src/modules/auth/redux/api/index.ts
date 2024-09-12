@@ -14,6 +14,11 @@ type TLoginResponse = {
   }
 }
 
+type TTokenResponse = {
+  access: string;
+  refresh: string;
+}
+
 export const authApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
     getAuthUser: build.query<TProfileData, void>({
@@ -45,6 +50,17 @@ export const authApi = baseApi.injectEndpoints({
 			transformResponse: (response: TLoginResponse) => response,
       extraOptions: { showErrors: false }
     }),
+    refreshToken: build.mutation<TTokenResponse, { refresh: string }>({
+      query: ({ refresh }) => ({
+        url: '/token/refresh/',
+        method: 'POST',
+        body: { refresh },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      transformResponse: (response: TTokenResponse) => response,
+    }),
 	}),
 	overrideExisting: false,
 });
@@ -52,5 +68,6 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useLazyGetAuthUserQuery,
   useGetAuthUserQuery,
-  useLoginMutation
+  useLoginMutation,
+  useRefreshTokenMutation
 } = authApi;

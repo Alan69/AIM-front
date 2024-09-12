@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import styles from './CompanyDetailsPage.module.scss';
 import { TProductData, useGetProductListByCompanyIdQuery } from '../../../product/redux/api';
+import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 
 interface DataType {
   key: string;
@@ -19,17 +20,17 @@ interface DataType {
 }
 
 const { Title, Text } = Typography;
+const { Content } = Layout;
 
 export const CompanyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const { data: company, isLoading, refetch } = useGetCompanyByIdQuery(id || '');
   const { data: productListByCompanyId } = useGetProductListByCompanyIdQuery(company?.id || '');
-
-  const { Content } = Layout;
+  const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
 
   const columns: TableProps<DataType>['columns'] = [
     {
-      title: 'Наименование',
+      title: 'Название',
       dataIndex: 'product_name',
       key: 'product_name',
       render: (text) => <div>{text}</div>,
@@ -58,9 +59,34 @@ export const CompanyDetailsPage = () => {
     ),
   })) || [];
 
+
+  const newSocialMediaList = socialMediaList?.map((item: TSocialMediaByCurrentCompanyData) => ({
+    key: item.username,
+    platform: item.platform.name,
+    username: item.username,
+  })) || [];
+
+  const socialMediaListColumns: TableProps<TSocialMediaByCurrentCompanyData>['columns'] = [
+    {
+      title: 'Название социальной сети',
+      dataIndex: 'platform',
+      key: 'platform',
+    },
+    {
+      title: 'Имя пользователя',
+      dataIndex: 'username',
+      key: 'username',
+    },
+  ];
+
   useEffect(() => {
     refetch()
   }, [refetch])
+
+
+  useEffect(() => {
+    refetchSocialMediaList()
+  }, [company])
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -92,6 +118,22 @@ export const CompanyDetailsPage = () => {
                 <Text >На данный момент отсутствуют продукты или бренды. Вы можете добавить новый продукт или бренд.</Text>
               </div> : ''}
               <Table columns={columns} dataSource={data} pagination={false} />
+            </div>
+          </Content>
+        </Layout>
+        <Layout>
+          <h2 className={styles.product__title}>
+            Социальные сети <Link to={`/social-media/${company?.id}/add`}><PlusCircleOutlined /></Link>
+          </h2>
+          <Content >
+            <div className={styles.companyDescr}>
+              {!productListByCompanyId?.length ?
+                <div style={{ paddingBottom: '12px' }}>
+                  <Text >На данный момент отсутствуют социальные сети. Вы можете добавить новую социальную сеть.</Text>
+                </div>
+                : ''}
+              {/* @ts-ignore */}
+              <Table columns={socialMediaListColumns} dataSource={newSocialMediaList} pagination={false} />
             </div>
           </Content>
         </Layout>

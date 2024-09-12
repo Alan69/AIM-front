@@ -36,7 +36,7 @@ export const postQueryApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPostQueriesList: build.query<TPostQueryData[], void>({
       query: () => ({
-        url: '/post_queries/',
+        url: '/postqueries/company/',
         method: 'GET'
       }),
       transformResponse: (response: TPostQueryData[]) => response,

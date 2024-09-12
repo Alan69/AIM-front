@@ -4,16 +4,18 @@ import { useGetCompanyByIdQuery, useGetCompanyListQuery, useDeleteCompanyMutatio
 import { Layout, Button } from 'antd';
 import styles from './CompanyDeletePage.module.scss';
 import Title from 'antd/es/typography/Title';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const { Content } = Layout;
 
 export const CompanyDeletePage = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useTypedSelector((state) => state.auth);
+
   const navigate = useNavigate()
   const { data: company } = useGetCompanyByIdQuery(id || '');
-
   const [deleteCompany, { isLoading: isUpdating }] = useDeleteCompanyMutation();
-  const { refetch: refetchCompanyList } = useGetCompanyListQuery();
+  const { refetch: refetchCompanyList } = useGetCompanyListQuery(user?.profile.id);
 
   const handleDeleteCompany = () => {
     if (company) {

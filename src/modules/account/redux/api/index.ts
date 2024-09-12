@@ -18,10 +18,10 @@ export type TProfileData = {
     first_name?: string;
     last_name?: string;
     coins?: number;
-    location: TLocationTypesData | null;
-    job: TJobTypesData | null;
+    location: TLocationTypesData;
+    job: TJobTypesData;
     bd_year: number;
-    picture: string | null;
+    picture: string;
     time_create?: string;
     time_update?: string;
     user: TUserData;
@@ -29,42 +29,40 @@ export type TProfileData = {
 }
 
 export type TUpdateProfilesData = {
-  location?: string; // location-id
-  job?: string; // job-id
+  location: TLocationTypesData;
+  job: TJobTypesData;
   bd_year?: number;
   picture?: string;
   email?: string;
   first_name?: string;
   last_name?: string;
-  id: string; // user-id
+  id: string;
 }
 
 export const profilesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    // getProfiles: build.query<TUserData[], void>({
-    //   query: () => ({
-    //     url: '/profiles/',
-    //       method: 'GET'
-    //     }),
-    //   transformResponse: (response: TUserData[]) => response,
-    // }),
     updateProfiles: build.mutation<TUpdateProfilesData, TUpdateProfilesData>({
-      query: ({ location, job, bd_year, picture, email, first_name, last_name, id }) => ({
-        url: `/profiles/${id}/`,
-        method: 'PUT',
-        body: {
-          location,
-          job,
-          bd_year,
-          picture,
-          email,
-          first_name,
-          last_name,
-          id
+      query: ({ location, job, bd_year, picture, email, first_name, last_name, id }) => {
+        const formData = new FormData();
+        formData.append('location', location.id || '');
+        formData.append('job', job.id || '');
+        formData.append('bd_year', bd_year?.toString() || '');
+        formData.append('email', email || '');
+        formData.append('first_name', first_name || '');
+        formData.append('last_name', last_name || '');
+        
+        if (picture) {
+          formData.append('picture', picture);
         }
-      }),
-			transformResponse: (response: TUpdateProfilesData) => response,
-      extraOptions: { showErrors: false }
+
+        return {
+          url: `/profiles/${id}/`,
+          method: 'PUT',
+          body: formData,
+        };
+      },
+      transformResponse: (response: TUpdateProfilesData) => response,
+      extraOptions: { showErrors: false },
     }),
   }),
   overrideExisting: false,

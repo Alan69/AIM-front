@@ -15,38 +15,42 @@ export type TSchedulesrData = {
 }
 
 export type TAddToSchedulersData = {
-  post: string;
-  company: string;
-  product: string;
-  social_media: string;
+  post: string | undefined;
+  company: string | undefined;
+  social_media_account: string | undefined;
   scheduled_time: string;
-  created_by: string;
   active: boolean;
 }
 
 export type TAddToSchedulersResponse = {
+  id: string;
   post: string;
   company: string;
-  product: string;
   social_media: string;
   scheduled_time: string;
-  created_by: string;
   active: boolean;
 }
 
 export const contentPlanApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-		getSchedulers: build.query<TSchedulesrData[], void>({
-			query: () => ({
-				url: '/schedulers/by-current-company/',
+		getSchedulers: build.query<TSchedulesrData[], string | undefined>({
+			query: (company_id) => ({
+				url: `/schedulers/by-current-company/${company_id}`,
 				method: 'GET'
 			}),
 			transformResponse: (response: TSchedulesrData[]) => response,
     }),
     addToSchedulers: build.mutation<TAddToSchedulersResponse, TAddToSchedulersData>({
-			query: () => ({
+			query: ({post, company, social_media_account, scheduled_time, active}) => ({
 				url: '/schedulers/',
-				method: 'POST'
+				method: 'POST',
+        body: {
+          post,
+          company,
+          social_media_account,
+          scheduled_time,
+          active
+        }
 			}),
 			transformResponse: (response: TAddToSchedulersResponse) => response,
     }),

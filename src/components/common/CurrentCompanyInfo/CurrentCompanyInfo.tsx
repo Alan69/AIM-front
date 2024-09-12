@@ -7,14 +7,14 @@ import { useGetCompanyListQuery, useUpdateCurrentCompanyMutation } from 'modules
 import { Dropdown, Space, Menu, Button, Divider, Typography } from 'antd';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const CurrentCompanyInfo: React.FC = () => {
   const navigate = useNavigate()
-  const { current_company } = useTypedSelector((state) => state.auth);
-  const { data: companyList } = useGetCompanyListQuery();
-  const [getAuthUser] = useLazyGetAuthUserQuery()
-  const [updateCurrentCompany] = useUpdateCurrentCompanyMutation()
+  const { current_company, user } = useTypedSelector((state) => state.auth);
+  const { data: companyList } = useGetCompanyListQuery(user?.profile.id);
+  const [getAuthUser] = useLazyGetAuthUserQuery();
+  const [updateCurrentCompany] = useUpdateCurrentCompanyMutation();
 
   const companyItems = companyList?.map((company) => ({
     key: company.id,
@@ -22,13 +22,14 @@ const CurrentCompanyInfo: React.FC = () => {
       <Button
         type="text"
         className={styles.companyBtn}
-        onClick={() => {
-          navigate(`/company/${company.id}`)
+        onClick={(e) => {
+          // navigate(`/company/${company.id}`)
           updateCurrentCompany(company.id).unwrap().then(() => {
             getAuthUser()
           }).catch((err) => {
             console.log(err);
           })
+          e.stopPropagation();
         }}>
         {company.name}
       </Button>,
@@ -48,7 +49,7 @@ const CurrentCompanyInfo: React.FC = () => {
         <Text className={styles.dividerText}>Текущая компания</Text>
         <Divider className={styles.divider} />
       </div>
-      <div className={styles.infoBlock}>
+      <div className={styles.infoBlock} onClick={() => navigate(`/company/${current_company?.id}`)}>
         <div className={styles.details}>
           <div className={styles.name}>
             {current_company ? current_company.name : '-'}
@@ -64,7 +65,10 @@ const CurrentCompanyInfo: React.FC = () => {
               shape="circle"
               className={styles.addButton}
               icon={<PlusCircleOutlined className={styles.addIcon} />}
-              onClick={() => navigate('/company/create')}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/company/create');
+              }}
             />
           </div>
         </div>

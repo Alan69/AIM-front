@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Layout, Table } from 'antd';
 import type { TableProps } from 'antd';
 import { TPostQueryData, useGetPostQueriesListQuery } from '../redux/api';
 import { Link } from 'react-router-dom';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const { Content } = Layout;
 
 export const PostQueryListPage = () => {
-  const { data: postQueriesList } = useGetPostQueriesListQuery();
+  const { current_company } = useTypedSelector((state) => state.auth);
+  const { data: postQueriesList, refetch } = useGetPostQueriesListQuery();
 
   const columns: TableProps<TPostQueryData>['columns'] = [
     {
@@ -86,6 +88,10 @@ export const PostQueryListPage = () => {
     text_style: item?.text_style?.name,
     date: formatDate(item?.time_create),
   }));
+
+  useEffect(() => {
+    refetch()
+  }, [refetch, current_company])
 
   return (
     <Layout>

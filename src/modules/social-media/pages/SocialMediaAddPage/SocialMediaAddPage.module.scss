@@ -1,0 +1,32 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-radius: 16px;
+        background-color: #e6f4ff;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: 0.3s all;
+        &:hover {
+            border: 1px solid #1677ff;
+            transition: 0.3s all;
+        }
+        &__title {
+            color: #1677ff !important;
+            text-transform: capitalize;
+            margin-bottom: 0 !important;
+        }
+        img {
+            width: 32px;
+            height: 32px;
+        }
+    }
+}

@@ -29,15 +29,11 @@ export const PostDetailsPage = () => {
   const [recreatePostImage, { isLoading: isRecreatePostImageLoading }] = useRecreatePostImageMutation();
   const [recreatePostText, { isLoading: isRecreatePostTextLoading }] = useRecreatePostTextMutation();
 
-  console.log('post', post);
-
   const { user } = useTypedSelector((state) => state.auth);
 
   const [isEditBlockShow, setIsEditBlockShow] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImgStyle, setCurrentImgStyle] = useState(post?.img_style);
-
-  console.log('currentImgStyle', currentImgStyle);
 
   const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
 
@@ -104,7 +100,7 @@ export const PostDetailsPage = () => {
   }, [post, refetch, setValue]);
 
   if (isLoading) return <div className={styles.postDescr}>
-    <LoadingOutlined className={styles.loader} style={{ color: 'rgb(22, 119, 255)' }} />
+    <LoadingOutlined className={styles.loader} />
   </div>;
 
   return (
@@ -129,7 +125,7 @@ export const PostDetailsPage = () => {
                       </div>
                       <div className={styles.pictureBlock}>
                         {post?.picture?.includes('no_img') ?
-                          <LoadingOutlined className={styles.loader} style={{ fontSize: '16px', color: 'rgb(22, 119, 255)' }} />
+                          <LoadingOutlined className={styles.loader} />
                           :
                           <>
                             <Image
