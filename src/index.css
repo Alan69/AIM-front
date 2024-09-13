@@ -69,3 +69,22 @@ button:focus-visible {
 .ant-menu-item {
     height: auto !important;
 }
+
+.rbc-event {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgba(255, 119, 0, 1) !important;
+    padding: 5px;
+    font-weight: bold;
+    box-shadow: none !important;
+}
+
+.rbc-row-segment button {
+    padding: 0 5px;
+    color: rgba(0, 0, 0, 0.5) !important;
+    outline: none !important;
+}
+
+.rbc-overlay {
+    display: none !important;
+}

@@ -5,25 +5,19 @@
 }
 
 .calendar {
-    width: 70%;
-    &IsFull {
-        width: 100%;
-    }
+    width: 100%;
 }
 
 .eventContainer {
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    background-color: transparent !important;
+    padding: 0 5px;
 }
 
 .eventTitle {
     font-weight: bold;
     font-size: 12px;
-}
-
-.eventTime {
-    font-size: 10px;
-    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Layout, Tabs, TabsProps } from 'antd';
+import cn from 'classnames';
+import { Button, Layout, List, Tabs, TabsProps, Typography, Image } from 'antd';
 import { CalendarOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import styles from './ContentPlanPage.module.scss';
 import { ContentPlanCalendar } from '../../components/ContentPlanCalendar/ContentPlanCalendar';
@@ -12,8 +13,10 @@ import { ContentPlanPostsListModal } from 'modules/content-plan/components/Conte
 import { TPostData, useGetPostListByCompanyIdQuery } from 'modules/post/redux/api';
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
+import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
 
 const { Content } = Layout;
+const { Title } = Typography;
 
 export const ContentPlanPage = () => {
   const dispatch = useDispatch();
@@ -21,8 +24,13 @@ export const ContentPlanPage = () => {
   const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] = useState(false);
   const [isContentPlanPostsListModalOpen, setIsContentPlanPostsListModalOpen] = useState(false);
   const [isContentPlanSocialMediaListModalOpen, setIsContentPlanSocialMediaListModalOpen] = useState(false);
+
   const [selectNewPost, setSelectNewPost] = useState<TPostData | null>(null);
   const [selectNewSocialMedia, setSelectNewSocialMedia] = useState<TSocialMediaByCurrentCompanyData | null>(null);
+
+  const [selectedDatePreview, setSelectedDatePreview] = useState<Date | null>(null);
+  const [selectedEvents, setSelectedEvents] = useState<any[]>([]);
+  const [formattedSelectedDate, setFormattedSelectedDate] = useState<string | null>(null);
 
   const { selectedPost } = useTypedSelector((state) => state.contentPlan);
   const { current_company } = useTypedSelector((state) => state.auth);
@@ -30,7 +38,7 @@ export const ContentPlanPage = () => {
   const { data: postList, refetch: refetchPostList } = useGetSchedulersQuery(current_company?.id);
   const { data: postListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
   const { data: socialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
-  const [addToSchedulers] = useAddToSchedulersMutation();
+  const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
 
   const handleShowContentPlanAddPostModal = () => {
     setIsContentPlanAddPostModalOpen(true);
@@ -53,7 +61,23 @@ export const ContentPlanPage = () => {
   }
 
   const handleAddToSchedulers = (item: TAddToSchedulersData) => {
-    addToSchedulers(item).unwrap().then(() => refetchPostList());
+    addToSchedulers(item).unwrap().then(() => {
+      refetchPostList();
+      setIsContentPlanAddPostModalOpen(false);
+    });
+  }
+
+  const handleSelectEvent = (event: any) => {
+    if (selectedPost && selectedPost.id === event.id) {
+      dispatch(contentPlanActions.setSelectedPost(null));
+    } else {
+      dispatch(contentPlanActions.setSelectedPost(event));
+    }
+  };
+
+  const handleClearAddModalParams = () => {
+    setSelectNewPost(null);
+    setSelectNewSocialMedia(null);
   }
 
   const items: TabsProps['items'] = [
@@ -62,9 +86,12 @@ export const ContentPlanPage = () => {
       label: 'Календарь',
       children:
         <ContentPlanCalendar
-          handleShowContentPlanAddPostModal={handleShowContentPlanAddPostModal}
-          selectedPost={selectedPost}
           postList={postList}
+          handleSelectEvent={handleSelectEvent}
+          selectedDatePreview={selectedDatePreview}
+          setSelectedDatePreview={setSelectedDatePreview}
+          setSelectedEvents={setSelectedEvents}
+          setFormattedSelectedDate={setFormattedSelectedDate}
         />,
       icon: <CalendarOutlined />
     },
@@ -100,15 +127,49 @@ export const ContentPlanPage = () => {
         <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
           <h1>Контент план - {current_company?.name}</h1>
           <Layout>
-            <Content>
-              <div className={styles.container}>
+            <Content className={styles.content}>
+              <div className={cn(styles.calendar, selectedPost === null ? styles.calendarIsFull : '')}>
                 <Tabs
                   defaultActiveKey="1"
+                  tabBarExtraContent={<Button type="primary" onClick={handleShowContentPlanAddPostModal}>Добавить контент</Button>}
                   centered
                   items={items}
                   indicator={{ size: (origin) => origin - 20, align: 'center' }}
                 />
               </div>
+              {selectedDatePreview || selectedPost !== null ? <div className={styles.previewBlock}>
+                {selectedDatePreview ?
+                  <div className={styles.selectedEvents}>
+                    <Title level={5}>{formattedSelectedDate}</Title>
+                    {selectedEvents.length > 0 ? (
+                      <List
+                        itemLayout="horizontal"
+                        dataSource={selectedEvents}
+                        renderItem={(item) => (
+                          <List.Item
+                            className={cn(styles.selectedPost, selectedPost?.id === item.id ? styles.selectedPost__isActive : '')}
+                            onClick={() => handleSelectEvent(item)}
+                          >
+                            <List.Item.Meta
+                              className={styles.selectedPost__content}
+                              avatar={<Image width={32} height={32} src={item.picture} />}
+                              title={
+                                <div className={styles.selectedPost__text}>
+                                  <div className={styles.selectedPost__title}>{item.title}</div>
+                                  <div className={styles.selectedPost__time}>{item.time}</div>
+                                </div>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                      />
+                    ) : (
+                      <p>Нет событий</p>
+                    )}
+                  </div> : ''
+                }
+                {selectedPost === null ? '' : <SelectedPostPreview selectedPost={selectedPost} />}
+              </div> : ''}
             </Content>
           </Layout>
         </Content>
@@ -120,7 +181,9 @@ export const ContentPlanPage = () => {
         handleShowContentPlanSocialMediaListModal={handleShowContentPlanSocialMediaListModal}
         selectNewPost={selectNewPost}
         selectNewSocialMedia={selectNewSocialMedia}
+        isAddingToSchedulers={isAddingToSchedulers}
         handleAddToSchedulers={handleAddToSchedulers}
+        handleClearAddModalParams={handleClearAddModalParams}
       />
       <ContentPlanPostsListModal
         isModalOpen={isContentPlanPostsListModalOpen}

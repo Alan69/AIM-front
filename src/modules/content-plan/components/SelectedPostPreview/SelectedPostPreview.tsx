@@ -22,8 +22,8 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
   const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
 
   return (
-    <Layout style={{ width: '50%' }}>
-      <Content style={{ padding: '24px' }}>
+    <Layout>
+      <Content>
         <div className={styles.postDescr}>
           <div className={styles.container}>
             <div className={styles.postHeader}>
