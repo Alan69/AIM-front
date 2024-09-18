@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Layout, Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select, Image, Typography, Checkbox } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTypesApi';
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
 import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
 import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import { useNavigate } from 'react-router-dom';
+import styles from './PostQueryGenerateForm.module.scss';
+import { useLazyGetPostByIdQuery } from 'modules/post/redux/api';
+import { useDispatch } from 'react-redux';
+import { postActions } from 'modules/post/redux/slices/post.slice';
 
-const { Content } = Layout;
+const { Title, Text } = Typography;
 
-export const PostQueryCreatePage = () => {
-  const navigate = useNavigate();
+export const PostQueryGenerateForm = () => {
+  const dispatch = useDispatch();
   const { current_company } = useTypedSelector((state) => state.auth);
+  const { isPostCreated } = useTypedSelector((state) => state.post);
   const [selectedCompany, setSelectedCompany] = useState<string | undefined>();
 
   const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] = useLazyGetProductListByCompanyIdQuery();
+  const [getPostById, { data: post, isLoading: isPostLoading }] = useLazyGetPostByIdQuery();
   const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery();
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
@@ -25,7 +31,7 @@ export const PostQueryCreatePage = () => {
   const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQuerCreateData>({
     defaultValues: {
       content: '',
-      company: '',
+      company: current_company?.id,
       product: '',
       post_type: '',
       text_style: '',
@@ -46,20 +52,71 @@ export const PostQueryCreatePage = () => {
     }
   }, [selectedCompany, getProductListByCompanyId]);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (post) {
+      const { main_text, title, hashtags, picture, id } = post;
+
+      if (!main_text || !title || !hashtags || picture?.includes('no_img')) {
+        interval = setInterval(() => {
+          getPostById(id);
+        }, 5000);
+      }
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [post, getPostById]);
+
   const onSubmit = (data: TPostQuerCreateData) => {
     const updatedData = {
       ...data,
       company: current_company?.id,
     };
+
     createPost(updatedData).unwrap().then((response) => {
-      navigate(`/post/${response.post_id}`);
+      getPostById(response.id).unwrap().then(() => {
+        dispatch(postActions.setPostCreated(true));
+      })
     });
   };
 
   return (
-    <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Запрос</h1>
+    <>
+      {isPostCreated ?
+        <div className={styles.postDescr}>
+          <div className={styles.container}>
+            <div className={styles.mainBlock}>
+              <div className={styles.postHeader}>
+                <div className={styles.pictureBlock}>
+                  {post?.picture?.includes('no_img') ?
+                    <LoadingOutlined className={styles.loader} />
+                    :
+                    <Image
+                      src={post?.picture}
+                      className={styles.picture}
+                      alt="Post Image"
+                    />
+                  }
+                </div>
+              </div>
+              <div className={styles.postContent}>
+                <Title level={3}>{post?.title}</Title>
+                <Text>{post?.main_text}</Text>
+
+                <div className={styles.postHashtags}>
+                  <Text>{post?.hashtags}</Text>
+                </div>
+              </div>
+              <div className={styles.postLike}>
+                <Text>Лайк</Text>
+                <Checkbox checked={post?.like}></Checkbox>
+              </div>
+            </div>
+          </div>
+        </div> :
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item label="Компания" validateStatus={errors.company ? 'error' : ''} help={errors.company && 'Заполните это поле.'}>
             <Controller
@@ -172,12 +229,12 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={isPostCreating}>
+            <Button type="primary" htmlType="submit" loading={isPostCreating} block>
               Отправить запрос
             </Button>
           </Form.Item>
         </Form>
-      </Content>
-    </Layout>
+      }
+    </>
   );
 };

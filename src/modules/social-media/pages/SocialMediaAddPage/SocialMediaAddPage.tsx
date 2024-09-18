@@ -2,17 +2,16 @@ import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Layout, Button, Form, Input, Typography } from 'antd';
 import styles from './SocialMediaAddPage.module.scss';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { TSocialMediaData, useAddTelegramMutation, useGetSocialMediaListQuery } from 'modules/social-media/redux/api';
+import { TSocialMediaData, useLazyAddTelegramQuery, useLazyAddTwitterQuery, useGetSocialMediaListQuery, useLazyGetTwitterCallbackQuery } from 'modules/social-media/redux/api';
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
 
 export const SocialMediaAddPage = () => {
   const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListQuery();
-  const [addTelegram] = useAddTelegramMutation();
-
-  const { current_company } = useTypedSelector((state) => state.auth);
+  const [addTelegram] = useLazyAddTelegramQuery();
+  const [addTwitter] = useLazyAddTwitterQuery();
+  const [getTwitterCallback] = useLazyGetTwitterCallbackQuery();
 
   const navigate = useNavigate();
   // const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
@@ -24,12 +23,22 @@ export const SocialMediaAddPage = () => {
 
   const handleAddSocialMedia = (item: TSocialMediaData) => {
     if (item.name === 'telegram') {
-      addTelegram(current_company?.id).unwrap().then((res) => {
+      addTelegram().unwrap().then((res) => {
         if (res.auth_url) {
-          // window.open(res.auth_url, '_self');
+          window.open(res.auth_url, '_self');
         }
       }).catch((err) => {
         console.error("Error adding Telegram:", err);
+      });
+    }
+
+    if (item.name === 'twitter') {
+      addTwitter().unwrap().then((res) => {
+        if (res.auth_url) {
+          window.open(res.auth_url, '_self'); // Перенаправление пользователя на Twitter для авторизации
+        }
+      }).catch((err) => {
+        console.error("Error adding Twitter:", err);
       });
     }
   };

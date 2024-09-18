@@ -45,7 +45,6 @@ export const ContentPlanAddPostModal = ({
 
   const handleDateChange = (date: moment.Moment | null) => {
     setSelectedDate(date);
-
     if (!date) {
       setSelectedTime(null);
     }
@@ -59,7 +58,7 @@ export const ContentPlanAddPostModal = ({
     handleClearAddModalParams();
     setSelectedDate(null);
     setSelectedTime(null);
-  }
+  };
 
   const handleSubmit = () => {
     if (selectedDate && selectedTime && current_company && selectNewPost && selectNewSocialMedia) {
@@ -104,7 +103,10 @@ export const ContentPlanAddPostModal = ({
       title="Добавить контент"
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
-      onCancel={() => setIsModalOpen(false)}
+      onCancel={() => {
+        handleClearAddModal();
+        setIsModalOpen(false);
+      }}
       width={600}
       footer={[
         <Button.Group key="group" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>

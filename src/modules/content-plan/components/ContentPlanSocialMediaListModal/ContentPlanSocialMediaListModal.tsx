@@ -1,4 +1,4 @@
-import { Modal, Button, Divider, List, Typography } from 'antd';
+import { Modal, Button, Divider, Typography } from 'antd';
 import cn from 'classnames'
 
 import React, { useState } from 'react';
@@ -44,6 +44,7 @@ export const ContentPlanSocialMediaListModal = ({
             borderRadius: '16px',
             width: '100%',
           }}
+          disabled={!selectCurrentSocialMedia}
         >
           Выбрать
           {/* <b>{selectCurrentSocialMedia?.title}</b> */}

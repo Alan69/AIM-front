@@ -5,6 +5,7 @@ import styles from './LoginForm.module.scss';
 import { useLoginMutation } from 'modules/auth/redux/api';
 import { useDispatch } from 'react-redux';
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
+import { Link } from 'react-router-dom';
 
 export const LoginForm = () => {
   const dispatch = useDispatch();
@@ -25,57 +26,54 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginBox}>
-        <h2>Авторизация</h2>
-        <Form
-          name="login_form"
-          className={styles.loginForm}
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
+    <div className={styles.loginBox}>
+      <h2>Авторизация</h2>
+      <Form
+        name="login_form"
+        className={styles.loginForm}
+        initialValues={{ remember: true }}
+        onFinish={onFinish}
+      >
+        <Form.Item
+          name="email"
+          rules={[{ required: true, message: 'Пожалуйста, введите логин!' }]}
         >
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: 'Пожалуйста, введите логин!' }]}
+          <Input
+            prefix={<UserOutlined className="site-form-item-icon" />}
+            placeholder="Логин"
+          />
+        </Form.Item>
+        <Form.Item
+          name="password"
+          rules={[{ required: true, message: 'Пожалуйста, введите пароль!' }]}
+        >
+          <Input.Password
+            prefix={<LockOutlined className="site-form-item-icon" />}
+            type="password"
+            placeholder="Пароль"
+          />
+        </Form.Item>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className={styles.loginFormButton}
+            loading={isLoading}
           >
-            <Input
-              prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Логин"
-            />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Пожалуйста, введите пароль!' }]}
-          >
-            <Input
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              type="password"
-              placeholder="Пароль"
-            />
-          </Form.Item>
+            Войти
+          </Button>
+        </Form.Item>
 
-          <Form.Item>
-            <a className={styles.loginFormForgot} href="">
-              Забыли пароль?
-            </a>
-          </Form.Item>
+        <div className={styles.linksBlock}>
+          <Link to="/signup">Регистрация аккаунта</Link>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className={styles.loginFormButton}
-              loading={isLoading}
-            >
-              Войти
-            </Button>
-          </Form.Item>
+          <Link className={styles.loginFormForgot} to="/recovery">
+            Забыли пароль?
+          </Link>
+        </div>
 
-          <Form.Item>
-            <a href="">Регистрация аккаунта</a>
-          </Form.Item>
-        </Form>
-      </div>
+      </Form>
     </div>
   );
 };

@@ -20,6 +20,15 @@ export type TPostData = {
   author: TUserData;
 }
 
+export type TCreatePost = {
+  title: string;
+  main_text: string;
+  hashtags: string;
+  picture?: string;
+  like?: boolean;
+  active?: boolean;
+}
+
 export type TUpdatePost = {
   id: string;
   title: string;
@@ -69,6 +78,28 @@ export const postApi = baseApi.injectEndpoints({
         method: 'GET'
       }),
       transformResponse: (response: TPostData[]) => response,
+    }),
+    createPost: build.mutation<TPostData, TCreatePost>({
+      query: ({ title, main_text, hashtags, picture, like, active }) => {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('main_text', main_text || '');
+        formData.append('hashtags', hashtags || '');
+        like && formData.append('like', like.toString());
+        active && formData.append('active', active.toString());
+        
+        if (picture) {
+          formData.append('picture', picture);
+        }
+    
+        return {
+          url: '/posts/',
+          method: 'POST',
+          body: formData,
+        };
+      },
+      transformResponse: (response: TPostData) => response,
+      extraOptions: { showErrors: false },
     }),
     updatePost: build.mutation<TPostData, TUpdatePost>({
       query: ({ id, title, img_prompt, txt_prompt, main_text, hashtags, like, active, img_style, post_query, author, picture }) => {
@@ -134,7 +165,9 @@ export const postApi = baseApi.injectEndpoints({
 export const {
   useGetPostListQuery,
   useGetPostByIdQuery,
+  useLazyGetPostByIdQuery,
   useGetPostListByCompanyIdQuery,
+  useCreatePostMutation,
   useUpdatePostMutation,
   useRecreatePostImageMutation,
   useRecreatePostTextMutation,

@@ -40,25 +40,15 @@ export const ContentPlanPage = () => {
   const { data: socialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
 
-  const handleShowContentPlanAddPostModal = () => {
-    setIsContentPlanAddPostModalOpen(true);
-  };
+  const handleShowContentPlanAddPostModal = () => setIsContentPlanAddPostModalOpen(true);
 
-  const handleShowContentPlanPostsListModal = () => {
-    setIsContentPlanPostsListModalOpen(true);
-  };
+  const handleShowContentPlanPostsListModal = () => setIsContentPlanPostsListModalOpen(true);
 
-  const handleShowContentPlanSocialMediaListModal = () => {
-    setIsContentPlanSocialMediaListModalOpen(true);
-  };
+  const handleShowContentPlanSocialMediaListModal = () => setIsContentPlanSocialMediaListModalOpen(true);
 
-  const handleSelectNewPost = (post: TPostData) => {
-    setSelectNewPost(post);
-  }
+  const handleSelectNewPost = (post: TPostData) => setSelectNewPost(post);
 
-  const handleSelectNewSocialMedia = (socialMedia: TSocialMediaByCurrentCompanyData) => {
-    setSelectNewSocialMedia(socialMedia);
-  }
+  const handleSelectNewSocialMedia = (socialMedia: TSocialMediaByCurrentCompanyData) => setSelectNewSocialMedia(socialMedia);
 
   const handleAddToSchedulers = (item: TAddToSchedulersData) => {
     addToSchedulers(item).unwrap().then(() => {
@@ -68,7 +58,7 @@ export const ContentPlanPage = () => {
   }
 
   const handleSelectEvent = (event: any) => {
-    if (selectedPost && selectedPost.id === event.id) {
+    if (selectedPost?.id === event.id) {
       dispatch(contentPlanActions.setSelectedPost(null));
     } else {
       dispatch(contentPlanActions.setSelectedPost(event));
@@ -114,12 +104,12 @@ export const ContentPlanPage = () => {
   useEffect(() => {
     return () => {
       dispatch(contentPlanActions.setSelectedPost(null));
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     dispatch(contentPlanActions.setSelectedPost(null));
-  }, [current_company])
+  }, [current_company]);
 
   return (
     <>
@@ -134,42 +124,43 @@ export const ContentPlanPage = () => {
                   tabBarExtraContent={<Button type="primary" onClick={handleShowContentPlanAddPostModal}>Добавить контент</Button>}
                   centered
                   items={items}
-                  indicator={{ size: (origin) => origin - 20, align: 'center' }}
                 />
               </div>
-              {selectedDatePreview || selectedPost !== null ? <div className={styles.previewBlock}>
-                {selectedDatePreview ?
-                  <div className={styles.selectedEvents}>
-                    <Title level={5}>{formattedSelectedDate}</Title>
-                    {selectedEvents.length > 0 ? (
-                      <List
-                        itemLayout="horizontal"
-                        dataSource={selectedEvents}
-                        renderItem={(item) => (
-                          <List.Item
-                            className={cn(styles.selectedPost, selectedPost?.id === item.id ? styles.selectedPost__isActive : '')}
-                            onClick={() => handleSelectEvent(item)}
-                          >
-                            <List.Item.Meta
-                              className={styles.selectedPost__content}
-                              avatar={<Image width={32} height={32} src={item.picture} />}
-                              title={
-                                <div className={styles.selectedPost__text}>
-                                  <div className={styles.selectedPost__title}>{item.title}</div>
-                                  <div className={styles.selectedPost__time}>{item.time}</div>
-                                </div>
-                              }
-                            />
-                          </List.Item>
-                        )}
-                      />
-                    ) : (
-                      <p>Нет событий</p>
-                    )}
-                  </div> : ''
-                }
-                {selectedPost === null ? '' : <SelectedPostPreview selectedPost={selectedPost} />}
-              </div> : ''}
+              {selectedDatePreview || selectedPost !== null ? (
+                <div className={styles.previewBlock}>
+                  {selectedDatePreview ? (
+                    <div className={styles.selectedEvents}>
+                      <Title level={5}>{formattedSelectedDate}</Title>
+                      {selectedEvents.length > 0 ? (
+                        <List
+                          itemLayout="horizontal"
+                          dataSource={selectedEvents}
+                          renderItem={(item) => (
+                            <List.Item
+                              className={cn(styles.selectedPost, selectedPost?.id === item.id ? styles.selectedPost__isActive : '')}
+                              onClick={() => handleSelectEvent(item)}
+                            >
+                              <List.Item.Meta
+                                className={styles.selectedPost__content}
+                                avatar={<Image width={32} height={32} src={item.picture} />}
+                                title={
+                                  <div className={styles.selectedPost__text}>
+                                    <div className={styles.selectedPost__title}>{item.title}</div>
+                                    <div className={styles.selectedPost__time}>{item.time}</div>
+                                  </div>
+                                }
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      ) : (
+                        <p>Нет событий</p>
+                      )}
+                    </div>
+                  ) : ''}
+                  {selectedPost === null ? '' : <SelectedPostPreview selectedPost={selectedPost} />}
+                </div>
+              ) : ''}
             </Content>
           </Layout>
         </Content>

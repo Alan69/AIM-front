@@ -10,7 +10,6 @@ import styles from './PostDetailsPage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import avatar from '../../../../assets/avatar.png';
 import { Controller, useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { ModalImageStylesList } from 'modules/post-query/components/ModalImageStylesList/ModalImageStylesList';
 import { TImgStylesData, useGetImgStylesListQuery } from '../../../../redux/api/imgStyles/imgStylesApi';
 
@@ -22,7 +21,6 @@ const { Panel } = Collapse;
 export const PostDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
   const { data: imgStylesList } = useGetImgStylesListQuery();
@@ -185,9 +183,6 @@ export const PostDetailsPage = () => {
                       >
                         Отменить
                       </Button>
-                    </div>
-                    <div className={styles.postActions}>
-
                     </div>
                   </div>
                   {isEditBlockShow && (

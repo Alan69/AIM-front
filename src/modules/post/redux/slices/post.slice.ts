@@ -6,7 +6,6 @@ interface PostState {
 
 const initialState: PostState = {
   isPostCreated: false,
-  // isPostCreated: true,
 };
 
 const contentPlanSlice = createSlice({

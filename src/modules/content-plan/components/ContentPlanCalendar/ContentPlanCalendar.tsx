@@ -71,12 +71,18 @@ export const ContentPlanCalendar = ({
   const handleSelectSlot = (slotInfo: any) => {
     dispatch(contentPlanActions.setSelectedPost(null));
 
-    const selectedDateEvents = events.filter(
-      (event) => moment(event.start).isSame(slotInfo.start, 'day')
-    );
-    setSelectedEvents(selectedDateEvents);
-    setSelectedDatePreview(slotInfo.start);
-    setFormattedSelectedDate(moment(slotInfo.start).format('D MMMM, YYYY'));
+    if (selectedDatePreview && moment(slotInfo.start).isSame(selectedDatePreview, 'day')) {
+      setSelectedDatePreview(null);
+      setSelectedEvents([]);
+      setFormattedSelectedDate(null);
+    } else {
+      const selectedDateEvents = events.filter(
+        (event) => moment(event.start).isSame(slotInfo.start, 'day')
+      );
+      setSelectedEvents(selectedDateEvents);
+      setSelectedDatePreview(slotInfo.start);
+      setFormattedSelectedDate(moment(slotInfo.start).format('D MMMM, YYYY'));
+    }
   };
 
   const EventComponent = ({ event }: { event: any }) => {
@@ -134,15 +140,19 @@ export const ContentPlanCalendar = ({
   };
 
   const dayPropGetter = (date: Date) => {
+    let style = {};
     if (selectedDatePreview && moment(date).isSame(selectedDatePreview, 'day')) {
-      return {
-        style: {
-          backgroundColor: '#d4f0ff',
-          border: '1px solid #1890ff',
-        },
+      style = {
+        backgroundColor: '#d4f0ff',
+        border: '1px solid #1890ff',
       };
     }
-    return {};
+    return {
+      style: {
+        ...style,
+        cursor: 'pointer', // Добавление курсора pointer
+      },
+    };
   };
 
   return (

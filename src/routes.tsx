@@ -41,7 +41,7 @@ const AppRoutes: FC = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate('/login', { replace: true });
+      // navigate('/login', { replace: true });
     } else {
       getAuthUser();
     }

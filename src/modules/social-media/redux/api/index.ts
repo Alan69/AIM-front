@@ -18,6 +18,8 @@ type TTelegramResponse = {
   auth_url: string
 }
 
+type TTwitterResponse = TTelegramResponse
+
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getSocialMediaList: build.query<TSocialMediaData[], void>({
@@ -34,12 +36,25 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TSocialMediaByCurrentCompanyData[]) => response,
     }),
-    addTelegram: build.mutation<TTelegramResponse, string | undefined>({
-      query: (company_id) => ({
-        url: `/telegram/auth/${company_id}/`,
+    addTelegram: build.query<TTelegramResponse, void>({
+      query: () => ({
+        url: '/telegram/auth/',
         method: 'GET'
       }),
       transformResponse: (response: TTelegramResponse) => response,
+    }),
+    addTwitter: build.query<TTwitterResponse, void>({
+      query: () => ({
+        url: '/twitter/auth/',
+        method: 'GET'
+      }),
+      transformResponse: (response: TTwitterResponse) => response,
+    }),
+    getTwitterCallback: build.query<TTwitterResponse, { oauth_token: string; oauth_verifier: string }>({
+      query: ({ oauth_token, oauth_verifier }) => ({
+        url: `/twitter/callback/?oauth_token=${oauth_token}&oauth_verifier=${oauth_verifier}`,
+        method: 'GET',
+      }),
     }),
   }),
   overrideExisting: false,
@@ -48,5 +63,7 @@ export const postApi = baseApi.injectEndpoints({
 export const {
   useGetSocialMediaListQuery,
   useGetSocialMediaListByCurrentCompanyQuery,
-  useAddTelegramMutation
+  useLazyAddTelegramQuery,
+  useLazyAddTwitterQuery,
+  useLazyGetTwitterCallbackQuery
 } = postApi;

@@ -7,11 +7,25 @@ type TLogin = {
   password: string;
 }
 
+type TSignUp = {
+  email: string;
+  password: string;
+  password2: string;
+  first_name: string;
+  last_name: string;
+}
+
 type TLoginResponse = {
   data: {
     access: string;
     refresh: string;
   }
+}
+
+type TSignUpResponse = {
+  access: string;
+  refresh: string;
+  user: TUserData;
 }
 
 type TTokenResponse = {
@@ -50,6 +64,21 @@ export const authApi = baseApi.injectEndpoints({
 			transformResponse: (response: TLoginResponse) => response,
       extraOptions: { showErrors: false }
     }),
+    signUp: build.mutation<TSignUpResponse, TSignUp>({
+      query: ({ email, password, password2, first_name, last_name }) => ({
+        url: '/user/register/',
+        method: 'POST',
+        body: {
+          email,
+          password,
+          password2,
+          first_name,
+          last_name
+        }
+      }),
+			transformResponse: (response: TSignUpResponse) => response,
+      extraOptions: { showErrors: false }
+    }),
     refreshToken: build.mutation<TTokenResponse, { refresh: string }>({
       query: ({ refresh }) => ({
         url: '/token/refresh/',
@@ -69,5 +98,6 @@ export const {
   useLazyGetAuthUserQuery,
   useGetAuthUserQuery,
   useLoginMutation,
+  useSignUpMutation,
   useRefreshTokenMutation
 } = authApi;

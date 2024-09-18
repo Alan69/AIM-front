@@ -5,11 +5,11 @@ import { TJobTypesData } from 'redux/api/jobTypes/jobTypesApi';
 
 export type TUserData = {
   id: string;
-  username: string;
   first_name?: string;
   last_name?: string;
   email?: string;
   current_company: TCompanyData | null;
+  tariff: number;
 }
 
 export type TProfileData = {
