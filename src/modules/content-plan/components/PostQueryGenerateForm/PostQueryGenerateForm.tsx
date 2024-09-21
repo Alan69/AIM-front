@@ -6,24 +6,26 @@ import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTy
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
 import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
-import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
+import { TPostQuerCreateData } from 'modules/post-query/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import styles from './PostQueryGenerateForm.module.scss';
-import { useLazyGetPostByIdQuery } from 'modules/post/redux/api';
-import { useDispatch } from 'react-redux';
-import { postActions } from 'modules/post/redux/slices/post.slice';
+import { TPostData } from 'modules/post/redux/api';
 
 const { Title, Text } = Typography;
 
-export const PostQueryGenerateForm = () => {
-  const dispatch = useDispatch();
+type TProps = {
+  isPostCreating: boolean
+  post: TPostData | undefined
+  handleGeneratePost: (updatedData: TPostQuerCreateData) => void
+  handleGetPostById: (id: string) => void
+}
+
+export const PostQueryGenerateForm = ({ isPostCreating, post, handleGeneratePost, handleGetPostById }: TProps) => {
   const { current_company } = useTypedSelector((state) => state.auth);
-  const { isPostCreated } = useTypedSelector((state) => state.post);
+  const { isPostGenerated } = useTypedSelector((state) => state.post);
   const [selectedCompany, setSelectedCompany] = useState<string | undefined>();
 
-  const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] = useLazyGetProductListByCompanyIdQuery();
-  const [getPostById, { data: post, isLoading: isPostLoading }] = useLazyGetPostByIdQuery();
   const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery();
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
@@ -60,7 +62,7 @@ export const PostQueryGenerateForm = () => {
 
       if (!main_text || !title || !hashtags || picture?.includes('no_img')) {
         interval = setInterval(() => {
-          getPostById(id);
+          handleGetPostById(id);
         }, 5000);
       }
     }
@@ -68,7 +70,7 @@ export const PostQueryGenerateForm = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [post, getPostById]);
+  }, [post, handleGetPostById]);
 
   const onSubmit = (data: TPostQuerCreateData) => {
     const updatedData = {
@@ -76,16 +78,12 @@ export const PostQueryGenerateForm = () => {
       company: current_company?.id,
     };
 
-    createPost(updatedData).unwrap().then((response) => {
-      getPostById(response.id).unwrap().then(() => {
-        dispatch(postActions.setPostCreated(true));
-      })
-    });
+    handleGeneratePost(updatedData);
   };
 
   return (
     <>
-      {isPostCreated ?
+      {isPostGenerated ?
         <div className={styles.postDescr}>
           <div className={styles.container}>
             <div className={styles.mainBlock}>

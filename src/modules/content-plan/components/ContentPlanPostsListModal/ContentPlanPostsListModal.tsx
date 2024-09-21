@@ -8,6 +8,8 @@ import styles from './ContentPlanPostsListModal.module.scss'
 import { TPostData } from 'modules/post/redux/api';
 import { PostQueryGenerateForm } from '../PostQueryGenerateForm/PostQueryGenerateForm';
 import { PostCreateForm } from '../PostCreateForm/PostCreateForm';
+import { useTypedSelector } from 'hooks/useTypedSelector';
+import { TPostQuerCreateData } from 'modules/post-query/redux/api';
 
 type TProps = {
   isModalOpen: boolean;
@@ -15,6 +17,10 @@ type TProps = {
   postListByCompanyId: TPostData[] | undefined
   handleSelectNewPost: (post: TPostData) => void
   selectNewPost: TPostData | null;
+  isPostCreating: boolean
+  post: TPostData | undefined
+  handleGeneratePost: (updatedData: TPostQuerCreateData) => void
+  handleGetPostById: (id: string) => void
 };
 
 const { Title, Paragraph } = Typography;
@@ -25,10 +31,15 @@ export const ContentPlanPostsListModal = ({
   postListByCompanyId,
   handleSelectNewPost,
   selectNewPost,
+  isPostCreating,
+  post,
+  handleGeneratePost,
+  handleGetPostById,
 }: TProps) => {
   const [expandedKeys, setExpandedKeys] = useState<Record<number, boolean>>({});
   const [selectCurrentPost, setSelectCurrentPost] = useState<TPostData | null>(selectNewPost);
-  const [activeTabKey, setActiveTabKey] = useState<string>('1');
+  const [activeTabKey, setActiveTabKey] = useState<string>('2');
+  const { generatedPost } = useTypedSelector((state) => state.post);
 
   const toggleExpand = (index: number) => {
     setExpandedKeys((prevKeys) => ({
@@ -42,16 +53,17 @@ export const ContentPlanPostsListModal = ({
   };
 
   const items: TabsProps['items'] = [
-    // {
-    //   key: '1',
-    //   label: 'Создание поста',
-    //   children: <PostCreateForm />,
-    //   icon: <AppstoreAddOutlined />
-    // },
+    {
+      key: '1',
+      label: 'Создание поста',
+      children: <PostCreateForm />,
+      icon: <AppstoreAddOutlined />,
+      disabled: true
+    },
     {
       key: '2',
       label: 'Генерация поста',
-      children: <PostQueryGenerateForm />,
+      children: <PostQueryGenerateForm isPostCreating={isPostCreating} post={post} handleGeneratePost={handleGeneratePost} handleGetPostById={handleGetPostById} />,
       icon: <AppstoreAddOutlined />,
     },
     {
@@ -101,33 +113,38 @@ export const ContentPlanPostsListModal = ({
       onCancel={() => setIsModalOpen(false)}
       onClose={() => setIsModalOpen(false)}
       width={600}
-      footer={activeTabKey === '3' ? [
+      footer={[
         <Button
           key="schedule"
           type="default"
           onClick={() => {
-            selectCurrentPost && handleSelectNewPost(selectCurrentPost);
+            activeTabKey === '2' && generatedPost && handleSelectNewPost(generatedPost);
+            activeTabKey === '3' && selectCurrentPost && handleSelectNewPost(selectCurrentPost);
             setIsModalOpen(false);
           }}
           style={{
             borderRadius: '16px',
             width: '100%',
           }}
-          disabled={!selectCurrentPost}
+          disabled={
+            (activeTabKey === '2' && !generatedPost)
+            ||
+            (activeTabKey === '3' && !selectCurrentPost)
+          }
         >
           Выбрать
           {/* <b>{selectCurrentPost?.title}</b> */}
         </Button>
-      ] : null}
+      ]}
     >
       <Divider />
       <Tabs
-        defaultActiveKey="1"
+        defaultActiveKey="2"
         onChange={handleTabChange}
         centered
         items={items}
       />
       <Divider />
-    </Modal>
+    </Modal >
   );
 };

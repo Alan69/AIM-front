@@ -10,10 +10,12 @@ import { useDispatch } from 'react-redux';
 import { TAddToSchedulersData, useAddToSchedulersMutation, useGetSchedulersQuery } from 'modules/content-plan/redux/api';
 import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
 import { ContentPlanPostsListModal } from 'modules/content-plan/components/ContentPlanPostsListModal/ContentPlanPostsListModal';
-import { TPostData, useGetPostListByCompanyIdQuery } from 'modules/post/redux/api';
+import { TPostData, useGetPostListByCompanyIdQuery, useLazyGetPostByIdQuery } from 'modules/post/redux/api';
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
 import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
+import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
+import { postActions } from 'modules/post/redux/slices/post.slice';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -36,11 +38,16 @@ export const ContentPlanPage = () => {
   const { current_company } = useTypedSelector((state) => state.auth);
 
   const { data: postList, refetch: refetchPostList } = useGetSchedulersQuery(current_company?.id);
-  const { data: postListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
+  const { data: postListByCompanyId, refetch: refetchPostListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
   const { data: socialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
+  const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
+  const [getPostById, { data: post }] = useLazyGetPostByIdQuery();
 
-  const handleShowContentPlanAddPostModal = () => setIsContentPlanAddPostModalOpen(true);
+  const handleShowContentPlanAddPostModal = () => {
+    refetchPostListByCompanyId();
+    setIsContentPlanAddPostModalOpen(true);
+  };
 
   const handleShowContentPlanPostsListModal = () => setIsContentPlanPostsListModalOpen(true);
 
@@ -55,6 +62,19 @@ export const ContentPlanPage = () => {
       refetchPostList();
       setIsContentPlanAddPostModalOpen(false);
     });
+  }
+
+  const handleGeneratePost = (updatedData: TPostQuerCreateData) => {
+    createPost(updatedData).unwrap().then((response) => {
+      getPostById(response.id).unwrap().then((responsePost) => {
+        dispatch(postActions.setIsPostGenerated(true));
+        dispatch(postActions.setGeneratedPost(responsePost));
+      })
+    });
+  };
+
+  const handleGetPostById = (id: string) => {
+    getPostById(id);
   }
 
   const handleSelectEvent = (event: any) => {
@@ -182,6 +202,10 @@ export const ContentPlanPage = () => {
         postListByCompanyId={postListByCompanyId}
         handleSelectNewPost={handleSelectNewPost}
         selectNewPost={selectNewPost}
+        isPostCreating={isPostCreating}
+        post={post}
+        handleGeneratePost={handleGeneratePost}
+        handleGetPostById={handleGetPostById}
       />
       <ContentPlanSocialMediaListModal
         isModalOpen={isContentPlanSocialMediaListModalOpen}

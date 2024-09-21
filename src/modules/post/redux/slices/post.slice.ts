@@ -1,23 +1,29 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TPostData } from '../api';
 
 interface PostState {
-  isPostCreated: boolean;
+  isPostGenerated: boolean;
+  generatedPost: TPostData | null;
 }
 
 const initialState: PostState = {
-  isPostCreated: false,
+  isPostGenerated: false,
+  generatedPost: null,
 };
 
-const contentPlanSlice = createSlice({
+const postSlice = createSlice({
   name: 'post',
   initialState,
   reducers: {
-    setPostCreated: (state, { payload }: PayloadAction<boolean>) => {
-      state.isPostCreated = payload;
+    setIsPostGenerated: (state, { payload }: PayloadAction<boolean>) => {
+      state.isPostGenerated = payload;
+    },
+    setGeneratedPost: (state, { payload }: PayloadAction<TPostData | null>) => {
+      state.generatedPost = payload;
     },
   },
 });
 
-export const postReducer = contentPlanSlice.reducer;
-export const postActions = contentPlanSlice.actions;
+export const postReducer = postSlice.reducer;
+export const postActions = postSlice.actions;
 export type { PostState };
