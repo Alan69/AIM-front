@@ -16,9 +16,9 @@ export type TSchedulesrData = {
 }
 
 export type TAddToSchedulersData = {
-  post: string | undefined;
-  company: string | undefined;
-  social_media_account: string | undefined;
+  post_id: string | undefined;
+  company_id: string | undefined;
+  social_media_account_ids: string[] | undefined;
   scheduled_date: string;
   scheduled_time: string;
   active: boolean;
@@ -43,13 +43,13 @@ export const contentPlanApi = baseApi.injectEndpoints({
 			transformResponse: (response: TSchedulesrData[]) => response,
     }),
     addToSchedulers: build.mutation<TAddToSchedulersResponse, TAddToSchedulersData>({
-			query: ({post, company, social_media_account, scheduled_date, scheduled_time, active}) => ({
-				url: '/schedulers/',
+			query: ({post_id, company_id, social_media_account_ids, scheduled_date, scheduled_time, active}) => ({
+				url: '/scheduler/post/',
 				method: 'POST',
         body: {
-          post,
-          company,
-          social_media_account,
+          post_id,
+          company_id,
+          social_media_account_ids,
           scheduled_date,
           scheduled_time,
           active

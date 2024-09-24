@@ -12,7 +12,7 @@ const OfferInfo: React.FC = () => {
   const { user } = useTypedSelector((state) => state.auth);
 
   return (
-    <Link to="/account/offers" className={styles.link}>
+    <Link to="/tariffs" className={styles.link}>
       <div className={styles.offerInfo}>
         <img src={coins} alt="User Avatar" className={styles.avatar} />
         <div className={styles.details}>
@@ -21,7 +21,7 @@ const OfferInfo: React.FC = () => {
               <span style={{ marginLeft: '4px' }}><QuestionCircleOutlined /></span>
             </Tooltip>
           </div>
-          <Link to="/account/offers" className={styles.link}>Купить тарифный план</Link>
+          <Link to="/tariffs" className={styles.link}>Купить тарифный план</Link>
         </div>
       </div>
     </Link>

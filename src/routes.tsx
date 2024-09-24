@@ -7,12 +7,10 @@ import { RecoveryPage } from 'modules/auth/pages/RecoveryPage/RecoveryPage';
 import { SignUpPage } from 'modules/auth/pages/SignUpPage/SignUpPage';
 import { LoginPage } from 'modules/auth/pages/LoginPage/LoginPage';
 import { AccountPage } from 'modules/account/pages/AccountPage/AccountPage';
-import { OfferPage } from 'modules/offer/pages/OfferPage/OfferPage';
 import { CompanyCreatePage } from 'modules/company/pages/CompanyCreatePage/CompanyCreatePage';
 import { CompanyDetailsPage } from 'modules/company/pages/CompanyDetailsPage/CompanyDetailsPage';
 import { CompanyUpdatePage } from 'modules/company/pages/CompanyUpdatePage/CompanyUpdatePage';
 import { CompanyDeletePage } from 'modules/company/pages/CompanyDeletePage/CompanyDeletePage';
-import { OffersPage } from 'modules/account/pages/OffersPage/OffersPage';
 import { ProductCreatePage } from 'modules/product/pages/ProductCreatePage/ProductCreatePage';
 import { ProductUpdatePage } from 'modules/product/pages/ProductUpdatePage/ProductUpdatePage';
 import { ProductDeletePage } from 'modules/product/pages/ProductDeletePage/ProductDeletePage';
@@ -28,6 +26,7 @@ import { PostDetailsPage } from 'modules/post/pages/PostDetailsPage/PostDetailsP
 import { useLazyGetAuthUserQuery, useRefreshTokenMutation } from 'modules/auth/redux/api';
 import { ContentPlanPage } from 'modules/content-plan/pages/ContentPlanPage/ContentPlanPage';
 import { SocialMediaAddPage } from 'modules/social-media/pages/SocialMediaAddPage/SocialMediaAddPage';
+import { TariffListPage } from 'modules/tariff/pages/TariffListPage/TariffListPage';
 
 const REFRESH_TOKEN_INTERVAL = 20 * 60 * 1000;
 
@@ -92,8 +91,8 @@ const AppRoutes: FC = () => {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path='/account/profile/edit' element={<AccountPage />} />
-        <Route path='/account/offers' element={<OffersPage />} />
-        <Route path='/offer' element={<OfferPage />} />
+        <Route path='/account/tariffs' element={<TariffListPage />} />
+        <Route path='/tariffs' element={<TariffListPage />} />
         <Route path="/post-query" element={<PostQueryListPage />} />
         <Route path="/post-query/list" element={<PostQueryListPage />} />
         <Route path="/post-query/create" element={<PostQueryCreatePage />} />

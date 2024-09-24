@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Layout, Button, Form, Input, Typography } from 'antd';
 import styles from './SocialMediaAddPage.module.scss';
-import { TSocialMediaData, useLazyAddTelegramQuery, useLazyAddTwitterQuery, useGetSocialMediaListQuery, useLazyGetTwitterCallbackQuery } from 'modules/social-media/redux/api';
+import { TSocialMediaData, useLazyAddTelegramQuery, useLazyAddTwitterQuery, useGetSocialMediaListQuery, useLazyGetTwitterCallbackQuery, useLazyAddLinkedinQuery, useLazyAddTumblrQuery } from 'modules/social-media/redux/api';
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
@@ -12,6 +12,9 @@ export const SocialMediaAddPage = () => {
   const [addTelegram] = useLazyAddTelegramQuery();
   const [addTwitter] = useLazyAddTwitterQuery();
   const [getTwitterCallback] = useLazyGetTwitterCallbackQuery();
+  const [addLinkedin] = useLazyAddLinkedinQuery();
+  const [addTumblr] = useLazyAddTumblrQuery();
+
 
   const navigate = useNavigate();
   // const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
@@ -35,10 +38,32 @@ export const SocialMediaAddPage = () => {
     if (item.name === 'twitter') {
       addTwitter().unwrap().then((res) => {
         if (res.auth_url) {
-          window.open(res.auth_url, '_self'); // Перенаправление пользователя на Twitter для авторизации
+          window.open(res.auth_url, '_self');
         }
       }).catch((err) => {
         console.error("Error adding Twitter:", err);
+      });
+    }
+
+    if (item.name === 'linkedin') {
+      addLinkedin().unwrap().then((res) => {
+        if (res) {
+          window.open(res, '_self');
+        }
+      }).catch((err) => {
+        console.error("Error adding linkedin:", err);
+      });
+    }
+
+    if (item.name === 'tumblr') {
+      addTumblr().unwrap().then((res) => {
+        console.log(res);
+
+        if (res) {
+          window.open(res, '_self');
+        }
+      }).catch((err) => {
+        console.error("Error adding tumblr:", err);
       });
     }
   };

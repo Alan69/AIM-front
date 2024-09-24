@@ -66,9 +66,9 @@ export const ContentPlanAddPostModal = ({
       const scheduledTime = selectedTime.format('HH:mm:ss');
 
       handleAddToSchedulers({
-        post: selectNewPost.id,
-        company: current_company.id,
-        social_media_account: selectNewSocialMedia.id,
+        post_id: selectNewPost.id,
+        company_id: current_company.id,
+        social_media_account_ids: [selectNewSocialMedia.id],
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime,
         active: true,

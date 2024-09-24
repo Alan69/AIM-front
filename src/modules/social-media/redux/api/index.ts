@@ -56,6 +56,20 @@ export const postApi = baseApi.injectEndpoints({
         method: 'GET',
       }),
     }),
+    addLinkedin: build.query<string, void>({
+      query: () => ({
+        url: '/linkedin/auth/',
+        method: 'GET'
+      }),
+      transformResponse: (response: string) => response,
+    }),
+    addTumblr: build.query<string, void>({
+      query: () => ({
+        url: '/tumblr/auth/',
+        method: 'GET'
+      }),
+      transformResponse: (response: string) => response,
+    }),
   }),
   overrideExisting: false,
 });
@@ -65,5 +79,7 @@ export const {
   useGetSocialMediaListByCurrentCompanyQuery,
   useLazyAddTelegramQuery,
   useLazyAddTwitterQuery,
-  useLazyGetTwitterCallbackQuery
+  useLazyGetTwitterCallbackQuery,
+  useLazyAddLinkedinQuery,
+  useLazyAddTumblrQuery
 } = postApi;

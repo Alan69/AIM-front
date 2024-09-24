@@ -65,6 +65,7 @@ export const ContentPlanPostsListModal = ({
       label: 'Генерация поста',
       children: <PostQueryGenerateForm isPostCreating={isPostCreating} post={post} handleGeneratePost={handleGeneratePost} handleGetPostById={handleGetPostById} />,
       icon: <AppstoreAddOutlined />,
+      disabled: isPostCreating,
     },
     {
       key: '3',
@@ -102,6 +103,7 @@ export const ContentPlanPostsListModal = ({
         />
       </div>,
       icon: <UnorderedListOutlined />,
+      disabled: isPostCreating,
     },
   ];
 

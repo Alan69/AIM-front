@@ -1,0 +1,124 @@
+.pricing-page {
+    padding: 20px;
+    background-color: #f0f2f5;
+}
+
+.whatsappInfo {
+    margin-top: 20px;
+}
+
+.accountInfo {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+}
+
+.whatsappButton {
+    color: #198754;
+    background: #fff;
+    border-color: #198754;
+    transition: 0.3s all;
+    &:hover,
+    &:focus {
+        color: #fff !important;
+        background: #198754 !important;
+        border-color: #fff !important;
+        transition: 0.3s all;
+    }
+}
+
+.card {
+    border-radius: 32px;
+    &__title {
+        text-transform: capitalize;
+    }
+    &__body {
+        padding: 8px;
+        border: 1px solid #3b3b3b5b;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 8px 0;
+        border-bottom: 1px dotted #3b3b3b5b;
+        &__notActive {
+            opacity: 0.3;
+        }
+        &__label {
+            width: calc(90% - 16px);
+        }
+        &__value {
+            width: 10%;
+            text-align: end;
+        }
+    }
+    &__price {
+        margin-top: 16px;
+    }
+    &__button {
+        padding: 24px;
+        background-color: #2e2c2c;
+        color: #fff;
+        border-radius: 32px;
+    }
+}
+
+.col:nth-child(4) {
+    .card {
+        background-color: rgba(68, 68, 233, 0.425);
+        &__item:last-child {
+            border-bottom: 1px dotted transparent;
+        }
+    }
+}
+
+.sliderContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sliderValue {
+    font-size: 32px;
+    font-weight: bold;
+    width: 100px;
+    text-align: center;
+}
+
+.customSlider {
+    width: 100%;
+    .ant-slider-track {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(33, 150, 243, 1) 100%);
+    }
+    .ant-slider-handle {
+        width: 32px;
+        height: 32px;
+        background-color: #0062cc;
+        border: none;
+    }
+    .ant-slider-rail {
+        background-color: #333;
+    }
+    .ant-slider-mark {
+        font-size: 12px;
+        color: #ccc;
+    }
+    .ant-slider-mark-text {
+        color: white;
+    }
+    .ant-slider-dot {
+        background-color: transparent;
+        border-color: #ccc;
+    }
+}
+
+.title {
+    color: white;
+    text-align: left;
+}

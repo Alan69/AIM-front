@@ -69,6 +69,7 @@ export const ContentPlanPage = () => {
       getPostById(response.id).unwrap().then((responsePost) => {
         dispatch(postActions.setIsPostGenerated(true));
         dispatch(postActions.setGeneratedPost(responsePost));
+        refetchPostListByCompanyId();
       })
     });
   };
@@ -124,6 +125,8 @@ export const ContentPlanPage = () => {
   useEffect(() => {
     return () => {
       dispatch(contentPlanActions.setSelectedPost(null));
+      dispatch(postActions.setIsPostGenerated(false));
+      dispatch(postActions.setGeneratedPost(null));
     };
   }, []);
 
