@@ -2,6 +2,7 @@ import { TCompanyData } from 'modules/company/redux/api';
 import baseApi from '../../../../redux/api';
 import { TLocationTypesData } from 'redux/api/contries/contriesApi';
 import { TJobTypesData } from 'redux/api/jobTypes/jobTypesApi';
+import { TTariffData } from 'modules/tariff/redux/api';
 
 export type TUserData = {
   id: string;
@@ -9,7 +10,7 @@ export type TUserData = {
   last_name?: string;
   email?: string;
   current_company: TCompanyData | null;
-  tariff: number;
+  tariff: TTariffData;
 }
 
 export type TProfileData = {

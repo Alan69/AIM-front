@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostByIdQuery, useRecreatePostImageMutation, useRecreatePostTextMutation } from '../../redux/api';
-import { Layout, Typography, Image, Button, Collapse, Checkbox, Radio, Input } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { useGetPostByIdQuery, usePostNowMutation, useRecreatePostImageMutation, useRecreatePostTextMutation } from '../../redux/api';
+import { Layout, Typography, Image, Button, Collapse, Checkbox, Radio, Input, message } from 'antd';
 import {
   ReloadOutlined,
   LoadingOutlined
@@ -12,6 +12,10 @@ import avatar from '../../../../assets/avatar.png';
 import { Controller, useForm } from 'react-hook-form';
 import { ModalImageStylesList } from 'modules/post-query/components/ModalImageStylesList/ModalImageStylesList';
 import { TImgStylesData, useGetImgStylesListQuery } from '../../../../redux/api/imgStyles/imgStylesApi';
+import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
+import { useGetSocialMediaListByCurrentCompanyQuery, TSocialMediaByCurrentCompanyData } from 'modules/social-media/redux/api';
+import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
+import { TAddToSchedulersData, useAddToSchedulersMutation } from 'modules/content-plan/redux/api';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -24,14 +28,21 @@ export const PostDetailsPage = () => {
 
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
   const { data: imgStylesList } = useGetImgStylesListQuery();
+  const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
   const [recreatePostImage, { isLoading: isRecreatePostImageLoading }] = useRecreatePostImageMutation();
   const [recreatePostText, { isLoading: isRecreatePostTextLoading }] = useRecreatePostTextMutation();
+  const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
+  const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
 
+  const [currentImgStyle, setCurrentImgStyle] = useState(post?.img_style);
+  const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>([]);
   const [isEditBlockShow, setIsEditBlockShow] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentImgStyle, setCurrentImgStyle] = useState(post?.img_style);
+  const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] = useState(false);
+  const [isContentPlanSocialMediaListModalOpen, setIsContentPlanSocialMediaListModalOpen] = useState(false);
+  const [isPostPageOpen, setIsPostPageOpen] = useState(true);
 
   const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
 
@@ -48,14 +59,25 @@ export const PostDetailsPage = () => {
   const imageOption = watch('imageOption');
   const textOption = watch('textOption');
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  }
-
   const handleChangeCurrentImgStyle = (style: TImgStylesData | undefined) => {
     setCurrentImgStyle(style);
     setIsModalOpen(false);
   }
+
+  const handleOpenModal = () => setIsModalOpen(true);
+
+  const handleShowContentPlanSocialMediaListModal = () => {
+    refetchSocialMediaList();
+    setIsContentPlanSocialMediaListModalOpen(true);
+  }
+
+  const handleShowContentPlanAddPostModal = () => {
+    refetchSocialMediaList();
+    setIsPostPageOpen(false);
+    setIsContentPlanAddPostModalOpen(true);
+  }
+
+  const handleSelectNewSocialMedias = (socialMedias: TSocialMediaByCurrentCompanyData[]) => setSelectedNewSocialMedias(socialMedias);
 
   // @ts-ignore
   const onSubmit = (data) => {
@@ -72,6 +94,31 @@ export const PostDetailsPage = () => {
         txt_prompt: data.textDescription,
         main_text: post?.main_text
       }).unwrap().then(() => refetch())
+    }
+  };
+
+  const handleAddToSchedulers = (item: TAddToSchedulersData) => {
+    addToSchedulers(item).unwrap().then(() => {
+      setIsPostPageOpen(true);
+      setIsContentPlanAddPostModalOpen(false);
+      message.success('Пост успешно добавлен в планировщик.');
+    });
+  }
+
+  const handleClearAddModalParams = () => {
+    setSelectedNewSocialMedias([]);
+  }
+
+  const handlePostNow = () => {
+    if (post?.id) {
+      postNow({
+        post_id: post.id,
+        social_media_account_ids: selectedNewSocialMedias.map((media) => media.id)
+      }).unwrap().then((res) => {
+        setIsContentPlanSocialMediaListModalOpen(false);
+        setSelectedNewSocialMedias([]);
+        message.success(res.message);
+      })
     }
   };
 
@@ -168,11 +215,13 @@ export const PostDetailsPage = () => {
                       </Button>
                       <Button
                         type="primary"
+                        onClick={handleShowContentPlanSocialMediaListModal}
                       >
-                        Опубликовать
+                        Опубликовать сейчас
                       </Button>
                       <Button
                         type="primary"
+                        onClick={handleShowContentPlanAddPostModal}
                       >
                         В планировщик
                       </Button>
@@ -282,6 +331,29 @@ export const PostDetailsPage = () => {
         setIsModalOpen={setIsModalOpen}
         imgStylesList={imgStylesList}
         handleChangeCurrentImgStyle={handleChangeCurrentImgStyle}
+      />
+      <ContentPlanAddPostModal
+        isModalOpen={isContentPlanAddPostModalOpen}
+        setIsModalOpen={setIsContentPlanAddPostModalOpen}
+        handleShowContentPlanSocialMediaListModal={handleShowContentPlanSocialMediaListModal}
+        selectNewPost={post}
+        selectedNewSocialMedias={selectedNewSocialMedias}
+        isAddingToSchedulers={isAddingToSchedulers}
+        handleAddToSchedulers={handleAddToSchedulers}
+        handleClearAddModalParams={handleClearAddModalParams}
+        isPostNowLoading={isPostNowLoading}
+        handlePostNow={handlePostNow}
+        isPostPage
+      />
+      <ContentPlanSocialMediaListModal
+        isModalOpen={isContentPlanSocialMediaListModalOpen}
+        setIsModalOpen={setIsContentPlanSocialMediaListModalOpen}
+        socialMediaList={socialMediaList}
+        handleSelectNewSocialMedias={handleSelectNewSocialMedias}
+        selectedNewSocialMedias={selectedNewSocialMedias}
+        isPostNow={isPostPageOpen}
+        isPostNowLoading={isPostNowLoading}
+        handlePostNow={handlePostNow}
       />
     </>
   );

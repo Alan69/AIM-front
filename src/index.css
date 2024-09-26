@@ -1,3 +1,31 @@
+@font-face {
+    font-family: 'Involve';
+    src: url('./assets/fonts/Involve-Regular.otf') format('opentype'), url('./assets/fonts/Involve-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Involve';
+    src: url('./assets/fonts/Involve-Bold.otf') format('opentype'), url('./assets/fonts/Involve-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Involve';
+    src: url('./assets/fonts/Involve-Medium.otf') format('opentype'), url('./assets/fonts/Involve-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Involve';
+    src: url('./assets/fonts/Involve-SemiBold.otf') format('opentype'), url('./assets/fonts/Involve-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
@@ -9,6 +37,15 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+body,
+html {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: rgba(238, 238, 238, 1) !important;
 }
 
 a {

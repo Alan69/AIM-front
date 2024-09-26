@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import cn from 'classnames';
-import { Button, Layout, List, Tabs, TabsProps, Typography, Image } from 'antd';
+import { Button, Layout, List, Tabs, TabsProps, Typography, Image, message } from 'antd';
 import { CalendarOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import styles from './ContentPlanPage.module.scss';
 import { ContentPlanCalendar } from '../../components/ContentPlanCalendar/ContentPlanCalendar';
@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { TAddToSchedulersData, useAddToSchedulersMutation, useGetSchedulersQuery } from 'modules/content-plan/redux/api';
 import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
 import { ContentPlanPostsListModal } from 'modules/content-plan/components/ContentPlanPostsListModal/ContentPlanPostsListModal';
-import { TPostData, useGetPostListByCompanyIdQuery, useLazyGetPostByIdQuery } from 'modules/post/redux/api';
+import { TPostData, useGetPostListByCompanyIdQuery, useLazyGetPostByIdQuery, usePostNowMutation } from 'modules/post/redux/api';
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
 import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
@@ -28,7 +28,7 @@ export const ContentPlanPage = () => {
   const [isContentPlanSocialMediaListModalOpen, setIsContentPlanSocialMediaListModalOpen] = useState(false);
 
   const [selectNewPost, setSelectNewPost] = useState<TPostData | null>(null);
-  const [selectNewSocialMedia, setSelectNewSocialMedia] = useState<TSocialMediaByCurrentCompanyData | null>(null);
+  const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>([]);
 
   const [selectedDatePreview, setSelectedDatePreview] = useState<Date | null>(null);
   const [selectedEvents, setSelectedEvents] = useState<any[]>([]);
@@ -39,10 +39,11 @@ export const ContentPlanPage = () => {
 
   const { data: postList, refetch: refetchPostList } = useGetSchedulersQuery(current_company?.id);
   const { data: postListByCompanyId, refetch: refetchPostListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
-  const { data: socialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
+  const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
   const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getPostById, { data: post }] = useLazyGetPostByIdQuery();
+  const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
 
   const handleShowContentPlanAddPostModal = () => {
     refetchPostListByCompanyId();
@@ -55,12 +56,27 @@ export const ContentPlanPage = () => {
 
   const handleSelectNewPost = (post: TPostData) => setSelectNewPost(post);
 
-  const handleSelectNewSocialMedia = (socialMedia: TSocialMediaByCurrentCompanyData) => setSelectNewSocialMedia(socialMedia);
+  const handleSelectNewSocialMedias = (socialMedias: TSocialMediaByCurrentCompanyData[]) => setSelectedNewSocialMedias(socialMedias);
+
+  const handlePostNow = () => {
+    if (selectNewPost?.id) {
+      postNow({
+        post_id: selectNewPost?.id,
+        social_media_account_ids: selectedNewSocialMedias.map((media) => media.id)
+      }).unwrap().then((res) => {
+        setIsContentPlanSocialMediaListModalOpen(false);
+        setIsContentPlanAddPostModalOpen(false);
+        setSelectedNewSocialMedias([]);
+        message.success(res.message);
+      })
+    }
+  };
 
   const handleAddToSchedulers = (item: TAddToSchedulersData) => {
     addToSchedulers(item).unwrap().then(() => {
       refetchPostList();
       setIsContentPlanAddPostModalOpen(false);
+      message.success('Пост успешно добавлен в планировщик.');
     });
   }
 
@@ -88,7 +104,7 @@ export const ContentPlanPage = () => {
 
   const handleClearAddModalParams = () => {
     setSelectNewPost(null);
-    setSelectNewSocialMedia(null);
+    setSelectedNewSocialMedias([]);
   }
 
   const items: TabsProps['items'] = [
@@ -132,6 +148,7 @@ export const ContentPlanPage = () => {
 
   useEffect(() => {
     dispatch(contentPlanActions.setSelectedPost(null));
+    refetchSocialMediaList();
   }, [current_company]);
 
   return (
@@ -194,10 +211,12 @@ export const ContentPlanPage = () => {
         handleShowContentPlanPostsListModal={handleShowContentPlanPostsListModal}
         handleShowContentPlanSocialMediaListModal={handleShowContentPlanSocialMediaListModal}
         selectNewPost={selectNewPost}
-        selectNewSocialMedia={selectNewSocialMedia}
+        selectedNewSocialMedias={selectedNewSocialMedias}
         isAddingToSchedulers={isAddingToSchedulers}
         handleAddToSchedulers={handleAddToSchedulers}
         handleClearAddModalParams={handleClearAddModalParams}
+        isPostNowLoading={isPostNowLoading}
+        handlePostNow={handlePostNow}
       />
       <ContentPlanPostsListModal
         isModalOpen={isContentPlanPostsListModalOpen}
@@ -214,8 +233,8 @@ export const ContentPlanPage = () => {
         isModalOpen={isContentPlanSocialMediaListModalOpen}
         setIsModalOpen={setIsContentPlanSocialMediaListModalOpen}
         socialMediaList={socialMediaList}
-        handleSelectNewSocialMedia={handleSelectNewSocialMedia}
-        selectNewSocialMedia={selectNewSocialMedia}
+        handleSelectNewSocialMedias={handleSelectNewSocialMedias}
+        selectedNewSocialMedias={selectedNewSocialMedias}
       />
     </>
   )

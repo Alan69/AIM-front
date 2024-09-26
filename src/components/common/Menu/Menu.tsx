@@ -8,7 +8,7 @@ import type { MenuProps } from 'antd';
 import { Button, Menu } from 'antd';
 import styles from './Menu.module.scss';
 import UserInfo from '../UserInfo/Userinfo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import OfferInfo from '../OfferInfo/OfferInfo';
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
 import { useDispatch } from 'react-redux';
@@ -17,10 +17,12 @@ import CurrentCompanyInfo from '../CurrentCompanyInfo/CurrentCompanyInfo';
 type MenuItem = Required<MenuProps>['items'][number];
 
 const MenuNav: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const logOut = () => {
     dispatch(authActions.logOut());
+    navigate('/login', { replace: true });
   }
 
   const items: MenuItem[] = [

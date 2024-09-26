@@ -1,0 +1,51 @@
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 30px 40px;
+    height: auto;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(238, 238, 238, 1);
+}
+
+.logo {
+    position: fixed;
+    left: 40px;
+    top: 30px;
+    img {
+        width: 50px;
+        height: auto;
+        cursor: pointer;
+    }
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    right: 40px;
+    top: 32px;
+}
+
+.languageButton {
+    height: auto;
+    padding: 14px 40px;
+    background-color: transparent;
+    border-color: rgba(27, 27, 27, 1);
+    border-radius: 100px;
+    color: rgba(27, 27, 27, 1);
+}
+
+.startButton {
+    height: auto;
+    padding: 14px 40px;
+    background-color: rgba(27, 27, 27, 1);
+    border-color: rgba(27, 27, 27, 1);
+    border-radius: 100px;
+    color: rgba(255, 255, 255, 1);
+}

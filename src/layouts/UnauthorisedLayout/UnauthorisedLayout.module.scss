@@ -1,7 +1,9 @@
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #3a507f;
+.layout {
+    font-family: 'Involve';
+}
+
+.main {
+    margin-top: 124px;
+    height: calc(100vh - 124px);
+    background-color: rgba(238, 238, 238, 1);
 }

@@ -46,22 +46,16 @@ export const SocialMediaAddPage = () => {
     }
 
     if (item.name === 'linkedin') {
-      addLinkedin().unwrap().then((res) => {
-        if (res) {
-          window.open(res, '_self');
-        }
+      addLinkedin().unwrap().then((authUrl) => {
+        window.open(authUrl, '_self');
       }).catch((err) => {
-        console.error("Error adding linkedin:", err);
+        console.error("Error adding LinkedIn:", err);
       });
     }
 
     if (item.name === 'tumblr') {
-      addTumblr().unwrap().then((res) => {
-        console.log(res);
-
-        if (res) {
-          window.open(res, '_self');
-        }
+      addTumblr().unwrap().then((authUrl) => {
+        window.open(authUrl, '_self');
       }).catch((err) => {
         console.error("Error adding tumblr:", err);
       });

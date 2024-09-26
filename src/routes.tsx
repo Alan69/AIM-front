@@ -27,6 +27,7 @@ import { useLazyGetAuthUserQuery, useRefreshTokenMutation } from 'modules/auth/r
 import { ContentPlanPage } from 'modules/content-plan/pages/ContentPlanPage/ContentPlanPage';
 import { SocialMediaAddPage } from 'modules/social-media/pages/SocialMediaAddPage/SocialMediaAddPage';
 import { TariffListPage } from 'modules/tariff/pages/TariffListPage/TariffListPage';
+import { LandingPage } from 'layouts/UnauthorisedLayout/Pages/LandingPage';
 
 const REFRESH_TOKEN_INTERVAL = 20 * 60 * 1000;
 
@@ -75,9 +76,11 @@ const AppRoutes: FC = () => {
     return (
       <Routes>
         <Route element={<UnauthorisedLayout />}>
-          <Route path="/recovery" element={<RecoveryPage />} />
+          <Route path="/home" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="*" element={<LoginPage />} />
+          <Route path="/recovery" element={<RecoveryPage />} />
+          <Route path="*" element={<LandingPage />} />
         </Route>
       </Routes>
     )

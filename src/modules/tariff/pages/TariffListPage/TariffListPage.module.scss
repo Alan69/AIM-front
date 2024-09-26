@@ -30,22 +30,22 @@
 
 .card {
     border-radius: 32px;
+    >div {
+        padding: 16px !important;
+    }
     &__title {
         text-transform: capitalize;
+        font-family: Inter;
     }
     &__body {
-        padding: 8px;
-        border: 1px solid #3b3b3b5b;
-        border-radius: 16px;
         display: flex;
         flex-direction: column;
+        gap: 12px;
     }
     &__item {
         display: flex;
         justify-content: space-between;
         gap: 16px;
-        padding: 8px 0;
-        border-bottom: 1px dotted #3b3b3b5b;
         &__notActive {
             opacity: 0.3;
         }
@@ -62,18 +62,28 @@
     }
     &__button {
         padding: 24px;
-        background-color: #2e2c2c;
+        background-color: rgba(0, 95, 170, 1);
+        border-color: rgba(0, 95, 170, 1);
         color: #fff;
         border-radius: 32px;
+        transition: 0.3s;
+        &:hover {
+            svg {
+                path {
+                    transition: 0.3s;
+                    fill: #4096ff;
+                }
+            }
+        }
     }
 }
 
-.col:nth-child(4) {
-    .card {
-        background-color: rgba(68, 68, 233, 0.425);
-        &__item:last-child {
-            border-bottom: 1px dotted transparent;
-        }
+.col {
+    &:first-child {
+        width: calc(65% - 30px);
+    }
+    &:last-child {
+        width: calc(35% - 30px);
     }
 }
 

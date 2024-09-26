@@ -1,7 +1,8 @@
 import React from 'react'
+import styles from './RecoveryPage.module.scss'
 
 export const RecoveryPage = () => {
   return (
-    <div>RecoveryPage</div>
+    <div className={styles.container}>RecoveryPage</div>
   )
 }

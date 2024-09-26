@@ -1,8 +1,11 @@
 import { SignUpForm } from 'modules/auth/components/SignUpForm/SignUpForm'
 import React from 'react'
+import styles from './SignUpPage.module.scss'
 
 export const SignUpPage = () => {
   return (
-    <SignUpForm />
+    <div className={styles.container}>
+      <SignUpForm />
+    </div>
   )
 }

@@ -1,0 +1,18 @@
+.menu {
+    flex-grow: 1;
+    justify-content: center;
+    background-color: rgba(238, 238, 238, 1);
+    border-bottom: none;
+    .ant-menu-item {
+        font-family: Involve;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 21.28px;
+    }
+    .ant-menu-item a {
+        color: rgba(27, 27, 27, 1);
+    }
+    .ant-menu-item a:hover {
+        color: #007bff;
+    }
+}

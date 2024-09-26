@@ -9,9 +9,12 @@ import { TSocialMediaByCurrentCompanyData } from 'modules/social-media/redux/api
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  socialMediaList: TSocialMediaByCurrentCompanyData[] | undefined
-  handleSelectNewSocialMedia: (socialMedia: TSocialMediaByCurrentCompanyData) => void
-  selectNewSocialMedia: TSocialMediaByCurrentCompanyData | null;
+  socialMediaList: TSocialMediaByCurrentCompanyData[] | undefined;
+  handleSelectNewSocialMedias: (socialMedias: TSocialMediaByCurrentCompanyData[]) => void;
+  selectedNewSocialMedias: TSocialMediaByCurrentCompanyData[];
+  isPostNow?: boolean;
+  isPostNowLoading?: boolean
+  handlePostNow?: () => void
 };
 
 const { Title } = Typography;
@@ -20,14 +23,47 @@ export const ContentPlanSocialMediaListModal = ({
   isModalOpen,
   setIsModalOpen,
   socialMediaList,
-  handleSelectNewSocialMedia,
-  selectNewSocialMedia,
+  handleSelectNewSocialMedias,
+  selectedNewSocialMedias,
+  isPostNow = false,
+  isPostNowLoading,
+  handlePostNow
 }: TProps) => {
-  const [selectCurrentSocialMedia, setSelectCurrentSocialMedia] = useState<TSocialMediaByCurrentCompanyData | null>(selectNewSocialMedia);
+  const [selectCurrentSocialMedias, setSelectCurrentSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>(selectedNewSocialMedias);
+
+  const handleSelectSocialMedia = (item: TSocialMediaByCurrentCompanyData) => {
+    if (isPostNow) {
+      if (!selectCurrentSocialMedias.some((social) => social.id === item.id)) {
+        const updatedSelection = [...selectCurrentSocialMedias, item];
+        setSelectCurrentSocialMedias(updatedSelection);
+        handleSelectNewSocialMedias(updatedSelection)
+      } else {
+        const updatedSelection = selectCurrentSocialMedias.filter((social) => social.id !== item.id);
+        setSelectCurrentSocialMedias(updatedSelection);
+        handleSelectNewSocialMedias(updatedSelection);
+      }
+    } else {
+      if (selectCurrentSocialMedias.some((social) => social.id === item.id)) {
+        setSelectCurrentSocialMedias(selectCurrentSocialMedias.filter((social) => social.id !== item.id));
+      } else {
+        setSelectCurrentSocialMedias([...selectCurrentSocialMedias, item]);
+      }
+    }
+  };
+
+
+  const handleSelect = () => {
+    if (isPostNow) {
+      handlePostNow && handlePostNow();
+    } else {
+      handleSelectNewSocialMedias(selectCurrentSocialMedias);
+      setIsModalOpen(false);
+    }
+  }
 
   return (
     <Modal
-      title="Выбрать социальную сеть"
+      title="Выбрать социальные сети"
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -36,25 +72,29 @@ export const ContentPlanSocialMediaListModal = ({
         <Button
           key="schedule"
           type="default"
-          onClick={() => {
-            selectCurrentSocialMedia && handleSelectNewSocialMedia(selectCurrentSocialMedia);
-            setIsModalOpen(false);
-          }}
+          onClick={handleSelect}
           style={{
             borderRadius: '16px',
             width: '100%',
           }}
-          disabled={!selectCurrentSocialMedia}
+          disabled={isPostNow ? (isPostNowLoading || selectCurrentSocialMedias.length === 0) : selectCurrentSocialMedias.length === 0}
+          loading={isPostNowLoading}
         >
-          Выбрать
-          {/* <b>{selectCurrentSocialMedia?.title}</b> */}
+          {isPostNow ? 'Опубликовать сейчас' : 'Выбрать'}
         </Button>
       ]}
     >
       <Divider />
       <div className={styles.itemList}>
         {socialMediaList?.map((item) => (
-          <div key={item.id} className={cn(styles.item, selectCurrentSocialMedia?.id === item.id ? styles.item__isActive : '')} onClick={() => setSelectCurrentSocialMedia(item)}>
+          <div
+            key={item.id}
+            className={cn(
+              styles.item,
+              selectCurrentSocialMedias.some((social) => social.id === item.id) ? styles.item__isActive : ''
+            )}
+            onClick={() => handleSelectSocialMedia(item)}
+          >
             <img width={32} height={32} src={item?.platform.icon} alt={item?.username} />
             <Title level={5} className={styles.username}>{item?.username}</Title>
           </div>

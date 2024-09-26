@@ -56,6 +56,17 @@ export type TRecreatePostText = {
   main_text?: string;
 }
 
+export type TPostNow = {
+  post_id: string;
+  social_media_account_ids: string[];
+}
+
+export type TPostNowResponse = {
+  message: string;
+  post_id: string;
+  social_media_accounts: string[];
+}
+
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPostList: build.query<TPostData[], string>({
@@ -158,6 +169,18 @@ export const postApi = baseApi.injectEndpoints({
         method: 'DELETE'
       })
     }),
+    postNow: build.mutation<TPostNowResponse, TPostNow>({
+      query: ({post_id, social_media_account_ids}) => ({
+        url: '/post/now/',
+        method: 'POST',
+        body: {
+          post_id,
+          social_media_account_ids
+        }
+      }),
+      transformResponse: (response: TPostNowResponse) => response,
+      extraOptions: { showErrors: false }
+    }),
   }),
   overrideExisting: false,
 });
@@ -171,5 +194,6 @@ export const {
   useUpdatePostMutation,
   useRecreatePostImageMutation,
   useRecreatePostTextMutation,
-  useDeletePostMutation
+  useDeletePostMutation,
+  usePostNowMutation
 } = postApi;

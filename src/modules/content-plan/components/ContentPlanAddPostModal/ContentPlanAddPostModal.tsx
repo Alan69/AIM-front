@@ -15,13 +15,16 @@ moment.locale('ru');
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handleShowContentPlanPostsListModal: () => void;
+  handleShowContentPlanPostsListModal?: () => void;
   handleShowContentPlanSocialMediaListModal: () => void;
-  selectNewPost: TPostData | null;
-  selectNewSocialMedia: TSocialMediaByCurrentCompanyData | null;
+  selectNewPost: TPostData | null | undefined;
+  selectedNewSocialMedias: TSocialMediaByCurrentCompanyData[];
   isAddingToSchedulers: boolean;
   handleAddToSchedulers: (item: TAddToSchedulersData) => void;
   handleClearAddModalParams: () => void;
+  isPostNowLoading: boolean
+  handlePostNow: () => void
+  isPostPage?: boolean;
 };
 
 const { Title, Paragraph } = Typography;
@@ -32,10 +35,13 @@ export const ContentPlanAddPostModal = ({
   handleShowContentPlanPostsListModal,
   handleShowContentPlanSocialMediaListModal,
   selectNewPost,
-  selectNewSocialMedia,
+  selectedNewSocialMedias,
   isAddingToSchedulers,
   handleAddToSchedulers,
-  handleClearAddModalParams
+  handleClearAddModalParams,
+  isPostNowLoading,
+  handlePostNow,
+  isPostPage = false,
 }: TProps) => {
   const { current_company } = useTypedSelector((state) => state.auth);
 
@@ -61,14 +67,14 @@ export const ContentPlanAddPostModal = ({
   };
 
   const handleSubmit = () => {
-    if (selectedDate && selectedTime && current_company && selectNewPost && selectNewSocialMedia) {
+    if (selectedDate && selectedTime && current_company && selectNewPost && selectedNewSocialMedias.length > 0) {
       const scheduledDate = selectedDate.format('YYYY-MM-DD');
       const scheduledTime = selectedTime.format('HH:mm:ss');
 
       handleAddToSchedulers({
         post_id: selectNewPost.id,
         company_id: current_company.id,
-        social_media_account_ids: [selectNewSocialMedia.id],
+        social_media_account_ids: selectedNewSocialMedias.map((media) => media.id),
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime,
         active: true,
@@ -100,7 +106,7 @@ export const ContentPlanAddPostModal = ({
 
   return (
     <Modal
-      title="Добавить контент"
+      title={isPostPage ? 'Добавление в планировщик' : "Добавить контент"}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => {
@@ -110,33 +116,35 @@ export const ContentPlanAddPostModal = ({
       width={600}
       footer={[
         <Button.Group key="group" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          <Button
+          {isPostPage ? '' : <Button
             key="submit"
             type="default"
-            onClick={() => setIsModalOpen(false)}
+            onClick={handlePostNow}
             style={{
               borderRadius: '20px 0 0 20px',
               borderRight: '1px solid #d9d9d9',
               width: '33.33%',
             }}
+            disabled={isPostNowLoading}
+            loading={isPostNowLoading}
           >
             Опубликовать сейчас
-          </Button>
+          </Button>}
           <Button
             key="schedule"
             type="default"
             onClick={handleSubmit}
             style={{
-              borderRight: '1px solid #d9d9d9',
-              borderRadius: '0',
-              width: '33.33%',
+              borderRight: isPostPage ? 'none' : '1px solid #d9d9d9',
+              borderRadius: isPostPage ? '20px' : '0',
+              width: isPostPage ? '100%' : '33.33%',
             }}
-            disabled={!selectedDate || !selectedTime || !selectNewPost || !selectNewSocialMedia}
+            disabled={!selectedDate || !selectedTime || !selectNewPost || selectedNewSocialMedias.length === 0}
             loading={isAddingToSchedulers}
           >
             В планировщик
           </Button>
-          <Button
+          {isPostPage ? '' : <Button
             key="draft"
             type="default"
             onClick={() => setIsModalOpen(false)}
@@ -146,58 +154,62 @@ export const ContentPlanAddPostModal = ({
             }}
           >
             Черновик
-          </Button>
+          </Button>}
         </Button.Group>
       ]}
     >
-      <Divider />
-      <div className={styles.addBtns}>
-        <Button icon={<PictureOutlined />} onClick={handleShowContentPlanPostsListModal}>
-          Пост
-        </Button>
-        <Button icon={<VideoCameraOutlined />} disabled>
-          Reels
-        </Button>
-        <Button icon={<PlayCircleOutlined />} disabled>
-          Stories
-        </Button>
-      </div>
-      <Divider />
+      {isPostPage ? '' : <>
+        <Divider />
+        <div className={styles.addBtns}>
+          <Button icon={<PictureOutlined />} onClick={handleShowContentPlanPostsListModal}>
+            Пост
+          </Button>
+          <Button icon={<VideoCameraOutlined />} disabled>
+            Reels
+          </Button>
+          <Button icon={<PlayCircleOutlined />} disabled>
+            Stories
+          </Button>
+        </div>
+        <Divider />
 
-      {selectNewPost !== null ? (
-        <List.Item>
-          <List.Item.Meta
-            className={cn(styles.selectNewPost, styles.selectNewPost__isActive)}
-            avatar={<Image width={160} height={160} src={selectNewPost?.picture} />}
-            title={<Title level={5}>{selectNewPost?.title}</Title>}
-            description={
-              <>
-                <Paragraph className={styles.text} ellipsis={!expandedKeys ? { rows: 4, expandable: false } : false}>
-                  {selectNewPost?.main_text}
-                </Paragraph>
-                <div className={styles.expandBtn}>
-                  <Button type="link" onClick={() => setExpandedKeys(!expandedKeys)}>
-                    {expandedKeys ? 'Скрыть' : 'Развернуть'}
-                  </Button>
-                </div>
-              </>
-            }
-          />
-        </List.Item>
-      ) : null}
+        {selectNewPost !== null ? (
+          <List.Item>
+            <List.Item.Meta
+              className={cn(styles.selectNewPost, styles.selectNewPost__isActive)}
+              avatar={<Image width={160} height={160} src={selectNewPost?.picture} />}
+              title={<Title level={5}>{selectNewPost?.title}</Title>}
+              description={
+                <>
+                  <Paragraph className={styles.text} ellipsis={!expandedKeys ? { rows: 4, expandable: false } : false}>
+                    {selectNewPost?.main_text}
+                  </Paragraph>
+                  <div className={styles.expandBtn}>
+                    <Button type="link" onClick={() => setExpandedKeys(!expandedKeys)}>
+                      {expandedKeys ? 'Скрыть' : 'Развернуть'}
+                    </Button>
+                  </div>
+                </>
+              }
+            />
+          </List.Item>
+        ) : null}
+      </>}
 
       <Button onClick={handleShowContentPlanSocialMediaListModal} className={styles.socialMediaAddBtn}>
         Добавить социальную сеть
       </Button>
 
-      {selectNewSocialMedia !== null ? (
+      {selectedNewSocialMedias.length > 0 ? (
         <div className={styles.itemList}>
-          <div className={cn(styles.selectNewSocialMedia, styles.selectNewSocialMedia__isActive)}>
-            <img width={32} height={32} src={selectNewSocialMedia?.platform.icon} alt={selectNewSocialMedia?.username} />
-            <Title level={5} className={styles.username}>
-              {selectNewSocialMedia?.username}
-            </Title>
-          </div>
+          {selectedNewSocialMedias.map((media) => (
+            <div key={media.id} className={cn(styles.selectNewSocialMedia, styles.selectNewSocialMedia__isActive)}>
+              <img width={32} height={32} src={media.platform.icon} alt={media.username} />
+              <Title level={5} className={styles.username}>
+                {media.username}
+              </Title>
+            </div>
+          ))}
         </div>
       ) : null}
 
