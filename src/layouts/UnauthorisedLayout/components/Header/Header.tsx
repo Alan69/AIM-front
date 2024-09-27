@@ -4,19 +4,20 @@ import styles from './Header.module.scss';
 import Menu from '../Menu/Menu';
 import logo from '../../../../assets/logo.svg';
 import { DownOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const { Header: AntHeader } = Layout;
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <AntHeader className={styles.header}>
       <div className={styles.logo}>
         <Link to={'/home'}><img src={logo} alt={logo} /></Link>
       </div>
-      <Menu />
+      {location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/recovery' ? '' : <Menu />}
       <div className={styles.actions}>
         <Button className={styles.languageButton} iconPosition='end' icon={<DownOutlined />}>РУС</Button>
         <Button className={styles.startButton} type="primary" onClick={() => navigate('/login')}>Начать</Button>
