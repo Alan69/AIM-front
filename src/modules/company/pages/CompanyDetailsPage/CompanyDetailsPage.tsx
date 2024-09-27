@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useGetCompanyByIdQuery } from '../../redux/api';
 
 import { Layout, Table, TableProps, Typography } from 'antd';
@@ -11,6 +11,7 @@ import {
 import styles from './CompanyDetailsPage.module.scss';
 import { TProductData, useGetProductListByCompanyIdQuery } from '../../../product/redux/api';
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 interface DataType {
   key: string;
@@ -23,7 +24,11 @@ const { Title, Text } = Typography;
 const { Content } = Layout;
 
 export const CompanyDetailsPage = () => {
+  const navigate = useNavigate()
+
   const { id } = useParams<{ id: string }>();
+  const { current_company } = useTypedSelector((state) => state.auth);
+
   const { data: company, isLoading, refetch } = useGetCompanyByIdQuery(id || '');
   const { data: productListByCompanyId } = useGetProductListByCompanyIdQuery(company?.id || '');
   const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
@@ -83,10 +88,13 @@ export const CompanyDetailsPage = () => {
     refetch()
   }, [refetch])
 
-
   useEffect(() => {
     refetchSocialMediaList()
   }, [company])
+
+  useEffect(() => {
+    navigate(`/company/${current_company?.id}`)
+  }, [current_company])
 
   if (isLoading) return <div>Loading...</div>;
 

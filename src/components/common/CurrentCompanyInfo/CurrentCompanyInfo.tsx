@@ -49,9 +49,9 @@ const CurrentCompanyInfo: React.FC = () => {
         <Text className={styles.dividerText}>Текущая компания</Text>
         <Divider className={styles.divider} />
       </div>
-      <div className={styles.infoBlock} onClick={() => navigate(`/company/${current_company?.id}`)}>
+      <div className={styles.infoBlock}>
         <div className={styles.details}>
-          <div className={styles.name}>
+          <div className={styles.name} onClick={() => navigate(`/company/${current_company?.id}`)}>
             {current_company ? current_company.name : '-'}
           </div>
           <div className={styles.actions}>

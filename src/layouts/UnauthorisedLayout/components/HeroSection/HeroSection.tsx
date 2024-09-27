@@ -1,8 +1,11 @@
 import React from 'react'
 import styles from './HeroSection.module.scss';
 import { Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+
   const features = [
     'Маркетинговая стратегия',
     'Воронка продаж',
@@ -30,8 +33,8 @@ export const HeroSection = () => {
       <h1 className={styles.title}>С нами бизнес <br /> процветает</h1>
       <h3 className={styles.subtitle}>Инновационная ИИ-платформа для <br /> автоматизации и оптимизации маркетинга</h3>
       <div className={styles.actions}>
-        <Button className={styles.tariffBtn}>Тарифы</Button>
-        <Button className={styles.startBtn} icon={icon} iconPosition='end'>Начать бесплатно</Button>
+        <Button className={styles.tariffBtn} onClick={() => navigate('/login')}>Тарифы</Button>
+        <Button className={styles.startBtn} onClick={() => navigate('/login')} icon={icon} iconPosition='end'>Начать бесплатно</Button>
       </div>
       <div className={styles.feature}>
         {features.map((feature, index) => (

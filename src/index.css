@@ -190,3 +190,25 @@ button:focus-visible {
     background-color: transparent !important;
     border-color: transparent !important;
 }
+
+.tariff-page {
+    width: 100%;
+    height: 40px !important;
+    position: relative;
+}
+
+.tariff-page .ant-slider-track {
+    height: 40px !important;
+}
+
+.tariff-page .ant-slider-rail {
+    height: 40px !important;
+}
+
+.tariff-page .ant-slider-handle {
+    inset-block-start: 20px !important;
+}
+
+.tariff-page .ant-slider-mark-text {
+    margin-top: 40px !important;
+}

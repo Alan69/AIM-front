@@ -7,8 +7,10 @@
     background: #fff;
     border-radius: 12px;
     width: 70%;
+    transition: width 0.3s ease;
     &IsFull {
         width: 100%;
+        transition: width 0.3s ease;
     }
 }
 
@@ -70,4 +72,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    opacity: 0; // Изначально элемент невидим
+    transform: translateY(20px); // Изначально смещен вниз
+    transition: opacity 0.3s ease, transform 0.3s ease; // Плавные переходы для opacity и transform
+    &__visible {
+        opacity: 1; // Элемент становится видимым
+        transform: translateY(0); // Возвращается на своё место
+    }
 }

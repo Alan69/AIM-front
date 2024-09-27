@@ -31,7 +31,7 @@ export const ContentPlanPage = () => {
   const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>([]);
 
   const [selectedDatePreview, setSelectedDatePreview] = useState<Date | null>(null);
-  const [selectedEvents, setSelectedEvents] = useState<any[]>([]);
+  const [selectedEvents, setSelectedEvents] = useState<any[] | null>(null);
   const [formattedSelectedDate, setFormattedSelectedDate] = useState<string | null>(null);
 
   const { selectedPost } = useTypedSelector((state) => state.contentPlan);
@@ -158,7 +158,7 @@ export const ContentPlanPage = () => {
           <h1>Контент план - {current_company?.name}</h1>
           <Layout>
             <Content className={styles.content}>
-              <div className={cn(styles.calendar, selectedPost === null ? styles.calendarIsFull : '')}>
+              <div className={cn(styles.calendar, selectedPost === null && selectedDatePreview === null ? styles.calendarIsFull : '')}>
                 <Tabs
                   defaultActiveKey="1"
                   tabBarExtraContent={<Button type="primary" onClick={handleShowContentPlanAddPostModal}>Добавить контент</Button>}
@@ -171,7 +171,7 @@ export const ContentPlanPage = () => {
                   {selectedDatePreview ? (
                     <div className={styles.selectedEvents}>
                       <Title level={5}>{formattedSelectedDate}</Title>
-                      {selectedEvents.length > 0 ? (
+                      {selectedEvents && selectedEvents.length > 0 ? (
                         <List
                           itemLayout="horizontal"
                           dataSource={selectedEvents}

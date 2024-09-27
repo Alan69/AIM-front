@@ -17,7 +17,7 @@ type TProps = {
   handleSelectEvent: (event: any) => void
   selectedDatePreview: Date | null
   setSelectedDatePreview: React.Dispatch<React.SetStateAction<Date | null>>
-  setSelectedEvents: React.Dispatch<React.SetStateAction<any[]>>
+  setSelectedEvents: React.Dispatch<React.SetStateAction<any[] | null>>
   setFormattedSelectedDate: React.Dispatch<React.SetStateAction<string | null>>
 }
 
@@ -73,7 +73,7 @@ export const ContentPlanCalendar = ({
 
     if (selectedDatePreview && moment(slotInfo.start).isSame(selectedDatePreview, 'day')) {
       setSelectedDatePreview(null);
-      setSelectedEvents([]);
+      setSelectedEvents(null);
       setFormattedSelectedDate(null);
     } else {
       const selectedDateEvents = events.filter(
@@ -150,7 +150,7 @@ export const ContentPlanCalendar = ({
     return {
       style: {
         ...style,
-        cursor: 'pointer', // Добавление курсора pointer
+        cursor: 'pointer',
       },
     };
   };

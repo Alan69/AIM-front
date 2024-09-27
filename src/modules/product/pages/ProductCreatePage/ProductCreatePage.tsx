@@ -88,9 +88,19 @@ export const ProductCreatePage = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" loading={isCreating}>
-                    Сохранить
-                  </Button>
+                  <div className={styles.postActions}>
+                    <Button type="primary" htmlType="submit" loading={isCreating}>
+                      Сохранить
+                    </Button>
+                    <Button
+                      htmlType="button"
+                      style={{ color: '#faad14', borderColor: '#faad14' }}
+                      onClick={() => navigate(-1)}
+                    >
+                      Отменить
+                    </Button>
+                  </div>
+
                 </Form.Item>
               </Form>
             </div>

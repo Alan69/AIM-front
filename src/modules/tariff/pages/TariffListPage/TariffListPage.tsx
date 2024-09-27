@@ -174,13 +174,13 @@ export const TariffListPage: React.FC = () => {
               <section className={styles.section}>
                 <h3 className={styles.title}>Подбери свой тариф</h3>
                 <div>
-                  <Flex gap={120} justify="center">
+                  <Flex gap={60} justify="space-between">
                     <div className={styles.col}>
                       <div className={styles.slidersBlock}>
                         <div className={styles.sliderBlock}>
                           <h4 className={styles.subtitle}>Количество компаний</h4>
                           <Slider
-                            className='customSlider'
+                            className={'customSlider tariff-page'}
                             min={1}
                             max={12}
                             value={companyCount}
@@ -193,7 +193,7 @@ export const TariffListPage: React.FC = () => {
                         <div className={styles.sliderBlock}>
                           <h4 className={styles.subtitle}>Длительность, месяцев</h4>
                           <Slider
-                            className='customSlider'
+                            className={'customSlider tariff-page'}
                             min={1}
                             max={12}
                             value={monthDuration}

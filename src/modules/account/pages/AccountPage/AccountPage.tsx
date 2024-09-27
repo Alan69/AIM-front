@@ -222,9 +222,6 @@ export const AccountPage = () => {
             <Button htmlType="button" style={{ margin: '0 8px' }}>
               Изменить пароль
             </Button>
-            <Button htmlType="button" style={{ color: '#faad14', borderColor: '#faad14' }}>
-              Отменить
-            </Button>
           </Form.Item>
         </Form>
       </Content>

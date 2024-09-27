@@ -1,7 +1,7 @@
-import { Modal, Button, DatePicker, TimePicker, Divider, List, Typography, Image } from 'antd';
+import { Modal, Button, DatePicker, TimePicker, Divider, List, Typography, Image, message } from 'antd';
 import { PictureOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import cn from 'classnames';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import 'moment/locale/ru';
 import styles from './ContentPlanAddPostModal.module.scss';
@@ -94,8 +94,10 @@ export const ContentPlanAddPostModal = ({
 
   const disableMinutes = (selectedHour: number) => {
     const currentMinute = moment().minute();
-    if (selectedDate && selectedDate.isSame(moment(), 'day') && selectedHour === moment().hour()) {
-      return Array.from({ length: 60 }, (_, i) => i).filter((minute) => minute < currentMinute);
+    const currentHour = moment().hour();
+
+    if (selectedDate && selectedDate.isSame(moment(), 'day') && selectedHour === currentHour) {
+      return Array.from({ length: 60 }, (_, i) => i).filter((minute) => minute <= currentMinute);
     }
     return [];
   };
@@ -103,6 +105,30 @@ export const ContentPlanAddPostModal = ({
   const disableDate = (current: moment.Moment) => {
     return current && current < moment().startOf('day');
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (selectedDate && selectedDate.isSame(moment(), 'day') && selectedTime) {
+        const now = moment();
+        const selectedDateTime = moment(selectedDate).set({
+          hour: selectedTime.hour(),
+          minute: selectedTime.minute(),
+        });
+
+        if (now.isAfter(selectedDateTime)) {
+          message.warning('Выбранное время прошло, сбрасываем выбор времени.');
+          setSelectedTime(null);
+        }
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [selectedDate, selectedTime]);
+
+  useEffect(() => {
+    setSelectedTime(null);
+  }, [selectedDate]);
+
 
   return (
     <Modal
@@ -232,11 +258,21 @@ export const ContentPlanAddPostModal = ({
           format="HH:mm"
           minuteStep={15}
           disabled={!selectedDate}
-          disabledTime={() => ({
-            disabledHours: disableHours,
-            disabledMinutes: disableMinutes,
-          })}
+          disabledTime={(current) => {
+            const selectedHour = current ? current.hour() : 0;
+            return {
+              disabledHours: disableHours,
+              disabledMinutes: () => disableMinutes(selectedHour),
+            };
+          }}
           placeholder="Выберите время"
+          showNow={false}
+          onOpenChange={(open) => {
+            if (open) {
+              const selectedHour = selectedTime ? selectedTime.hour() : 0;
+              disableMinutes(selectedHour);
+            }
+          }}
         />
       </div>
     </Modal>
