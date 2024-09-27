@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import cn from 'classnames';
 import { Card, Typography, Button, Layout, Divider, Slider, Flex } from 'antd';
-import { CheckOutlined } from '@ant-design/icons';
 import styles from './TariffListPage.module.scss';
 import { Content } from 'antd/es/layout/layout';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useCreateTariffMutation, usePaymentInitiateMutation, usePaymentTokenMutation } from 'modules/tariff/redux/api';
+
+import iconPlus from '../../../../assets/plus-white.svg'
+import infinity from '../../../../assets/infinity.svg'
+import checked from '../../../../assets/checked.svg'
+import arrow from '../../../../assets/arrow.svg'
+import card from '../../../../assets/tariff-card-bg.png';
 
 const { Title, Text } = Typography;
 
@@ -15,7 +19,7 @@ export const TariffListPage: React.FC = () => {
   const [companyCount, setCompanyCount] = useState<number>(1);
   const [monthDuration, setMonthDuration] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
-  const [totalCost, setTotalCost] = useState<number>(4900);
+  const [totalCost, setTotalCost] = useState<number>(9900);
 
   const [createTariff] = useCreateTariffMutation();
   const [paymentToken] = usePaymentTokenMutation();
@@ -42,7 +46,7 @@ export const TariffListPage: React.FC = () => {
   }
 
   const calculateCost = (companies: number, months: number) => {
-    const baseCost = 4900;
+    const baseCost = 9900;
     let discount = 0;
 
     if (months >= 4 && months <= 6) {
@@ -69,17 +73,6 @@ export const TariffListPage: React.FC = () => {
     setTotalCost(calculatedCost);
     setDiscount(calculatedDiscount);
   };
-
-  const getDurationLabel = () => {
-    return `Длительность, месяцев ${monthDuration}`;
-  };
-
-  const iconPlus = (
-    <svg className={styles.iconPlus} width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M6.83325 4.0001C7.12021 4.0001 7.37497 4.18372 7.46571 4.45595L8.44363 7.38972L11.3774 8.36764C11.6496 8.45838 11.8333 8.71314 11.8333 9.0001C11.8333 9.28705 11.6496 9.54181 11.3774 9.63255L8.44363 10.6105L7.46571 13.5442C7.37497 13.8165 7.12021 14.0001 6.83325 14.0001C6.5463 14.0001 6.29154 13.8165 6.2008 13.5442L5.22287 10.6105L2.2891 9.63255C2.01687 9.54181 1.83325 9.28705 1.83325 9.0001C1.83325 8.71314 2.01687 8.45838 2.2891 8.36764L5.22287 7.38972L6.2008 4.45595C6.29154 4.18372 6.5463 4.0001 6.83325 4.0001ZM6.83325 6.77495L6.38237 8.12758C6.31602 8.32665 6.15981 8.48286 5.96074 8.54922L4.6081 9.0001L5.96074 9.45098C6.15981 9.51733 6.31602 9.67354 6.38237 9.87261L6.83325 11.2252L7.28413 9.87261C7.35049 9.67354 7.5067 9.51733 7.70577 9.45098L9.0584 9.0001L7.70577 8.54922C7.5067 8.48286 7.35049 8.32665 7.28413 8.12758L6.83325 6.77495Z" fill="white" />
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M12.1666 1.6001C12.3388 1.6001 12.4916 1.71027 12.5461 1.87361L13.0661 3.43387L14.6264 3.95396C14.7897 4.0084 14.8999 4.16126 14.8999 4.33343C14.8999 4.5056 14.7897 4.65846 14.6264 4.7129L13.0661 5.23299L12.5461 6.79326C12.4916 6.95659 12.3388 7.06676 12.1666 7.06676C11.9944 7.06676 11.8416 6.95659 11.7871 6.79326L11.267 5.23299L9.70676 4.7129C9.54342 4.65846 9.43325 4.5056 9.43325 4.33343C9.43325 4.16126 9.54342 4.0084 9.70676 3.95396L11.267 3.43387L11.7871 1.87361C11.8416 1.71027 11.9944 1.6001 12.1666 1.6001Z" fill="white" />
-    </svg>
-  );
 
   // const items: TabsProps['items'] = [
   //   {
@@ -178,68 +171,81 @@ export const TariffListPage: React.FC = () => {
                 </Content>
               </Layout>
 
-              <Layout className={styles.accountInfo}>
-                <Content>
-                  <Flex gap={60} justify="center">
+              <section className={styles.section}>
+                <h3 className={styles.title}>Подбери свой тариф</h3>
+                <div>
+                  <Flex gap={120} justify="center">
                     <div className={styles.col}>
-                      <Title level={4}>Количество компаний {companyCount}</Title>
-                      <Slider
-                        className={cn(styles.customSlider, 'customSlider')}
-                        min={1}
-                        max={12}
-                        value={companyCount}
-                        onChange={handleCompanyChange}
-                        tooltip={{ visible: true }}
-                        marks={{ 1: '1', 6: '6', 12: '12' }}
-                      />
-                      <Title level={4}>{getDurationLabel()}</Title>
-                      <Slider
-                        className={cn(styles.customSlider, 'customSlider')}
-                        min={1}
-                        max={12}
-                        value={monthDuration}
-                        onChange={handleDurationChange}
-                        tooltip={{ visible: true }}
-                        marks={{ 1: '1 мес.', 6: '6 мес.', 12: '12 мес.' }}
-                      />
+                      <div className={styles.slidersBlock}>
+                        <div className={styles.sliderBlock}>
+                          <h4 className={styles.subtitle}>Количество компаний</h4>
+                          <Slider
+                            className='customSlider'
+                            min={1}
+                            max={12}
+                            value={companyCount}
+                            onChange={handleCompanyChange}
+                            tooltip={{ visible: false }}
+                            marks={{ 1: '1', 2: '2', 3: '3', 4: '5', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                          />
+                          {/* <div>{companyCount}</div> */}
+                        </div>
+                        <div className={styles.sliderBlock}>
+                          <h4 className={styles.subtitle}>Длительность, месяцев</h4>
+                          <Slider
+                            className='customSlider'
+                            min={1}
+                            max={12}
+                            value={monthDuration}
+                            onChange={handleDurationChange}
+                            tooltip={{ visible: false }}
+                            marks={{ 1: '1', 2: '2', 3: '3', 4: '5', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                          />
+                          {/* <div>{monthDuration}</div> */}
+                        </div>
+                      </div>
                       <Divider />
                       <div className={styles.discountSection}>
-                        <Text>Ваша скидка: </Text>
-                        <Text>{discount} ₸</Text>
+                        <div className={styles.discountSection__label}>Ваша скидка: </div>
+                        <div className={styles.discountSection__value}>{discount} ₸</div>
                       </div>
                     </div>
                     <div className={styles.col}>
-                      <Card hoverable className={styles.card}>
-                        <Title level={2} className={styles.card__title}>Твой уникальный тариф</Title>
-                        <div className={styles.card__body}>
-                          <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
-                            <div className={styles.card__item__value}><CheckOutlined /></div>
-                          </div>
-                          <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Генерация воронки продаж</div>
-                            <div className={styles.card__item__value}><CheckOutlined /></div>
-                          </div>
-                          <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Генерации постов</div>
-                            <div className={styles.card__item__value}>*</div>
-                          </div>
-                          <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Продукты</div>
-                            <div className={styles.card__item__value}>*</div>
-                          </div>
-                          <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Аккаунты на каждую платформу социальных сетей</div>
-                            <div className={styles.card__item__value}>До 1</div>
+                      <Card hoverable className={styles.card} style={{ background: `url('${card}')` }}>
+                        <div className={styles.card__head}>
+                          <div className={styles.card__title}>Твой уникальный тариф</div>
+                          <div className={styles.card__body}>
+                            <div className={styles.card__item}>
+                              <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
+                              <div className={styles.card__item__value}><img src={checked} alt='checked' /></div>
+                            </div>
+                            <div className={styles.card__item}>
+                              <div className={styles.card__item__label}>Генерация воронки продаж</div>
+                              <div className={styles.card__item__value}><img src={checked} alt='checked' /></div>
+                            </div>
+                            <div className={styles.card__item}>
+                              <div className={styles.card__item__label}>Генерации постов</div>
+                              <div className={styles.card__item__value}><img src={infinity} alt='infinity' /></div>
+                            </div>
+                            <div className={styles.card__item}>
+                              <div className={styles.card__item__label}>Количество продуктов</div>
+                              <div className={styles.card__item__value}><img src={infinity} alt='infinity' /></div>
+                            </div>
                           </div>
                         </div>
-                        <Title level={4} className={styles.card__price}>{totalCost} ₸</Title>
-                        <Button block className={styles.card__button} icon={iconPlus} onClick={handleBuyTariff}>Подключить</Button>
+                        <div className={styles.card__bottom}>
+                          <div className={styles.card__price}>
+                            <div className={styles.card__price__label}>Стоимость:</div>
+                            <img src={arrow} alt='arrow' />
+                            <div className={styles.card__price__value}>{totalCost} ₸</div>
+                          </div>
+                          <Button className={styles.card__button} onClick={handleBuyTariff}>Подключить <img src={iconPlus} alt='iconPlus' /></Button>
+                        </div>
                       </Card>
                     </div>
                   </Flex>
-                </Content>
-              </Layout>
+                </div>
+              </section>
             </div>
           </Content>
         </Layout>
