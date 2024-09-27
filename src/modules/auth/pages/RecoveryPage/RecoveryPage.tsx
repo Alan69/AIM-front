@@ -3,6 +3,6 @@ import styles from './RecoveryPage.module.scss'
 
 export const RecoveryPage = () => {
   return (
-    <div className={styles.container}>RecoveryPage</div>
+    <div className={styles.container}><div>RecoveryPage</div></div>
   )
 }

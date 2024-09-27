@@ -5,7 +5,7 @@ import styles from './SignUpPage.module.scss'
 export const SignUpPage = () => {
   return (
     <div className={styles.container}>
-      <SignUpForm />
+      <div><SignUpForm /></div>
     </div>
   )
 }
