@@ -18,7 +18,7 @@ export const WhatYouGetSection = () => {
   ];
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id='WhatYouGetSection'>
       <div className={styles.head}>
         <div className={styles.label}>Лучшие решения</div>
         <h2 className={styles.title}>Что вы получите</h2>

@@ -7,10 +7,12 @@ import { HowItWorkSection } from '../components/HowItWorkSection/HowItWorkSectio
 import { AdvantagesSection } from '../components/AdvantagesSection/AdvantagesSection'
 import { WhatYouGetSection } from '../components/WhatYouGetSection/WhatYouGetSection'
 import { TariffSelectorSection } from '../components/TariffSelectorSection/TariffSelectorSection'
+import { FAQSection } from '../components/FAQSection/FAQSection'
+import { StartAISection } from '../components/StartAISection/StartAISection'
 
 export const LandingPage = () => {
   return (
-    <div>
+    <>
       <HeroSection />
       <VideoSection />
       <OurWorksSection />
@@ -19,6 +21,8 @@ export const LandingPage = () => {
       <AdvantagesSection />
       <WhatYouGetSection />
       <TariffSelectorSection />
-    </div>
+      <FAQSection />
+      <StartAISection />
+    </>
   )
 }

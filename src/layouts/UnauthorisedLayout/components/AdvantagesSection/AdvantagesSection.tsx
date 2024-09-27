@@ -12,7 +12,7 @@ import icon8 from '../../../../assets/image/advantages-section/8.svg';
 
 export const AdvantagesSection = () => {
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id='AdvantagesSection'>
       <h2 className={styles.title}>Преимущества <br /> работы с AIM</h2>
       <div className={styles.advantagesBlock}>
         <div className={cn(styles.advantagesRow, styles.advantagesRow__end)}>

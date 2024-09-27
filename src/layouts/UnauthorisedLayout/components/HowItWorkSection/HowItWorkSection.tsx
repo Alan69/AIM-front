@@ -6,7 +6,7 @@ import icon2 from '../../../../assets/image/how-it-works-section/2.svg';
 
 export const HowItWorkSection = () => {
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id='HowItWorkSection'>
       <h2 className={styles.title}>Как это работает</h2>
       <div className={styles.card}>
         <div className={styles.card__item}>

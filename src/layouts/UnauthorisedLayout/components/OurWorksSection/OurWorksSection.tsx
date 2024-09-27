@@ -16,7 +16,7 @@ import hand from '../../../../assets/image/works/hand.svg'
 
 export const OurWorksSection = () => {
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id='OurWorksSection'>
       <h3 className={styles.title}>Работы, созданные нашим ИИ</h3>
       <div className={styles.works}>
         <div className={styles.works__block}>
