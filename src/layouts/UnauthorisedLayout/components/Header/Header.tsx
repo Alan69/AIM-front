@@ -17,7 +17,7 @@ const Header = () => {
       <div className={styles.logo}>
         <Link to={'/home'}><img src={logo} alt={logo} /></Link>
       </div>
-      {location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/recovery' ? '' : <Menu />}
+      {location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/recovery' || location.pathname === '/policy' || location.pathname === '/agreement' ? '' : <Menu />}
       <div className={styles.actions}>
         <Button className={styles.languageButton} iconPosition='end' icon={<DownOutlined />}>РУС</Button>
         <Button className={styles.startButton} type="primary" onClick={() => navigate('/login')}>Начать</Button>

@@ -5,4 +5,51 @@
 .main {
     padding-top: 124px;
     background-color: rgba(238, 238, 238, 1);
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.docsSection {
+    padding: 60px 40px;
+    &__title {
+        margin-bottom: 40px;
+        color: var(--blue, #005FAA);
+        text-align: center;
+        font-size: 32px;
+        font-weight: 600;
+        font-style: normal;
+        text-transform: uppercase;
+    }
+    &__subtitle {
+        margin-bottom: 20px;
+        color: #444444;
+        font-size: 20px;
+        font-weight: 500;
+    }
+    &__text {
+        margin-bottom: 16px;
+        color: #444444;
+        font-size: 16px;
+        font-weight: 400;
+        &__flexed {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        &__bold {
+            margin-bottom: 16px;
+            color: #444444;
+            font-size: 16px;
+            font-weight: 500;
+        }
+    }
+    &__list {
+        padding-left: 1em;
+        &__item {
+            color: #444444;
+            font-size: 16px;
+            font-weight: 400;
+        }
+    }
 }

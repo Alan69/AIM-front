@@ -5,6 +5,7 @@ import {
   InstagramOutlined,
   LinkedinOutlined
 } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 export const Footer = (() => {
   return (
@@ -40,8 +41,8 @@ export const Footer = (() => {
       <div className={styles.footerBottom}>
         <div className={styles.footerBottom__text}>© 2024 AIM - с нами бизнес процветает. Все права защищены.</div>
         <div className={styles.links}>
-          <a href="#">Договор оферты</a>
-          <a href="#">Политика конфиденциальности</a>
+          <Link to="/agreement" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Договор оферты</Link>
+          <Link to="/policy" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Политика конфиденциальности</Link>
         </div>
       </div>
     </footer>
