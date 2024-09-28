@@ -28,7 +28,7 @@ type TSignUpResponse = {
   user: TUserData;
 }
 
-type TTokenResponse = {
+export type TTokenResponse = {
   access: string;
   refresh: string;
 }

@@ -1,12 +1,8 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import Cookies from 'js-cookie';
 import { MainLayout } from './layouts/MainLayout/MainLayout';
 import { UnauthorisedLayout } from './layouts/UnauthorisedLayout/UnauthorisedLayout';
-import { useLazyGetAuthUserQuery, useRefreshTokenMutation } from 'modules/auth/redux/api';
 import { useTypedSelector } from './hooks/useTypedSelector';
-import { authActions } from 'modules/auth/redux/slices/auth.slice';
 
 import { RecoveryPage } from 'modules/auth/pages/RecoveryPage/RecoveryPage';
 import { SignUpPage } from 'modules/auth/pages/SignUpPage/SignUpPage';
@@ -34,48 +30,10 @@ import { LandingPage } from 'layouts/UnauthorisedLayout/Pages/LandingPage';
 import { PolicyPage } from 'layouts/UnauthorisedLayout/Pages/PolicyPage';
 import { AgreementPage } from 'layouts/UnauthorisedLayout/Pages/AgreementPage';
 
-const REFRESH_TOKEN_INTERVAL = 20 * 60 * 1000;
-
 const AppRoutes: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { token, refreshToken } = useTypedSelector((state) => state.auth);
-  const [getAuthUser] = useLazyGetAuthUserQuery();
-  const [refreshTokenMutation] = useRefreshTokenMutation();
-
-  useEffect(() => {
-    if (!token) {
-      // navigate('/login', { replace: true });
-    } else {
-      getAuthUser();
-    }
-  }, [token, navigate, getAuthUser, location.pathname]);
-
-  // useEffect(() => {
-  //   const refreshAccessToken = async () => {
-  //     try {
-  //       if (refreshToken) {
-  //         const response = await refreshTokenMutation({ refresh: refreshToken }).unwrap();
-  //         dispatch(authActions.setToken({ token: response.access, refreshToken }));
-  //         Cookies.set('token', response.access, { expires: 7 });
-  //       } else {
-  //         throw new Error('No refresh token found');
-  //       }
-  //     } catch (error) {
-  //       dispatch(authActions.logOut());
-  //       navigate('/login', { replace: true });
-  //     }
-  //   };
-
-  //   const intervalId = setInterval(() => {
-  //     refreshAccessToken();
-  //   }, REFRESH_TOKEN_INTERVAL);
-
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, [refreshToken, dispatch, navigate, refreshTokenMutation, location.pathname]);
+  const { token } = useTypedSelector((state) => state.auth);
 
   if (!token) {
     return (
