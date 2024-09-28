@@ -1,5 +1,4 @@
 import baseApi from '../../../../redux/api';
-import { RootState } from '../../../../redux/rootReducer';
 
 export type TCompanyData = {
   id: string;

@@ -8,6 +8,15 @@
     display: flex;
     justify-content: center;
     flex-direction: column;
+    @media (max-width: 1263px) {
+        padding-top: 103px;
+    }
+    @media (max-width: 1024px) {
+        padding-top: 88px;
+    }
+    @media (max-width: 992) {
+        padding-top: 74px;
+    }
 }
 
 .docsSection {

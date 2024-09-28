@@ -3,6 +3,14 @@
     display: flex;
     flex-direction: column;
     gap: 60px;
+    @media (max-width: 1263px) {
+        padding: 0 30px;
+        gap: 30px;
+    }
+    @media (max-width: 1024px) {
+        padding: 0 24px;
+        gap: 20px;
+    }
 }
 
 .title {
@@ -10,12 +18,21 @@
     font-weight: 600;
     text-align: center;
     color: rgba(27, 27, 27, 1);
+    @media (max-width: 1263px) {
+        font-size: 48px;
+    }
+    @media (max-width: 1024px) {
+        font-size: 40px;
+    }
 }
 
 .card {
     display: flex;
     align-items: center;
     gap: 12px;
+    @media (max-width: 992px) {
+        flex-wrap: wrap;
+    }
     &__item {
         background-color: rgba(255, 255, 255, 1);
         background-position: center;
@@ -26,15 +43,48 @@
         display: flex;
         flex-direction: column;
         gap: 130px;
+        @media (max-width: 1263px) {
+            gap: 54px;
+        }
+        @media (max-width: 1024px) {
+            min-height: 340px;
+            gap: 36px;
+        }
+        @media (max-width: 992px) {
+            min-height: 500px;
+            width: calc(50% - 6px);
+            justify-content: space-between;
+        }
+        @media (max-width: 576px) {
+            min-height: 350px;
+            width: 100%;
+        }
+        &:last-child {
+            @media (max-width: 992px) {
+                width: 100%;
+            }
+        }
         &__title {
             font-size: 110px;
             font-weight: 600;
             color: rgba(238, 238, 238, 1);
+            @media (max-width: 1263px) {
+                font-size: 72px;
+            }
+            @media (max-width: 1024px) {
+                font-size: 56px;
+            }
         }
         &__bottom {
             display: flex;
             flex-direction: column;
             gap: 40px;
+            @media (max-width: 1263px) {
+                gap: 32px;
+            }
+            @media (max-width: 1024px) {
+                gap: 24px;
+            }
         }
         &__whiteBlock {
             background-color: rgba(255, 255, 255, 1);
@@ -43,20 +93,47 @@
             display: flex;
             flex-direction: column;
             gap: 30px;
+            @media (max-width: 1263px) {
+                padding: 24px;
+                gap: 20px;
+            }
+            @media (max-width: 1024px) {
+                padding: 16px;
+                gap: 12px;
+            }
+            @media (max-width: 992px) {
+                padding: 40px;
+            }
+            @media (max-width: 576px) {
+                padding: 20px;
+            }
             &__title {
                 font-size: 26px;
                 font-weight: 500;
                 color: rgba(27, 27, 27, 1);
+                @media (max-width: 1263px) {
+                    font-size: 20px;
+                }
+                @media (max-width: 1024px) {
+                    font-size: 16px;
+                }
             }
             &__descr {
                 font-size: 16px;
                 font-weight: 400;
                 line-height: 21.28px;
                 color: rgba(27, 27, 27, 1);
+                @media (max-width: 1263px) {
+                    font-size: 14px;
+                }
+                @media (max-width: 1024px) {
+                    font-size: 12px;
+                    line-height: 16px;
+                }
             }
         }
         &:last-child {
-            background-size: cover;
+            background-size: cover !important;
             .card__item__title {
                 color: rgba(255, 255, 255, 1);
             }
@@ -67,4 +144,15 @@
 .icon {
     width: 80px;
     height: 80px;
+    @media (max-width: 1263px) {
+        width: 56px;
+        height: 56px;
+    }
+    @media (max-width: 1024px) {
+        width: 40px;
+        height: 40px;
+    }
+    @media (max-width: 992px) {
+        margin-left: 40px;
+    }
 }

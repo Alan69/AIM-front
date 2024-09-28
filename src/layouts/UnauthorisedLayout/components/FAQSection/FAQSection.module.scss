@@ -1,11 +1,23 @@
 .section {
     padding: 40px;
+    @media (max-width: 1263px) {
+        padding: 30px;
+    }
+    @media (max-width: 1024px) {
+        padding: 24px;
+    }
 }
 
 .title {
     color: var(--black, #1B1B1B);
     font-size: 36px;
     font-weight: 500;
+    @media (max-width: 1263px) {
+        font-size: 32px;
+    }
+    @media (max-width: 1024px) {
+        font-size: 28px;
+    }
 }
 
 .accordion {
@@ -14,19 +26,10 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    .ant-collapse-header {
-        background-color: red !important;
-        font-size: 18px;
-        font-weight: 500;
-    }
-    .ant-collapse-content {
-        background-color: white;
-        border-radius: 10px;
-    }
 }
 
 .item {
-    padding: 40px;
+    padding: 32px;
     border-radius: 40px !important;
     background: var(--white, #FFF);
     &:hover {
@@ -39,6 +42,12 @@
             }
         }
     }
+    @media (max-width: 1263px) {
+        padding: 24px;
+    }
+    @media (max-width: 1024px) {
+        padding: 16px;
+    }
     &__title {
         display: flex;
         justify-content: space-between;
@@ -46,6 +55,12 @@
         color: var(--black, #1B1B1B);
         font-size: 26px;
         font-weight: 500;
+        @media (max-width: 1263px) {
+            font-size: 22px;
+        }
+        @media (max-width: 1024px) {
+            font-size: 20px;
+        }
         &__isActive {
             color: var(--blue, #005FAA) !important;
         }
@@ -56,6 +71,12 @@
         font-size: 16px;
         font-weight: 400;
         line-height: 120%;
+        @media (max-width: 1263px) {
+            margin-top: 20px;
+        }
+        @media (max-width: 1024px) {
+            margin-top: 12px;
+        }
     }
 }
 

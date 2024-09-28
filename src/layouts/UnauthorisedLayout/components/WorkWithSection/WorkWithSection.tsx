@@ -1,10 +1,10 @@
 import React from 'react'
 import styles from './WorkWithSection.module.scss';
-import inst from '../../../../assets/image/social-media-logos/inst.svg'
-import youtube from '../../../../assets/image/social-media-logos/youtube.svg'
-import tiktok from '../../../../assets/image/social-media-logos/tiktok.svg'
-import vk from '../../../../assets/image/social-media-logos/vk.svg'
-import facebook from '../../../../assets/image/social-media-logos/facebook.svg'
+import inst from 'assets/image/social-media-logos/inst.svg'
+import youtube from 'assets/image/social-media-logos/youtube.svg'
+import tiktok from 'assets/image/social-media-logos/tiktok.svg'
+import vk from 'assets/image/social-media-logos/vk.svg'
+import facebook from 'assets/image/social-media-logos/facebook.svg'
 
 export const WorkWithSection = () => {
   return (

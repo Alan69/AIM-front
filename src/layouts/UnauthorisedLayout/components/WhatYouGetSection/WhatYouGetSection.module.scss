@@ -2,6 +2,12 @@
     padding: 90px;
     border-radius: 40px;
     background: var(--blue, #005FAA);
+    @media (max-width: 1263px) {
+        padding: 40px;
+    }
+    @media (max-width: 1024px) {
+        padding: 24px;
+    }
 }
 
 .head {
@@ -10,6 +16,12 @@
     justify-content: center;
     align-items: center;
     gap: 30px;
+    @media (max-width: 1263px) {
+        gap: 20px;
+    }
+    @media (max-width: 1024px) {
+        gap: 16px;
+    }
 }
 
 .label {
@@ -21,54 +33,105 @@
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
+    @media (max-width: 1263px) {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
 }
 
 .title {
-    text-align: center;
+    margin-bottom: 40px;
     font-size: 48px;
     font-weight: 600;
+    text-align: center;
     color: white;
-    margin-bottom: 40px;
+    @media (max-width: 1263px) {
+        margin-bottom: 20px;
+        font-size: 40px;
+    }
+    @media (max-width: 1024px) {
+        margin-bottom: 16px;
+        font-size: 32px;
+    }
 }
 
-.benefitsGrid {
+.benefit {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 9px;
     row-gap: 80px;
-}
-
-.benefitItem {
-    padding: 0 50px;
-    border-radius: 20px;
-    width: calc(33.33333% - 6px);
-    text-align: center;
-    color: white;
+    @media (max-width: 1263px) {
+        row-gap: 40px;
+    }
+    @media (max-width: 1024px) {
+        row-gap: 32px;
+    }
+    @media (max-width: 992px) {
+        gap: 10px;
+        row-gap: 40px;
+    }
+    &__item {
+        padding: 0 50px;
+        border-radius: 20px;
+        width: calc(33.33333% - 6px);
+        text-align: center;
+        color: white;
+        @media (max-width: 1263px) {
+            padding: 0 24px;
+        }
+        @media (max-width: 1024px) {
+            padding: 0 16px;
+        }
+        @media (max-width: 992px) {
+            width: calc(50% - 5px);
+        }
+        @media (max-width: 576px) {
+            width: 100%;
+        }
+        &__title {
+            margin-bottom: 30px;
+            color: var(--white, #FFF);
+            font-family: Involve;
+            font-size: 26px;
+            font-style: normal;
+            font-weight: 500;
+            @media (max-width: 1263px) {
+                margin-bottom: 20px;
+                font-size: 20px;
+            }
+            @media (max-width: 1024px) {
+                margin-bottom: 16px;
+                font-size: 18px;
+            }
+        }
+        &__description {
+            color: var(--white, #FFF);
+            font-size: 16px;
+            text-align: center;
+            font-weight: 400;
+            @media (max-width: 1263px) {
+                font-size: 14px;
+            }
+            @media (max-width: 1024px) {
+                font-size: 12px;
+            }
+        }
+    }
 }
 
 .iconWrapper {
     margin-bottom: 40px;
+    @media (max-width: 1263px) {
+        margin-bottom: 20px;
+    }
+    @media (max-width: 1024px) {
+        margin-bottom: 16px;
+    }
 }
 
 .icon {
     width: 100%;
     height: auto;
     object-fit: cover;
-}
-
-.benefitTitle {
-    color: var(--white, #FFF);
-    font-family: Involve;
-    font-size: 26px;
-    font-style: normal;
-    font-weight: 500;
-}
-
-.benefitDescription {
-    color: var(--white, #FFF);
-    text-align: center;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
 }

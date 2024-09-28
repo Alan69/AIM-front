@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Slider, Card, Button, Divider, Flex } from 'antd';
+import { Slider, Card, Button, Divider } from 'antd';
 
 import styles from './TariffSelectorSection.module.scss';
 
-import iconPlus from '../../../../assets/plus-white.svg'
-import infinity from '../../../../assets/infinity.svg'
-import checked from '../../../../assets/checked.svg'
-import arrow from '../../../../assets/arrow.svg'
-import card from '../../../../assets/tariff-card-bg.png';
+import card from 'assets/tariff-card-bg.png';
+import { ReactComponent as IconChecked } from 'assets/checked.svg';
+import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
+import { ReactComponent as IconInfinity } from 'assets/infinity.svg';
+import { ReactComponent as IconArrow } from 'assets/arrow.svg';
+import { useIsXlTablet } from 'hooks/media';
 
 export const TariffSelectorSection: React.FC = () => {
   const navigate = useNavigate();
+  const isXlTablet = useIsXlTablet();
 
   const [companyCount, setCompanyCount] = useState<number>(1);
   const [monthDuration, setMonthDuration] = useState<number>(1);
@@ -62,7 +64,7 @@ export const TariffSelectorSection: React.FC = () => {
     <section className={styles.section}>
       <h3 className={styles.title}>Подбери свой тариф</h3>
       <div>
-        <Flex gap={120} justify="center">
+        <div className={styles.row}>
           <div className={styles.col}>
             <div className={styles.slidersBlock}>
               <div className={styles.sliderBlock}>
@@ -92,11 +94,11 @@ export const TariffSelectorSection: React.FC = () => {
                 {/* <div>{monthDuration}</div> */}
               </div>
             </div>
-            <Divider />
-            <div className={styles.discountSection}>
+            {isXlTablet ? '' : <Divider />}
+            {isXlTablet ? '' : <div className={styles.discountSection}>
               <div className={styles.discountSection__label}>Ваша скидка: </div>
               <div className={styles.discountSection__value}>{discount} ₸</div>
-            </div>
+            </div>}
           </div>
           <div className={styles.col}>
             <Card hoverable className={styles.card} style={{ background: `url('${card}')` }}>
@@ -105,33 +107,37 @@ export const TariffSelectorSection: React.FC = () => {
                 <div className={styles.card__body}>
                   <div className={styles.card__item}>
                     <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
-                    <div className={styles.card__item__value}><img src={checked} alt='checked' /></div>
+                    <div className={styles.card__item__value}><IconChecked className={styles.iconChecked} /></div>
                   </div>
                   <div className={styles.card__item}>
                     <div className={styles.card__item__label}>Генерация воронки продаж</div>
-                    <div className={styles.card__item__value}><img src={checked} alt='checked' /></div>
+                    <div className={styles.card__item__value}><IconChecked className={styles.iconChecked} /></div>
                   </div>
                   <div className={styles.card__item}>
                     <div className={styles.card__item__label}>Генерации постов</div>
-                    <div className={styles.card__item__value}><img src={infinity} alt='infinity' /></div>
+                    <div className={styles.card__item__value}><IconInfinity className={styles.iconInfinity} /></div>
                   </div>
                   <div className={styles.card__item}>
                     <div className={styles.card__item__label}>Количество продуктов</div>
-                    <div className={styles.card__item__value}><img src={infinity} alt='infinity' /></div>
+                    <div className={styles.card__item__value}><IconInfinity className={styles.iconInfinity} /></div>
                   </div>
                 </div>
               </div>
               <div className={styles.card__bottom}>
                 <div className={styles.card__price}>
                   <div className={styles.card__price__label}>Стоимость:</div>
-                  <img src={arrow} alt='arrow' />
+                  <IconArrow />
                   <div className={styles.card__price__value}>{totalCost} ₸</div>
                 </div>
-                <Button className={styles.card__button} onClick={() => navigate('/login')}>Подключить <img src={iconPlus} alt='iconPlus' /></Button>
+                <Button className={styles.card__button} onClick={() => navigate('/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
               </div>
             </Card>
+            {!isXlTablet ? '' : <div className={styles.discountSection}>
+              <div className={styles.discountSection__label}>Ваша скидка: </div>
+              <div className={styles.discountSection__value}>{discount} ₸</div>
+            </div>}
           </div>
-        </Flex>
+        </div>
       </div>
     </section>
   );

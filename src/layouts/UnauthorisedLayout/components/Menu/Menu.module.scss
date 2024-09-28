@@ -3,6 +3,9 @@
     justify-content: center;
     background-color: rgba(238, 238, 238, 1);
     border-bottom: none;
+    @media (max-width: 992px) {
+        display: none;
+    }
     .ant-menu-item {
         font-family: Involve;
         font-size: 16px;

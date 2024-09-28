@@ -14,9 +14,7 @@ const Header = () => {
 
   return (
     <AntHeader className={styles.header}>
-      <div className={styles.logo}>
-        <Link to={'/home'}><img src={logo} alt={logo} /></Link>
-      </div>
+      <Link className={styles.logo} to={'/home'}><img src={logo} alt={logo} /></Link>
       {location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/recovery' || location.pathname === '/policy' || location.pathname === '/agreement' ? '' : <Menu />}
       <div className={styles.actions}>
         <Button className={styles.languageButton} iconPosition='end' icon={<DownOutlined />}>РУС</Button>

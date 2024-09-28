@@ -9,15 +9,13 @@ export const StartAISection = () => {
 
   return (
     <section className={styles.section}>
-      <div className={styles.heroContent}>
-        <div className={styles.textContent}>
-          <div className={styles.preHeading}>Мы готовы, а Вы?</div>
-          <h2 className={styles.mainHeading}>
-            Начните работу <br /> с нашей ИИ-платформой <br /> прямо сейчас!
-          </h2>
-          <div className={styles.subHeading}>
-            Автоматизируйте маркетинг, оптимизируйте процессы <br /> и увеличьте конверсии  с помощью ИИ
-          </div>
+      <div className={styles.container}>
+        <div className={styles.label}>Мы готовы, а Вы?</div>
+        <h2 className={styles.title}>
+          Начните работу <br /> с нашей ИИ-платформой <br /> прямо сейчас!
+        </h2>
+        <div className={styles.subtitle}>
+          Автоматизируйте маркетинг, оптимизируйте процессы и увеличьте конверсии  с помощью ИИ
         </div>
         <Button className={styles.button} onClick={() => navigate('/login')}>
           Начать бесплатно<IconPlus className={styles.icon} />

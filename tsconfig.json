@@ -18,6 +18,7 @@
       "modules/*": ["modules/*"],
       "components/*": ["components/*"],
       "redux/*": ["redux/*"],
+      "assets/*": ["assets/*"]
     },
     "jsx": "react-jsx"
   },

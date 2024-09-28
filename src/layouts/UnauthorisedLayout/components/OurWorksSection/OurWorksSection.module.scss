@@ -2,12 +2,30 @@
     position: relative;
     padding: 0 40px;
     padding-top: 110px;
+    @media (max-width: 1263px) {
+        padding: 0 30px;
+        padding-top: 60px;
+    }
+    @media (max-width: 1024px) {
+        padding: 0 24px;
+        padding-top: 40px;
+    }
 }
 
 .title {
     font-size: 36px;
     font-weight: 500;
     text-align: left;
+    @media (max-width: 1263px) {
+        font-size: 32px;
+    }
+    @media (max-width: 1024px) {
+        font-size: 28px;
+    }
+    @media (max-width: 576px) {
+        font-size: 20px;
+        text-align: center;
+    }
 }
 
 .works {
@@ -15,17 +33,32 @@
     margin-top: 60px;
     display: flex;
     gap: 12px;
+    @media (max-width: 1263px) {
+        margin-top: 36px;
+    }
+    @media (max-width: 1024px) {
+        margin-top: 20px;
+    }
     &__block {
         width: calc(40% - 8px);
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
+        @media (max-width: 992px) {
+            width: calc(33.333% - 8px);
+        }
         &__hand {
             width: calc(20% - 8px);
+            @media (max-width: 992px) {
+                width: calc(33.333% - 8px);
+            }
         }
     }
     &__item {
         width: calc(50% - 6px);
+        @media (max-width: 992px) {
+            width: 100%;
+        }
         img {
             width: 100%;
             height: auto;
@@ -39,6 +72,10 @@
             width: 180%;
             transform: translateX(-15px);
             object-fit: cover;
+            @media (max-width: 992px) {
+                width: 200%;
+                transform: translateX(-32px);
+            }
         }
     }
 }

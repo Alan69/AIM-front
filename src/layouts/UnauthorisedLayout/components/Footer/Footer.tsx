@@ -18,7 +18,7 @@ export const Footer = (() => {
           <a href="#" className={styles.item}>Отзывы</a>
         </div>
         <div className={styles.column}>
-          <div>Следите за нашими <br /> новостями и обновлениями</div>
+          <div className={styles.item}>Следите за нашими <br /> новостями и обновлениями</div>
           <div className={styles.socialIcons}>
             <a href="https://www.facebook.com/people/AimMagic/61560400936181/"><FacebookOutlined /> </a>
             <a href="https://www.instagram.com/aimmagic/"><InstagramOutlined /></a>
@@ -27,8 +27,8 @@ export const Footer = (() => {
         </div>
         <div className={cn(styles.column, styles.blockEmail)}>
           <div className={styles.blockEmail__head}>
-            <div>По всем <br /> вопросам пишите</div>
-            <svg xmlns="http://www.w3.org/2000/svg" width="61" height="47" viewBox="0 0 61 47" fill="none">
+            <div >По всем <br /> вопросам пишите</div>
+            <svg className={styles.iconEmail} xmlns="http://www.w3.org/2000/svg" width="61" height="47" viewBox="0 0 61 47" fill="none">
               <path d="M60.4997 46.665V38.3105H0.5V46.665H60.4997Z" fill="#005FAA" />
               <path d="M60.4997 8.69038V0.335938H0.5V8.69038H60.4997Z" fill="#005FAA" />
               <path d="M54.0448 2.23438L60.5005 8.69008L30.5006 37.9306L24.0449 31.4749L54.0448 2.23438Z" fill="#005FAA" />

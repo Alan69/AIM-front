@@ -5,6 +5,12 @@
     max-height: 860px;
     position: relative;
     overflow: hidden;
+    @media (max-width: 1263px) {
+        max-height: 720px;
+    }
+    @media (max-width: 1024px) {
+        max-height: 560px;
+    }
 }
 
 .video {

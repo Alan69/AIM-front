@@ -6,14 +6,14 @@ import 'moment/locale/ru';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import styles from './ContentPlanCalendar.module.scss';
-import { TSchedulesrData } from 'modules/content-plan/redux/api';
+import { TSchedulesData } from 'modules/content-plan/redux/api';
 import { contentPlanActions } from 'modules/content-plan/redux/slices/contentPlan.slice';
 import { useDispatch } from 'react-redux';
 
 moment.locale('ru');
 
 type TProps = {
-  postList: TSchedulesrData[] | undefined
+  postList: TSchedulesData[] | undefined
   handleSelectEvent: (event: any) => void
   selectedDatePreview: Date | null
   setSelectedDatePreview: React.Dispatch<React.SetStateAction<Date | null>>

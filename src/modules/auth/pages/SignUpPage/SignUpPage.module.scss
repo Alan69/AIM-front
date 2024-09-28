@@ -4,4 +4,13 @@
     align-items: center;
     height: calc(100vh - 124px - 391px);
     padding-bottom: 20px;
+    @media (max-width: 1263px) {
+        height: calc(100vh - 103px - 351px);
+    }
+    @media (max-width: 1024px) {
+        height: calc(100vh - 88px - 278px);
+    }
+    @media (max-width: 992) {
+        height: calc(100vh - 88px - 470px);
+    }
 }

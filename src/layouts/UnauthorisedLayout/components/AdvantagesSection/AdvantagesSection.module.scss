@@ -1,6 +1,16 @@
 .section {
     padding: 180px 40px;
-    background-color: #f4f4f4;
+    @media (max-width: 1263px) {
+        padding: 80px 30px;
+    }
+    @media (max-width: 1024px) {
+        padding: 56px 24px;
+    }
+    br {
+        @media (max-width: 1024px) {
+            display: none;
+        }
+    }
 }
 
 .title {
@@ -10,6 +20,13 @@
     font-style: normal;
     font-weight: 500;
     line-height: 110%;
+    @media (max-width: 1263px) {
+        font-size: 32px;
+        line-height: 32px;
+    }
+    @media (max-width: 1024px) {
+        font-size: 28px;
+    }
 }
 
 .advantagesBlock {
@@ -21,6 +38,9 @@
 .advantagesRow {
     display: flex;
     gap: 10px;
+    @media (max-width: 992px) {
+        flex-wrap: wrap;
+    }
     &__end {
         justify-content: flex-end;
     }
@@ -41,18 +61,46 @@
         border: 1px solid white;
         transition: 0.3s;
     }
+    @media (max-width: 1024px) {
+        padding: 16px;
+    }
+    @media (max-width: 992px) {
+        width: 100%;
+    }
     &__big {
         width: calc(63% - 5px);
+        @media (max-width: 992px) {
+            width: 100%;
+        }
+    }
+    &__reverse {
+        @media (max-width: 992px) {
+            flex-direction: row-reverse;
+        }
     }
     &__title {
         color: var(--black, #1B1B1B);
         font-size: 20px;
         font-style: normal;
         font-weight: 500;
+        @media (max-width: 1263px) {
+            font-size: 18px;
+        }
+        @media (max-width: 1024px) {
+            font-size: 16px;
+        }
     }
     &__icon {
         width: 50px;
         height: 50px;
+        @media (max-width: 1263px) {
+            width: 32px;
+            height: 32px;
+        }
+        @media (max-width: 1024px) {
+            width: 24px;
+            height: 24px;
+        }
     }
 }
 

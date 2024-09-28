@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from './WhatYouGetSection.module.scss';
-import icon1 from '../../../../assets/image/what-you-get-section/1.svg';
-import icon2 from '../../../../assets/image/what-you-get-section/2.svg';
-import icon3 from '../../../../assets/image/what-you-get-section/3.svg';
-import icon4 from '../../../../assets/image/what-you-get-section/4.svg';
-import icon5 from '../../../../assets/image/what-you-get-section/5.svg';
-import icon6 from '../../../../assets/image/what-you-get-section/6.svg';
+import icon1 from 'assets/image/what-you-get-section/1.svg';
+import icon2 from 'assets/image/what-you-get-section/2.svg';
+import icon3 from 'assets/image/what-you-get-section/3.svg';
+import icon4 from 'assets/image/what-you-get-section/4.svg';
+import icon5 from 'assets/image/what-you-get-section/5.svg';
+import icon6 from 'assets/image/what-you-get-section/6.svg';
 
 export const WhatYouGetSection = () => {
   const benefits = [
@@ -23,14 +23,14 @@ export const WhatYouGetSection = () => {
         <div className={styles.label}>Лучшие решения</div>
         <h2 className={styles.title}>Что вы получите</h2>
       </div>
-      <div className={styles.benefitsGrid}>
+      <div className={styles.benefit}>
         {benefits.map((benefit) => (
-          <div key={benefit.id} className={styles.benefitItem}>
+          <div key={benefit.id} className={styles.benefit__item}>
             <div className={styles.iconWrapper}>
               <img src={benefit.icon} alt={benefit.title} className={styles.icon} />
             </div>
-            <h3 className={styles.benefitTitle}>{benefit.title}</h3>
-            <p className={styles.benefitDescription}>{benefit.description}</p>
+            <h3 className={styles.benefit__item__title}>{benefit.title}</h3>
+            <p className={styles.benefit__item__description}>{benefit.description}</p>
           </div>
         ))}
       </div>

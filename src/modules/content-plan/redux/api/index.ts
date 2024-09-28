@@ -3,7 +3,7 @@ import baseApi from '../../../../redux/api';
 import { TCompanyData } from 'modules/company/redux/api';
 import { TProductData } from 'modules/product/redux/api';
 
-export type TSchedulesrData = {
+export type TSchedulesData = {
   id: string;
   post: TPostData;
   company: TCompanyData;
@@ -35,12 +35,12 @@ export type TAddToSchedulersResponse = {
 
 export const contentPlanApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-		getSchedulers: build.query<TSchedulesrData[], string | undefined>({
+		getSchedulers: build.query<TSchedulesData[], string | undefined>({
 			query: (company_id) => ({
 				url: `/schedulers/by-current-company/${company_id}`,
 				method: 'GET'
 			}),
-			transformResponse: (response: TSchedulesrData[]) => response,
+			transformResponse: (response: TSchedulesData[]) => response,
     }),
     addToSchedulers: build.mutation<TAddToSchedulersResponse, TAddToSchedulersData>({
 			query: ({post_id, company_id, social_media_account_ids, scheduled_date, scheduled_time, active}) => ({
