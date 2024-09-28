@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './OfferInfo.module.scss';
-import coins from '../../../assets/coins.jpeg';
+import coins from 'assets/coins.jpeg';
 import { Link } from 'react-router-dom';
 import { Tooltip } from 'antd';
 import {

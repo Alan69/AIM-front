@@ -1,8 +1,8 @@
 import React from 'react'
 import styles from './HowItWorkSection.module.scss';
-import card from '../../../../assets/image/how-it-works-section/card-bg.png';
-import icon1 from '../../../../assets/image/how-it-works-section/1.svg';
-import icon2 from '../../../../assets/image/how-it-works-section/2.svg';
+import card from 'assets/image/how-it-works-section/card-bg.png';
+import icon1 from 'assets/image/how-it-works-section/1.svg';
+import icon2 from 'assets/image/how-it-works-section/2.svg';
 
 export const HowItWorkSection = () => {
   return (

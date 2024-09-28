@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import styles from './SelectedPostPreview.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import avatar from '../../../../assets/avatar.png';
+import avatar from 'assets/avatar.png';
 
 type TProps = {
   selectedPost: TPostSerializer | null | undefined

@@ -2,7 +2,7 @@ import React from 'react';
 import { Layout, Button } from 'antd';
 import styles from './Header.module.scss';
 import Menu from '../Menu/Menu';
-import logo from '../../../../assets/logo.svg';
+import logo from 'assets/logo.svg';
 import { DownOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 

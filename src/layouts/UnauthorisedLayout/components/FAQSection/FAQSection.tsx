@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import cn from 'classnames';
 import { Collapse } from 'antd';
 import styles from './FAQSection.module.scss';
-import { ReactComponent as IconArrow } from '../../../../assets/arrow-grey.svg';
+import { ReactComponent as IconArrow } from 'assets/arrow-grey.svg';
 
 const { Panel } = Collapse;
 

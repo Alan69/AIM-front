@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './UserInfo.module.scss';
-import avatar from '../../../assets/avatar.png';
+import avatar from 'assets/avatar.png';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const UserInfo: React.FC = () => {

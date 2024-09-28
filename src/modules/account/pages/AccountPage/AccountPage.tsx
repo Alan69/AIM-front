@@ -7,7 +7,7 @@ import { useGetJobTypesListQuery } from '../../../../redux/api/jobTypes/jobTypes
 import { useGetContriesListQuery } from '../../../../redux/api/contries/contriesApi';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
-import avatar from '../../../../assets/avatar.png';
+import avatar from 'assets/avatar.png';
 import { useNavigate } from 'react-router-dom';
 import styles from './AccountPage.module.scss'
 

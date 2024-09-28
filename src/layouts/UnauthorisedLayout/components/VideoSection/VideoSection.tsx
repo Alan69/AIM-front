@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './VideoSection.module.scss';
 // @ts-ignore
-import videoSrc from '../../../../assets/video.mp4';
+import videoSrc from 'assets/video.mp4';
 
 export const VideoSection = () => {
   return (

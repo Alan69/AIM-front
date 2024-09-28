@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout/MainLayout';
 import { UnauthorisedLayout } from './layouts/UnauthorisedLayout/UnauthorisedLayout';
@@ -29,11 +29,21 @@ import { TariffListPage } from 'modules/tariff/pages/TariffListPage/TariffListPa
 import { LandingPage } from 'layouts/UnauthorisedLayout/Pages/LandingPage';
 import { PolicyPage } from 'layouts/UnauthorisedLayout/Pages/PolicyPage';
 import { AgreementPage } from 'layouts/UnauthorisedLayout/Pages/AgreementPage';
+import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 
 const AppRoutes: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [getAuthUser] = useLazyGetAuthUserQuery();
   const { token } = useTypedSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!token) {
+      // navigate('/login', { replace: true });
+    } else {
+      getAuthUser();
+    }
+  }, [token, navigate, getAuthUser, location.pathname]);
 
   if (!token) {
     return (
@@ -89,3 +99,7 @@ const AppRoutes: FC = () => {
 }
 
 export default AppRoutes;
+function getAuthUser() {
+  throw new Error('Function not implemented.');
+}
+

@@ -5,11 +5,11 @@ import { Content } from 'antd/es/layout/layout';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useCreateTariffMutation, usePaymentInitiateMutation, usePaymentTokenMutation } from 'modules/tariff/redux/api';
 
-import iconPlus from '../../../../assets/plus-white.svg'
-import infinity from '../../../../assets/infinity.svg'
-import checked from '../../../../assets/checked.svg'
-import arrow from '../../../../assets/arrow.svg'
-import card from '../../../../assets/tariff-card-bg.png';
+import iconPlus from 'assets/plus-white.svg'
+import infinity from 'assets/infinity.svg'
+import checked from 'assets/checked.svg'
+import arrow from 'assets/arrow.svg'
+import card from 'assets/tariff-card-bg.png';
 
 const { Title, Text } = Typography;
 

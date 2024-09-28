@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import styles from './PostDetailsPage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import avatar from '../../../../assets/avatar.png';
+import avatar from 'assets/avatar.png';
 import { Controller, useForm } from 'react-hook-form';
 import { ModalImageStylesList } from 'modules/post-query/components/ModalImageStylesList/ModalImageStylesList';
 import { TImgStylesData, useGetImgStylesListQuery } from '../../../../redux/api/imgStyles/imgStylesApi';
