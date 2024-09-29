@@ -2,8 +2,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 124px - 391px);
     padding-bottom: 20px;
+    min-height: 500px;
+    height: calc(100vh - 124px - 391px);
     @media (max-width: 1263px) {
         height: calc(100vh - 103px - 351px);
     }
