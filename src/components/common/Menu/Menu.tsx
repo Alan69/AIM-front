@@ -13,6 +13,7 @@ import OfferInfo from '../OfferInfo/OfferInfo';
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
 import { useDispatch } from 'react-redux';
 import CurrentCompanyInfo from '../CurrentCompanyInfo/CurrentCompanyInfo';
+import { ReactComponent as IconLogo } from 'assets/logo.svg';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -61,7 +62,7 @@ const MenuNav: React.FC = () => {
 
   return (
     <div className={styles.menuBody}>
-      <div className={styles.logo}>AIM</div>
+      <Link className={styles.logo} to={'/home'}><IconLogo /></Link>
       <Menu
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}

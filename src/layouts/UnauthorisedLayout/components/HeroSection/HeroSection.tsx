@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
 import styles from './HeroSection.module.scss';
 import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 export const HeroSection = () => {
   const navigate = useNavigate();
+  const { token } = useTypedSelector((state) => state.auth);
 
   const features = [
     'Маркетинговая стратегия',
@@ -26,8 +28,8 @@ export const HeroSection = () => {
       <h1 className={styles.title}>С нами бизнес <br /> процветает</h1>
       <h3 className={styles.subtitle}>Инновационная ИИ-платформа для <br /> автоматизации и оптимизации маркетинга</h3>
       <div className={styles.actions}>
-        <Button className={styles.tariffBtn} onClick={() => navigate('/login')}>Тарифы</Button>
-        <Button className={styles.startBtn} onClick={() => navigate('/login')} >Начать бесплатно <IconPlus className={styles.iconPlus} /></Button>
+        <Button className={styles.tariffBtn} onClick={() => navigate(token ? '/tariffs' : '/login')}>Тарифы</Button>
+        <Button className={styles.startBtn} onClick={() => navigate(token ? '/tariffs' : '/login')} >Начать бесплатно <IconPlus className={styles.iconPlus} /></Button>
       </div>
       <div className={styles.feature}>
         {features.map((feature, index) => (

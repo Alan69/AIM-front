@@ -10,10 +10,12 @@ import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
 import { ReactComponent as IconInfinity } from 'assets/infinity.svg';
 import { ReactComponent as IconArrow } from 'assets/arrow.svg';
 import { useIsXlTablet } from 'hooks/media';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 export const TariffSelectorSection: React.FC = () => {
   const navigate = useNavigate();
   const isXlTablet = useIsXlTablet();
+  const { token } = useTypedSelector((state) => state.auth);
 
   const [companyCount, setCompanyCount] = useState<number>(1);
   const [monthDuration, setMonthDuration] = useState<number>(1);
@@ -76,7 +78,7 @@ export const TariffSelectorSection: React.FC = () => {
                   value={companyCount}
                   onChange={handleCompanyChange}
                   tooltip={{ visible: false }}
-                  marks={{ 1: '1', 2: '2', 3: '3', 4: '5', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                  marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
                 />
                 {/* <div>{companyCount}</div> */}
               </div>
@@ -89,7 +91,7 @@ export const TariffSelectorSection: React.FC = () => {
                   value={monthDuration}
                   onChange={handleDurationChange}
                   tooltip={{ visible: false }}
-                  marks={{ 1: '1', 2: '2', 3: '3', 4: '5', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                  marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
                 />
                 {/* <div>{monthDuration}</div> */}
               </div>
@@ -129,7 +131,7 @@ export const TariffSelectorSection: React.FC = () => {
                   <IconArrow />
                   <div className={styles.card__price__value}>{totalCost} ₸</div>
                 </div>
-                <Button className={styles.card__button} onClick={() => navigate('/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
+                <Button className={styles.card__button} onClick={() => navigate(token ? '/tariffs' : '/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
               </div>
             </Card>
             {!isXlTablet ? '' : <div className={styles.discountSection}>

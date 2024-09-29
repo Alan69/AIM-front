@@ -186,7 +186,7 @@ export const TariffListPage: React.FC = () => {
                             value={companyCount}
                             onChange={handleCompanyChange}
                             tooltip={{ visible: false }}
-                            marks={{ 1: '1', 2: '2', 3: '3', 4: '5', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                            marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
                           />
                           {/* <div>{companyCount}</div> */}
                         </div>
@@ -199,7 +199,7 @@ export const TariffListPage: React.FC = () => {
                             value={monthDuration}
                             onChange={handleDurationChange}
                             tooltip={{ visible: false }}
-                            marks={{ 1: '1', 2: '2', 3: '3', 4: '5', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                            marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
                           />
                           {/* <div>{monthDuration}</div> */}
                         </div>

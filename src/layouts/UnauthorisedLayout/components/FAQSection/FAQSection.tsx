@@ -44,9 +44,6 @@ export const FAQSection: React.FC = () => {
     }
   ];
 
-  console.log('activeKey', activeKey);
-
-
   return (
     <section className={styles.section} id='FAQSection'>
       <h2 className={styles.title}>FAQ</h2>

@@ -72,6 +72,9 @@ const AppRoutes: FC = () => {
   return (
     <Routes>
       <Route element={<MainLayout />}>
+        <Route path="/home" element={<LandingPage />} />
+        <Route path="/agreement" element={<AgreementPage />} />
+        <Route path="/policy" element={<PolicyPage />} />
         <Route path='/account/profile/edit' element={<AccountPage />} />
         <Route path='/account/tariffs' element={<TariffListPage />} />
         <Route path='/tariffs' element={<TariffListPage />} />
@@ -99,7 +102,3 @@ const AppRoutes: FC = () => {
 }
 
 export default AppRoutes;
-function getAuthUser() {
-  throw new Error('Function not implemented.');
-}
-

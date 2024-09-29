@@ -67,12 +67,10 @@ export const LoginForm = () => {
 
         <div className={styles.linksBlock}>
           <Link to="/signup">Регистрация аккаунта</Link>
-
           <Link className={styles.loginFormForgot} to="/recovery">
             Забыли пароль?
           </Link>
         </div>
-
       </Form>
     </div>
   );

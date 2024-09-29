@@ -4,11 +4,17 @@
 }
 
 .logo {
-    padding: 16px;
-    text-align: center;
-    color: rgba(67, 94, 190, 1);
-    font-size: 32px;
-    font-weight: 900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    svg {
+        cursor: pointer;
+        @media (max-width: 992px) {
+            height: 100%;
+            object-fit: cover;
+        }
+    }
 }
 
 .logOutBtn {
