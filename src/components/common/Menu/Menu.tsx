@@ -14,12 +14,14 @@ import { authActions } from 'modules/auth/redux/slices/auth.slice';
 import { useDispatch } from 'react-redux';
 import CurrentCompanyInfo from '../CurrentCompanyInfo/CurrentCompanyInfo';
 import { ReactComponent as IconLogo } from 'assets/logo.svg';
+import { useIsXlTablet } from 'hooks/media';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const MenuNav: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isXlTablet = useIsXlTablet();
 
   const logOut = () => {
     dispatch(authActions.logOut());
@@ -69,6 +71,7 @@ const MenuNav: React.FC = () => {
         mode="inline"
         theme="light"
         items={items}
+      // inlineCollapsed={isXlTablet ? true : false}
       />
     </div>
   );

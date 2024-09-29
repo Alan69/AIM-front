@@ -65,80 +65,78 @@ export const TariffSelectorSection: React.FC = () => {
   return (
     <section className={styles.section}>
       <h3 className={styles.title}>Подбери свой тариф</h3>
-      <div>
-        <div className={styles.row}>
-          <div className={styles.col}>
-            <div className={styles.slidersBlock}>
-              <div className={styles.sliderBlock}>
-                <h4 className={styles.subtitle}>Количество компаний</h4>
-                <Slider
-                  className='customSlider'
-                  min={1}
-                  max={12}
-                  value={companyCount}
-                  onChange={handleCompanyChange}
-                  tooltip={{ visible: false }}
-                  marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
-                />
-                {/* <div>{companyCount}</div> */}
-              </div>
-              <div className={styles.sliderBlock}>
-                <h4 className={styles.subtitle}>Длительность, месяцев</h4>
-                <Slider
-                  className='customSlider'
-                  min={1}
-                  max={12}
-                  value={monthDuration}
-                  onChange={handleDurationChange}
-                  tooltip={{ visible: false }}
-                  marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
-                />
-                {/* <div>{monthDuration}</div> */}
+      <div className={styles.row}>
+        <div className={styles.col}>
+          <div className={styles.slidersBlock}>
+            <div className={styles.sliderBlock}>
+              <h4 className={styles.subtitle}>Количество компаний</h4>
+              <Slider
+                className='customSlider'
+                min={1}
+                max={12}
+                value={companyCount}
+                onChange={handleCompanyChange}
+                tooltip={{ visible: false }}
+                marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+              />
+              {/* <div>{companyCount}</div> */}
+            </div>
+            <div className={styles.sliderBlock}>
+              <h4 className={styles.subtitle}>Длительность, месяцев</h4>
+              <Slider
+                className='customSlider'
+                min={1}
+                max={12}
+                value={monthDuration}
+                onChange={handleDurationChange}
+                tooltip={{ visible: false }}
+                marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+              />
+              {/* <div>{monthDuration}</div> */}
+            </div>
+          </div>
+          {isXlTablet ? '' : <Divider />}
+          {isXlTablet ? '' : <div className={styles.discountSection}>
+            <div className={styles.discountSection__label}>Ваша скидка: </div>
+            <div className={styles.discountSection__value}>{discount} ₸</div>
+          </div>}
+        </div>
+        <div className={styles.col}>
+          <Card hoverable className={styles.card} style={{ background: `url('${card}')` }}>
+            <div className={styles.card__head}>
+              <div className={styles.card__title}>Твой уникальный тариф</div>
+              <div className={styles.card__body}>
+                <div className={styles.card__item}>
+                  <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
+                  <div className={styles.card__item__value}><IconChecked className={styles.iconChecked} /></div>
+                </div>
+                <div className={styles.card__item}>
+                  <div className={styles.card__item__label}>Генерация воронки продаж</div>
+                  <div className={styles.card__item__value}><IconChecked className={styles.iconChecked} /></div>
+                </div>
+                <div className={styles.card__item}>
+                  <div className={styles.card__item__label}>Генерации постов</div>
+                  <div className={styles.card__item__value}><IconInfinity className={styles.iconInfinity} /></div>
+                </div>
+                <div className={styles.card__item}>
+                  <div className={styles.card__item__label}>Количество продуктов</div>
+                  <div className={styles.card__item__value}><IconInfinity className={styles.iconInfinity} /></div>
+                </div>
               </div>
             </div>
-            {isXlTablet ? '' : <Divider />}
-            {isXlTablet ? '' : <div className={styles.discountSection}>
-              <div className={styles.discountSection__label}>Ваша скидка: </div>
-              <div className={styles.discountSection__value}>{discount} ₸</div>
-            </div>}
-          </div>
-          <div className={styles.col}>
-            <Card hoverable className={styles.card} style={{ background: `url('${card}')` }}>
-              <div className={styles.card__head}>
-                <div className={styles.card__title}>Твой уникальный тариф</div>
-                <div className={styles.card__body}>
-                  <div className={styles.card__item}>
-                    <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
-                    <div className={styles.card__item__value}><IconChecked className={styles.iconChecked} /></div>
-                  </div>
-                  <div className={styles.card__item}>
-                    <div className={styles.card__item__label}>Генерация воронки продаж</div>
-                    <div className={styles.card__item__value}><IconChecked className={styles.iconChecked} /></div>
-                  </div>
-                  <div className={styles.card__item}>
-                    <div className={styles.card__item__label}>Генерации постов</div>
-                    <div className={styles.card__item__value}><IconInfinity className={styles.iconInfinity} /></div>
-                  </div>
-                  <div className={styles.card__item}>
-                    <div className={styles.card__item__label}>Количество продуктов</div>
-                    <div className={styles.card__item__value}><IconInfinity className={styles.iconInfinity} /></div>
-                  </div>
-                </div>
+            <div className={styles.card__bottom}>
+              <div className={styles.card__price}>
+                <div className={styles.card__price__label}>Стоимость:</div>
+                <IconArrow />
+                <div className={styles.card__price__value}>{totalCost} ₸</div>
               </div>
-              <div className={styles.card__bottom}>
-                <div className={styles.card__price}>
-                  <div className={styles.card__price__label}>Стоимость:</div>
-                  <IconArrow />
-                  <div className={styles.card__price__value}>{totalCost} ₸</div>
-                </div>
-                <Button className={styles.card__button} onClick={() => navigate(token ? '/tariffs' : '/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
-              </div>
-            </Card>
-            {!isXlTablet ? '' : <div className={styles.discountSection}>
-              <div className={styles.discountSection__label}>Ваша скидка: </div>
-              <div className={styles.discountSection__value}>{discount} ₸</div>
-            </div>}
-          </div>
+              <Button className={styles.card__button} onClick={() => navigate(token ? '/tariffs' : '/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
+            </div>
+          </Card>
+          {!isXlTablet ? '' : <div className={styles.discountSection}>
+            <div className={styles.discountSection__label}>Ваша скидка: </div>
+            <div className={styles.discountSection__value}>{discount} ₸</div>
+          </div>}
         </div>
       </div>
     </section>

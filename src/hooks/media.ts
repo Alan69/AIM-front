@@ -4,7 +4,7 @@ export const useIsMobile = () => useMediaQuery({ maxWidth: 576 })
 
 export const useIsTablet = () => useMediaQuery({ maxWidth: 768 })
 
-export const useIsXlTablet = () => useMediaQuery({ maxWidth: 962 })
+export const useIsXlTablet = () => useMediaQuery({ maxWidth: 992 })
 
 export const useIsLaptop = () => useMediaQuery({ maxWidth: 1100 })
 

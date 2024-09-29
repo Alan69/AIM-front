@@ -1,6 +1,6 @@
 import { SignUpForm } from 'modules/auth/components/SignUpForm/SignUpForm'
 import React from 'react'
-import styles from './SignUpPage.module.scss'
+import styles from './AuthPagesStyle.module.scss'
 
 export const SignUpPage = () => {
   return (

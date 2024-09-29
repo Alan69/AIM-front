@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
+import { Link } from 'react-router-dom';
 import { Layout, Table } from 'antd';
 import type { TableProps } from 'antd';
-import { TPostQueryData, useGetPostQueriesListQuery } from '../redux/api';
-import { Link } from 'react-router-dom';
+import { TPostQueryData, useGetPostQueriesListQuery } from '../../redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import styles from './PostQueryListPage.module.scss'
 
 const { Content } = Layout;
 
@@ -96,7 +97,7 @@ export const PostQueryListPage = () => {
   return (
     <Layout>
       <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>История запросов</h1>
+        <h1 className={styles.title}>История запросов</h1>
         {/* @ts-ignore */}
         <Table columns={columns} dataSource={data} pagination={false} />
       </Content>

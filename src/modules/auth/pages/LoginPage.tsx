@@ -1,6 +1,6 @@
 import React from 'react'
 import { LoginForm } from 'modules/auth/components/LoginForm/LoginForm';
-import styles from './LoginPage.module.scss'
+import styles from './AuthPagesStyle.module.scss'
 
 export const LoginPage = () => {
   return (

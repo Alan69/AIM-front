@@ -4,9 +4,9 @@ import { MainLayout } from './layouts/MainLayout/MainLayout';
 import { UnauthorisedLayout } from './layouts/UnauthorisedLayout/UnauthorisedLayout';
 import { useTypedSelector } from './hooks/useTypedSelector';
 
-import { RecoveryPage } from 'modules/auth/pages/RecoveryPage/RecoveryPage';
-import { SignUpPage } from 'modules/auth/pages/SignUpPage/SignUpPage';
-import { LoginPage } from 'modules/auth/pages/LoginPage/LoginPage';
+import { RecoveryPage } from 'modules/auth/pages/RecoveryPage';
+import { SignUpPage } from 'modules/auth/pages/SignUpPage';
+import { LoginPage } from 'modules/auth/pages/LoginPage';
 
 import { AccountPage } from 'modules/account/pages/AccountPage/AccountPage';
 import { CompanyCreatePage } from 'modules/company/pages/CompanyCreatePage/CompanyCreatePage';
@@ -16,7 +16,7 @@ import { CompanyDeletePage } from 'modules/company/pages/CompanyDeletePage/Compa
 import { ProductCreatePage } from 'modules/product/pages/ProductCreatePage/ProductCreatePage';
 import { ProductUpdatePage } from 'modules/product/pages/ProductUpdatePage/ProductUpdatePage';
 import { ProductDeletePage } from 'modules/product/pages/ProductDeletePage/ProductDeletePage';
-import { PostQueryListPage } from 'modules/post-query/pages/PostQueryListPage';
+import { PostQueryListPage } from 'modules/post-query/pages/PostQueryListPage/PostQueryListPage';
 import { PostQueryCreatePage } from 'modules/post-query/pages/PostQueryCreatePage/PostQueryCreatePage';
 import { PostQueryDetailsPage } from 'modules/post-query/pages/PostQueryDetailsPage/PostQueryDetailsPage';
 import { PostUpdatePage } from 'modules/post/pages/PostUpdatePage/PostUpdatePage';

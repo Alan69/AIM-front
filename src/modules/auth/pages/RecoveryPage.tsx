@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from './RecoveryPage.module.scss'
+import styles from './AuthPagesStyle.module.scss'
 
 export const RecoveryPage = () => {
   return (
