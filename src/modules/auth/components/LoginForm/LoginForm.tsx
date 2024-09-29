@@ -19,9 +19,9 @@ export const LoginForm = () => {
       const { access: token, refresh: refreshToken } = response.data;
 
       dispatch(authActions.setToken({ token, refreshToken }));
-      message.success('Login successful!');
+      message.success('Авторизация прошла успешно!');
     } catch (error) {
-      message.error('Login failed. Please check your credentials.');
+      message.error('Вход в систему не удался. Пожалуйста, проверьте свои учетные данные.');
     }
   };
 

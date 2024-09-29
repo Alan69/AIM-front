@@ -22,7 +22,7 @@ export const Footer = (() => {
           <div className={styles.socialIcons}>
             <a href="https://www.facebook.com/people/AimMagic/61560400936181/"><FacebookOutlined /> </a>
             <a href="https://www.instagram.com/aimmagic/"><InstagramOutlined /></a>
-            <a href="/"><LinkedinOutlined /></a>
+            <a href="https://www.linkedin.com/company/a-gene/"><LinkedinOutlined /></a>
           </div>
         </div>
         <div className={cn(styles.column, styles.blockEmail)}>
