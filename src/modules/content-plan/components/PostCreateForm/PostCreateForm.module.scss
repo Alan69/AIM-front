@@ -17,9 +17,18 @@
 
 .container {
     width: 100%;
+}
+
+.mainBlock {
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.editBlock {
+    width: 50%;
+    max-width: 450px;
 }
 
 .picture,
@@ -30,8 +39,45 @@
     }
 }
 
+.postContent,
+.postHashtags,
+.postLike,
+.postActions {
+    margin-top: 16px;
+}
+
 .postLike {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.postActions {
+    display: flex;
+    gap: 16px;
+}
+
+.pictureBlock {
+    position: relative;
+}
+
+.submitButton {
+    margin-top: 12px;
+}
+
+.loader {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    font-size: 100px;
+    color: rgb(22, 119, 255);
+}
+
+.name {
+    height: auto;
+    font-size: 16px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

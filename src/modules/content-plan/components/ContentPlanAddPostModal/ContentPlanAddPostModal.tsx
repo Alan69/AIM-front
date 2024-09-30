@@ -129,7 +129,6 @@ export const ContentPlanAddPostModal = ({
     setSelectedTime(null);
   }, [selectedDate]);
 
-
   return (
     <Modal
       title={isPostPage ? 'Добавление в планировщик' : "Добавить контент"}
@@ -187,7 +186,7 @@ export const ContentPlanAddPostModal = ({
       {isPostPage ? '' : <>
         <Divider />
         <div className={styles.addBtns}>
-          <Button icon={<PictureOutlined />} onClick={handleShowContentPlanPostsListModal}>
+          <Button icon={<PictureOutlined />} onClick={handleShowContentPlanPostsListModal} className={cn(styles.addBtn, selectNewPost?.id ? styles.addBtn__isActive : '')}>
             Пост
           </Button>
           <Button icon={<VideoCameraOutlined />} disabled>

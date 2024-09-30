@@ -14,13 +14,13 @@ import { TPostData } from 'modules/post/redux/api';
 const { Title, Text } = Typography;
 
 type TProps = {
-  isPostCreating: boolean
   post: TPostData | undefined
+  isPostCreating: boolean
   handleGeneratePost: (updatedData: TPostQuerCreateData) => void
   handleGetPostById: (id: string) => void
 }
 
-export const PostQueryGenerateForm = ({ isPostCreating, post, handleGeneratePost, handleGetPostById }: TProps) => {
+export const PostQueryGenerateForm = ({ post, isPostCreating, handleGeneratePost, handleGetPostById }: TProps) => {
   const { current_company } = useTypedSelector((state) => state.auth);
   const { isPostGenerated } = useTypedSelector((state) => state.post);
   const [selectedCompany, setSelectedCompany] = useState<string | undefined>();
@@ -107,10 +107,6 @@ export const PostQueryGenerateForm = ({ isPostCreating, post, handleGeneratePost
                 <div className={styles.postHashtags}>
                   <Text>{post?.hashtags}</Text>
                 </div>
-              </div>
-              <div className={styles.postLike}>
-                <Text>Лайк</Text>
-                <Checkbox checked={post?.like}></Checkbox>
               </div>
             </div>
           </div>

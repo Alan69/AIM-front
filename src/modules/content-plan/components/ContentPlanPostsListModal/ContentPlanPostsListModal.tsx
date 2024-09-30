@@ -1,15 +1,14 @@
-import { Modal, Button, Divider, List, Image, Typography, Tabs, TabsProps } from 'antd';
-import { AppstoreAddOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import cn from 'classnames'
-
 import React, { useState } from 'react';
+import { Modal, Button, Divider, Tabs, TabsProps } from 'antd';
+import { AppstoreAddOutlined, UnorderedListOutlined } from '@ant-design/icons';
+
 import 'moment/locale/ru';
-import styles from './ContentPlanPostsListModal.module.scss'
-import { TPostData } from 'modules/post/redux/api';
+import { TCreatePost, TPostData } from 'modules/post/redux/api';
 import { PostQueryGenerateForm } from '../PostQueryGenerateForm/PostQueryGenerateForm';
 import { PostCreateForm } from '../PostCreateForm/PostCreateForm';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { TPostQuerCreateData } from 'modules/post-query/redux/api';
+import { ContentPlanPostList } from '../ContentPlanPostList/ContentPlanPostList';
 
 type TProps = {
   isModalOpen: boolean;
@@ -17,13 +16,13 @@ type TProps = {
   postListByCompanyId: TPostData[] | undefined
   handleSelectNewPost: (post: TPostData) => void
   selectNewPost: TPostData | null;
-  isPostCreating: boolean
+  isPostCreating: boolean;
+  isCustomPostCreating: boolean;
   post: TPostData | undefined
   handleGeneratePost: (updatedData: TPostQuerCreateData) => void
+  handleCreateCustomPost: (updatedData: TCreatePost) => void
   handleGetPostById: (id: string) => void
 };
-
-const { Title, Paragraph } = Typography;
 
 export const ContentPlanPostsListModal = ({
   isModalOpen,
@@ -32,14 +31,16 @@ export const ContentPlanPostsListModal = ({
   handleSelectNewPost,
   selectNewPost,
   isPostCreating,
+  isCustomPostCreating,
   post,
   handleGeneratePost,
+  handleCreateCustomPost,
   handleGetPostById,
 }: TProps) => {
   const [expandedKeys, setExpandedKeys] = useState<Record<number, boolean>>({});
   const [selectCurrentPost, setSelectCurrentPost] = useState<TPostData | null>(selectNewPost);
   const [activeTabKey, setActiveTabKey] = useState<string>('2');
-  const { generatedPost } = useTypedSelector((state) => state.post);
+  const { generatedPost, createdCustomPost } = useTypedSelector((state) => state.post);
 
   const toggleExpand = (index: number) => {
     setExpandedKeys((prevKeys) => ({
@@ -56,52 +57,40 @@ export const ContentPlanPostsListModal = ({
     {
       key: '1',
       label: 'Создание поста',
-      children: <PostCreateForm />,
+      children:
+        <PostCreateForm
+          post={post}
+          isCustomPostCreating={isCustomPostCreating}
+          handleCreateCustomPost={handleCreateCustomPost}
+        />,
       icon: <AppstoreAddOutlined />,
-      disabled: true
+      disabled: isCustomPostCreating,
     },
     {
       key: '2',
       label: 'Генерация поста',
-      children: <PostQueryGenerateForm isPostCreating={isPostCreating} post={post} handleGeneratePost={handleGeneratePost} handleGetPostById={handleGetPostById} />,
+      children:
+        <PostQueryGenerateForm
+          post={post}
+          isPostCreating={isPostCreating}
+          handleGeneratePost={handleGeneratePost}
+          handleGetPostById={handleGetPostById}
+        />,
       icon: <AppstoreAddOutlined />,
       disabled: isPostCreating,
     },
     {
       key: '3',
       label: 'Список постов',
-      children: <div className={styles.modalWithScroll}>
-        <List
-          itemLayout="horizontal"
-          dataSource={postListByCompanyId}
-          renderItem={(item, index) => (
-            <List.Item
-              onClick={() => setSelectCurrentPost(item)}
-              className={cn(styles.item, selectCurrentPost?.id === item.id ? styles.item__isActive : '')}
-            >
-              <List.Item.Meta
-                avatar={<Image width={160} height={160} src={item.picture} />}
-                title={<Title level={5}>{item.title}</Title>}
-                description={
-                  <>
-                    <Paragraph
-                      className={styles.text}
-                      ellipsis={!expandedKeys[index] ? { rows: 4, expandable: false } : false}
-                    >
-                      {item.main_text}
-                    </Paragraph>
-                    <div className={styles.expandBtn}>
-                      <Button type="link" onClick={() => toggleExpand(index)}>
-                        {expandedKeys[index] ? 'Скрыть' : 'Развернуть'}
-                      </Button>
-                    </div>
-                  </>
-                }
-              />
-            </List.Item>
-          )}
+      children:
+        <ContentPlanPostList
+          postListByCompanyId={postListByCompanyId}
+          selectCurrentPost={selectCurrentPost}
+          setSelectCurrentPost={setSelectCurrentPost}
+          expandedKeys={expandedKeys}
+          toggleExpand={toggleExpand}
         />
-      </div>,
+      ,
       icon: <UnorderedListOutlined />,
       disabled: isPostCreating,
     },
@@ -120,6 +109,7 @@ export const ContentPlanPostsListModal = ({
           key="schedule"
           type="default"
           onClick={() => {
+            activeTabKey === '1' && createdCustomPost && handleSelectNewPost(createdCustomPost);
             activeTabKey === '2' && generatedPost && handleSelectNewPost(generatedPost);
             activeTabKey === '3' && selectCurrentPost && handleSelectNewPost(selectCurrentPost);
             setIsModalOpen(false);
@@ -129,6 +119,8 @@ export const ContentPlanPostsListModal = ({
             width: '100%',
           }}
           disabled={
+            (activeTabKey === '1' && !createdCustomPost)
+            ||
             (activeTabKey === '2' && !generatedPost)
             ||
             (activeTabKey === '3' && !selectCurrentPost)

@@ -4,6 +4,14 @@
     gap: 8px;
 }
 
+.addBtn {
+    &__isActive {
+        color: #4096ff;
+        border-color: #4096ff;
+        background: #ffffff;
+    }
+}
+
 .selectNewPost {
     display: flex;
     gap: 16px;

@@ -4,11 +4,15 @@ import { TPostData } from '../api';
 interface PostState {
   isPostGenerated: boolean;
   generatedPost: TPostData | null;
+  isCustomPostCreated: boolean;
+  createdCustomPost: TPostData | null;
 }
 
 const initialState: PostState = {
   isPostGenerated: false,
   generatedPost: null,
+  createdCustomPost: null,
+  isCustomPostCreated: false
 };
 
 const postSlice = createSlice({
@@ -20,6 +24,12 @@ const postSlice = createSlice({
     },
     setGeneratedPost: (state, { payload }: PayloadAction<TPostData | null>) => {
       state.generatedPost = payload;
+    },
+    setCreatedCustomPost: (state, { payload }: PayloadAction<TPostData | null>) => {
+      state.createdCustomPost = payload;
+    },
+    setIsCustomCreated: (state, { payload }: PayloadAction<boolean>) => {
+      state.isCustomPostCreated = payload;
     },
   },
 });

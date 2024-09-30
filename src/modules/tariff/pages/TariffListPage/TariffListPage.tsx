@@ -167,7 +167,7 @@ export const TariffListPage: React.FC = () => {
             <div className={styles.offerPage}>
               <Layout className={styles.accountInfo}>
                 <Content>
-                  <Title level={2}>Ваш тариф "Free" заканчивается через {user?.profile.user.tariff.days} дней.</Title>
+                  <Title level={2}>Ваш тариф заканчивается через {user?.profile.user.tariff.days} дней.</Title>
                 </Content>
               </Layout>
 

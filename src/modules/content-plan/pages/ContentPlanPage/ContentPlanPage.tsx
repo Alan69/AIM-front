@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { TAddToSchedulersData, useAddToSchedulersMutation, useGetSchedulersQuery } from 'modules/content-plan/redux/api';
 import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
 import { ContentPlanPostsListModal } from 'modules/content-plan/components/ContentPlanPostsListModal/ContentPlanPostsListModal';
-import { TPostData, useGetPostListByCompanyIdQuery, useLazyGetPostByIdQuery, usePostNowMutation } from 'modules/post/redux/api';
+import { TCreatePost, TPostData, useCreateCustomPostMutation, useGetPostListByCompanyIdQuery, useLazyGetPostByIdQuery, usePostNowMutation } from 'modules/post/redux/api';
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
 import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
@@ -42,6 +42,7 @@ export const ContentPlanPage = () => {
   const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
   const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
+  const [createCustomPost, { isLoading: isCustomPostCreating }] = useCreateCustomPostMutation();
   const [getPostById, { data: post }] = useLazyGetPostByIdQuery();
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
 
@@ -86,6 +87,17 @@ export const ContentPlanPage = () => {
         dispatch(postActions.setIsPostGenerated(true));
         dispatch(postActions.setGeneratedPost(responsePost));
         refetchPostListByCompanyId();
+      })
+    });
+  };
+
+  const handleCreateCustomPost = (updatedData: TCreatePost) => {
+    createCustomPost(updatedData).unwrap().then((response) => {
+      console.log('response', response);
+
+      getPostById(response.id).unwrap().then((responsePost) => {
+        dispatch(postActions.setIsCustomCreated(true));
+        dispatch(postActions.setCreatedCustomPost(responsePost));
       })
     });
   };
@@ -225,8 +237,10 @@ export const ContentPlanPage = () => {
         handleSelectNewPost={handleSelectNewPost}
         selectNewPost={selectNewPost}
         isPostCreating={isPostCreating}
+        isCustomPostCreating={isCustomPostCreating}
         post={post}
         handleGeneratePost={handleGeneratePost}
+        handleCreateCustomPost={handleCreateCustomPost}
         handleGetPostById={handleGetPostById}
       />
       <ContentPlanSocialMediaListModal

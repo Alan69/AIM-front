@@ -112,6 +112,27 @@ export const postApi = baseApi.injectEndpoints({
       transformResponse: (response: TPostData) => response,
       extraOptions: { showErrors: false },
     }),
+    createCustomPost: build.mutation<TPostData, TCreatePost>({
+      query: ({ title, main_text, hashtags, picture, like, active }) => {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('main_text', main_text || '');
+        formData.append('hashtags', hashtags || '');
+        like && formData.append('like', like.toString());
+        
+        if (picture) {
+          formData.append('picture', picture);
+        }
+    
+        return {
+          url: '/post/custom/',
+          method: 'POST',
+          body: formData,
+        };
+      },
+      transformResponse: (response: TPostData) => response,
+      extraOptions: { showErrors: false },
+    }),
     updatePost: build.mutation<TPostData, TUpdatePost>({
       query: ({ id, title, img_prompt, txt_prompt, main_text, hashtags, like, active, img_style, post_query, author, picture }) => {
         const formData = new FormData();
@@ -191,6 +212,7 @@ export const {
   useLazyGetPostByIdQuery,
   useGetPostListByCompanyIdQuery,
   useCreatePostMutation,
+  useCreateCustomPostMutation,
   useUpdatePostMutation,
   useRecreatePostImageMutation,
   useRecreatePostTextMutation,
