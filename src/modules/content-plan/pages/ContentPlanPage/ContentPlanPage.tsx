@@ -93,8 +93,6 @@ export const ContentPlanPage = () => {
 
   const handleCreateCustomPost = (updatedData: TCreatePost) => {
     createCustomPost(updatedData).unwrap().then((response) => {
-      console.log('response', response);
-
       getPostById(response.id).unwrap().then((responsePost) => {
         dispatch(postActions.setIsCustomCreated(true));
         dispatch(postActions.setCreatedCustomPost(responsePost));
