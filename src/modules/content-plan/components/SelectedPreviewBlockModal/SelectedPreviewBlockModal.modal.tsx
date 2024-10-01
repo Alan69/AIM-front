@@ -1,5 +1,8 @@
 import React from 'react'
-import { List, Typography, Image, Button } from 'antd';
+import { List, Typography, Image } from 'antd';
+import {
+  CaretRightOutlined
+} from '@ant-design/icons';
 import cn from 'classnames';
 import { SelectedPostPreview } from '../SelectedPostPreview/SelectedPostPreview';
 import { TPostSerializer } from 'modules/content-plan/types';
@@ -28,10 +31,10 @@ export const SelectedPreviewBlockModal = ({
   handleCloseModal
 }: TProps) => {
   return (
-    <div className={cn(styles.modalLayout, isOpen ? styles.modalLayout__isOpen : '')}>
+    <div className={cn(styles.modalLayout, isOpen ? styles.modalLayout__isOpen : '')} onClick={handleCloseModal}>
       <div className={cn(styles.modalBody, isOpen ? styles.modalBody__isOpen : '')}>
-        <Button onClick={handleCloseModal}>close</Button>
-        <div className={styles.previewBlock}>
+        <div className={styles.closeButton} onClick={handleCloseModal}>{<CaretRightOutlined />}</div>
+        <div className={styles.previewBlock} onClick={(e) => e.stopPropagation()}>
           {selectedDatePreview ? (
             <div className={styles.selectedEvents}>
               <Title level={5}>{formattedSelectedDate}</Title>

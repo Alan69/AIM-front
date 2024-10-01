@@ -8,6 +8,7 @@ import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api
 import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useNavigate } from 'react-router-dom';
+import styles from './PostQueryCreatePage.module.scss'
 
 const { Content } = Layout;
 
@@ -79,6 +80,7 @@ export const PostQueryCreatePage = () => {
                 </Select>
               )}
             />
+            {!current_company?.id ? <div className={styles.noContent}>(Если поле пустое, вы можете выбрать или добавить текущую компания в меню слева)</div> : ''}
           </Form.Item>
 
           <Form.Item label="Продукт" validateStatus={errors.product ? 'error' : ''} help={errors.product && 'Заполните это поле.'}>

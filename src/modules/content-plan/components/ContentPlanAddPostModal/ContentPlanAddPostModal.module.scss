@@ -43,10 +43,12 @@
 }
 
 .selectNewSocialMedia {
+    width: calc(25% - 8px);
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 8px;
     margin: 8px 0;
     padding: 8px !important;
     border: 1px solid transparent;
@@ -64,10 +66,12 @@
 .itemList {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
 .username {
+    text-align: center;
     margin-bottom: 0 !important;
 }
 

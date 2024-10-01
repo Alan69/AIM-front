@@ -5,7 +5,15 @@
     @media (max-width: 1024px) {
         padding: 16px;
         padding-left: 32px;
-        // padding-top: 64px;
-        // padding-left: 64px !important;
+    }
+}
+
+.main-title {
+    margin-bottom: 16px;
+    @media (max-width: 1024px) {
+        font-size: 36px;
+    }
+    @media (max-width: 768px) {
+        font-size: 32px;
     }
 }

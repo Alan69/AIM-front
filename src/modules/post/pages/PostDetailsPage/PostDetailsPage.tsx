@@ -4,8 +4,11 @@ import { useGetPostByIdQuery, usePostNowMutation, useRecreatePostImageMutation, 
 import { Layout, Typography, Image, Button, Collapse, Checkbox, Radio, Input, message } from 'antd';
 import {
   ReloadOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  HeartOutlined,
+  HeartTwoTone
 } from '@ant-design/icons';
+
 import styles from './PostDetailsPage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import avatar from 'assets/avatar.png';
@@ -203,8 +206,10 @@ export const PostDetailsPage = () => {
                       </div>
                     </div>
                     <div className={styles.postLike}>
+                      {/* <Text>Лайк</Text> */}
+                      {/* <Checkbox checked={post?.like}></Checkbox> */}
+                      {post?.like ? <HeartTwoTone twoToneColor="#eb2f96" /> : <HeartOutlined />}
                       <Text>Лайк</Text>
-                      <Checkbox checked={post?.like}></Checkbox>
                     </div>
                     <div className={styles.postActions}>
                       <Button

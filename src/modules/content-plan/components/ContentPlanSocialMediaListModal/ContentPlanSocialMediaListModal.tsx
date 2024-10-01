@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 import 'moment/locale/ru';
 import styles from './ContentPlanSocialMediaListModal.module.scss'
 import { TSocialMediaByCurrentCompanyData } from 'modules/social-media/redux/api';
+import { Link } from 'react-router-dom';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type TProps = {
   isModalOpen: boolean;
@@ -29,6 +31,8 @@ export const ContentPlanSocialMediaListModal = ({
   isPostNowLoading,
   handlePostNow
 }: TProps) => {
+  const { current_company } = useTypedSelector((state) => state.auth);
+
   const [selectCurrentSocialMedias, setSelectCurrentSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>(selectedNewSocialMedias);
 
   const handleSelectSocialMedia = (item: TSocialMediaByCurrentCompanyData) => {
@@ -51,6 +55,15 @@ export const ContentPlanSocialMediaListModal = ({
     }
   };
 
+  const handleSelectAll = () => {
+    if (socialMediaList) {
+      handleSelectNewSocialMedias(socialMediaList);
+      setSelectCurrentSocialMedias(socialMediaList);
+      if (!isPostNow) {
+        setIsModalOpen(false);
+      }
+    }
+  }
 
   const handleSelect = () => {
     if (isPostNow) {
@@ -86,21 +99,39 @@ export const ContentPlanSocialMediaListModal = ({
     >
       <Divider />
       <div className={styles.itemList}>
-        {socialMediaList?.map((item) => (
-          <div
-            key={item.id}
-            className={cn(
-              styles.item,
-              selectCurrentSocialMedias.some((social) => social.id === item.id) ? styles.item__isActive : ''
-            )}
-            onClick={() => handleSelectSocialMedia(item)}
-          >
-            <img width={32} height={32} src={item?.platform.icon} alt={item?.username} />
-            <Title level={5} className={styles.username}>{item?.username}</Title>
+        {socialMediaList?.length ?
+          socialMediaList?.map((item) => (
+            <div
+              key={item.id}
+              className={cn(
+                styles.item,
+                selectCurrentSocialMedias.some((social) => social.id === item.id) ? styles.item__isActive : ''
+              )}
+              onClick={() => handleSelectSocialMedia(item)}
+            >
+              <img width={32} height={32} src={item?.platform.icon} alt={item?.username} />
+              <Title level={5} className={styles.username}>{item?.username}</Title>
+            </div>
+          )) : <div className={styles.noContent}>
+            <div className={styles.noContent__text}>У вас нет подключенных социльаных сетей</div>
+            <Link to={`/social-media/${current_company?.id}/add`} className={styles.noContent__link}>Подключить социальную сеть</Link>
           </div>
-        ))}
+        }
       </div>
       <Divider />
+      <Button
+        key="schedule"
+        type="default"
+        onClick={handleSelectAll}
+        style={{
+          borderRadius: '16px',
+          width: '100%',
+        }}
+        disabled={socialMediaList?.length === 0}
+        loading={isPostNowLoading}
+      >
+        Выбрать всё
+      </Button>
     </Modal>
   );
 };

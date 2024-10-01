@@ -10,6 +10,7 @@
         right: 0;
         top: 0;
         z-index: 1000;
+        overflow-y: scroll;
     }
     &__isOpen {
         visibility: visible;
@@ -37,6 +38,17 @@
     &__isOpen {
         transform: translateX(0);
     }
+}
+
+.closeButton {
+    position: absolute;
+    top: 14px;
+    left: -13px;
+    padding: 11px 4px;
+    z-index: 3;
+    background-color: #e6e6e6;
+    border-radius: 20px;
+    border: 1px solid #bbbbbb;
 }
 
 .previewBlock {

@@ -6,9 +6,13 @@ import {
   AppstoreAddOutlined,
   CalendarOutlined,
   MenuUnfoldOutlined,
-  CaretLeftOutlined
+  CaretLeftOutlined,
+  StockOutlined,
+  WechatOutlined,
+  FundOutlined,
+  RadarChartOutlined
 } from '@ant-design/icons';
-import { Button, Menu } from 'antd';
+import { Badge, Button, Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import cn from 'classnames'
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
@@ -39,43 +43,71 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
   const items: MenuItem[] = [
     {
       key: '1',
-      label: <Link to="/account/profile/edit" onClick={() => handleSwitchMenu()}><UserInfo /></Link>,
+      label: <Link to="/account/profile/edit"><UserInfo /></Link>,
     },
     {
       key: '2',
       label: <OfferInfo />,
-      // @ts-ignore
-      onClick: handleSwitchMenu,
     },
     {
       key: '3',
-      label: <div className={styles.logOutBtn} onClick={() => handleSwitchMenu()}><Button type='primary' onClick={logOut}>Выход</Button></div>,
+      label: <div className={styles.logOutBtn}><Button type='primary' onClick={logOut}>Выход</Button></div>,
     },
     {
       key: '4',
-      label: <CurrentCompanyInfo handleSwitchMenu={handleSwitchMenu} />,
+      label: <CurrentCompanyInfo />,
     },
     {
       key: '5',
       icon: <AppstoreAddOutlined />,
-      label: <Link to="/post-query/create" onClick={() => handleSwitchMenu()}>Создать пост</Link>,
+      label: <Link to="/post-query/create">Создать пост</Link>,
     },
     {
       key: '6',
       icon: <UnorderedListOutlined />,
-      label: <Link to="/post-query" onClick={() => handleSwitchMenu()}>История</Link>,
+      label: <Link to="/post-query">История</Link>,
     },
     {
       key: '7',
-      icon: < CalendarOutlined />,
-      label: <Link to="/content-plan" onClick={() => handleSwitchMenu()}>Контент план</Link>,
+      icon: <CalendarOutlined />,
+      label: <Link to="/content-plan">Контент план</Link>,
     },
+    {
+      key: '8',
+      icon: <StockOutlined />,
+      label: <div className={styles.soon}>Маркетинговая стратегия <Badge count={'скоро'} /></div>,
+      disabled: true
+    },
+    {
+      key: '9',
+      icon: <FundOutlined />,
+      label: <div className={styles.soon}>Воронка продаж <Badge count={'скоро'} /></div>,
+      disabled: true
+    },
+    {
+      key: '10',
+      icon: <WechatOutlined />,
+      label: <div className={styles.soon}>Единый чат-хаб <Badge count={'скоро'} /></div>,
+      disabled: true
+    },
+    {
+      key: '11',
+      icon: <RadarChartOutlined />,
+      label: <div className={styles.soon}>Аналитика <Badge count={'скоро'} /></div>,
+      disabled: true
+    },
+    // {
+    //   key: '12',
+    //   icon: <CalendarOutlined />,
+    //   label: <div className={styles.soon}>Планировщик <Badge count={'скоро'} /></div>,
+    //   disabled: true
+    // },
   ];
 
   return (
-    <div className={cn(styles.menuLayout, isOpen ? styles.menuLayout__isOpen : '')}>
-      <div className={cn(styles.menuBody, isOpen ? styles.menuBody__isOpen : '')}>
-        {isSmallLaptop ? <div className={styles.menuButton} onClick={() => handleSwitchMenu()}>{<CaretLeftOutlined />}</div> : ''}
+    <div className={cn(styles.menuLayout, isOpen ? styles.menuLayout__isOpen : '')} onClick={handleSwitchMenu}>
+      <div className={cn(styles.menuBody, isOpen ? styles.menuBody__isOpen : '')} onClick={(e) => e.stopPropagation()}>
+        {isSmallLaptop ? <div className={styles.menuButton} onClick={handleSwitchMenu}>{<CaretLeftOutlined />}</div> : ''}
         <Link className={styles.logo} to={'/home'}><IconLogo /></Link>
         <Menu
           defaultSelectedKeys={['1']}
