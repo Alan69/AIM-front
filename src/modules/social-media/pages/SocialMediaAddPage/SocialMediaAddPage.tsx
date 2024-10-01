@@ -65,8 +65,8 @@ export const SocialMediaAddPage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Добавление социальной сети</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>Добавление социальной сети</h1>
         <Layout>
           <Content>
             <div className={styles.list}>

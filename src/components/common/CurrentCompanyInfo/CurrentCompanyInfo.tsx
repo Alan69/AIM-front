@@ -9,7 +9,11 @@ import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 
 const { Text } = Typography;
 
-const CurrentCompanyInfo: React.FC = () => {
+type TProps = {
+  handleSwitchMenu: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+}
+
+const CurrentCompanyInfo = ({ handleSwitchMenu }: TProps) => {
   const navigate = useNavigate()
   const { current_company, user } = useTypedSelector((state) => state.auth);
   const { data: companyList } = useGetCompanyListQuery(user?.profile.id);
@@ -51,11 +55,14 @@ const CurrentCompanyInfo: React.FC = () => {
       </div>
       <div className={styles.infoBlock}>
         <div className={styles.details}>
-          <div className={styles.name} onClick={() => navigate(`/company/${current_company?.id}`)}>
+          <div className={styles.name} onClick={() => {
+            navigate(`/company/${current_company?.id}`)
+            handleSwitchMenu()
+          }}>
             {current_company ? current_company.name : '-'}
           </div>
           <div className={styles.actions}>
-            <Dropdown overlay={menu} trigger={['hover']} className={styles.dropdown} placement="bottom">
+            <Dropdown overlay={menu} trigger={["click"]} className={styles.dropdown} placement="bottom">
               <Space>
                 <UnorderedListOutlined className={styles.addIcon} />
               </Space>

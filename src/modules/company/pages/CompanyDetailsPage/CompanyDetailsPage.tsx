@@ -39,6 +39,7 @@ export const CompanyDetailsPage = () => {
       dataIndex: 'product_name',
       key: 'product_name',
       render: (text) => <div>{text}</div>,
+      fixed: 'left',
     },
     {
       title: 'Назначение',
@@ -76,6 +77,7 @@ export const CompanyDetailsPage = () => {
       title: 'Название социальной сети',
       dataIndex: 'platform',
       key: 'platform',
+      fixed: 'left',
     },
     {
       title: 'Имя пользователя',
@@ -100,13 +102,13 @@ export const CompanyDetailsPage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Компания: {company?.name}</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>Компания: {company?.name}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
               <div className={styles.companyDescr__title}>
-                <Title level={4} >Сфера деятельности: {company?.scope}</Title>
+                <Title level={4} >Сфера деятельности: <span className={styles.companyDescr__title__value}>{company?.scope}</span></Title>
                 <div className={styles.companyDescr__icons}>
                   <Link to={`/company/${company?.id}/update`}><EditOutlined /></Link>
                   <Link to={`/company/${company?.id}/delete`}><DeleteOutlined /></Link>
@@ -125,7 +127,7 @@ export const CompanyDetailsPage = () => {
               {!productListByCompanyId?.length ? <div style={{ paddingBottom: '12px' }}>
                 <Text >На данный момент отсутствуют продукты или бренды. Вы можете добавить новый продукт или бренд.</Text>
               </div> : ''}
-              <Table columns={columns} dataSource={data} pagination={false} />
+              <Table columns={columns} dataSource={data} pagination={false} scroll={{ x: 'max-content' }} />
             </div>
           </Content>
         </Layout>
@@ -141,7 +143,7 @@ export const CompanyDetailsPage = () => {
                 </div>
                 : ''}
               {/* @ts-ignore */}
-              <Table columns={socialMediaListColumns} dataSource={newSocialMediaList} pagination={false} />
+              <Table columns={socialMediaListColumns} dataSource={newSocialMediaList} pagination={false} scroll={{ x: 'max-content' }} />
             </div>
           </Content>
         </Layout>

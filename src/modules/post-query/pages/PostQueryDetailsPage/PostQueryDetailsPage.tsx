@@ -36,6 +36,7 @@ export const PostQueryDetailsPage = () => {
           {text}
         </Link>
       ),
+      fixed: 'left',
     },
     {
       title: 'Лайк',
@@ -100,8 +101,8 @@ export const PostQueryDetailsPage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>{(postQuery?.company?.name ? postQuery?.company?.name : '-') + ' - ' + (postQuery?.product?.name ? postQuery?.product?.name : '-')}</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>{(postQuery?.company?.name ? postQuery?.company?.name : '-') + ' - ' + (postQuery?.product?.name ? postQuery?.product?.name : '-')}</h1>
         <Layout>
           <Content>
             <div className={styles.postQueryDescr}>
@@ -128,7 +129,7 @@ export const PostQueryDetailsPage = () => {
             <div className={styles.postQueryDescr}>
               {!posts?.length ? <div style={{ paddingBottom: '12px' }}>
                 <Text >No posts</Text>
-              </div> : <Table columns={columns} dataSource={data} pagination={false} />}
+              </div> : <Table columns={columns} dataSource={data} pagination={false} scroll={{ x: 'max-content' }} />}
             </div>
           </Content>
         </Layout>

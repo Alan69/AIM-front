@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import moment from 'moment';
@@ -8,7 +9,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import styles from './ContentPlanCalendar.module.scss';
 import { TSchedulesData } from 'modules/content-plan/redux/api';
 import { contentPlanActions } from 'modules/content-plan/redux/slices/contentPlan.slice';
-import { useDispatch } from 'react-redux';
+import { useIsLargeLaptop, useIsSmallLaptop, useIsTablet, useIsXlTablet } from 'hooks/media';
 
 moment.locale('ru');
 
@@ -32,6 +33,12 @@ export const ContentPlanCalendar = ({
   const dispatch = useDispatch();
   const localizer = momentLocalizer(moment);
   const DnDCalendar = withDragAndDrop(Calendar);
+  const isLargeLaptop = useIsLargeLaptop();
+  const isSmallLaptop = useIsSmallLaptop();
+  const isXlTablet = useIsXlTablet();
+  const isTablet = useIsTablet();
+
+  const calendarHeight = isTablet ? 400 : isXlTablet ? 500 : isSmallLaptop ? 600 : isLargeLaptop ? 700 : 800;
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -165,7 +172,7 @@ export const ContentPlanCalendar = ({
           date={currentDate}
           onNavigate={setCurrentDate}
           draggableAccessor={(event) => false}
-          style={{ height: 1000 }}
+          style={{ height: calendarHeight }}
           popup
           views={['month']}
           defaultView="month"

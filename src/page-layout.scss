@@ -1,0 +1,11 @@
+.page-layout {
+    padding: 24px;
+    height: calc(100vh - 70px);
+    overflow-y: scroll;
+    @media (max-width: 1024px) {
+        padding: 16px;
+        padding-left: 32px;
+        // padding-top: 64px;
+        // padding-left: 64px !important;
+    }
+}

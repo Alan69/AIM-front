@@ -4,7 +4,7 @@ import styles from '../UnauthorisedLayout.module.scss'
 export const PolicyPage = () => {
   return (
     <section className={styles.docsSection}>
-      <h1 className={styles.docsSection__title}>Политика конфиденциальности</h1>
+      <h1 className='main-title' className={styles.docsSection__title}>Политика конфиденциальности</h1>
       <div className={styles.docsSection__text}>Настоящая Политика конфиденциальности персональных данных (далее – Политика конфиденциальности) действует в отношении всей информации, которую ТОО «A-Gene» (Далее - ТОО) может получить о Пользователе посредством информационно-телекоммуникационной сети «Интернет» через сайт или через мобильное приложение (далее по тексту – Платформа).</div>
 
       <h3 className={styles.docsSection__subtitle}>Определения терминов</h3>

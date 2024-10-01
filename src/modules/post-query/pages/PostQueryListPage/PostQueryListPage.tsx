@@ -13,21 +13,22 @@ export const PostQueryListPage = () => {
   const { data: postQueriesList, refetch } = useGetPostQueriesListQuery();
 
   const columns: TableProps<TPostQueryData>['columns'] = [
-    {
-      title: 'Компания',
-      dataIndex: 'company',
-      key: 'company',
-      render: (text, record) => (
-        // @ts-ignore
-        <Link to={`/post-query/${record.key}`}>
-          {text}
-        </Link>
-      ),
-    },
+    // {
+    //   title: 'Компания',
+    //   dataIndex: 'company',
+    //   key: 'company',
+    //   render: (text, record) => (
+    //     // @ts-ignore
+    //     <Link to={`/post-query/${record.key}`}>
+    //       {text}
+    //     </Link>
+    //   ),
+    // },
     {
       title: 'Продукт',
       dataIndex: 'product',
       key: 'product',
+      fixed: 'left',
       render: (text, record) => (
         // @ts-ignore
         <Link to={`/post-query/${record.key}`}>
@@ -83,7 +84,7 @@ export const PostQueryListPage = () => {
 
   const data = postQueriesList?.map((item) => ({
     key: item.id,
-    company: item?.company?.name,
+    // company: item?.company?.name,
     product: item?.product?.name,
     post_type: item?.post_type?.name,
     text_style: item?.text_style?.name,
@@ -96,10 +97,10 @@ export const PostQueryListPage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1 className={styles.title}>История запросов</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>История запросов - {current_company?.name}</h1>
         {/* @ts-ignore */}
-        <Table columns={columns} dataSource={data} pagination={false} />
+        <Table columns={columns} dataSource={data} pagination={false} scroll={{ x: 'max-content' }} />
       </Content>
     </Layout>
   )

@@ -25,7 +25,7 @@ export const HeroSection = () => {
 
   return (
     <section className={styles.section}>
-      <h1 className={styles.title}>С нами бизнес <br /> процветает</h1>
+      <h1 className='main-title' className={styles.title}>С нами бизнес <br /> процветает</h1>
       <h3 className={styles.subtitle}>Инновационная ИИ-платформа для <br /> автоматизации и оптимизации маркетинга</h3>
       <div className={styles.actions}>
         <Button className={styles.tariffBtn} onClick={() => navigate(token ? '/tariffs' : '/login')}>Тарифы</Button>

@@ -69,8 +69,8 @@ export const ProductUpdatePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Редактирование данных</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>Редактирование данных</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>

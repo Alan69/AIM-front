@@ -43,8 +43,8 @@ export const ProductCreatePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Добавление продукта</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>Добавление продукта</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>

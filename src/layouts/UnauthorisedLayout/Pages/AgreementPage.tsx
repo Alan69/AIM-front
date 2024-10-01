@@ -4,7 +4,7 @@ import styles from '../UnauthorisedLayout.module.scss'
 export const AgreementPage = () => {
   return (
     <section className={styles.docsSection}>
-      <h1 className={styles.docsSection__title}>Договор оферты</h1>
+      <h1 className='main-title' className={styles.docsSection__title}>Договор оферты</h1>
       <div className={styles.docsSection__text__flexed}>
         <div className={styles.docsSection__text__bold}>г. Астана«01»</div>
         <div className={styles.docsSection__text__bold}>мая 2024 г.</div>

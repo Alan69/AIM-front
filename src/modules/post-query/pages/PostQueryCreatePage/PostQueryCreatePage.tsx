@@ -58,8 +58,8 @@ export const PostQueryCreatePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Запрос</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>Запрос</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item label="Компания" validateStatus={errors.company ? 'error' : ''} help={errors.company && 'Заполните это поле.'}>
             <Controller

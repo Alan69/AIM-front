@@ -161,7 +161,7 @@ export const TariffListPage: React.FC = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
+      <Content className='page-layout'>
         <Layout>
           <Content>
             <div className={styles.offerPage}>

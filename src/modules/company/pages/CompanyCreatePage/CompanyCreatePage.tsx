@@ -41,8 +41,8 @@ export const CompanyCreatePage = () => {
 
   return (
     <Layout>
-      <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-        <h1>Добавление компании</h1>
+      <Content className='page-layout'>
+        <h1 className='main-title'>Добавление компании</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>

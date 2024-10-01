@@ -16,6 +16,7 @@ import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components
 import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
 import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { postActions } from 'modules/post/redux/slices/post.slice';
+import { SelectedPreviewBlockModal } from 'modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -117,6 +118,13 @@ export const ContentPlanPage = () => {
     setSelectedNewSocialMedias([]);
   }
 
+  const handleClosePreviewBlockModal = () => {
+    dispatch(contentPlanActions.setSelectedPost(null));
+    setSelectedDatePreview(null);
+    setSelectedEvents(null);
+    setFormattedSelectedDate(null);
+  }
+
   const items: TabsProps['items'] = [
     {
       key: '1',
@@ -164,8 +172,8 @@ export const ContentPlanPage = () => {
   return (
     <>
       <Layout>
-        <Content style={{ padding: '24px', minHeight: 'calc(100vh - 70px)' }}>
-          <h1>Контент план - {current_company?.name}</h1>
+        <Content className='page-layout'>
+          <h1 className='main-title'>Контент план - {current_company?.name}</h1>
           <Layout>
             <Content className={styles.content}>
               <div className={cn(styles.calendar, selectedPost === null && selectedDatePreview === null ? styles.calendarIsFull : '')}>
@@ -204,7 +212,7 @@ export const ContentPlanPage = () => {
                           )}
                         />
                       ) : (
-                        <p>Нет событий</p>
+                        <p>Нет активный публикаций</p>
                       )}
                     </div>
                   ) : ''}
@@ -247,6 +255,15 @@ export const ContentPlanPage = () => {
         socialMediaList={socialMediaList}
         handleSelectNewSocialMedias={handleSelectNewSocialMedias}
         selectedNewSocialMedias={selectedNewSocialMedias}
+      />
+      <SelectedPreviewBlockModal
+        selectedDatePreview={selectedDatePreview}
+        selectedPost={selectedPost}
+        formattedSelectedDate={formattedSelectedDate}
+        selectedEvents={selectedEvents}
+        handleSelectEvent={handleSelectEvent}
+        isOpen={(selectedDatePreview || selectedPost !== null) ? true : false}
+        handleCloseModal={handleClosePreviewBlockModal}
       />
     </>
   )
