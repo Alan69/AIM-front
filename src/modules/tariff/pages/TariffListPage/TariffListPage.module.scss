@@ -32,6 +32,20 @@
 }
 
 .subtitle {
+    margin-bottom: 10px;
+    color: var(--white, #FFF);
+    font-size: 22px;
+    font-weight: 400;
+    text-align: center;
+    @media (max-width: 1263px) {
+        font-size: 18px;
+    }
+    @media (max-width: 1024px) {
+        font-size: 14px;
+    }
+}
+
+.sliderSubtitle {
     margin-top: 60px;
     color: var(--white, #FFF);
     font-size: 26px;

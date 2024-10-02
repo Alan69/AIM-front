@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useUpdateProfilesMutation } from '../../redux/api';
-import { Layout, Button, Form, Input, Upload, Select, Image } from 'antd';
+import { Layout, Button, Form, Input, Upload, Select, Image, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useGetJobTypesListQuery } from '../../../../redux/api/jobTypes/jobTypesApi';
 import { useGetContriesListQuery } from '../../../../redux/api/contries/contriesApi';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 import avatar from 'assets/avatar.png';
-import { useNavigate } from 'react-router-dom';
 import styles from './AccountPage.module.scss'
 
 type TUpdateProfilesForm = {
@@ -31,7 +30,6 @@ type TUpdateProfilesForm = {
 const { Content } = Layout;
 
 export const AccountPage = () => {
-  const navigate = useNavigate();
   const { user } = useTypedSelector((state) => state.auth);
   const [file, setFile] = useState<File | null>(null);
 
@@ -96,7 +94,9 @@ export const AccountPage = () => {
       // @ts-ignore
       updateProfiles(updatedData).unwrap().then(() => {
         getAuthUser().refetch();
-        navigate('/post-query/create');
+        message.success('Ваш профиль был успешно изменен!')
+      }).catch(() => {
+        message.error('Произошла ошибка! Ваш профиль не был изменен!')
       });
     }
   };

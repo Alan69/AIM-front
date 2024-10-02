@@ -8,6 +8,7 @@ import { SelectedPostPreview } from '../SelectedPostPreview/SelectedPostPreview'
 import { TPostSerializer } from 'modules/content-plan/types';
 
 import styles from './SelectedPreviewBlockModal.module.scss'
+import { useIsSmallLaptop } from 'hooks/media';
 
 const { Title } = Typography;
 
@@ -30,10 +31,12 @@ export const SelectedPreviewBlockModal = ({
   isOpen,
   handleCloseModal
 }: TProps) => {
+  const isSmallLaptop = useIsSmallLaptop();
+
   return (
     <div className={cn(styles.modalLayout, isOpen ? styles.modalLayout__isOpen : '')} onClick={handleCloseModal}>
       <div className={cn(styles.modalBody, isOpen ? styles.modalBody__isOpen : '')}>
-        <div className={styles.closeButton} onClick={handleCloseModal}>{<CaretRightOutlined />}</div>
+        {isSmallLaptop ? <div className={styles.closeButton} onClick={handleCloseModal}>{<CaretRightOutlined />}</div> : ''}
         <div className={styles.previewBlock} onClick={(e) => e.stopPropagation()}>
           {selectedDatePreview ? (
             <div className={styles.selectedEvents}>

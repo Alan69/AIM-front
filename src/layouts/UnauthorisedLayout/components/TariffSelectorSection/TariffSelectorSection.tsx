@@ -61,15 +61,15 @@ export const TariffSelectorSection: React.FC = () => {
     setDiscount(calculatedDiscount);
   };
 
-
   return (
     <section className={styles.section}>
       <h3 className={styles.title}>Подбери свой тариф</h3>
+      <div className={styles.subtitle}>Только сейчас акция: месяц за <b>4900</b> тенге вместо <b style={{ textDecoration: 'line-through' }}>9900</b> тенге</div>
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.slidersBlock}>
             <div className={styles.sliderBlock}>
-              <h4 className={styles.subtitle}>Количество компаний</h4>
+              <h4 className={styles.sliderSubtitle}>Количество компаний</h4>
               <Slider
                 className='customSlider'
                 min={1}
@@ -79,10 +79,9 @@ export const TariffSelectorSection: React.FC = () => {
                 tooltip={{ visible: false }}
                 marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
               />
-              {/* <div>{companyCount}</div> */}
             </div>
             <div className={styles.sliderBlock}>
-              <h4 className={styles.subtitle}>Длительность, месяцев</h4>
+              <h4 className={styles.sliderSubtitle}>Длительность, месяцев</h4>
               <Slider
                 className='customSlider'
                 min={1}
@@ -92,7 +91,6 @@ export const TariffSelectorSection: React.FC = () => {
                 tooltip={{ visible: false }}
                 marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
               />
-              {/* <div>{monthDuration}</div> */}
             </div>
           </div>
           {isXlTablet ? '' : <Divider />}
@@ -128,7 +126,7 @@ export const TariffSelectorSection: React.FC = () => {
               <div className={styles.card__price}>
                 <div className={styles.card__price__label}>Стоимость:</div>
                 <IconArrow />
-                <div className={styles.card__price__value}>{totalCost} ₸</div>
+                <div className={styles.card__price__value}>{totalCost.toFixed()} ₸</div>
               </div>
               <Button className={styles.card__button} onClick={() => navigate(token ? '/tariffs' : '/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
             </div>

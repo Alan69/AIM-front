@@ -173,11 +173,12 @@ export const TariffListPage: React.FC = () => {
 
               <section className={styles.section}>
                 <h3 className={styles.title}>Подбери свой тариф</h3>
+                <div className={styles.subtitle}>Только сейчас акция: месяц за <b>4900</b> тенге вместо <b style={{ textDecoration: 'line-through' }}>9900</b> тенге</div>
                 <div className={styles.row}>
                   <div className={styles.col}>
                     <div className={styles.slidersBlock}>
                       <div className={styles.sliderBlock}>
-                        <h4 className={styles.subtitle}>Количество компаний</h4>
+                        <h4 className={styles.sliderSubtitle}>Количество компаний</h4>
                         <Slider
                           className={'customSlider tariff-page-slider'}
                           min={1}
@@ -190,7 +191,7 @@ export const TariffListPage: React.FC = () => {
                         {/* <div>{companyCount}</div> */}
                       </div>
                       <div className={styles.sliderBlock}>
-                        <h4 className={styles.subtitle}>Длительность, месяцев</h4>
+                        <h4 className={styles.sliderSubtitle}>Длительность, месяцев</h4>
                         <Slider
                           className={'customSlider tariff-page-slider'}
                           min={1}
@@ -236,7 +237,7 @@ export const TariffListPage: React.FC = () => {
                         <div className={styles.card__price}>
                           <div className={styles.card__price__label}>Стоимость:</div>
                           <img src={arrow} alt='arrow' />
-                          <div className={styles.card__price__value}>{totalCost} ₸</div>
+                          <div className={styles.card__price__value}>{totalCost.toFixed()} ₸</div>
                         </div>
                         <Button className={styles.card__button} onClick={handleBuyTariff}>Подключить <img src={iconPlus} alt='iconPlus' /></Button>
                       </div>
