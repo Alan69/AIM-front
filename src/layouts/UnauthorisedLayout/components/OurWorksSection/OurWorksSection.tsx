@@ -13,6 +13,10 @@ import works10 from 'assets/image/works/10.svg'
 import works11 from 'assets/image/works/11.svg'
 import works12 from 'assets/image/works/12.svg'
 import hand from 'assets/image/works/hand.svg'
+// @ts-ignore
+import videoSrc from 'assets/card.mp4';
+// @ts-ignore
+import videoSrc2 from 'assets/card_1.mp4';
 
 export const OurWorksSection = () => {
   return (
@@ -28,7 +32,12 @@ export const OurWorksSection = () => {
           <div className={styles.works__item}><img src={works6} alt='works6' /></div>
         </div>
         <div className={styles.works__block__hand}>
-          <div className={styles.works__hand}><img src={hand} alt='hand' /></div>
+          <div className={styles.works__hand}>
+            <img src={hand} alt='hand' />
+            {/* <video autoPlay muted loop className={styles.video}>
+              <source src={videoSrc2} type="video/mp4" />
+            </video> */}
+          </div>
         </div>
         <div className={styles.works__block}>
           <div className={styles.works__item}><img src={works7} alt='works7' /></div>

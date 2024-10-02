@@ -79,3 +79,38 @@
         }
     }
 }
+
+.video {
+    width: 80%;
+    height: auto;
+    top: 17%;
+    left: 50px;
+    height: auto;
+    position: absolute;
+    z-index: 2;
+    object-fit: cover;
+    // border-radius: 32px;
+    // width: 82%;
+    // top: 6px;
+    // left: calc(12% + 2px);
+    // @media (max-width: 1440px) {
+    //     width: 81%;
+    //     left: calc(12% + 0px);
+    // }
+    // @media (max-width: 1263px) {
+    //     width: 83%;
+    //     top: 3px;
+    //     left: calc(12% + -4px);
+    // }
+    // @media (max-width: 1024px) {
+    //     width: 82%;
+    //     top: 2px;
+    //     left: calc(12% + -6px);
+    // }
+    // @media (max-width: 992px) {
+    //     width: 90%;
+    //     top: 6px;
+    //     left: calc(12% + -9px);
+    //     border-radius: 40px;
+    // }
+}
