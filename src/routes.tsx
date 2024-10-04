@@ -96,7 +96,7 @@ const AppRoutes: FC = () => {
         <Route path="/content-plan" element={<ContentPlanPage />} />
         <Route path="/social-media/:companyId/add" element={<SocialMediaAddPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/post-query" replace />} />
+      <Route path="*" element={<Navigate to="/post-query/create" replace />} />
     </Routes>
   )
 }

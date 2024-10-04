@@ -62,7 +62,7 @@ export const PostQueryCreatePage = () => {
   return (
     <Layout>
       <Content className='page-layout'>
-        <h1 className='main-title'>Запрос</h1>
+        <h1 className='main-title'>Создать запрос</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item label="Компания" validateStatus={errors.company ? 'error' : ''} help={errors.company && 'Заполните это поле.'}>
             <Controller
