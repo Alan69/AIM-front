@@ -21,6 +21,7 @@ export const TariffSelectorSection: React.FC = () => {
   const [monthDuration, setMonthDuration] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(4900);
+  const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] = useState<number>(4900);
 
   const handleCompanyChange = (value: number) => {
     setCompanyCount(value);
@@ -58,6 +59,7 @@ export const TariffSelectorSection: React.FC = () => {
     const calculatedDiscount = maxCost - calculatedCost;
 
     setTotalCost(calculatedCost);
+    setTotalCostWithoutDiscount(maxCost);
     setDiscount(calculatedDiscount);
   };
 
@@ -124,9 +126,12 @@ export const TariffSelectorSection: React.FC = () => {
             </div>
             <div className={styles.card__bottom}>
               <div className={styles.card__price}>
-                <div className={styles.card__price__label}>Стоимость:</div>
+                <div className={styles.card__price__label}>Ваша скидка:</div>
                 <IconArrow />
-                <div className={styles.card__price__value}>{totalCost.toFixed()} ₸</div>
+                <div className={styles.card__price__value}>
+                  {discount > 0 ? <span>{totalCostWithoutDiscount.toFixed()} ₸</span> : ''}
+                  {totalCost.toFixed()} ₸
+                </div>
               </div>
               <Button className={styles.card__button} onClick={() => navigate(token ? '/tariffs' : '/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
             </div>

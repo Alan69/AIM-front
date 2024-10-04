@@ -8,7 +8,7 @@ import { useCreateTariffMutation, usePaymentInitiateMutation, usePaymentTokenMut
 import iconPlus from 'assets/plus-white.svg'
 import infinity from 'assets/infinity.svg'
 import checked from 'assets/checked.svg'
-import arrow from 'assets/arrow.svg'
+import { ReactComponent as IconArrow } from 'assets/arrow.svg';
 import card from 'assets/tariff-card-bg.png';
 
 const { Title, Text } = Typography;
@@ -20,6 +20,7 @@ export const TariffListPage: React.FC = () => {
   const [monthDuration, setMonthDuration] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(4900);
+  const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] = useState<number>(4900);
 
   const [createTariff] = useCreateTariffMutation();
   const [paymentToken] = usePaymentTokenMutation();
@@ -73,6 +74,7 @@ export const TariffListPage: React.FC = () => {
     const calculatedDiscount = maxCost - calculatedCost;
 
     setTotalCost(calculatedCost);
+    setTotalCostWithoutDiscount(maxCost);
     setDiscount(calculatedDiscount);
   };
 
@@ -237,9 +239,12 @@ export const TariffListPage: React.FC = () => {
                       </div>
                       <div className={styles.card__bottom}>
                         <div className={styles.card__price}>
-                          <div className={styles.card__price__label}>Стоимость:</div>
-                          <img src={arrow} alt='arrow' />
-                          <div className={styles.card__price__value}>{totalCost.toFixed()} ₸</div>
+                          <div className={styles.card__price__label}>Ваша скидка:</div>
+                          <IconArrow />
+                          <div className={styles.card__price__value}>
+                            {discount > 0 ? <span>{totalCostWithoutDiscount.toFixed()} ₸</span> : ''}
+                            {totalCost.toFixed()} ₸
+                          </div>
                         </div>
                         <Button className={styles.card__button} onClick={handleBuyTariff}>Подключить <img src={iconPlus} alt='iconPlus' /></Button>
                       </div>

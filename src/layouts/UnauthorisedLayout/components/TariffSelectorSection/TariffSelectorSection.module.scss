@@ -267,6 +267,9 @@
             color: var(--white, #FFF);
             font-size: 26px;
             font-weight: 500;
+            @media (max-width: 1440px) {
+                font-size: 22px;
+            }
             @media (max-width: 1263px) {
                 font-size: 20px;
             }
@@ -278,11 +281,30 @@
             color: var(--white, #FFF);
             font-size: 36px;
             font-weight: 500;
+            position: relative;
             @media (max-width: 1263px) {
                 font-size: 28px;
             }
             @media (max-width: 1024px) {
                 font-size: 24px;
+            }
+            span {
+                position: absolute;
+                top: -30px;
+                right: -12px;
+                text-decoration: line-through;
+                font-size: 30px;
+                color: #d2d2d2c2;
+                @media (max-width: 1440px) {
+                    font-size: 26px;
+                }
+                @media (max-width: 1263px) {
+                    top: -22px;
+                    font-size: 24px;
+                }
+                @media (max-width: 1024px) {
+                    font-size: 20px;
+                }
             }
         }
     }

@@ -11,9 +11,12 @@
 }
 
 .section {
-    padding: 30px 40px;
+    padding: 24px 32px;
     border-radius: 40px;
     background: var(--black, #1B1B1B);
+    @media (max-width: 1440px) {
+        padding: 20px 28px;
+    }
 }
 
 .title {
@@ -91,37 +94,27 @@
     @media (max-width: 1263px) {
         gap: 40px;
     }
-    @media (max-width: 1024px) {
-        gap: 24px;
-    }
-    @media (max-width: 992px) {
-        gap: 60px;
+    @media (max-width: 1200px) {
         flex-direction: column;
     }
 }
 
 .col {
     &:first-child {
-        width: calc(55% - 60px);
+        width: calc(55% - 30px);
         @media (max-width: 1263px) {
-            width: calc(55% - 40px);
+            width: calc(55% - 20px);
         }
-        @media (max-width: 1024px) {
-            width: calc(55% - 24px);
-        }
-        @media (max-width: 992px) {
+        @media (max-width: 1200px) {
             width: 100%;
         }
     }
     &:last-child {
-        width: calc(45% - 60px);
+        width: calc(45% - 30px);
         @media (max-width: 1263px) {
-            width: calc(45% - 40px);
+            width: calc(45% - 20px);
         }
-        @media (max-width: 1024px) {
-            width: calc(45% - 24px);
-        }
-        @media (max-width: 992px) {
+        @media (max-width: 1200px) {
             width: 100%;
         }
     }
@@ -271,6 +264,9 @@
             color: var(--white, #FFF);
             font-size: 26px;
             font-weight: 500;
+            @media (max-width: 1440px) {
+                font-size: 22px;
+            }
             @media (max-width: 1263px) {
                 font-size: 20px;
             }
@@ -282,11 +278,33 @@
             color: var(--white, #FFF);
             font-size: 36px;
             font-weight: 500;
+            position: relative;
+            @media (max-width: 1440px) {
+                font-size: 30px;
+            }
             @media (max-width: 1263px) {
                 font-size: 28px;
             }
             @media (max-width: 1024px) {
                 font-size: 24px;
+            }
+            span {
+                position: absolute;
+                top: -30px;
+                right: -12px;
+                text-decoration: line-through;
+                font-size: 30px;
+                color: #d2d2d2c2;
+                @media (max-width: 1440px) {
+                    font-size: 26px;
+                }
+                @media (max-width: 1263px) {
+                    top: -22px;
+                    font-size: 24px;
+                }
+                @media (max-width: 1024px) {
+                    font-size: 20px;
+                }
             }
         }
     }
