@@ -239,7 +239,7 @@ export const TariffListPage: React.FC = () => {
                       </div>
                       <div className={styles.card__bottom}>
                         <div className={styles.card__price}>
-                          <div className={styles.card__price__label}>Ваша скидка:</div>
+                          <div className={styles.card__price__label}>Стоимость:</div>
                           <IconArrow />
                           <div className={styles.card__price__value}>
                             {discount > 0 ? <span>{totalCostWithoutDiscount.toFixed()} ₸</span> : ''}
