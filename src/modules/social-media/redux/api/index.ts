@@ -59,7 +59,10 @@ export const postApi = baseApi.injectEndpoints({
     addLinkedin: build.query<string, void>({
       query: () => ({
         url: '/linkedin/auth/',
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }),
       transformResponse: (response: string) => response,
     }),
