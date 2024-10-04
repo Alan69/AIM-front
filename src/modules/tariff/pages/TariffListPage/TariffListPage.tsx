@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Typography, Button, Layout, Divider, Slider, Flex } from 'antd';
+import { Card, Typography, Button, Layout, Divider, Slider, Flex, message } from 'antd';
 import styles from './TariffListPage.module.scss';
 import { Content } from 'antd/es/layout/layout';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -42,6 +42,8 @@ export const TariffListPage: React.FC = () => {
           window.open(resInitiate.invoice_url, '_self');
         })
       })
+    }).catch((error) => {
+      message.error(error.data.error)
     })
   }
 

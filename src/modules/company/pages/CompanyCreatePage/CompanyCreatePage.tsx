@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useCreateCompanyMutation, useGetCompanyListQuery, useUpdateCurrentCompanyMutation } from '../../redux/api';
 import { useForm, Controller } from 'react-hook-form';
-import { Layout, Button, Form, Input } from 'antd';
+import { Layout, Button, Form, Input, message } from 'antd';
 import styles from './CompanyCreatePage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
@@ -36,6 +36,8 @@ export const CompanyCreatePage = () => {
         refetchCompanyList();
         getAuthUser();
       });
+    }).catch((error) => {
+      message.error(error.data.error)
     })
   };
 

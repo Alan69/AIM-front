@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Layout, Button, Form, Input, Select } from 'antd';
+import { Layout, Button, Form, Input, Select, message } from 'antd';
 import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTypesApi';
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
@@ -17,7 +17,7 @@ export const PostQueryCreatePage = () => {
   const { current_company } = useTypedSelector((state) => state.auth);
   const [selectedCompany, setSelectedCompany] = useState<string | undefined>();
 
-  const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
+  const [createPostQuery, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] = useLazyGetProductListByCompanyIdQuery();
   const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery();
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
@@ -52,8 +52,10 @@ export const PostQueryCreatePage = () => {
       ...data,
       company: current_company?.id,
     };
-    createPost(updatedData).unwrap().then((response) => {
+    createPostQuery(updatedData).unwrap().then((response) => {
       navigate(`/post/${response.post_id}`);
+    }).catch((error) => {
+      message.error(error.data.error)
     });
   };
 

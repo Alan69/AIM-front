@@ -42,7 +42,7 @@ export const ContentPlanPage = () => {
   const { data: postListByCompanyId, refetch: refetchPostListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
   const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
-  const [createPost, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
+  const [createPostQuery, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [createCustomPost, { isLoading: isCustomPostCreating }] = useCreateCustomPostMutation();
   const [getPostById, { data: post }] = useLazyGetPostByIdQuery();
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
@@ -83,12 +83,14 @@ export const ContentPlanPage = () => {
   }
 
   const handleGeneratePost = (updatedData: TPostQuerCreateData) => {
-    createPost(updatedData).unwrap().then((response) => {
+    createPostQuery(updatedData).unwrap().then((response) => {
       getPostById(response.id).unwrap().then((responsePost) => {
         dispatch(postActions.setIsPostGenerated(true));
         dispatch(postActions.setGeneratedPost(responsePost));
         refetchPostListByCompanyId();
       })
+    }).catch((error) => {
+      message.error(error.data.error)
     });
   };
 

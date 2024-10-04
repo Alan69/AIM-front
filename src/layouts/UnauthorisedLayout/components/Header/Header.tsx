@@ -3,19 +3,17 @@ import { Layout, Button } from 'antd';
 import styles from './Header.module.scss';
 import Menu from '../Menu/Menu';
 import { DownOutlined } from '@ant-design/icons';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ReactComponent as IconLogo } from 'assets/logo.svg';
 
 const { Header: AntHeader } = Layout;
 
 const Header = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   return (
     <AntHeader className={styles.header}>
       <Link className={styles.logo} to={'/home'}><IconLogo /></Link>
-      {/* {location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/recovery' || location.pathname === '/policy' || location.pathname === '/agreement' ? '' : */}
       <Menu />
       <div className={styles.actions}>
         <Button className={styles.languageButton} iconPosition='end' icon={<DownOutlined />}>РУС</Button>

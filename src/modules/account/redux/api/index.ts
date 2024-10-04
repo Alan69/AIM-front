@@ -18,7 +18,6 @@ export type TProfileData = {
     id: string;
     first_name?: string;
     last_name?: string;
-    coins?: number;
     location: TLocationTypesData;
     job: TJobTypesData;
     bd_year: number;
