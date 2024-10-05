@@ -2,9 +2,6 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 24px;
-    background: #fff;
-    border-radius: 12px;
     &__item {
         display: flex;
         justify-content: space-between;
@@ -29,4 +26,14 @@
             height: 32px;
         }
     }
+}
+
+.wrapper {
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+}
+
+.backBtn {
+    margin-top: 16px;
 }

@@ -14,11 +14,9 @@ export type TSocialMediaByCurrentCompanyData = {
   company: string;
 }
 
-type TTelegramResponse = {
+type TAddSocielMediaResponse = {
   auth_url: string
 }
-
-type TTwitterResponse = TTelegramResponse
 
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -36,25 +34,25 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TSocialMediaByCurrentCompanyData[]) => response,
     }),
-    addTelegram: build.query<TTelegramResponse, void>({
+    addFacebook: build.query<TAddSocielMediaResponse, void>({
       query: () => ({
-        url: '/telegram/auth/',
-        method: 'GET'
-      }),
-      transformResponse: (response: TTelegramResponse) => response,
-    }),
-    addTwitter: build.query<TTwitterResponse, void>({
-      query: () => ({
-        url: '/twitter/auth/',
-        method: 'GET'
-      }),
-      transformResponse: (response: TTwitterResponse) => response,
-    }),
-    getTwitterCallback: build.query<TTwitterResponse, { oauth_token: string; oauth_verifier: string }>({
-      query: ({ oauth_token, oauth_verifier }) => ({
-        url: `/twitter/callback/?oauth_token=${oauth_token}&oauth_verifier=${oauth_verifier}`,
+        url: '/facebook/auth/',
         method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }),
+      transformResponse: (response: TAddSocielMediaResponse) => response,
+    }),
+    addInstagram: build.query<TAddSocielMediaResponse, void>({
+      query: () => ({
+        url: '/instagram/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: TAddSocielMediaResponse) => response,
     }),
     addLinkedin: build.query<string, void>({
       query: () => ({
@@ -66,12 +64,81 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: string) => response,
     }),
+    addReddit: build.query<string, void>({
+      query: () => ({
+        url: '/reddit/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: string) => response,
+    }),
+    addSnapchat: build.query<string, void>({
+      query: () => ({
+        url: '/snapchat/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: string) => response,
+    }),
+    addTelegram: build.query<TAddSocielMediaResponse, void>({
+      query: () => ({
+        url: '/telegram/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: TAddSocielMediaResponse) => response,
+    }),
+    addTiktok: build.query<string, void>({
+      query: () => ({
+        url: '/tiktok/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: string) => response,
+    }),
     addTumblr: build.query<string, void>({
       query: () => ({
         url: '/tumblr/auth/',
-        method: 'GET'
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }),
       transformResponse: (response: string) => response,
+    }),
+    addTwitter: build.query<TAddSocielMediaResponse, void>({
+      query: () => ({
+        url: '/twitter/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: TAddSocielMediaResponse) => response,
+    }),
+    addVk: build.query<TAddSocielMediaResponse, void>({
+      query: () => ({
+        url: '/vk/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: TAddSocielMediaResponse) => response,
+    }),
+    getTwitterCallback: build.query<TAddSocielMediaResponse, { oauth_token: string; oauth_verifier: string }>({
+      query: ({ oauth_token, oauth_verifier }) => ({
+        url: `/twitter/callback/?oauth_token=${oauth_token}&oauth_verifier=${oauth_verifier}`,
+        method: 'GET',
+      }),
     }),
   }),
   overrideExisting: false,
@@ -80,9 +147,15 @@ export const postApi = baseApi.injectEndpoints({
 export const {
   useGetSocialMediaListQuery,
   useGetSocialMediaListByCurrentCompanyQuery,
-  useLazyAddTelegramQuery,
-  useLazyAddTwitterQuery,
-  useLazyGetTwitterCallbackQuery,
+  useLazyAddFacebookQuery,
+  useLazyAddInstagramQuery,
   useLazyAddLinkedinQuery,
-  useLazyAddTumblrQuery
+  useLazyAddRedditQuery,
+  useLazyAddSnapchatQuery,
+  useLazyAddTelegramQuery,
+  useLazyAddTiktokQuery,
+  useLazyAddTumblrQuery,
+  useLazyAddTwitterQuery,
+  useLazyAddVkQuery,
+  useLazyGetTwitterCallbackQuery,
 } = postApi;

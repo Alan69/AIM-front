@@ -10,9 +10,6 @@ import styles from './OfferInfo.module.scss';
 const OfferInfo: React.FC = () => {
   const { user } = useTypedSelector((state) => state.auth);
 
-  console.log('user', user);
-
-
   return (
     <Link to="/tariffs" className={styles.link}>
       <div className={styles.offerInfo}>
