@@ -44,7 +44,7 @@ export const PostQueryDetailsPage = () => {
       key: 'post_like',
     },
     {
-      title: 'Дата',
+      title: 'Дата cоздания',
       dataIndex: 'time_create',
       key: 'time_create',
       render: (text, record) => (
@@ -84,7 +84,7 @@ export const PostQueryDetailsPage = () => {
     key: post.id.toString(),
     post_name: post.title,
     post_like: <Checkbox checked={post.like}></Checkbox>,
-    time_create: formatDate(post.time_update),
+    time_create: formatDate(post.time_create),
     post_actions: (
       <div className={styles.postQueryDescr__icons}>
         <Link to={`/post/${postQuery?.id}/${post?.id}/update`}><EditOutlined /></Link>

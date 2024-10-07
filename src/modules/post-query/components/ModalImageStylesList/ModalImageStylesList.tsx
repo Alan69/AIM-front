@@ -27,7 +27,7 @@ export const ModalImageStylesList = ({ isModalOpen, setIsModalOpen, imgStylesLis
       <Divider />
       <div className={styles.imgStylesList}>
         {imgStylesList?.map((item) => (
-          <div className={styles.imgStylesItem}>
+          <div key={item.id} className={styles.imgStylesItem}>
             <Title level={4}>{item.name}</Title>
             <img src={item.picture} alt={item.name} onClick={() => handleChangeCurrentImgStyle(item)} />
           </div>

@@ -13,25 +13,13 @@ export const PostQueryListPage = () => {
   const { data: postQueriesList, refetch } = useGetPostQueriesListQuery();
 
   const columns: TableProps<TPostQueryData>['columns'] = [
-    // {
-    //   title: 'Компания',
-    //   dataIndex: 'company',
-    //   key: 'company',
-    //   render: (text, record) => (
-    //     // @ts-ignore
-    //     <Link to={`/post-query/${record.key}`}>
-    //       {text}
-    //     </Link>
-    //   ),
-    // },
     {
       title: 'Продукт',
       dataIndex: 'product',
       key: 'product',
       fixed: 'left',
       render: (text, record) => (
-        // @ts-ignore
-        <Link to={`/post-query/${record.key}`}>
+        <Link to={`/post-query/${record.id}`}>
           {text}
         </Link>
       ),
@@ -41,8 +29,7 @@ export const PostQueryListPage = () => {
       dataIndex: 'post_type',
       key: 'post_type',
       render: (text, record) => (
-        // @ts-ignore
-        <Link to={`/post-query/${record.key}`}>
+        <Link to={`/post-query/${record.id}`}>
           {text}
         </Link>
       ),
@@ -52,19 +39,17 @@ export const PostQueryListPage = () => {
       dataIndex: 'text_style',
       key: 'text_style',
       render: (text, record) => (
-        // @ts-ignore
-        <Link to={`/post-query/${record.key}`}>
+        <Link to={`/post-query/${record.id}`}>
           {text}
         </Link>
       ),
     },
     {
-      title: 'Дата',
+      title: 'Дата cоздания',
       dataIndex: 'date',
       key: 'date',
       render: (text, record) => (
-        // @ts-ignore
-        <Link to={`/post-query/${record.key}`}>
+        <Link to={`/post-query/${record.id}`}>
           {text}
         </Link>
       ),
@@ -83,8 +68,7 @@ export const PostQueryListPage = () => {
   };
 
   const data = postQueriesList?.map((item) => ({
-    key: item.id,
-    // company: item?.company?.name,
+    id: item.id,
     product: item?.product?.name,
     post_type: item?.post_type?.name,
     text_style: item?.text_style?.name,
