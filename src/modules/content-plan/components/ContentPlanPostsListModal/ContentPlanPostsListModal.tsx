@@ -81,7 +81,7 @@ export const ContentPlanPostsListModal = ({
     },
     {
       key: '3',
-      label: 'Список постов',
+      label: 'Список избранных постов',
       children:
         <ContentPlanPostList
           postListByCompanyId={postListByCompanyId}

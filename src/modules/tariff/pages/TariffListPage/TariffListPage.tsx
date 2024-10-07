@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { Card, Typography, Button, Layout, Divider, Slider, Flex, message } from 'antd';
+import { Card, Typography, Button, Layout, Divider, Slider, message } from 'antd';
 import styles from './TariffListPage.module.scss';
 import { Content } from 'antd/es/layout/layout';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useCreateTariffMutation, usePaymentInitiateMutation, usePaymentTokenMutation } from 'modules/tariff/redux/api';
 
-import iconPlus from 'assets/plus-white.svg'
+import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
 import infinity from 'assets/infinity.svg'
 import checked from 'assets/checked.svg'
 import { ReactComponent as IconArrow } from 'assets/arrow.svg';
 import card from 'assets/tariff-card-bg.png';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export const TariffListPage: React.FC = () => {
   const { user } = useTypedSelector((state) => state.auth);
@@ -77,91 +77,6 @@ export const TariffListPage: React.FC = () => {
     setTotalCostWithoutDiscount(maxCost);
     setDiscount(calculatedDiscount);
   };
-
-  // const items: TabsProps['items'] = [
-  //   {
-  //     key: '1',
-  //     label: 'Месяц',
-  //     children: <Row gutter={[16, 16]} justify="center">
-  //       {data?.slice(0, 4).map((el) => (
-  //         <Col key={el.id} xs={24} sm={12} md={6} className={styles.col}>
-  //           <Card hoverable className={styles.card}>
-  //             <Title level={3} className={styles.card__title}>{el.name}</Title>
-  //             <div className={styles.card__body}>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Генерации постов</div>
-  //                 <div className={styles.card__item__value}>{el.post_generations_limit ? el.post_generations_limit : '*'}</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
-  //                 <div className={styles.card__item__value}>1</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Генерация воронки продаж</div>
-  //                 <div className={styles.card__item__value}>1</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Компании</div>
-  //                 <div className={styles.card__item__value}>{el.company_limit}</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Продукты</div>
-  //                 <div className={styles.card__item__value}>1</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Аккаунты на каждую социальную сеть</div>
-  //                 <div className={styles.card__item__value}>До {el.social_media_account_limit}</div>
-  //               </div>
-  //             </div>
-  //             <Title level={4} className={styles.card__price}>{el.monthly_price ? `${el.monthly_price} ₸` : 'Бесплатно'}</Title>
-  //             <Button block className={styles.card__button} icon={iconPlus}>Подключить</Button>
-  //           </Card>
-  //         </Col>
-  //       ))}
-  //     </Row>,
-  //   },
-  //   {
-  //     key: '2',
-  //     label: 'Год',
-  //     children: <Row gutter={[16, 16]} justify="center">
-  //       {data?.slice(0, 4).map((el) => (
-  //         <Col key={el.id} xs={24} sm={12} md={6} className={styles.col}>
-  //           <Card hoverable className={styles.card}>
-  //             <Title level={3} className={styles.card__title}>{el.name}</Title>
-  //             <div className={styles.card__body}>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Генерации постов</div>
-  //                 <div className={styles.card__item__value}>{el.post_generations_limit ? el.post_generations_limit : '*'}</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
-  //                 <div className={styles.card__item__value}>1</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Генерация воронки продаж</div>
-  //                 <div className={styles.card__item__value}>1</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Компании</div>
-  //                 <div className={styles.card__item__value}>{el.company_limit}</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Продукты</div>
-  //                 <div className={styles.card__item__value}>1</div>
-  //               </div>
-  //               <div className={styles.card__item}>
-  //                 <div className={styles.card__item__label}>Аккаунты на каждую социальную сеть</div>
-  //                 <div className={styles.card__item__value}>До {el.social_media_account_limit}</div>
-  //               </div>
-  //             </div>
-  //             <Title level={4} className={styles.card__price}>{el.yearly_price ? `${el.yearly_price} ₸` : 'Бесплатно'}</Title>
-  //             <Button block className={styles.card__button} icon={iconPlus}>Подключить</Button>
-  //           </Card>
-  //         </Col>
-  //       ))}
-  //     </Row>,
-  //   },
-  // ];
 
   return (
     <Layout>
@@ -246,7 +161,7 @@ export const TariffListPage: React.FC = () => {
                             {totalCost.toFixed()} ₸
                           </div>
                         </div>
-                        <Button className={styles.card__button} onClick={handleBuyTariff}>Подключить <img src={iconPlus} alt='iconPlus' /></Button>
+                        <Button className={styles.card__button} onClick={handleBuyTariff}>Подключить <IconPlus className={styles.iconPlus} /></Button>
                       </div>
                     </Card>
                   </div>

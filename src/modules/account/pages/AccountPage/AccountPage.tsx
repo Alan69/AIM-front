@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useUpdateProfilesMutation } from '../../redux/api';
-import { Layout, Button, Form, Input, Upload, Select, Image, message } from 'antd';
+import { Layout, Button, Form, Input, Upload, Select, Image, message, Breadcrumb } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useGetJobTypesListQuery } from '../../../../redux/api/jobTypes/jobTypesApi';
 import { useGetContriesListQuery } from '../../../../redux/api/contries/contriesApi';
@@ -9,6 +9,7 @@ import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 import avatar from 'assets/avatar.png';
 import styles from './AccountPage.module.scss'
+import { Link } from 'react-router-dom';
 
 type TUpdateProfilesForm = {
   user: string;
@@ -118,7 +119,7 @@ export const AccountPage = () => {
       <Content className='page-layout'>
         <h1 className='main-title'>Профиль</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-          <Form.Item label="Фото">
+          <Form.Item label="">
             <div className={styles.photo}>
               {user && (
                 <Image width={200} src={profileImage} alt={user.profile.picture ? user.profile.picture : 'Аватар'} />

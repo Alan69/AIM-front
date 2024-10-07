@@ -64,7 +64,7 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
 
             <div className={styles.postLike}>
               {selectedPost?.like ? <HeartTwoTone twoToneColor="#eb2f96" /> : <HeartOutlined />}
-              <Text>Лайк</Text>
+              <Text>В избранные для публикации</Text>
             </div>
           </div>
         </div>

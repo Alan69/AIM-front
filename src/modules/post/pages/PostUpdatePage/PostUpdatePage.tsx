@@ -102,7 +102,7 @@ export const PostUpdatePage = () => {
                   </Form.Item>
 
                   <Form.Item name="like" valuePropName="checked">
-                    <Checkbox>Лайк</Checkbox>
+                    <Checkbox>В избранные для публикации</Checkbox>
                   </Form.Item>
 
                   <Form.Item>

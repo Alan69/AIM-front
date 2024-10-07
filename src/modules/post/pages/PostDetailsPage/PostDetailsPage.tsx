@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { useGetPostByIdQuery, usePostNowMutation, useRecreatePostImageMutation, useRecreatePostTextMutation } from '../../redux/api';
-import { Layout, Typography, Image, Button, Collapse, Checkbox, Radio, Input, message } from 'antd';
+import { Layout, Typography, Image, Button, Collapse, Radio, Input, message } from 'antd';
 import {
   ReloadOutlined,
   LoadingOutlined,
@@ -206,10 +206,8 @@ export const PostDetailsPage = () => {
                       </div>
                     </div>
                     <div className={styles.postLike}>
-                      {/* <Text>Лайк</Text> */}
-                      {/* <Checkbox checked={post?.like}></Checkbox> */}
                       {post?.like ? <HeartTwoTone twoToneColor="#eb2f96" /> : <HeartOutlined />}
-                      <Text>Лайк</Text>
+                      <Text>В избранные для публикации</Text>
                     </div>
                     <div className={styles.postActions}>
                       <Button

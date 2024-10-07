@@ -14,7 +14,7 @@ interface DataType {
   key: string;
   post_name: string;
   post_like: ReactNode;
-  post_date?: string;
+  time_create?: string;
   post_actions?: ReactNode;
 }
 
@@ -39,14 +39,14 @@ export const PostQueryDetailsPage = () => {
       fixed: 'left',
     },
     {
-      title: 'Лайк',
+      title: 'В избранные для публикации',
       dataIndex: 'post_like',
       key: 'post_like',
     },
     {
       title: 'Дата',
-      dataIndex: 'post_date',
-      key: 'post_date',
+      dataIndex: 'time_create',
+      key: 'time_create',
       render: (text, record) => (
         <Link to={`/post/${id}/${record.key}`}>
           {text}
@@ -84,7 +84,7 @@ export const PostQueryDetailsPage = () => {
     key: post.id.toString(),
     post_name: post.title,
     post_like: <Checkbox checked={post.like}></Checkbox>,
-    post_date: formatDate(post.time_update),
+    time_create: formatDate(post.time_update),
     post_actions: (
       <div className={styles.postQueryDescr__icons}>
         <Link to={`/post/${postQuery?.id}/${post?.id}/update`}><EditOutlined /></Link>

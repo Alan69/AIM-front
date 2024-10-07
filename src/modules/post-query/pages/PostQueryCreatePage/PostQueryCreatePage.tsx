@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input, Select, message } from 'antd';
+import { useTypedSelector } from 'hooks/useTypedSelector';
+import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTypesApi';
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
 import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
-import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { useNavigate } from 'react-router-dom';
 import styles from './PostQueryCreatePage.module.scss'
 
 const { Content } = Layout;
@@ -15,7 +15,6 @@ const { Content } = Layout;
 export const PostQueryCreatePage = () => {
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
-  const [selectedCompany, setSelectedCompany] = useState<string | undefined>();
 
   const [createPostQuery, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
   const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] = useLazyGetProductListByCompanyIdQuery();
@@ -37,15 +36,15 @@ export const PostQueryCreatePage = () => {
   useEffect(() => {
     if (current_company) {
       setValue('company', current_company.id);
-      setSelectedCompany(current_company.id);
     }
   }, [current_company, setValue]);
 
   useEffect(() => {
-    if (selectedCompany) {
-      getProductListByCompanyId(selectedCompany);
+    if (current_company) {
+      getProductListByCompanyId(current_company.id);
+      setValue('product', '');
     }
-  }, [selectedCompany, getProductListByCompanyId]);
+  }, [current_company, getProductListByCompanyId]);
 
   const onSubmit = (data: TPostQuerCreateData) => {
     const updatedData = {
@@ -73,7 +72,7 @@ export const PostQueryCreatePage = () => {
               render={({ field }) => (
                 <Select
                   {...field}
-                  value={field.value || selectedCompany}
+                  value={field.value || current_company?.id}
                   disabled
                 >
                   <Select.Option key={current_company?.id} value={current_company?.id}>

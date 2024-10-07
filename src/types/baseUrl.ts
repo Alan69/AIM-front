@@ -1,1 +1,1 @@
-export const baseURL = 'https://api.aimmagic.com';
+export const baseURL = 'https://api.aimmagic.com/api/';

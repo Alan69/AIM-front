@@ -2,11 +2,12 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TTokenResponse } from 'modules/auth/redux/api';
 import { authActions } from 'modules/auth/redux/slices/auth.slice';
 import { RootState } from 'redux/rootReducer';
+import { baseURL } from 'types/baseUrl';
 
 const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://api.aimmagic.com/api/',
+    baseUrl: baseURL,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
 
@@ -21,7 +22,7 @@ const baseApi = createApi({
   // @ts-ignore
   async baseQuery(args, api, extraOptions) {
     let result = await fetchBaseQuery({
-      baseUrl: 'https://api.aimmagic.com/api/',
+      baseUrl: baseURL,
       prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth.token;
         if (token) {
@@ -36,7 +37,7 @@ const baseApi = createApi({
 
       if (refreshToken) {
         const refreshResult = await fetchBaseQuery({
-          baseUrl: 'https://api.aimmagic.com/api/',
+          baseUrl: baseURL,
         })(
           {
             url: '/token/refresh/',
@@ -52,7 +53,7 @@ const baseApi = createApi({
           api.dispatch(authActions.setToken({ token: newTokens.access, refreshToken: newTokens.refresh }));
 
           result = await fetchBaseQuery({
-            baseUrl: 'https://api.aimmagic.com/api/',
+            baseUrl: baseURL,
             prepareHeaders: (headers) => {
               headers.set('Authorization', `Bearer ${newTokens.access}`);
               return headers;
