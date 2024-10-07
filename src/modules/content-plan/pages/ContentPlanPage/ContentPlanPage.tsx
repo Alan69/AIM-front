@@ -17,12 +17,14 @@ import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPos
 import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { postActions } from 'modules/post/redux/slices/post.slice';
 import { SelectedPreviewBlockModal } from 'modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal';
+import { useIsSmallLaptop } from 'hooks/media';
 
 const { Content } = Layout;
 const { Title } = Typography;
 
 export const ContentPlanPage = () => {
   const dispatch = useDispatch();
+  const isSmallLaptop = useIsSmallLaptop();
 
   const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] = useState(false);
   const [isContentPlanPostsListModalOpen, setIsContentPlanPostsListModalOpen] = useState(false);
@@ -258,7 +260,7 @@ export const ContentPlanPage = () => {
         handleSelectNewSocialMedias={handleSelectNewSocialMedias}
         selectedNewSocialMedias={selectedNewSocialMedias}
       />
-      <SelectedPreviewBlockModal
+      {isSmallLaptop ? <SelectedPreviewBlockModal
         selectedDatePreview={selectedDatePreview}
         selectedPost={selectedPost}
         formattedSelectedDate={formattedSelectedDate}
@@ -266,7 +268,7 @@ export const ContentPlanPage = () => {
         handleSelectEvent={handleSelectEvent}
         isOpen={(selectedDatePreview || selectedPost !== null) ? true : false}
         handleCloseModal={handleClosePreviewBlockModal}
-      />
+      /> : ''}
     </>
   )
 }
