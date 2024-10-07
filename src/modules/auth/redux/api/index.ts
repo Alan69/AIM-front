@@ -77,7 +77,6 @@ export const authApi = baseApi.injectEndpoints({
         }
       }),
 			transformResponse: (response: TSignUpResponse) => response,
-      extraOptions: { showErrors: false }
     }),
     refreshToken: build.mutation<TTokenResponse, { refresh: string }>({
       query: ({ refresh }) => ({

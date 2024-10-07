@@ -11,23 +11,46 @@ export const SignUpForm = () => {
   const dispatch = useDispatch();
   const [signUp, { isLoading }] = useSignUpMutation();
 
-  const onFinish = async (values: { email: string; password: string; password2: string }) => {
-    if (values.password !== values.password2) {
-      message.error('Пароли не совпадают!');
-      return;
+  const passwordValidator = (rule: any, value: any) => {
+    if (!value) {
+      return Promise.reject('Пожалуйста, введите пароль!');
     }
-
-    try {
-      const response = await signUp({ ...values, first_name: 'Имя', last_name: 'Фамилия' });
-      // @ts-ignore
-      const { access: token, refresh: refreshToken } = response.data;
-
-      dispatch(authActions.setToken({ token, refreshToken }));
-      message.success('Регистрация успешна! Пожалуйста, войдите в систему.');
-    } catch (error) {
-      message.error('Ошибка регистрации. Пожалуйста, проверьте введенные данные.');
+    if (value.length < 8) {
+      return Promise.reject('Пароль должен содержать минимум 8 символов.');
     }
+    if (!/\d.*\d/.test(value)) {
+      return Promise.reject('Пароль должен содержать как минимум два числа.');
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+      return Promise.reject('Пароль должен содержать как минимум один спецсимвол.');
+    }
+    return Promise.resolve();
   };
+
+  const confirmPasswordValidator = ({ getFieldValue }: any) => ({
+    validator(_: any, value: any) {
+      if (!value || getFieldValue('password') === value) {
+        return Promise.resolve();
+      }
+      return Promise.reject('Пароли не совпадают!');
+    },
+  });
+
+  const onFinish = (values: { email: string; password: string; password2: string }) => {
+    signUp({ ...values, first_name: 'Имя', last_name: 'Фамилия' })
+      .unwrap()
+      .then((response) => {
+        const { access: token, refresh: refreshToken } = response;
+
+        dispatch(authActions.setToken({ token, refreshToken }));
+        message.success('Регистрация успешна! Пожалуйста, войдите в систему.');
+      })
+      .catch((error) => {
+        const errorMsg = error?.data?.error || 'Ошибка регистрации. Пожалуйста, проверьте введенные данные.';
+        message.error(errorMsg);
+      });
+  };
+
 
   return (
     <div className={styles.signUpBox}>
@@ -49,7 +72,10 @@ export const SignUpForm = () => {
 
         <Form.Item
           name="password"
-          rules={[{ required: true, message: 'Пожалуйста, введите пароль!' }]}
+          rules={[
+            { required: true },
+            { validator: passwordValidator }
+          ]}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
@@ -60,7 +86,11 @@ export const SignUpForm = () => {
 
         <Form.Item
           name="password2"
-          rules={[{ required: true, message: 'Пожалуйста, подтвердите пароль!' }]}
+          dependencies={['password']}
+          rules={[
+            { required: true, message: 'Пожалуйста, подтвердите пароль!' },
+            confirmPasswordValidator
+          ]}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
