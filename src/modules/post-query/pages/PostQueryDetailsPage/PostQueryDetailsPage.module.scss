@@ -22,3 +22,12 @@
         gap: 8px;
     }
 }
+
+.iconHeart {
+    font-size: 24px;
+    &__active {
+        path {
+            fill: #eb2f96;
+        }
+    }
+}

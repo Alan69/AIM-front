@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDeletePostMutation, useGetPostByIdQuery } from '../../redux/api';
-import { Layout, Button } from 'antd';
+import { Layout, Button, message } from 'antd';
 import styles from './PostDeletePage.module.scss';
 import Title from 'antd/es/typography/Title';
 import { useGetCompanyListQuery } from 'modules/company/redux/api';
@@ -22,7 +22,9 @@ export const PostDeletePage = () => {
     if (post) {
       deletePost(post?.id).unwrap().then((response) => {
         navigate(`/post-query/${post?.post_query}`);
-        refetchCompanyList();
+        refetchCompanyList().unwrap().then(() => {
+          message.success('Вы успешно удалили пост!');
+        });
       });
     }
   };

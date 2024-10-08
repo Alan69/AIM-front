@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetPostByIdQuery, useUpdatePostMutation } from '../../redux/api';
-import { Layout, Image, Button, Checkbox, Form, Input, Upload } from 'antd';
+import { Layout, Image, Button, Checkbox, Form, Input, Upload, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import styles from './PostUpdatePage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -48,13 +48,14 @@ export const PostUpdatePage = () => {
 
       updatePost(updatedData).unwrap().then((response) => {
         navigate(`/post/${response.post_query.id}/${response.id}`);
-        refetch();
+        refetch().unwrap().then(() => {
+          message.success('Вы успешно обновили пост!');
+        });
       });
     }
   };
 
   if (isLoading) return <div>Loading...</div>;
-
 
   return (
     <Layout>

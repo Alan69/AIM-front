@@ -1,13 +1,15 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { useGetPostByIdQuery, usePostNowMutation, useRecreatePostImageMutation, useRecreatePostTextMutation } from '../../redux/api';
+import { useGetPostByIdQuery, usePostNowMutation, useRecreatePostImageMutation, useRecreatePostTextMutation, useUpdatePostMutation } from '../../redux/api';
 import { Layout, Typography, Image, Button, Collapse, Radio, Input, message } from 'antd';
 import {
   ReloadOutlined,
   LoadingOutlined,
   HeartOutlined,
-  HeartTwoTone
+  HeartFilled
 } from '@ant-design/icons';
+
+import cn from 'classnames'
 
 import styles from './PostDetailsPage.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -36,6 +38,7 @@ export const PostDetailsPage = () => {
   const [recreatePostText, { isLoading: isRecreatePostTextLoading }] = useRecreatePostTextMutation();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
+  const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
 
@@ -125,6 +128,31 @@ export const PostDetailsPage = () => {
     }
   };
 
+  const handleUpdateLike = () => {
+    if (post) {
+      const updatedData = {
+        id: id,
+        title: post?.title,
+        img_prompt: post?.img_prompt,
+        txt_prompt: post?.txt_prompt,
+        main_text: post?.main_text,
+        hashtags: post?.hashtags,
+        like: post?.like ? false : true,
+        active: post.active,
+        img_style: post.img_style?.id,
+        post_query: post.post_query,
+        author: user?.profile.id,
+      };
+
+      // @ts-ignore
+      updatePost(updatedData).unwrap().then(() => {
+        refetch().unwrap().then(() => {
+          message.success(post?.like ? 'Вы успешно удалили из избранных!' : 'Вы успешно добавили в избранные!')
+        });
+      });
+    }
+  };
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -206,7 +234,12 @@ export const PostDetailsPage = () => {
                       </div>
                     </div>
                     <div className={styles.postLike}>
-                      {post?.like ? <HeartTwoTone twoToneColor="#eb2f96" /> : <HeartOutlined />}
+                      <HeartFilled
+                        height={24}
+                        width={24}
+                        className={cn(styles.iconHeart, post?.like ? styles.iconHeart__active : '')}
+                        onClick={handleUpdateLike}
+                      />
                       <Text>В избранные для публикации</Text>
                     </div>
                     <div className={styles.postActions}>

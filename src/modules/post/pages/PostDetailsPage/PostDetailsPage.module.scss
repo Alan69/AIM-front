@@ -144,3 +144,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.iconHeart {
+    font-size: 24px;
+    cursor: pointer;
+    path {
+        transition: 0.3s all;
+    }
+    &__active,
+    &:hover {
+        transition: 0.3s all;
+        path {
+            transition: 0.3s all;
+            fill: #eb2f96;
+        }
+    }
+}

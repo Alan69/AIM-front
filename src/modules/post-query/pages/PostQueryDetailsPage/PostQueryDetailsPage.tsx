@@ -1,13 +1,15 @@
 import React, { ReactNode, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useGetPostQueriesByIdQuery } from '../../redux/api';
 
 import { Layout, Table, TableProps, Typography, Checkbox } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
+  HeartFilled
 } from '@ant-design/icons';
 import styles from './PostQueryDetailsPage.module.scss';
+import cn from 'classnames'
 import { TPostData, useGetPostListQuery } from 'modules/post/redux/api';
 
 interface DataType {
@@ -22,9 +24,10 @@ const { Title, Text } = Typography;
 const { Content } = Layout;
 
 export const PostQueryDetailsPage = () => {
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const { data: postQuery, isLoading, refetch } = useGetPostQueriesByIdQuery(id || '');
-  const { data: posts } = useGetPostListQuery(postQuery?.id || '')
+  const { data: posts, refetch: refetchPostList } = useGetPostListQuery(postQuery?.id || '')
 
   const columns: TableProps<DataType>['columns'] = [
     {
@@ -83,7 +86,11 @@ export const PostQueryDetailsPage = () => {
   const data: DataType[] = posts?.map((post: TPostData) => ({
     key: post.id.toString(),
     post_name: post.title,
-    post_like: <Checkbox checked={post.like}></Checkbox>,
+    post_like: <HeartFilled
+      height={24}
+      width={24}
+      className={cn(styles.iconHeart, post?.like ? styles.iconHeart__active : '')}
+    />,
     time_create: formatDate(post.time_create),
     post_actions: (
       <div className={styles.postQueryDescr__icons}>
@@ -95,7 +102,9 @@ export const PostQueryDetailsPage = () => {
 
   useEffect(() => {
     refetch()
-  }, [refetch])
+    refetchPostList()
+
+  }, [refetch, refetchPostList, location.pathname])
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -128,7 +137,7 @@ export const PostQueryDetailsPage = () => {
           <Content >
             <div className={styles.postQueryDescr}>
               {!posts?.length ? <div style={{ paddingBottom: '12px' }}>
-                <Text >No posts</Text>
+                <Text>Посты не найдены. Добавьте пост.</Text>
               </div> : <Table columns={columns} dataSource={data} pagination={false} scroll={{ x: 'max-content' }} />}
             </div>
           </Content>
