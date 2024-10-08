@@ -4,7 +4,7 @@ import styles from './CurrentCompanyInfo.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useNavigate } from 'react-router-dom';
 import { useGetCompanyListQuery, useUpdateCurrentCompanyMutation } from 'modules/company/redux/api';
-import { Dropdown, Space, Menu, Button, Divider, Typography } from 'antd';
+import { Dropdown, Space, Menu, Button, Divider, Typography, Tooltip } from 'antd';
 import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
 
 const { Text } = Typography;
@@ -51,25 +51,29 @@ const CurrentCompanyInfo = () => {
       </div>
       <div className={styles.infoBlock}>
         <div className={styles.details}>
-          <div className={styles.name} onClick={() => navigate(`/company/${current_company?.id}`)}>
-            {current_company ? current_company.name : '-'}
+          <div className={styles.name} onClick={() => navigate(`/company/${current_company?.id ? current_company?.id : 'create'}`)}>
+            {current_company?.name ? current_company.name : <span>Добавить компанию</span>}
           </div>
           <div className={styles.actions}>
-            <Dropdown overlay={menu} trigger={["click", "hover"]} className={styles.dropdown} placement="bottom">
-              <Space>
-                <UnorderedListOutlined className={styles.addIcon} />
-              </Space>
-            </Dropdown>
-            <Button
-              type="primary"
-              shape="circle"
-              className={styles.addButton}
-              icon={<PlusCircleOutlined className={styles.addIcon} />}
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate('/company/create');
-              }}
-            />
+            {current_company ? <Tooltip title='Список компаний'>
+              <Dropdown overlay={menu} trigger={["click", "hover"]} className={styles.dropdown} placement="bottom">
+                <Space>
+                  <UnorderedListOutlined className={styles.addIcon} />
+                </Space>
+              </Dropdown>
+            </Tooltip> : ''}
+            <Tooltip title='Добавить компанию'>
+              <Button
+                type="primary"
+                shape="circle"
+                className={styles.addButton}
+                icon={<PlusCircleOutlined className={styles.addIcon} />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate('/company/create');
+                }}
+              />
+            </Tooltip>
           </div>
         </div>
       </div>
