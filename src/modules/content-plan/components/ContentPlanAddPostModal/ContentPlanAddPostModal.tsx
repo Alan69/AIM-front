@@ -57,6 +57,14 @@ export const ContentPlanAddPostModal = ({
   };
 
   const handleTimeChange = (time: moment.Moment | null) => {
+    if (time) {
+      const minutes = time.minute();
+      if (minutes % 15 !== 0) {
+        setSelectedTime(null);
+        message.warning('Минуты должны быть кратны 15. Выберите другое время.');
+        return;
+      }
+    }
     setSelectedTime(time);
   };
 
@@ -150,7 +158,7 @@ export const ContentPlanAddPostModal = ({
               borderRight: '1px solid #d9d9d9',
               width: '33.33%',
             }}
-            disabled={!selectedDate || !selectedTime || !selectNewPost || selectedNewSocialMedias.length === 0}
+            disabled={!selectNewPost || selectedNewSocialMedias.length === 0}
             loading={isPostNowLoading}
           >
             Опубликовать сейчас
