@@ -92,14 +92,24 @@ export const PostDetailsPage = () => {
         id: post?.id,
         img_prompt: data.imageDescription,
         img_style: currentImgStyle?.id
-      }).unwrap().then(() => refetch())
+      }).unwrap().then(() => {
+        refetch()
+      }).catch((error) => {
+        // refetch().unwrap().then(() => message.error(error.data.error))
+        refetch()
+      })
     }
     if (formValues.textOption !== 'keepText') {
       recreatePostText({
         id: post?.id,
         txt_prompt: data.textDescription,
         main_text: post?.main_text
-      }).unwrap().then(() => refetch())
+      }).unwrap().then(() => {
+        refetch()
+      }).catch((error) => {
+        // refetch().unwrap().then(() => message.error(error.data.error))
+        refetch()
+      })
     }
   };
 
@@ -350,6 +360,7 @@ export const PostDetailsPage = () => {
                           htmlType="submit"
                           className={styles.submitButton}
                           disabled={isRecreatePostImageLoading || isRecreatePostTextLoading || (imageOption === 'keepImage' && textOption === 'keepText')}
+                          loading={isRecreatePostImageLoading || isRecreatePostTextLoading}
                         >
                           Отправить запрос
                         </Button>
