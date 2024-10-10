@@ -37,7 +37,8 @@ export const CompanyCreatePage = () => {
         getAuthUser();
       });
     }).catch((error) => {
-      message.error(error.data.error)
+      error.data.error && message.error(error.data.error)
+      error.data.comment[0] && message.error(error.data.comment[0])
     })
   };
 
