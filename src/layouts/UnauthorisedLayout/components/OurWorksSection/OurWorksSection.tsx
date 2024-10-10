@@ -17,8 +17,11 @@ import hand from 'assets/image/works/hand.svg'
 import videoSrc from 'assets/card.mp4';
 // @ts-ignore
 import videoSrc2 from 'assets/card_1.mp4';
+import { useIsTablet } from 'hooks/media';
 
 export const OurWorksSection = () => {
+  const isTablet = useIsTablet();
+
   return (
     <section className={styles.section} id='OurWorksSection'>
       <h3 className={styles.title}>Работы, созданные нашим ИИ</h3>
@@ -34,9 +37,13 @@ export const OurWorksSection = () => {
         <div className={styles.works__block__hand}>
           <div className={styles.works__hand}>
             <img src={hand} alt='hand' />
-            {/* <video autoPlay muted loop className={styles.video}>
+            {isTablet ? <video autoPlay muted loop className={styles.video}>
               <source src={videoSrc2} type="video/mp4" />
-            </video> */}
+            </video>
+              :
+              <video autoPlay muted loop className={styles.video}>
+                <source src={videoSrc} type="video/mp4" />
+              </video>}
           </div>
         </div>
         <div className={styles.works__block}>

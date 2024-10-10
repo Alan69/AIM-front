@@ -76,41 +76,64 @@
                 width: 200%;
                 transform: translateX(-32px);
             }
+            @media (max-width: 576px) {
+                transform: translateX(-22px);
+            }
+            @media (max-width: 375px) {
+                transform: translateX(-14px);
+            }
         }
     }
 }
 
 .video {
     width: 80%;
-    height: auto;
     top: 17%;
     left: 50px;
-    height: auto;
+    height: 69%;
     position: absolute;
     z-index: 2;
     object-fit: cover;
-    // border-radius: 32px;
-    // width: 82%;
-    // top: 6px;
-    // left: calc(12% + 2px);
-    // @media (max-width: 1440px) {
-    //     width: 81%;
-    //     left: calc(12% + 0px);
-    // }
-    // @media (max-width: 1263px) {
-    //     width: 83%;
-    //     top: 3px;
-    //     left: calc(12% + -4px);
-    // }
-    // @media (max-width: 1024px) {
-    //     width: 82%;
-    //     top: 2px;
-    //     left: calc(12% + -6px);
-    // }
-    // @media (max-width: 992px) {
-    //     width: 90%;
-    //     top: 6px;
-    //     left: calc(12% + -9px);
-    //     border-radius: 40px;
-    // }
+    border-radius: 32px;
+    width: 82%;
+    top: 6px;
+    left: calc(12% + 2px);
+    @media (max-width: 1440px) {
+        width: 81%;
+        left: calc(12% + 0px);
+    }
+    @media (max-width: 1263px) {
+        width: 83%;
+        top: 3px;
+        left: calc(12% + -4px);
+    }
+    @media (max-width: 1024px) {
+        width: 82%;
+        top: 2px;
+        left: calc(12% + -6px);
+    }
+    @media (max-width: 992px) {
+        width: 90%;
+        top: 6px;
+        left: calc(12% + -9px);
+        border-radius: 40px;
+    }
+    @media (max-width: 768px) {
+        height: auto;
+        left: 26px;
+        width: 80%;
+        top: 20%;
+    }
+    @media (max-width: 576px) {
+        border-radius: 0;
+        left: 11px;
+        width: 90%;
+    }
+    @media (max-width: 425px) {
+        left: 1px;
+        width: 86%;
+    }
+    @media (max-width: 375px) {
+        left: 7px;
+    }
 }
