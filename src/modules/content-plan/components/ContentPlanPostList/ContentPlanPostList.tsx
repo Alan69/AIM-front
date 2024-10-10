@@ -1,5 +1,5 @@
 import React from 'react'
-import { Modal, Button, Divider, List, Image, Typography, Tabs, TabsProps } from 'antd';
+import { Button, List, Image, Typography } from 'antd';
 import cn from 'classnames'
 
 import styles from './ContentPlanPostList.module.scss'
@@ -10,12 +10,14 @@ const { Title, Paragraph } = Typography;
 type TProps = {
   postListByCompanyId: TPostData[] | undefined
   selectCurrentPost: TPostData | null
+  handleSelectNewPost: (post: TPostData) => void
   setSelectCurrentPost: React.Dispatch<React.SetStateAction<TPostData | null>>
   expandedKeys: Record<number, boolean>
   toggleExpand: (index: number) => void
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, setSelectCurrentPost, expandedKeys, toggleExpand }: TProps) => {
+export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, handleSelectNewPost, setSelectCurrentPost, expandedKeys, toggleExpand, setIsModalOpen }: TProps) => {
   return (
     <div className={styles.modalWithScroll}>
       <List
@@ -24,6 +26,10 @@ export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, se
         renderItem={(item, index) => (
           <List.Item
             onClick={() => setSelectCurrentPost(item)}
+            onDoubleClick={() => {
+              handleSelectNewPost(item);
+              setIsModalOpen(false);
+            }}
             className={cn(styles.item, selectCurrentPost?.id === item.id ? styles.item__isActive : '')}
           >
             <List.Item.Meta

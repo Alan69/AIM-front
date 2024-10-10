@@ -18,6 +18,20 @@ export const HeroSection = () => {
     'Единый чат-хаб',
   ];
 
+  const handleScrollToTariff = () => {
+    const tariffSection = document.getElementById('tariff-section');
+    if (tariffSection) {
+      const offset = -124;
+      const elementPosition = tariffSection.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition + offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const iconChecked = <svg className={styles.iconChecked} width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M23.5 10L13.5 20L10 16.5" stroke="#005FAA" stroke-width="2" />
     <path d="M7 13.5L8.5 15" stroke="#005FAA" stroke-width="2" />
@@ -28,7 +42,7 @@ export const HeroSection = () => {
       <h1 className={styles.title}>С нами бизнес <br /> процветает</h1>
       <h3 className={styles.subtitle}>Инновационная ИИ-платформа для <br /> автоматизации и оптимизации маркетинга</h3>
       <div className={styles.actions}>
-        <Button className={styles.tariffBtn} onClick={() => navigate(token ? '/tariffs' : '/login')}>Тарифы</Button>
+        <Button className={styles.tariffBtn} onClick={handleScrollToTariff}>Тарифы</Button>
         <Button className={styles.startBtn} onClick={() => navigate(token ? '/tariffs' : '/login')} >Начать бесплатно <IconPlus className={styles.iconPlus} /></Button>
       </div>
       <div className={styles.feature}>

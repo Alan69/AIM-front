@@ -64,7 +64,7 @@ export const TariffSelectorSection: React.FC = () => {
   };
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id='tariff-section'>
       <h3 className={styles.title}>Подбери свой тариф</h3>
       <div className={styles.subtitle}>Только сейчас акция: месяц за <b>4900</b> тенге вместо <b style={{ textDecoration: 'line-through' }}>9900</b> тенге</div>
       <div className={styles.row}>

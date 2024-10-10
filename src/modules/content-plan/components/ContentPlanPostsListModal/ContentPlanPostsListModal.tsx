@@ -86,9 +86,11 @@ export const ContentPlanPostsListModal = ({
         <ContentPlanPostList
           postListByCompanyId={postListByCompanyId}
           selectCurrentPost={selectCurrentPost}
+          handleSelectNewPost={handleSelectNewPost}
           setSelectCurrentPost={setSelectCurrentPost}
           expandedKeys={expandedKeys}
           toggleExpand={toggleExpand}
+          setIsModalOpen={setIsModalOpen}
         />
       ,
       icon: <UnorderedListOutlined />,
@@ -104,6 +106,10 @@ export const ContentPlanPostsListModal = ({
       onCancel={() => setIsModalOpen(false)}
       onClose={() => setIsModalOpen(false)}
       width={600}
+      bodyStyle={{
+        maxHeight: '70vh',
+        overflowY: 'auto',
+      }}
       footer={[
         <Button
           key="schedule"
