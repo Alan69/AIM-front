@@ -62,7 +62,13 @@ export const SignUpForm = () => {
       >
         <Form.Item
           name="email"
-          rules={[{ required: true, message: 'Пожалуйста, введите email!' }]}
+          rules={[
+            { required: true, message: 'Пожалуйста, введите email!' },
+            {
+              type: 'email',
+              message: 'Некорректный формат email!',
+            }
+          ]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
