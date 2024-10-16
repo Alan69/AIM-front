@@ -7,7 +7,7 @@ import { TCreatePost, TPostData } from 'modules/post/redux/api';
 import { PostQueryGenerateForm } from '../PostQueryGenerateForm/PostQueryGenerateForm';
 import { PostCreateForm } from '../PostCreateForm/PostCreateForm';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import { TPostQuerCreateData } from 'modules/post-query/redux/api';
+import { TPostQueryCreateData } from 'modules/post-query/redux/api';
 import { ContentPlanPostList } from '../ContentPlanPostList/ContentPlanPostList';
 
 type TProps = {
@@ -19,7 +19,7 @@ type TProps = {
   isPostCreating: boolean;
   isCustomPostCreating: boolean;
   post: TPostData | undefined
-  handleGeneratePost: (updatedData: TPostQuerCreateData) => void
+  handleGeneratePost: (updatedData: TPostQueryCreateData) => void
   handleCreateCustomPost: (updatedData: TCreatePost) => void
   handleGetPostById: (id: string) => void
 };

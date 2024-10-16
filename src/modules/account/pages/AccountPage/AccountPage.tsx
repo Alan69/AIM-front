@@ -108,7 +108,11 @@ export const AccountPage = () => {
     const fileList = info.fileList;
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      setFile(lastFile.originFileObj);
+      if (lastFile.type === 'image/jpeg' || lastFile.type === 'image/png') {
+        setFile(lastFile.originFileObj);
+      } else {
+        message.error('Пожалуйста, загрузите файл формата JPEG или PNG');
+      }
     } else {
       setFile(null);
     }
@@ -130,6 +134,7 @@ export const AccountPage = () => {
                 render={({ field }) => (
                   <Upload
                     {...field}
+                    accept="image/jpeg, image/png"
                     listType="picture"
                     maxCount={1}
                     beforeUpload={() => false}

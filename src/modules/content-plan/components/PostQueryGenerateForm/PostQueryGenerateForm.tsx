@@ -6,7 +6,7 @@ import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTy
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
 import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
-import { TPostQuerCreateData } from 'modules/post-query/redux/api';
+import { TPostQueryCreateData } from 'modules/post-query/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import styles from './PostQueryGenerateForm.module.scss';
 import { TPostData } from 'modules/post/redux/api';
@@ -16,7 +16,7 @@ const { Title, Text } = Typography;
 type TProps = {
   post: TPostData | undefined
   isPostCreating: boolean
-  handleGeneratePost: (updatedData: TPostQuerCreateData) => void
+  handleGeneratePost: (updatedData: TPostQueryCreateData) => void
   handleGetPostById: (id: string) => void
 }
 
@@ -30,7 +30,7 @@ export const PostQueryGenerateForm = ({ post, isPostCreating, handleGeneratePost
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
 
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQuerCreateData>({
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQueryCreateData>({
     defaultValues: {
       content: '',
       company: current_company?.id,
@@ -72,7 +72,7 @@ export const PostQueryGenerateForm = ({ post, isPostCreating, handleGeneratePost
     };
   }, [post, handleGetPostById]);
 
-  const onSubmit = (data: TPostQuerCreateData) => {
+  const onSubmit = (data: TPostQueryCreateData) => {
     const updatedData = {
       ...data,
       company: current_company?.id,

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Layout, Button, Form, Input, Select, message } from 'antd';
 import { useTypedSelector } from 'hooks/useTypedSelector';
-import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
+import { TPostQueryCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTypesApi';
 import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
 import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
@@ -22,7 +22,7 @@ export const PostQueryCreatePage = () => {
   const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
 
-  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQuerCreateData>({
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<TPostQueryCreateData>({
     defaultValues: {
       content: '',
       company: '',
@@ -46,7 +46,7 @@ export const PostQueryCreatePage = () => {
     }
   }, [current_company, getProductListByCompanyId]);
 
-  const onSubmit = (data: TPostQuerCreateData) => {
+  const onSubmit = (data: TPostQueryCreateData) => {
     const updatedData = {
       ...data,
       company: current_company?.id,

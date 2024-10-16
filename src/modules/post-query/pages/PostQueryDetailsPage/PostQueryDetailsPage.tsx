@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom';
-import { useGetPostQueriesByIdQuery } from '../../redux/api';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useCreatePostQueryReplayMutation, useGetPostQueriesByIdQuery } from '../../redux/api';
 
-import { Layout, Table, TableProps, Typography, Checkbox } from 'antd';
+import { Layout, Table, TableProps, Typography, Button, message } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -25,9 +25,13 @@ const { Content } = Layout;
 
 export const PostQueryDetailsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const { id } = useParams<{ id: string }>();
+
   const { data: postQuery, isLoading, refetch } = useGetPostQueriesByIdQuery(id || '');
   const { data: posts, refetch: refetchPostList } = useGetPostListQuery(postQuery?.id || '')
+  const [createPostQueryReplay, { isLoading: isPostRecreating }] = useCreatePostQueryReplayMutation();
 
   const columns: TableProps<DataType>['columns'] = [
     {
@@ -100,6 +104,23 @@ export const PostQueryDetailsPage = () => {
     ),
   })) || [];
 
+  const handleCreatePostQueryReplay = () => {
+    const updatedData = {
+      id: postQuery?.id || '',
+      company: postQuery?.company?.id || '',
+      product: postQuery?.product?.id || '',
+      content: postQuery?.content || '',
+      post_type: postQuery?.post_type?.id || '',
+      text_style: postQuery?.text_style?.id || '',
+      lang: postQuery?.lang?.id || '',
+    };
+    createPostQueryReplay(updatedData).unwrap().then((response) => {
+      navigate(`/post/${response.post_id}`);
+    }).catch((error) => {
+      message.error(error.data.error)
+    });
+  };
+
   useEffect(() => {
     refetch()
     refetchPostList()
@@ -127,7 +148,16 @@ export const PostQueryDetailsPage = () => {
               <div className={styles.postQueryDescr__title}>
                 <Title level={4} >Описание: {postQuery?.content}</Title>
               </div>
+              <Button
+                type='primary'
+                disabled={isLoading}
+                loading={isPostRecreating}
+                onClick={handleCreatePostQueryReplay}
+              >
+                Повторить запрос
+              </Button>
             </div>
+
           </Content>
         </Layout>
         <Layout>

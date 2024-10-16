@@ -14,7 +14,7 @@ import { TCreatePost, TPostData, useCreateCustomPostMutation, useGetPostListByCo
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
 import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
-import { TPostQuerCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
+import { TPostQueryCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
 import { postActions } from 'modules/post/redux/slices/post.slice';
 import { SelectedPreviewBlockModal } from 'modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal';
 import { useIsSmallLaptop } from 'hooks/media';
@@ -84,7 +84,7 @@ export const ContentPlanPage = () => {
     });
   }
 
-  const handleGeneratePost = (updatedData: TPostQuerCreateData) => {
+  const handleGeneratePost = (updatedData: TPostQueryCreateData) => {
     createPostQuery(updatedData).unwrap().then((response) => {
       getPostById(response.id).unwrap().then((responsePost) => {
         dispatch(postActions.setIsPostGenerated(true));

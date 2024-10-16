@@ -18,7 +18,7 @@ export type TPostQueryData = {
   time_update?: string;
 }
 
-export type TPostQuerCreateData = {
+export type TPostQueryCreateData = {
   company: string | undefined;
   product: string;
   post_type: string; 
@@ -41,6 +41,21 @@ export type TPostQueryDataResponse = {
   time_update?: string;
 }
 
+export type TPostQueryCreateReplayData = {
+  id: string;
+  company: string;
+  product: string;
+  post_type: string; 
+  text_style: string;
+  lang: string;
+  content: string;
+}
+
+export type TPostQueryDataReplayResponse = {
+  post_id: string;
+  post_query_id: string;
+}
+
 export const postQueryApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPostQueriesList: build.query<TPostQueryData[], void>({
@@ -57,7 +72,7 @@ export const postQueryApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TPostQueryData) => response,
     }),
-    createPostQuery: build.mutation<TPostQueryDataResponse, TPostQuerCreateData>({
+    createPostQuery: build.mutation<TPostQueryDataResponse, TPostQueryCreateData>({
       query: ({ content, company, product, post_type, text_style, lang }) => ({
         url: '/post_queries/',
         method: 'POST',
@@ -72,6 +87,21 @@ export const postQueryApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TPostQueryDataResponse) => response,
     }),
+    createPostQueryReplay: build.mutation<TPostQueryDataReplayResponse, TPostQueryCreateReplayData>({
+      query: ({ id, content, company, product, post_type, text_style, lang }) => ({
+        url: `/post_queries/${id}/replay/`,
+        method: 'POST',
+        body: {
+          content,
+          company,
+          product,
+          post_type,
+          text_style,
+          lang,
+        }
+      }),
+      transformResponse: (response: TPostQueryDataReplayResponse) => response,
+    }),
   }),
   overrideExisting: false,
 });
@@ -79,5 +109,6 @@ export const postQueryApi = baseApi.injectEndpoints({
 export const {
   useGetPostQueriesListQuery,
   useGetPostQueriesByIdQuery,
-  useCreatePostQueryMutation
+  useCreatePostQueryMutation,
+  useCreatePostQueryReplayMutation
 } = postQueryApi;
