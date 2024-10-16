@@ -21,7 +21,7 @@ export const ProductUpdatePage = () => {
 
   const { id, companyId } = useParams<{ id: string, companyId: string }>();
   const { data: company } = useGetCompanyByIdQuery(companyId || '');
-  const { data: product, refetch: refetchProduct } = useGetProductByIdQuery(id || '');
+  const { data: product, isLoading, isFetching, refetch: refetchProduct } = useGetProductByIdQuery(id || '');
   const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(company?.id || '');
 
   const navigate = useNavigate()
@@ -89,6 +89,7 @@ export const ProductUpdatePage = () => {
                     control={control}
                     rules={{ required: true }}
                     render={({ field }) => <Input {...field} />}
+                    disabled={isLoading || isFetching || isUpdating}
                   />
                 </Form.Item>
 
@@ -102,6 +103,7 @@ export const ProductUpdatePage = () => {
                     control={control}
                     rules={{ required: true }}
                     render={({ field }) => <Input {...field} />}
+                    disabled={isLoading || isFetching || isUpdating}
                   />
                 </Form.Item>
 
@@ -110,20 +112,23 @@ export const ProductUpdatePage = () => {
                     name="comment"
                     control={control}
                     render={({ field }) => <Input.TextArea {...field} />}
+                    disabled={isLoading || isFetching || isUpdating}
                   />
                 </Form.Item>
                 <Form.Item>
                   <div className={styles.buttons}>
-                    <Button type="primary" htmlType="submit" loading={isUpdating}>
+                    <Button type="primary" htmlType="submit" disabled={isLoading || isFetching} loading={isUpdating}>
                       Сохранить
                     </Button>
                     <Button
                       type="default"
                       style={{ color: '#faad14', borderColor: '#faad14' }}
+                      disabled={isLoading || isFetching}
+                      loading={isUpdating}
                       onClick={() => {
                         navigate(`/company/${company?.id}`)
                       }}
-                      loading={isUpdating}>
+                    >
                       Отмена
                     </Button>
                   </div>
