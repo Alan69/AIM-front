@@ -142,7 +142,9 @@ button:focus-visible {
 
 .ant-btn-primary {
     background-color: #1B1B1B;
-    border-color: #1B1B1B;
     color: #ffffff;
   }
   
+.ant-btn-default {
+    border: 1px solid #1B1B1B;
+}
