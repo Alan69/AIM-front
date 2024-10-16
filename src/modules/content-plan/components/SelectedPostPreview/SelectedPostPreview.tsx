@@ -2,7 +2,7 @@ import React from 'react'
 import { TPostSerializer } from 'modules/content-plan/types'
 import { Layout, Typography, Image, Collapse } from 'antd';
 import {
-  HeartFilled
+  HeartOutlined
 } from '@ant-design/icons';
 import cn from 'classnames'
 import styles from './SelectedPostPreview.module.scss';
@@ -63,7 +63,7 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
             </div>
 
             <div className={styles.postLike}>
-              <HeartFilled
+              <HeartOutlined
                 height={24}
                 width={24}
                 className={cn(styles.iconHeart, selectedPost?.like ? styles.iconHeart__active : '')}
