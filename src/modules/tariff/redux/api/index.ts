@@ -36,7 +36,7 @@ export const tariffApi = baseApi.injectEndpoints({
     createTariff: build.mutation<void, TTariffCreateData>({
       query: ({ company_limit, month }) => ({
         url: '/tariffs/create/',
-        method: 'POST',
+        method: 'PUT',
         body: {
           company_limit,
           month,
