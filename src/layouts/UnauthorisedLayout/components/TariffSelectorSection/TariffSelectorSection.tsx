@@ -98,7 +98,7 @@ export const TariffSelectorSection: React.FC = () => {
           {isXlTablet ? '' : <Divider />}
           {isXlTablet ? '' : <div className={styles.discountSection}>
             <div className={styles.discountSection__label}>Ваша скидка: </div>
-            <div className={styles.discountSection__value}>{discount} ₸</div>
+            <div className={styles.discountSection__value}>{discount.toLocaleString()} ₸</div>
           </div>}
         </div>
         <div className={styles.col}>
@@ -129,8 +129,8 @@ export const TariffSelectorSection: React.FC = () => {
                 <div className={styles.card__price__label}>Стоимость:</div>
                 <IconArrow />
                 <div className={styles.card__price__value}>
-                  {discount > 0 ? <span>{totalCostWithoutDiscount.toFixed()} ₸</span> : ''}
-                  {totalCost.toFixed()} ₸
+                  {discount > 0 ? <span>{totalCostWithoutDiscount.toLocaleString()} ₸</span> : ''}
+                  {totalCost.toLocaleString()} ₸
                 </div>
               </div>
               <Button className={styles.card__button} onClick={() => navigate(token ? '/tariffs' : '/login')}>Подключить <IconPlus className={styles.iconPlus} /></Button>
@@ -138,7 +138,7 @@ export const TariffSelectorSection: React.FC = () => {
           </Card>
           {!isXlTablet ? '' : <div className={styles.discountSection}>
             <div className={styles.discountSection__label}>Ваша скидка: </div>
-            <div className={styles.discountSection__value}>{discount} ₸</div>
+            <div className={styles.discountSection__value}>{discount.toLocaleString()} ₸</div>
           </div>}
         </div>
       </div>
