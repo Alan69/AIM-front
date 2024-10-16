@@ -79,14 +79,12 @@ export const AgreementPage = () => {
         <li className={styles.docsSection__list__item}>Полное наименование организации:</li>
         <li className={styles.docsSection__list__item}>Товарищество с ограниченной ответственностью «A-Gene»</li>
         <li className={styles.docsSection__list__item}>Юридический адрес:</li>
-        <li className={styles.docsSection__list__item}>Казахстан, г.Астана, ул. Сыганак 29</li>
+        <li className={styles.docsSection__list__item}>Казахстан, г.Астана, ул. Сыганак 47</li>
         <li className={styles.docsSection__list__item}>БИН 190740005934</li>
         <li className={styles.docsSection__list__item}>Банковские реквизиты:</li>
         <li className={styles.docsSection__list__item}>АО «Народный Банк Казахстан»</li>
         <li className={styles.docsSection__list__item}>ИИК KZ53601A871028765411</li>
         <li className={styles.docsSection__list__item}>БИК HSBKKZKX</li>
-        <li className={styles.docsSection__list__item}>Телефон 8 (776) 13 77 999</li>
-        <li className={styles.docsSection__list__item}>Директор: Төкенұлы А.</li>
       </ul>
     </section>
   )

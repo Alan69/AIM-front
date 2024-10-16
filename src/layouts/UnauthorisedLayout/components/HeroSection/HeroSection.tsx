@@ -12,7 +12,7 @@ export const HeroSection = () => {
   const features = [
     'Маркетинговая стратегия',
     'Воронка продаж',
-    'Создание постов',
+    'Создание постов и рилсов',
     'Автопостинг',
     'Аналитика',
     'Единый чат-хаб',
@@ -39,11 +39,11 @@ export const HeroSection = () => {
 
   return (
     <section className={styles.section}>
-      <h1 className={styles.title}>С нами бизнес <br /> процветает</h1>
-      <h3 className={styles.subtitle}>Инновационная ИИ-платформа для <br /> автоматизации и оптимизации маркетинга</h3>
+      <h1 className={styles.title}>Создавайте яркий <br /> контент с AIM</h1>
+      <h3 className={styles.subtitle}>Идеи, публикации и аналитика — ключ к успеху в бизнесе!</h3>
       <div className={styles.actions}>
         <Button className={styles.tariffBtn} onClick={handleScrollToTariff}>Тарифы</Button>
-        <Button className={styles.startBtn} onClick={() => navigate(token ? '/tariffs' : '/login')} >Начать бесплатно <IconPlus className={styles.iconPlus} /></Button>
+        <Button className={styles.startBtn} onClick={() => navigate(token ? '/tariffs' : '/login')} >Начать сейчас <IconPlus className={styles.iconPlus} /></Button>
       </div>
       <div className={styles.feature}>
         {features.map((feature, index) => (

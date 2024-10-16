@@ -167,6 +167,7 @@
     padding: 10px;
     padding-top: 32px;
     border-color: unset !important;
+    background-color: #005FAA;
     cursor: unset;
     @media (max-width: 1263px) {
         padding-top: 20px;
@@ -291,10 +292,10 @@
             span {
                 position: absolute;
                 top: -30px;
-                right: -12px;
+                left: 0;
                 text-decoration: line-through;
                 font-size: 30px;
-                color: #d2d2d2c2;
+                color: rgb(176, 176, 176);
                 @media (max-width: 1440px) {
                     font-size: 26px;
                 }

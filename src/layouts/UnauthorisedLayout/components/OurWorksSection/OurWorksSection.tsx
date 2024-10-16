@@ -17,10 +17,11 @@ import hand from 'assets/image/works/hand.svg'
 import videoSrc from 'assets/card.mp4';
 // @ts-ignore
 import videoSrc2 from 'assets/card_1.mp4';
-import { useIsTablet } from 'hooks/media';
+import { useIsXlTablet, useIsTablet } from 'hooks/media';
 
 export const OurWorksSection = () => {
   const isTablet = useIsTablet();
+  const isXlTablet = useIsXlTablet();
 
   return (
     <section className={styles.section} id='OurWorksSection'>
@@ -30,9 +31,11 @@ export const OurWorksSection = () => {
           <div className={styles.works__item}><img src={works1} alt='works1' /></div>
           <div className={styles.works__item}><img src={works2} alt='works2' /></div>
           <div className={styles.works__item}><img src={works3} alt='works3' /></div>
-          <div className={styles.works__item}><img src={works4} alt='works4' /></div>
-          <div className={styles.works__item}><img src={works5} alt='works5' /></div>
-          <div className={styles.works__item}><img src={works6} alt='works6' /></div>
+          {isXlTablet ? '' : <>
+            <div className={styles.works__item}><img src={works4} alt='works4' /></div>
+            <div className={styles.works__item}><img src={works5} alt='works5' /></div>
+            <div className={styles.works__item}><img src={works6} alt='works6' /></div>
+          </>}
         </div>
         <div className={styles.works__block__hand}>
           <div className={styles.works__hand}>
@@ -50,9 +53,11 @@ export const OurWorksSection = () => {
           <div className={styles.works__item}><img src={works7} alt='works7' /></div>
           <div className={styles.works__item}><img src={works8} alt='works8' /></div>
           <div className={styles.works__item}><img src={works9} alt='works9' /></div>
-          <div className={styles.works__item}><img src={works10} alt='works10' /></div>
-          <div className={styles.works__item}><img src={works11} alt='works11' /></div>
-          <div className={styles.works__item}><img src={works12} alt='works12' /></div>
+          {isXlTablet ? '' : <>
+            <div className={styles.works__item}><img src={works10} alt='works10' /></div>
+            <div className={styles.works__item}><img src={works11} alt='works11' /></div>
+            <div className={styles.works__item}><img src={works12} alt='works12' /></div>
+          </>}
         </div>
       </div>
     </section>

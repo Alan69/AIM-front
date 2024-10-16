@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Card, Typography, Button, Layout, Divider, Slider, message } from 'antd';
-import styles from './TariffListPage.module.scss';
 import { Content } from 'antd/es/layout/layout';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useCreateTariffMutation, usePaymentInitiateMutation, usePaymentTokenMutation } from 'modules/tariff/redux/api';
 
-import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
 import infinity from 'assets/infinity.svg'
 import checked from 'assets/checked.svg'
+import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
 import { ReactComponent as IconArrow } from 'assets/arrow.svg';
-import card from 'assets/tariff-card-bg.png';
+import styles from './TariffListPage.module.scss';
 
 const { Title } = Typography;
 
@@ -19,8 +18,8 @@ export const TariffListPage: React.FC = () => {
   const [companyCount, setCompanyCount] = useState<number>(1);
   const [monthDuration, setMonthDuration] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
-  const [totalCost, setTotalCost] = useState<number>(4900);
-  const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] = useState<number>(4900);
+  const [totalCost, setTotalCost] = useState<number>(29900);
+  const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] = useState<number>(29900);
 
   const [createTariff] = useCreateTariffMutation();
   const [paymentToken] = usePaymentTokenMutation();
@@ -49,7 +48,7 @@ export const TariffListPage: React.FC = () => {
   }
 
   const calculateCost = (companies: number, months: number) => {
-    const baseCost = 4900;
+    const baseCost = 29900;
     let discount = 0;
 
     if (months >= 4 && months <= 6) {
@@ -92,7 +91,7 @@ export const TariffListPage: React.FC = () => {
 
               <section className={styles.section}>
                 <h3 className={styles.title}>Подбери свой тариф</h3>
-                <div className={styles.subtitle}>Только сейчас акция: месяц за <b>4900</b> тенге вместо <b style={{ textDecoration: 'line-through' }}>9900</b> тенге</div>
+                <div className={styles.subtitle}>Акция: купи годовой тариф и получи 2 месяца в подарок</div>
                 <div className={styles.row}>
                   <div className={styles.col}>
                     <div className={styles.slidersBlock}>
@@ -130,7 +129,7 @@ export const TariffListPage: React.FC = () => {
                     </div>
                   </div>
                   <div className={styles.col}>
-                    <Card hoverable className={styles.card} style={{ background: `url('${card}')` }}>
+                    <Card hoverable className={styles.card}>
                       <div className={styles.card__head}>
                         <div className={styles.card__title}>Твой уникальный тариф</div>
                         <div className={styles.card__body}>

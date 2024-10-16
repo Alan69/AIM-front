@@ -20,7 +20,7 @@ export const StartAISection = () => {
           Автоматизируйте маркетинг, оптимизируйте процессы и увеличьте конверсии  с помощью ИИ
         </div>
         <Button className={styles.button} onClick={() => navigate(token ? '/tariffs' : '/login')}>
-          Начать бесплатно<IconPlus className={styles.icon} />
+          Начать сейчас<IconPlus className={styles.icon} />
         </Button>
       </div>
     </section>

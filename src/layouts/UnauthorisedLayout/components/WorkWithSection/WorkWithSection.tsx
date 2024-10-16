@@ -9,7 +9,7 @@ import facebook from 'assets/image/social-media-logos/facebook.svg'
 export const WorkWithSection = () => {
   return (
     <section className={styles.section}>
-      <h3 className={styles.title}>Мы работаем с</h3>
+      <h3 className={styles.title}>AIM создает контент для...</h3>
       <div className={styles.socialMedia}>
         <div className={styles.socialMedia__item}><img src={inst} alt='inst' /></div>
         <div className={styles.socialMedia__item}><img src={youtube} alt='youtube' /></div>
