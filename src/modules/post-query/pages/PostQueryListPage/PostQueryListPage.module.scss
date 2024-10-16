@@ -1,3 +1,19 @@
 .title {
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.addBtn {
+    border-radius: 999px;
+    background: var(--Dark, #1B1B1B);
+    border: 1px solid #1B1B1B;
+    color: var(--White, #FFF);
+    text-align: center;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; 
 }

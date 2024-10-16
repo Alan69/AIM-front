@@ -57,51 +57,45 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       key: '4',
       label: <CurrentCompanyInfo />,
     },
+    // {
+    //   key: '5',
+    //   icon: <AppstoreAddOutlined />,
+    //   label: <Link to="/post-query/create">Создать пост</Link>,
+    // },
     {
       key: '5',
-      icon: <AppstoreAddOutlined />,
-      label: <Link to="/post-query/create">Создать пост</Link>,
+      icon: <UnorderedListOutlined />,
+      label: <Link to="/post-query">Посты</Link>,
     },
     {
       key: '6',
-      icon: <UnorderedListOutlined />,
-      label: <Link to="/post-query">История</Link>,
-    },
-    {
-      key: '7',
       icon: <CalendarOutlined />,
       label: <Link to="/content-plan">Контент план</Link>,
     },
     {
-      key: '8',
+      key: '7',
       icon: <StockOutlined />,
       label: <div className={styles.soon}>Маркетинговая стратегия <Badge count={'скоро'} /></div>,
       disabled: true
     },
     {
-      key: '9',
+      key: '8',
       icon: <FundOutlined />,
       label: <div className={styles.soon}>Воронка продаж <Badge count={'скоро'} /></div>,
       disabled: true
     },
     {
-      key: '10',
+      key: '9',
       icon: <WechatOutlined />,
       label: <div className={styles.soon}>Единый чат-хаб <Badge count={'скоро'} /></div>,
       disabled: true
     },
     {
-      key: '11',
+      key: '10',
       icon: <RadarChartOutlined />,
       label: <div className={styles.soon}>Аналитика <Badge count={'скоро'} /></div>,
       disabled: true
     },
-    // {
-    //   key: '12',
-    //   icon: <CalendarOutlined />,
-    //   label: <div className={styles.soon}>Планировщик <Badge count={'скоро'} /></div>,
-    //   disabled: true
-    // },
   ];
 
   return (
