@@ -6,7 +6,7 @@ import { Layout, Table, TableProps, Typography, Button, message } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
-  HeartOutlined
+  HeartTwoTone
 } from '@ant-design/icons';
 import styles from './PostQueryDetailsPage.module.scss';
 import cn from 'classnames'
@@ -90,7 +90,7 @@ export const PostQueryDetailsPage = () => {
   const data: DataType[] = posts?.map((post: TPostData) => ({
     key: post.id.toString(),
     post_name: post.title,
-    post_like: <HeartOutlined
+    post_like: <HeartTwoTone
       height={24}
       width={24}
       className={cn(styles.iconHeart, post?.like ? styles.iconHeart__active : '')}
@@ -115,7 +115,7 @@ export const PostQueryDetailsPage = () => {
       lang: postQuery?.lang?.id || '',
     };
     createPostQueryReplay(updatedData).unwrap().then((response) => {
-      navigate(`/post/${response.post_id}`);
+      navigate(`/post/${response.id}`);
     }).catch((error) => {
       message.error(error.data.error)
     });

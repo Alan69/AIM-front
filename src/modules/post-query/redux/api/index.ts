@@ -4,6 +4,7 @@ import { TProductData } from 'modules/product/redux/api';
 import { TPostTypesData } from 'redux/api/postTypes/postTypesApi';
 import { TTextStylesData } from 'redux/api/textStyles/textStylesApi';
 import { TLanguagesData } from 'redux/api/languages/languagesApi';
+import { TPostData } from 'modules/post/redux/api';
 
 export type TPostQueryData = {
   id: string;
@@ -87,7 +88,7 @@ export const postQueryApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TPostQueryDataResponse) => response,
     }),
-    createPostQueryReplay: build.mutation<TPostQueryDataReplayResponse, TPostQueryCreateReplayData>({
+    createPostQueryReplay: build.mutation<TPostData, TPostQueryCreateReplayData>({
       query: ({ id, content, company, product, post_type, text_style, lang }) => ({
         url: `/post_queries/${id}/replay/`,
         method: 'POST',
@@ -100,7 +101,7 @@ export const postQueryApi = baseApi.injectEndpoints({
           lang,
         }
       }),
-      transformResponse: (response: TPostQueryDataReplayResponse) => response,
+      transformResponse: (response: TPostData) => response,
     }),
   }),
   overrideExisting: false,

@@ -5,7 +5,7 @@ import { Layout, Typography, Image, Button, Collapse, Radio, Input, message } fr
 import {
   ReloadOutlined,
   LoadingOutlined,
-  HeartOutlined
+  HeartTwoTone
 } from '@ant-design/icons';
 
 import cn from 'classnames'
@@ -243,7 +243,7 @@ export const PostDetailsPage = () => {
                       </div>
                     </div>
                     <div className={styles.postLike}>
-                      <HeartOutlined
+                      <HeartTwoTone
                         height={24}
                         width={24}
                         className={cn(styles.iconHeart, post?.like ? styles.iconHeart__active : '')}
