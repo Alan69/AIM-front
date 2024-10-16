@@ -48,7 +48,6 @@ export const PostDeletePage = () => {
                 </Button>
                 <Button
                   type="default"
-                  style={{ color: '#faad14', borderColor: '#faad14' }}
                   onClick={() => {
                     navigate(`/post-query/${post?.post_query}`)
                   }}

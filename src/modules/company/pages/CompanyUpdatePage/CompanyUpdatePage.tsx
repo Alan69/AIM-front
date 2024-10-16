@@ -108,7 +108,6 @@ export const CompanyUpdatePage = () => {
                     </Button>
                     <Button
                       type="default"
-                      style={{ color: '#faad14', borderColor: '#faad14' }}
                       onClick={() => {
                         navigate(`/company/${company?.id}`)
                       }}

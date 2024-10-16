@@ -117,7 +117,7 @@ export const PostUpdatePage = () => {
                       </Button>
                       <Button
                         htmlType="button"
-                        style={{ color: '#faad14', borderColor: '#faad14' }}
+                        type='default'
                         onClick={() => navigate(-1)}
                         loading={isUpdating}
                       >

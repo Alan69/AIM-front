@@ -139,3 +139,10 @@ button:focus-visible {
 .rbc-overlay {
     display: none !important;
 }
+
+.ant-btn-primary {
+    background-color: #1B1B1B;
+    border-color: #1B1B1B;
+    color: #ffffff;
+  }
+  

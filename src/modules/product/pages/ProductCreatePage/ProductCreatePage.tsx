@@ -94,7 +94,7 @@ export const ProductCreatePage = () => {
                     </Button>
                     <Button
                       htmlType="button"
-                      style={{ color: '#faad14', borderColor: '#faad14' }}
+                      type='default'
                       onClick={() => navigate(-1)}
                     >
                       Отменить

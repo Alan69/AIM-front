@@ -122,7 +122,6 @@ export const ProductUpdatePage = () => {
                     </Button>
                     <Button
                       type="default"
-                      style={{ color: '#faad14', borderColor: '#faad14' }}
                       disabled={isLoading || isFetching}
                       loading={isUpdating}
                       onClick={() => {
