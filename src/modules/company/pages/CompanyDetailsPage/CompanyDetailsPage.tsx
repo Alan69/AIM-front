@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useGetCompanyByIdQuery } from '../../redux/api';
 
-import { Layout, Table, TableProps, Typography } from 'antd';
+import { Button, Layout, Table, TableProps, Tooltip, Typography } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -120,7 +120,16 @@ export const CompanyDetailsPage = () => {
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            Продукты <Link to={`/product/${company?.id}/create`}><PlusCircleOutlined /></Link>
+            Продукты
+            <Tooltip title='Добавить продукт'>
+              <Button
+                type="primary"
+                shape="circle"
+                className={styles.addButton}
+                icon={<PlusCircleOutlined className={styles.addIcon} />}
+                onClick={() => navigate(`/product/${company?.id}/create`)}
+              />
+            </Tooltip>
           </h2>
           <Content >
             <div className={styles.companyDescr}>
@@ -133,7 +142,16 @@ export const CompanyDetailsPage = () => {
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            Социальные сети <Link to={`/social-media/${company?.id}/add`}><PlusCircleOutlined /></Link>
+            Социальные сети
+            <Tooltip title='Добавить социальную сеть'>
+              <Button
+                type="primary"
+                shape="circle"
+                className={styles.addButton}
+                icon={<PlusCircleOutlined className={styles.addIcon} />}
+                onClick={() => navigate(`/social-media/${company?.id}/add`)}
+              />
+            </Tooltip>
           </h2>
           <Content >
             <div className={styles.companyDescr}>

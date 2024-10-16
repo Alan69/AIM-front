@@ -124,7 +124,7 @@ button:focus-visible {
 .rbc-event {
     background-color: transparent !important;
     border: none !important;
-    color: rgba(255, 119, 0, 1) !important;
+    color: #1B1B1B !important;
     padding: 5px;
     font-weight: bold;
     box-shadow: none !important;
