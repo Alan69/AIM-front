@@ -26,7 +26,11 @@ export const PostUpdatePage = () => {
     const fileList = info.fileList;
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      setFile(lastFile.originFileObj);
+      if (lastFile.type === 'image/jpeg' || lastFile.type === 'image/png') {
+        setFile(lastFile.originFileObj);
+      } else {
+        message.error('Пожалуйста, загрузите файл формата JPEG или PNG');
+      }
     } else {
       setFile(null);
     }
@@ -85,7 +89,7 @@ export const PostUpdatePage = () => {
                   }}
                 >
                   <Form.Item name="picture" label="Загрузить новое изображение">
-                    <Upload name="picture" listType="picture" maxCount={1} beforeUpload={() => false} onChange={handleFileChange}>
+                    <Upload name="picture" listType="picture" accept="image/jpeg, image/png" maxCount={1} beforeUpload={() => false} onChange={handleFileChange}>
                       <Button icon={<UploadOutlined />}>Выберите файл</Button>
                     </Upload>
                   </Form.Item>

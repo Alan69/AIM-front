@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Image, Button, Checkbox, Form, Input, Upload, Typography } from 'antd';
+import { Layout, Image, Button, Checkbox, Form, Input, Upload, Typography, message } from 'antd';
 import { UploadOutlined, LoadingOutlined } from '@ant-design/icons';
 import styles from './PostCreateForm.module.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -24,7 +24,11 @@ export const PostCreateForm = ({ post, isCustomPostCreating, handleCreateCustomP
     const fileList = info.fileList;
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      setFile(lastFile.originFileObj);
+      if (lastFile.type === 'image/jpeg' || lastFile.type === 'image/png') {
+        setFile(lastFile.originFileObj);
+      } else {
+        message.error('Пожалуйста, загрузите файл формата JPEG или PNG');
+      }
     } else {
       setFile(null);
     }
@@ -86,7 +90,7 @@ export const PostCreateForm = ({ post, isCustomPostCreating, handleCreateCustomP
                 onFinish={onFinish}
               >
                 <Form.Item name="picture" label="Загрузить новое изображение">
-                  <Upload name="picture" listType="picture" maxCount={1} beforeUpload={() => false} onChange={handleFileChange}>
+                  <Upload name="picture" listType="picture" accept="image/jpeg, image/png" maxCount={1} beforeUpload={() => false} onChange={handleFileChange}>
                     <Button icon={<UploadOutlined />}>Выберите файл</Button>
                   </Upload>
                 </Form.Item>
