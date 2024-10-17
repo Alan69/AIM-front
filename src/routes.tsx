@@ -25,6 +25,7 @@ import { PostDetailsPage } from 'modules/post/pages/PostDetailsPage/PostDetailsP
 import { ContentPlanPage } from 'modules/content-plan/pages/ContentPlanPage/ContentPlanPage';
 import { SocialMediaAddPage } from 'modules/social-media/pages/SocialMediaAddPage/SocialMediaAddPage';
 import { TariffListPage } from 'modules/tariff/pages/TariffListPage/TariffListPage';
+import { TargetAudiencePage } from 'modules/target-audience/pages/TargetAudiencePage/TargetAudiencePage';
 
 import { LandingPage } from 'layouts/UnauthorisedLayout/Pages/LandingPage';
 import { PolicyPage } from 'layouts/UnauthorisedLayout/Pages/PolicyPage';
@@ -95,6 +96,7 @@ const AppRoutes: FC = () => {
         <Route path="/post/:postQueryId/:id/delete" element={<PostDeletePage />} />
         <Route path="/content-plan" element={<ContentPlanPage />} />
         <Route path="/social-media/:companyId/add" element={<SocialMediaAddPage />} />
+        <Route path="/target-audience/create" element={<TargetAudiencePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/post-query/create" replace />} />
     </Routes>

@@ -12,6 +12,7 @@ import styles from './CompanyDetailsPage.module.scss';
 import { TProductData, useGetProductListByCompanyIdQuery } from '../../../product/redux/api';
 import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useGetCurrentTargetAudienceQuery } from 'modules/target-audience/redux/api';
 
 interface DataType {
   key: string;
@@ -32,6 +33,7 @@ export const CompanyDetailsPage = () => {
   const { data: company, isLoading, refetch } = useGetCompanyByIdQuery(id || '');
   const { data: productListByCompanyId } = useGetProductListByCompanyIdQuery(company?.id || '');
   const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
+  const { data: targetAudience, refetch: refetchTargetAudience } = useGetCurrentTargetAudienceQuery()
 
   const columns: TableProps<DataType>['columns'] = [
     {
@@ -92,6 +94,7 @@ export const CompanyDetailsPage = () => {
 
   useEffect(() => {
     refetchSocialMediaList()
+    refetchTargetAudience()
   }, [company])
 
   useEffect(() => {
@@ -115,6 +118,28 @@ export const CompanyDetailsPage = () => {
                 </div>
               </div>
               <Title level={5} >Описание: {company?.comment}</Title>
+            </div>
+          </Content>
+        </Layout>
+        <Layout>
+          <h2 className={styles.product__title}>
+            Целевая аудитория
+            <Tooltip title='Добавить целевую аудиторию'>
+              <Button
+                type="primary"
+                shape="circle"
+                className={styles.addButton}
+                icon={<PlusCircleOutlined className={styles.addIcon} />}
+                onClick={() => navigate('/target-audience/create')}
+              />
+            </Tooltip>
+          </h2>
+          <Content >
+            <div className={styles.companyDescr}>
+              {targetAudience?.text ?
+                <Text>{targetAudience?.text}</Text> :
+                <Text >На данный момент отсутствуют целевые аудитории. Вы можете добавить новую целевую аудиторию.</Text>
+              }
             </div>
           </Content>
         </Layout>
