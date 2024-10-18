@@ -1,11 +1,16 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
-import styles from './HeroSection.module.scss';
+import cn from 'classnames'
 import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import styles from './HeroSection.module.scss';
 
-export const HeroSection = () => {
+type TProps = {
+  isSticky: boolean
+}
+
+export const HeroSection = ({ isSticky }: TProps) => {
   const navigate = useNavigate();
   const { token } = useTypedSelector((state) => state.auth);
 
@@ -38,10 +43,10 @@ export const HeroSection = () => {
   </svg>
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} id='hero-section'>
       <h1 className={styles.title}>Создавайте яркий <br /> контент с AIM</h1>
       <h3 className={styles.subtitle}>Идеи, публикации и аналитика — ключ к успеху в бизнесе!</h3>
-      <div className={styles.actions}>
+      <div className={cn(styles.actions, isSticky ? styles.actions__hidden : '')}>
         <Button className={styles.tariffBtn} onClick={handleScrollToTariff}>Тарифы</Button>
         <Button className={styles.startBtn} onClick={() => navigate(token ? '/tariffs' : '/login')} >Начать сейчас <IconPlus className={styles.iconPlus} /></Button>
       </div>

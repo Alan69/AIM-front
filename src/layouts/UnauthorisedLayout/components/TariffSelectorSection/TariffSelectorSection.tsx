@@ -4,7 +4,6 @@ import { Slider, Card, Button, Divider } from 'antd';
 
 import styles from './TariffSelectorSection.module.scss';
 
-import card from 'assets/tariff-card-bg.png';
 import { ReactComponent as IconChecked } from 'assets/checked.svg';
 import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
 import { ReactComponent as IconInfinity } from 'assets/infinity.svg';

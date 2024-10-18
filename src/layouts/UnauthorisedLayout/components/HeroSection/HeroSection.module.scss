@@ -64,6 +64,12 @@
     margin-top: 64px;
     display: flex;
     justify-content: center;
+    transition: 0.3s all;
+    &__hidden {
+        pointer-events: none;
+        opacity: 0;
+        transition: 0.3s all;
+    }
     @media (max-width: 1263px) {
         margin-top: 40px;
     }
