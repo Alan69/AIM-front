@@ -5,7 +5,8 @@ import { Layout, Typography, Image, Button, Collapse, Radio, Input, message } fr
 import {
   ReloadOutlined,
   LoadingOutlined,
-  HeartTwoTone
+  HeartTwoTone,
+  DownloadOutlined
 } from '@ant-design/icons';
 
 import cn from 'classnames'
@@ -223,6 +224,30 @@ export const PostDetailsPage = () => {
                               icon={<ReloadOutlined />}
                               shape="circle"
                               onClick={() => setIsEditBlockShow(!isEditBlockShow)}
+                            />
+                            <Button
+                              className={styles.downloadButton}
+                              icon={<DownloadOutlined />}
+                              shape="circle"
+                              onClick={async () => {
+                                try {
+                                  // @ts-ignore
+                                  const response = await fetch(post?.picture);
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+
+                                  const link = document.createElement('a');
+                                  link.href = url;
+                                  link.setAttribute('download', 'image.jpg');
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                  message.success('Изображение скачано успешно!')
+                                } catch (error) {
+                                  message.error('Ошибка при загрузке изображения:');
+                                }
+                              }}
                             />
                           </>
                         }
