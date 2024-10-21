@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
-import { Button, Layout } from 'antd';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { useCreateTargetAudienceMutation, useSaveTargetAudienceMutation } from 'modules/target-audience/redux/api';
-import TextArea from 'antd/es/input/TextArea';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { Button, Layout } from "antd";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import {
+  useCreateTargetAudienceMutation,
+  useSaveTargetAudienceMutation,
+} from "modules/target-audience/redux/api";
+import TextArea from "antd/es/input/TextArea";
+import { useNavigate } from "react-router-dom";
+import { RedoOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
 
@@ -11,10 +15,12 @@ export const TargetAudiencePage = () => {
   const navigate = useNavigate();
 
   const { current_company } = useTypedSelector((state) => state.auth);
-  const [createTargetAudience, { isLoading: isCreating }] = useCreateTargetAudienceMutation();
-  const [saveTargetAudience, { isLoading: isSaving }] = useSaveTargetAudienceMutation();
+  const [createTargetAudience, { isLoading: isCreating }] =
+    useCreateTargetAudienceMutation();
+  const [saveTargetAudience, { isLoading: isSaving }] =
+    useSaveTargetAudienceMutation();
 
-  const [formattedResponse, setFormattedResponse] = useState('');
+  const [formattedResponse, setFormattedResponse] = useState("");
 
   const handleCreate = async () => {
     if (!current_company?.id) {
@@ -22,59 +28,104 @@ export const TargetAudiencePage = () => {
     }
 
     try {
-      const result = await createTargetAudience({ company: current_company.id }).unwrap();
+      const result = await createTargetAudience({
+        company: current_company.id,
+      }).unwrap();
       const formattedText = formatResponse(result);
       setFormattedResponse(formattedText);
     } catch (error) {
-      setFormattedResponse('Error creating target audience');
+      setFormattedResponse("Error creating target audience");
     }
   };
 
   const handleSave = async () => {
     try {
-      await saveTargetAudience({ text: formattedResponse }).unwrap().then(() => navigate(`company/${current_company?.id}`));
-    } catch (error) {
-    }
+      await saveTargetAudience({ text: formattedResponse })
+        .unwrap()
+        .then(() => navigate(`/company/${current_company?.id}`));
+    } catch (error) {}
   };
 
   const formatResponse = (data: any) => {
-    if (!data?.result) return '';
+    if (!data?.result) return "";
 
     return Object.entries(data.result)
       .map(([section, details]) => {
         // @ts-ignore
         const formattedDetails = Object.entries(details)
           .map(([key, value]) => `${key}: ${value}`)
-          .join('\n');
+          .join("\n");
 
         return `${section}:\n${formattedDetails}`;
       })
-      .join('\n\n');
+      .join("\n\n");
   };
 
   return (
     <Layout>
-      <Content className='page-layout'>
-        <h1 className='main-title'>Целевая аудитория</h1>
+      <Content className="page-layout">
+        <h1 className="main-title">Целевая аудитория</h1>
         <Layout>
           <Content>
-            <TextArea
-              rows={20}
-              value={formattedResponse}
-              readOnly
-              placeholder="Здесь будет отображаться отформатированный ответ"
-              style={{ marginTop: '20px' }}
-              disabled={isCreating || isSaving}
-            />
-            <Button type="primary" onClick={handleCreate} loading={isCreating || isSaving}>
-              Создать
-            </Button>
-            <Button type="primary" onClick={handleSave} loading={isCreating || isSaving}>
-              Сохранить
-            </Button>
+            <div style={{ position: "relative" }}>
+              <TextArea
+                rows={20}
+                value={formattedResponse}
+                onChange={(e) => setFormattedResponse(e.target.value)}
+                disabled={isCreating || isSaving}
+              />
+
+              {!formattedResponse && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    borderRadius: 8,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    zIndex: 1,
+                  }}
+                >
+                  <Button
+                    type="primary"
+                    onClick={handleCreate}
+                    loading={isCreating || isSaving}
+                  >
+                    Создать
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: "20px" }}>
+              <Button
+                type="primary"
+                onClick={handleSave}
+                loading={isCreating || isSaving}
+                disabled={!formattedResponse}
+                style={{ marginRight: "10px" }}
+              >
+                Сохранить
+              </Button>
+              {formattedResponse && (
+                <Button
+                  type="default"
+                  icon={<RedoOutlined />}
+                  onClick={handleCreate}
+                  loading={isCreating || isSaving}
+                >
+                  Пересоздать
+                </Button>
+              )}
+            </div>
           </Content>
         </Layout>
       </Content>
     </Layout>
-  )
-}
+  );
+};

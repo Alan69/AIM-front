@@ -45,7 +45,7 @@ export type TPostQueryDataResponse = {
 export type TPostQueryCreateReplayData = {
   id: string;
   company: string;
-  product: string;
+  product?: string;
   post_type: string; 
   text_style: string;
   lang: string;
