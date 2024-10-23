@@ -191,7 +191,8 @@ export const ContentPlanAddPostModal = ({
             display: "flex",
             justifyContent: "center",
             flexDirection: isMobile ? "column" : "row",
-            gap: isMobile ? "12px" : "0",
+            gap: isMobile ? "4px" : "0",
+            marginTop: isMobile ? "40px" : "0",
           }}
         >
           {isPostPage ? (

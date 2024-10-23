@@ -133,14 +133,14 @@ export const CompanyDetailsPage = () => {
 
     if (textLines.length > 5) {
       return (
-        <>
+        <div>
           <Text>
             {isExpanded ? targetText : textLines.slice(0, 5).join("\n")}
           </Text>
           <Button type="link" onClick={handleToggleExpand}>
             {isExpanded ? "Скрыть" : "Показать больше"}
           </Button>
-        </>
+        </div>
       );
     }
 
@@ -188,7 +188,13 @@ export const CompanyDetailsPage = () => {
             </Tooltip>
           </h2>
           <Content>
-            <div className={styles.companyDescr}>
+            <div
+              className={styles.companyDescr}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
               {targetAudience?.text ? (
                 renderTargetAudienceText()
               ) : (
@@ -196,6 +202,13 @@ export const CompanyDetailsPage = () => {
                   На данный момент отсутствуют целевые аудитории. Вы можете
                   добавить новую целевую аудиторию.
                 </Text>
+              )}
+              {targetAudience?.text ? (
+                <Link to={`/target-audience/${targetAudience?.id}/update`}>
+                  <EditOutlined />
+                </Link>
+              ) : (
+                ""
               )}
             </div>
           </Content>

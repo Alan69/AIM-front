@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Layout } from "antd";
+import { Button, Layout, message } from "antd";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import {
   useCreateTargetAudienceMutation,
@@ -42,7 +42,10 @@ export const TargetAudiencePage = () => {
     try {
       await saveTargetAudience({ text: formattedResponse })
         .unwrap()
-        .then(() => navigate(`/company/${current_company?.id}`));
+        .then(() => {
+          navigate(`/company/${current_company?.id}`);
+          message.success("Целевая аудитория успешно сохранена");
+        });
     } catch (error) {}
   };
 

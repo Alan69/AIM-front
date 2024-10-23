@@ -58,19 +58,18 @@ type TCreateTargetAudience = {
   company: string;
 }
 
+type TUpdateTargetAudience = {
+  id: string | undefined;
+  text: string;
+}
+
 type TSaveTargetAudience = {
   text: string;
+  id?: string
 }
 
 export const targetAudienceApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-		// getTargetAudienceList: build.query<TCompanyData[], string | undefined>({
-		// 	query: () => ({
-		// 		url: '/target-audience/',
-		// 		method: 'GET'
-		// 	}),
-		// 	transformResponse: (response: TCompanyData[]) => response,
-    // }),
     getCurrentTargetAudience: build.query<TSaveTargetAudience, void>({
 			query: () => ({
 				url: '/audience/current/',
@@ -87,6 +86,17 @@ export const targetAudienceApi = baseApi.injectEndpoints({
         }
       }),
 			transformResponse: (response: TCreateTargetAudienceResponse) => response,
+      extraOptions: { showErrors: false }
+    }),
+    updateTargetAudience: build.mutation<TUpdateTargetAudience, TUpdateTargetAudience>({
+      query: ({ text, id }) => ({
+        url: `/audience/update/${id}/`,
+        method: 'PUT',
+        body: {
+          text
+        }
+      }),
+			transformResponse: (response: TUpdateTargetAudience) => response,
       extraOptions: { showErrors: false }
     }),
     saveTargetAudience: build.mutation<string, TSaveTargetAudience>({
@@ -107,5 +117,6 @@ export const targetAudienceApi = baseApi.injectEndpoints({
 export const {
   useGetCurrentTargetAudienceQuery,
   useCreateTargetAudienceMutation,
+  useUpdateTargetAudienceMutation,
   useSaveTargetAudienceMutation
 } = targetAudienceApi;
