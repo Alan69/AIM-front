@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
-import { Modal, Button, Divider, Tabs, TabsProps } from 'antd';
-import { AppstoreAddOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import React, { useState } from "react";
+import { Modal, Button, Divider, Tabs, TabsProps } from "antd";
+import { AppstoreAddOutlined, UnorderedListOutlined } from "@ant-design/icons";
 
-import 'moment/locale/ru';
-import { TCreatePost, TPostData } from 'modules/post/redux/api';
-import { PostQueryGenerateForm } from '../PostQueryGenerateForm/PostQueryGenerateForm';
-import { PostCreateForm } from '../PostCreateForm/PostCreateForm';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { TPostQueryCreateData } from 'modules/post-query/redux/api';
-import { ContentPlanPostList } from '../ContentPlanPostList/ContentPlanPostList';
+import "moment/locale/ru";
+import { TCreatePost, TPostData } from "modules/post/redux/api";
+import { PostQueryGenerateForm } from "../PostQueryGenerateForm/PostQueryGenerateForm";
+import { PostCreateForm } from "../PostCreateForm/PostCreateForm";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import { TPostQueryCreateData } from "modules/post-query/redux/api";
+import { ContentPlanPostList } from "../ContentPlanPostList/ContentPlanPostList";
+import { useIsMobile } from "hooks/media";
 
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  postListByCompanyId: TPostData[] | undefined
-  handleSelectNewPost: (post: TPostData) => void
+  postListByCompanyId: TPostData[] | undefined;
+  handleSelectNewPost: (post: TPostData) => void;
   selectNewPost: TPostData | null;
   isPostCreating: boolean;
   isCustomPostCreating: boolean;
-  post: TPostData | undefined
-  handleGeneratePost: (updatedData: TPostQueryCreateData) => void
-  handleCreateCustomPost: (updatedData: TCreatePost) => void
-  handleGetPostById: (id: string) => void
+  post: TPostData | undefined;
+  handleGeneratePost: (updatedData: TPostQueryCreateData) => void;
+  handleCreateCustomPost: (updatedData: TCreatePost) => void;
+  handleGetPostById: (id: string) => void;
 };
 
 export const ContentPlanPostsListModal = ({
@@ -37,10 +38,16 @@ export const ContentPlanPostsListModal = ({
   handleCreateCustomPost,
   handleGetPostById,
 }: TProps) => {
+  const isMobile = useIsMobile();
+
   const [expandedKeys, setExpandedKeys] = useState<Record<number, boolean>>({});
-  const [selectCurrentPost, setSelectCurrentPost] = useState<TPostData | null>(selectNewPost);
-  const [activeTabKey, setActiveTabKey] = useState<string>('2');
-  const { generatedPost, createdCustomPost } = useTypedSelector((state) => state.post);
+  const [selectCurrentPost, setSelectCurrentPost] = useState<TPostData | null>(
+    selectNewPost
+  );
+  const [activeTabKey, setActiveTabKey] = useState<string>("2");
+  const { generatedPost, createdCustomPost } = useTypedSelector(
+    (state) => state.post
+  );
 
   const toggleExpand = (index: number) => {
     setExpandedKeys((prevKeys) => ({
@@ -53,36 +60,38 @@ export const ContentPlanPostsListModal = ({
     setActiveTabKey(key);
   };
 
-  const items: TabsProps['items'] = [
+  const items: TabsProps["items"] = [
     {
-      key: '1',
-      label: 'Создание поста',
-      children:
+      key: "1",
+      label: "Создание поста",
+      children: (
         <PostCreateForm
           post={post}
           isCustomPostCreating={isCustomPostCreating}
           handleCreateCustomPost={handleCreateCustomPost}
-        />,
+        />
+      ),
       icon: <AppstoreAddOutlined />,
       disabled: isCustomPostCreating,
     },
     {
-      key: '2',
-      label: 'Генерация поста',
-      children:
+      key: "2",
+      label: "Генерация поста",
+      children: (
         <PostQueryGenerateForm
           post={post}
           isPostCreating={isPostCreating}
           handleGeneratePost={handleGeneratePost}
           handleGetPostById={handleGetPostById}
-        />,
+        />
+      ),
       icon: <AppstoreAddOutlined />,
       disabled: isPostCreating,
     },
     {
-      key: '3',
-      label: 'Список избранных постов',
-      children:
+      key: "3",
+      label: "Список избранных постов",
+      children: (
         <ContentPlanPostList
           postListByCompanyId={postListByCompanyId}
           selectCurrentPost={selectCurrentPost}
@@ -92,7 +101,7 @@ export const ContentPlanPostsListModal = ({
           toggleExpand={toggleExpand}
           setIsModalOpen={setIsModalOpen}
         />
-      ,
+      ),
       icon: <UnorderedListOutlined />,
       disabled: isPostCreating,
     },
@@ -107,44 +116,50 @@ export const ContentPlanPostsListModal = ({
       onClose={() => setIsModalOpen(false)}
       width={600}
       bodyStyle={{
-        maxHeight: '70vh',
-        overflowY: 'auto',
+        maxHeight: "70vh",
+        overflowY: "auto",
       }}
       footer={[
         <Button
           key="schedule"
           type="default"
           onClick={() => {
-            activeTabKey === '1' && createdCustomPost && handleSelectNewPost(createdCustomPost);
-            activeTabKey === '2' && generatedPost && handleSelectNewPost(generatedPost);
-            activeTabKey === '3' && selectCurrentPost && handleSelectNewPost(selectCurrentPost);
+            activeTabKey === "1" &&
+              createdCustomPost &&
+              handleSelectNewPost(createdCustomPost);
+            activeTabKey === "2" &&
+              generatedPost &&
+              handleSelectNewPost(generatedPost);
+            activeTabKey === "3" &&
+              selectCurrentPost &&
+              handleSelectNewPost(selectCurrentPost);
             setIsModalOpen(false);
           }}
           style={{
-            borderRadius: '16px',
-            width: '100%',
+            borderRadius: "16px",
+            width: "100%",
           }}
           disabled={
-            (activeTabKey === '1' && !createdCustomPost)
-            ||
-            (activeTabKey === '2' && !generatedPost)
-            ||
-            (activeTabKey === '3' && !selectCurrentPost)
+            (activeTabKey === "1" && !createdCustomPost) ||
+            (activeTabKey === "2" && !generatedPost) ||
+            (activeTabKey === "3" && !selectCurrentPost)
           }
         >
           Выбрать
           {/* <b>{selectCurrentPost?.title}</b> */}
-        </Button>
+        </Button>,
       ]}
     >
       <Divider />
       <Tabs
         defaultActiveKey="2"
         onChange={handleTabChange}
-        centered
+        centered={!isMobile}
         items={items}
+        style={{ overflowX: isMobile ? "auto" : "unset", whiteSpace: "nowrap" }}
       />
+
       <Divider />
-    </Modal >
+    </Modal>
   );
 };

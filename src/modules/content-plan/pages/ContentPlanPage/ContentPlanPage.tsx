@@ -1,23 +1,54 @@
-import { useEffect, useState } from 'react'
-import cn from 'classnames';
-import { Button, Layout, List, Tabs, TabsProps, Typography, Image, message } from 'antd';
-import { CalendarOutlined, AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import styles from './ContentPlanPage.module.scss';
-import { ContentPlanCalendar } from '../../components/ContentPlanCalendar/ContentPlanCalendar';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { contentPlanActions } from 'modules/content-plan/redux/slices/contentPlan.slice';
-import { useDispatch } from 'react-redux';
-import { TAddToSchedulersData, useAddToSchedulersMutation, useGetSchedulersQuery } from 'modules/content-plan/redux/api';
-import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
-import { ContentPlanPostsListModal } from 'modules/content-plan/components/ContentPlanPostsListModal/ContentPlanPostsListModal';
-import { TCreatePost, TPostData, useCreateCustomPostMutation, useGetPostListByCompanyIdQuery, useLazyGetPostByIdQuery, usePostNowMutation } from 'modules/post/redux/api';
-import { TSocialMediaByCurrentCompanyData, useGetSocialMediaListByCurrentCompanyQuery } from 'modules/social-media/redux/api';
-import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
-import { SelectedPostPreview } from 'modules/content-plan/components/SelectedPostPreview/SelectedPostPreview';
-import { TPostQueryCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
-import { postActions } from 'modules/post/redux/slices/post.slice';
-import { SelectedPreviewBlockModal } from 'modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal';
-import { useIsSmallLaptop } from 'hooks/media';
+import { useEffect, useState } from "react";
+import cn from "classnames";
+import {
+  Button,
+  Layout,
+  List,
+  Tabs,
+  TabsProps,
+  Typography,
+  Image,
+  message,
+} from "antd";
+import {
+  CalendarOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  PlusCircleOutlined,
+} from "@ant-design/icons";
+import styles from "./ContentPlanPage.module.scss";
+import { ContentPlanCalendar } from "../../components/ContentPlanCalendar/ContentPlanCalendar";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import { contentPlanActions } from "modules/content-plan/redux/slices/contentPlan.slice";
+import { useDispatch } from "react-redux";
+import {
+  TAddToSchedulersData,
+  useAddToSchedulersMutation,
+  useGetSchedulersQuery,
+} from "modules/content-plan/redux/api";
+import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
+import { ContentPlanPostsListModal } from "modules/content-plan/components/ContentPlanPostsListModal/ContentPlanPostsListModal";
+import {
+  TCreatePost,
+  TPostData,
+  useCreateCustomPostMutation,
+  useGetPostListByCompanyIdQuery,
+  useLazyGetPostByIdQuery,
+  usePostNowMutation,
+} from "modules/post/redux/api";
+import {
+  TSocialMediaByCurrentCompanyData,
+  useGetSocialMediaListByCurrentCompanyQuery,
+} from "modules/social-media/redux/api";
+import { ContentPlanSocialMediaListModal } from "modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal";
+import { SelectedPostPreview } from "modules/content-plan/components/SelectedPostPreview/SelectedPostPreview";
+import {
+  TPostQueryCreateData,
+  useCreatePostQueryMutation,
+} from "modules/post-query/redux/api";
+import { postActions } from "modules/post/redux/slices/post.slice";
+import { SelectedPreviewBlockModal } from "modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal";
+import { useIsMobile, useIsSmallLaptop } from "hooks/media";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -25,27 +56,46 @@ const { Title } = Typography;
 export const ContentPlanPage = () => {
   const dispatch = useDispatch();
   const isSmallLaptop = useIsSmallLaptop();
+  const isMobile = useIsMobile();
 
-  const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] = useState(false);
-  const [isContentPlanPostsListModalOpen, setIsContentPlanPostsListModalOpen] = useState(false);
-  const [isContentPlanSocialMediaListModalOpen, setIsContentPlanSocialMediaListModalOpen] = useState(false);
+  const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] =
+    useState(false);
+  const [isContentPlanPostsListModalOpen, setIsContentPlanPostsListModalOpen] =
+    useState(false);
+  const [
+    isContentPlanSocialMediaListModalOpen,
+    setIsContentPlanSocialMediaListModalOpen,
+  ] = useState(false);
 
   const [selectNewPost, setSelectNewPost] = useState<TPostData | null>(null);
-  const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>([]);
+  const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<
+    TSocialMediaByCurrentCompanyData[]
+  >([]);
 
-  const [selectedDatePreview, setSelectedDatePreview] = useState<Date | null>(null);
+  const [selectedDatePreview, setSelectedDatePreview] = useState<Date | null>(
+    null
+  );
   const [selectedEvents, setSelectedEvents] = useState<any[] | null>(null);
-  const [formattedSelectedDate, setFormattedSelectedDate] = useState<string | null>(null);
+  const [formattedSelectedDate, setFormattedSelectedDate] = useState<
+    string | null
+  >(null);
 
   const { selectedPost } = useTypedSelector((state) => state.contentPlan);
   const { current_company } = useTypedSelector((state) => state.auth);
 
-  const { data: postList, refetch: refetchPostList } = useGetSchedulersQuery(current_company?.id);
-  const { data: postListByCompanyId, refetch: refetchPostListByCompanyId } = useGetPostListByCompanyIdQuery(current_company?.id);
-  const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
-  const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
-  const [createPostQuery, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
-  const [createCustomPost, { isLoading: isCustomPostCreating }] = useCreateCustomPostMutation();
+  const { data: postList, refetch: refetchPostList } = useGetSchedulersQuery(
+    current_company?.id
+  );
+  const { data: postListByCompanyId, refetch: refetchPostListByCompanyId } =
+    useGetPostListByCompanyIdQuery(current_company?.id);
+  const { data: socialMediaList, refetch: refetchSocialMediaList } =
+    useGetSocialMediaListByCurrentCompanyQuery();
+  const [addToSchedulers, { isLoading: isAddingToSchedulers }] =
+    useAddToSchedulersMutation();
+  const [createPostQuery, { isLoading: isPostCreating }] =
+    useCreatePostQueryMutation();
+  const [createCustomPost, { isLoading: isCustomPostCreating }] =
+    useCreateCustomPostMutation();
   const [getPostById, { data: post }] = useLazyGetPostByIdQuery();
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
 
@@ -54,60 +104,79 @@ export const ContentPlanPage = () => {
     setIsContentPlanAddPostModalOpen(true);
   };
 
-  const handleShowContentPlanPostsListModal = () => setIsContentPlanPostsListModalOpen(true);
+  const handleShowContentPlanPostsListModal = () =>
+    setIsContentPlanPostsListModalOpen(true);
 
-  const handleShowContentPlanSocialMediaListModal = () => setIsContentPlanSocialMediaListModalOpen(true);
+  const handleShowContentPlanSocialMediaListModal = () =>
+    setIsContentPlanSocialMediaListModalOpen(true);
 
   const handleSelectNewPost = (post: TPostData) => setSelectNewPost(post);
 
-  const handleSelectNewSocialMedias = (socialMedias: TSocialMediaByCurrentCompanyData[]) => setSelectedNewSocialMedias(socialMedias);
+  const handleSelectNewSocialMedias = (
+    socialMedias: TSocialMediaByCurrentCompanyData[]
+  ) => setSelectedNewSocialMedias(socialMedias);
 
   const handlePostNow = () => {
     if (selectNewPost?.id) {
       postNow({
         post_id: selectNewPost?.id,
-        social_media_account_ids: selectedNewSocialMedias.map((media) => media.id)
-      }).unwrap().then((res) => {
-        setIsContentPlanSocialMediaListModalOpen(false);
-        setIsContentPlanAddPostModalOpen(false);
-        setSelectedNewSocialMedias([]);
-        message.success(res.message);
+        social_media_account_ids: selectedNewSocialMedias.map(
+          (media) => media.id
+        ),
       })
+        .unwrap()
+        .then((res) => {
+          setIsContentPlanSocialMediaListModalOpen(false);
+          setIsContentPlanAddPostModalOpen(false);
+          setSelectedNewSocialMedias([]);
+          message.success(res.message);
+        });
     }
   };
 
   const handleAddToSchedulers = (item: TAddToSchedulersData) => {
-    addToSchedulers(item).unwrap().then(() => {
-      refetchPostList();
-      setIsContentPlanAddPostModalOpen(false);
-      message.success('Пост успешно добавлен в планировщик.');
-    });
-  }
+    addToSchedulers(item)
+      .unwrap()
+      .then(() => {
+        refetchPostList();
+        setIsContentPlanAddPostModalOpen(false);
+        message.success("Пост успешно добавлен в планировщик.");
+      });
+  };
 
   const handleGeneratePost = (updatedData: TPostQueryCreateData) => {
-    createPostQuery(updatedData).unwrap().then((response) => {
-      getPostById(response.id).unwrap().then((responsePost) => {
-        dispatch(postActions.setIsPostGenerated(true));
-        dispatch(postActions.setGeneratedPost(responsePost));
-        refetchPostListByCompanyId();
+    createPostQuery(updatedData)
+      .unwrap()
+      .then((response) => {
+        getPostById(response.id)
+          .unwrap()
+          .then((responsePost) => {
+            dispatch(postActions.setIsPostGenerated(true));
+            dispatch(postActions.setGeneratedPost(responsePost));
+            refetchPostListByCompanyId();
+          });
       })
-    }).catch((error) => {
-      message.error(error.data.error)
-    });
+      .catch((error) => {
+        message.error(error.data.error);
+      });
   };
 
   const handleCreateCustomPost = (updatedData: TCreatePost) => {
-    createCustomPost(updatedData).unwrap().then((response) => {
-      getPostById(response.id).unwrap().then((responsePost) => {
-        dispatch(postActions.setIsCustomCreated(true));
-        dispatch(postActions.setCreatedCustomPost(responsePost));
-      })
-    });
+    createCustomPost(updatedData)
+      .unwrap()
+      .then((response) => {
+        getPostById(response.id)
+          .unwrap()
+          .then((responsePost) => {
+            dispatch(postActions.setIsCustomCreated(true));
+            dispatch(postActions.setCreatedCustomPost(responsePost));
+          });
+      });
   };
 
   const handleGetPostById = (id: string) => {
     getPostById(id);
-  }
+  };
 
   const handleSelectEvent = (event: any) => {
     if (selectedPost?.id === event.id) {
@@ -120,20 +189,20 @@ export const ContentPlanPage = () => {
   const handleClearAddModalParams = () => {
     setSelectNewPost(null);
     setSelectedNewSocialMedias([]);
-  }
+  };
 
   const handleClosePreviewBlockModal = () => {
     dispatch(contentPlanActions.setSelectedPost(null));
     setSelectedDatePreview(null);
     setSelectedEvents(null);
     setFormattedSelectedDate(null);
-  }
+  };
 
-  const items: TabsProps['items'] = [
+  const items: TabsProps["items"] = [
     {
-      key: '1',
-      label: 'Календарь',
-      children:
+      key: "1",
+      label: "Календарь",
+      children: (
         <ContentPlanCalendar
           postList={postList}
           handleSelectEvent={handleSelectEvent}
@@ -141,22 +210,23 @@ export const ContentPlanPage = () => {
           setSelectedDatePreview={setSelectedDatePreview}
           setSelectedEvents={setSelectedEvents}
           setFormattedSelectedDate={setFormattedSelectedDate}
-        />,
-      icon: <CalendarOutlined />
+        />
+      ),
+      icon: <CalendarOutlined />,
     },
     {
-      key: '2',
-      label: 'Плитка',
-      children: 'Content of Tab Pane 2',
+      key: "2",
+      label: "Плитка",
+      children: "Content of Tab Pane 2",
       icon: <AppstoreOutlined />,
-      disabled: true
+      disabled: true,
     },
     {
-      key: '3',
-      label: 'Список',
-      children: 'Content of Tab Pane 2',
+      key: "3",
+      label: "Список",
+      children: "Content of Tab Pane 2",
       icon: <UnorderedListOutlined />,
-      disabled: true
+      disabled: true,
     },
   ];
 
@@ -176,16 +246,35 @@ export const ContentPlanPage = () => {
   return (
     <>
       <Layout>
-        <Content className='page-layout'>
-          <h1 className='main-title'>Контент план - {current_company?.name}</h1>
+        <Content className="page-layout">
+          <h1 className="main-title">Контент план - {current_company?.name}</h1>
           <Layout>
             <Content className={styles.content}>
-              <div className={cn(styles.calendar, selectedPost === null && selectedDatePreview === null ? styles.calendarIsFull : '')}>
+              <div
+                className={cn(
+                  styles.calendar,
+                  selectedPost === null && selectedDatePreview === null
+                    ? styles.calendarIsFull
+                    : ""
+                )}
+              >
                 <Tabs
                   defaultActiveKey="1"
-                  tabBarExtraContent={<Button type="primary" onClick={handleShowContentPlanAddPostModal}>Добавить контент</Button>}
-                  centered
+                  tabBarExtraContent={
+                    <Button
+                      type="primary"
+                      icon={<PlusCircleOutlined />}
+                      onClick={handleShowContentPlanAddPostModal}
+                    >
+                      {isMobile ? "" : "Добавить контент"}
+                    </Button>
+                  }
+                  centered={!isMobile}
                   items={items}
+                  style={{
+                    overflowX: isMobile ? "auto" : "unset",
+                    whiteSpace: "nowrap",
+                  }}
                 />
               </div>
               {selectedDatePreview || selectedPost !== null ? (
@@ -199,16 +288,31 @@ export const ContentPlanPage = () => {
                           dataSource={selectedEvents}
                           renderItem={(item) => (
                             <List.Item
-                              className={cn(styles.selectedPost, selectedPost?.id === item.id ? styles.selectedPost__isActive : '')}
+                              className={cn(
+                                styles.selectedPost,
+                                selectedPost?.id === item.id
+                                  ? styles.selectedPost__isActive
+                                  : ""
+                              )}
                               onClick={() => handleSelectEvent(item)}
                             >
                               <List.Item.Meta
                                 className={styles.selectedPost__content}
-                                avatar={<Image width={32} height={32} src={item.picture} />}
+                                avatar={
+                                  <Image
+                                    width={32}
+                                    height={32}
+                                    src={item.picture}
+                                  />
+                                }
                                 title={
                                   <div className={styles.selectedPost__text}>
-                                    <div className={styles.selectedPost__title}>{item.title}</div>
-                                    <div className={styles.selectedPost__time}>{item.time}</div>
+                                    <div className={styles.selectedPost__title}>
+                                      {item.title}
+                                    </div>
+                                    <div className={styles.selectedPost__time}>
+                                      {item.time}
+                                    </div>
                                   </div>
                                 }
                               />
@@ -219,10 +323,18 @@ export const ContentPlanPage = () => {
                         <p>Нет активный публикаций</p>
                       )}
                     </div>
-                  ) : ''}
-                  {selectedPost === null ? '' : <SelectedPostPreview selectedPost={selectedPost} />}
+                  ) : (
+                    ""
+                  )}
+                  {selectedPost === null ? (
+                    ""
+                  ) : (
+                    <SelectedPostPreview selectedPost={selectedPost} />
+                  )}
                 </div>
-              ) : ''}
+              ) : (
+                ""
+              )}
             </Content>
           </Layout>
         </Content>
@@ -230,8 +342,12 @@ export const ContentPlanPage = () => {
       <ContentPlanAddPostModal
         isModalOpen={isContentPlanAddPostModalOpen}
         setIsModalOpen={setIsContentPlanAddPostModalOpen}
-        handleShowContentPlanPostsListModal={handleShowContentPlanPostsListModal}
-        handleShowContentPlanSocialMediaListModal={handleShowContentPlanSocialMediaListModal}
+        handleShowContentPlanPostsListModal={
+          handleShowContentPlanPostsListModal
+        }
+        handleShowContentPlanSocialMediaListModal={
+          handleShowContentPlanSocialMediaListModal
+        }
         selectNewPost={selectNewPost}
         selectedNewSocialMedias={selectedNewSocialMedias}
         isAddingToSchedulers={isAddingToSchedulers}
@@ -260,15 +376,19 @@ export const ContentPlanPage = () => {
         handleSelectNewSocialMedias={handleSelectNewSocialMedias}
         selectedNewSocialMedias={selectedNewSocialMedias}
       />
-      {isSmallLaptop ? <SelectedPreviewBlockModal
-        selectedDatePreview={selectedDatePreview}
-        selectedPost={selectedPost}
-        formattedSelectedDate={formattedSelectedDate}
-        selectedEvents={selectedEvents}
-        handleSelectEvent={handleSelectEvent}
-        isOpen={(selectedDatePreview || selectedPost !== null) ? true : false}
-        handleCloseModal={handleClosePreviewBlockModal}
-      /> : ''}
+      {isSmallLaptop ? (
+        <SelectedPreviewBlockModal
+          selectedDatePreview={selectedDatePreview}
+          selectedPost={selectedPost}
+          formattedSelectedDate={formattedSelectedDate}
+          selectedEvents={selectedEvents}
+          handleSelectEvent={handleSelectEvent}
+          isOpen={selectedDatePreview || selectedPost !== null ? true : false}
+          handleCloseModal={handleClosePreviewBlockModal}
+        />
+      ) : (
+        ""
+      )}
     </>
-  )
-}
+  );
+};
