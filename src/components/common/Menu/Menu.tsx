@@ -4,8 +4,13 @@ import { useDispatch } from 'react-redux';
 import {
   UnorderedListOutlined,
   AppstoreAddOutlined,
+  AppstoreOutlined,
+  BorderOuterOutlined,
   CalendarOutlined,
+  FormOutlined,
+  SettingOutlined,
   MenuUnfoldOutlined,
+  FileDoneOutlined,
   CaretLeftOutlined,
   StockOutlined,
   WechatOutlined,
@@ -62,36 +67,48 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
     //   icon: <AppstoreAddOutlined />,
     //   label: <Link to="/post-query/create">Создать пост</Link>,
     // },
+
     {
       key: '5',
-      icon: <UnorderedListOutlined />,
-      label: <Link to="/post-query">Посты</Link>,
+      icon: <BorderOuterOutlined />, // Change to a different icon
+      label: <Link to="#">Идеи</Link>,
     },
     {
       key: '6',
+      icon: <FormOutlined />, // Change to another icon
+      label: <Link to="/post-query">Посты</Link>,
+    },
+    {
+      key: '7',
+      icon: <FileDoneOutlined /> , // Keep the original or change as needed
+      label: <Link to="#">Сценарий</Link>,
+    },
+
+    {
+      key: '8',
       icon: <CalendarOutlined />,
       label: <Link to="/content-plan">Контент план</Link>,
     },
     {
-      key: '7',
+      key: '9',
       icon: <StockOutlined />,
       label: <div className={styles.soon}>Маркетинговая стратегия <Badge count={'скоро'} /></div>,
       disabled: true
     },
     {
-      key: '8',
+      key: '10',
       icon: <FundOutlined />,
       label: <div className={styles.soon}>Воронка продаж <Badge count={'скоро'} /></div>,
       disabled: true
     },
     {
-      key: '9',
+      key: '11',
       icon: <WechatOutlined />,
       label: <div className={styles.soon}>Единый чат-хаб <Badge count={'скоро'} /></div>,
       disabled: true
     },
     {
-      key: '10',
+      key: '12',
       icon: <RadarChartOutlined />,
       label: <div className={styles.soon}>Аналитика <Badge count={'скоро'} /></div>,
       disabled: true
