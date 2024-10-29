@@ -111,10 +111,12 @@ export const ScenarioQueriesDetailsPage = () => {
                         description={
                           <div>
                             <div style={{ marginBottom: 8 }}>
-                              <Text>{item.short_description}</Text>
+                              Краткое описание:
+                              <Text>{" " + item.short_description}</Text>
                             </div>
                             <div style={{ marginBottom: 8 }}>
-                              <Text>{item.main_text}</Text>
+                              Основной текст:
+                              <Text>{" " + item.main_text}</Text>
                             </div>
                             <div style={{ marginBottom: 8 }}>
                               <Text type="secondary">{item.hashtags}</Text>
