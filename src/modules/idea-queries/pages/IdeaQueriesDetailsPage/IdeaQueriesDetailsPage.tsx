@@ -23,33 +23,12 @@ export const IdeaQueriesDetailsPage = () => {
     ideaQuery?.id || ""
   );
 
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) {
-      return "Invalid date";
-    }
-
-    const date = new Date(dateString);
-
-    if (isNaN(date.getTime())) {
-      return "Invalid date";
-    }
-
-    return new Intl.DateTimeFormat("ru-RU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
   const data =
     ideas?.flatMap((idea) =>
       idea.idea_text.map((idea_text_item) => ({
         key: idea.id,
         Idea: idea_text_item.Idea,
         Description: idea_text_item.Description,
-        time_create: formatDate(idea.time_create),
       }))
     ) || [];
 
@@ -106,7 +85,6 @@ export const IdeaQueriesDetailsPage = () => {
                         title={<Text strong>{item.Idea}</Text>}
                         description={<Text>{item.Description}</Text>}
                       />
-                      <div>Дата создания: {item.time_create}</div>
                     </List.Item>
                   )}
                 />

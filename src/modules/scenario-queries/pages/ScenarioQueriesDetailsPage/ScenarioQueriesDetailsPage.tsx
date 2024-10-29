@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
-import { Layout, Typography, List, Divider } from "antd";
+import { Layout, Typography, List } from "antd";
 import styles from "./ScenarioQueriesDetailsPage.module.scss";
 import { useGetScenarioQueriesByIdQuery } from "modules/scenario-queries/redux/api";
 import { useGetScenariosListQuery } from "modules/scenarios/redux/api";
@@ -22,26 +22,6 @@ export const ScenarioQueriesDetailsPage = () => {
   const { data: scenarios, refetch: refetchScenariosList } =
     useGetScenariosListQuery(scenarioQuery?.id || "");
 
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) {
-      return "Invalid date";
-    }
-
-    const date = new Date(dateString);
-
-    if (isNaN(date.getTime())) {
-      return "Invalid date";
-    }
-
-    return new Intl.DateTimeFormat("ru-RU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
   const data =
     scenarios?.map((item) => ({
       key: item.id.toString(),
@@ -49,7 +29,6 @@ export const ScenarioQueriesDetailsPage = () => {
       main_text: item.main_text,
       short_description: item.short_description,
       hashtags: item.hashtags,
-      time_create: formatDate(item.time_create),
     })) || [];
 
   useEffect(() => {
@@ -118,13 +97,12 @@ export const ScenarioQueriesDetailsPage = () => {
                               Основной текст:
                               <Text>{" " + item.main_text}</Text>
                             </div>
-                            <div style={{ marginBottom: 8 }}>
+                            <div>
                               <Text type="secondary">{item.hashtags}</Text>
                             </div>
                           </div>
                         }
                       />
-                      <div>Дата создания: {item.time_create}</div>
                     </List.Item>
                   )}
                 />
