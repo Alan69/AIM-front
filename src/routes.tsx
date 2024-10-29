@@ -38,6 +38,12 @@ import { PolicyPage } from "layouts/UnauthorisedLayout/Pages/PolicyPage";
 import { AgreementPage } from "layouts/UnauthorisedLayout/Pages/AgreementPage";
 import { useLazyGetAuthUserQuery } from "modules/auth/redux/api";
 import { TargetAudienceUpdatePage } from "modules/target-audience/pages/TargetAudienceUpdatePage/TargetAudienceUpdatePage";
+import { IdeaQueriesListPage } from "modules/idea-queries/pages/IdeaQueriesListPage/IdeaQueriesListPage";
+import { IdeaQueriesCreatePage } from "modules/idea-queries/pages/IdeaQueriesCreatePage/IdeaQueriesCreatePage";
+import { IdeaQueriesDetailsPage } from "modules/idea-queries/pages/IdeaQueriesDetailsPage/IdeaQueriesDetailsPage";
+import { ScenarioQueriesListPage } from "modules/scenario-queries/pages/ScenarioQueriesListPage/ScenarioQueriesListPage";
+import { ScenarioQueriesCreatePage } from "modules/scenario-queries/pages/ScenarioQueriesCreatePage/ScenarioQueriesCreatePage";
+import { ScenarioQueriesDetailsPage } from "modules/scenario-queries/pages/ScenarioQueriesDetailsPage/ScenarioQueriesDetailsPage";
 
 const AppRoutes: FC = () => {
   const location = useLocation();
@@ -128,6 +134,26 @@ const AppRoutes: FC = () => {
         <Route
           path="/target-audience/:id/update"
           element={<TargetAudienceUpdatePage />}
+        />
+        <Route path="/idea-queries" element={<IdeaQueriesListPage />} />
+        <Route path="/idea-queries/list" element={<IdeaQueriesListPage />} />
+        <Route
+          path="/idea-queries/create"
+          element={<IdeaQueriesCreatePage />}
+        />
+        <Route path="/idea-queries/:id" element={<IdeaQueriesDetailsPage />} />
+        <Route path="/scenario-queries" element={<ScenarioQueriesListPage />} />
+        <Route
+          path="/scenario-queries/list"
+          element={<ScenarioQueriesListPage />}
+        />
+        <Route
+          path="/scenario-queries/create"
+          element={<ScenarioQueriesCreatePage />}
+        />
+        <Route
+          path="/scenario-queries/:id"
+          element={<ScenarioQueriesDetailsPage />}
         />
       </Route>
       <Route path="*" element={<Navigate to="/post-query/create" replace />} />

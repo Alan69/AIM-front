@@ -53,6 +53,13 @@ type TCreateTargetAudienceResponse = {
   };
 };
 
+type TTargetAudienceData = {
+  id: string;
+  author: string;
+  company: string;
+  prompt: string;
+  created_at: string;
+}
 
 type TCreateTargetAudience = {
   company: string;
@@ -76,6 +83,13 @@ export const targetAudienceApi = baseApi.injectEndpoints({
 				method: 'GET'
 			}),
 			transformResponse: (response: TSaveTargetAudience) => response,
+    }),
+    getTargetAudienceList: build.query<TTargetAudienceData[], void>({
+			query: () => ({
+				url: '/target-audience/',
+				method: 'GET'
+			}),
+			transformResponse: (response: TTargetAudienceData[]) => response,
     }),
     createTargetAudience: build.mutation<TCreateTargetAudienceResponse, TCreateTargetAudience>({
       query: ({ company }) => ({
@@ -116,6 +130,7 @@ export const targetAudienceApi = baseApi.injectEndpoints({
 
 export const {
   useGetCurrentTargetAudienceQuery,
+  useGetTargetAudienceListQuery,
   useCreateTargetAudienceMutation,
   useUpdateTargetAudienceMutation,
   useSaveTargetAudienceMutation
