@@ -110,15 +110,13 @@ export const ScenarioQueriesDetailsPage = () => {
                         title={<Text strong>{item.topic}</Text>}
                         description={
                           <div>
-                            <div>
+                            <div style={{ marginBottom: 8 }}>
                               <Text>{item.short_description}</Text>
                             </div>
-                            <Divider />
-                            <div>
+                            <div style={{ marginBottom: 8 }}>
                               <Text>{item.main_text}</Text>
                             </div>
-                            <Divider />
-                            <div>
+                            <div style={{ marginBottom: 8 }}>
                               <Text type="secondary">{item.hashtags}</Text>
                             </div>
                           </div>
