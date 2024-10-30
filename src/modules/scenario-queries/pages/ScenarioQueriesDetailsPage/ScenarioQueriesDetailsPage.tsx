@@ -31,6 +31,14 @@ export const ScenarioQueriesDetailsPage = () => {
       hashtags: item.hashtags,
     })) || [];
 
+  const formatMainText = (text: string) => {
+    return text.split("\n").map((line, index) => (
+      <p key={index} style={{ margin: 0, marginLeft: 16 }}>
+        {line}
+      </p>
+    ));
+  };
+
   useEffect(() => {
     refetch();
     refetchScenariosList();
@@ -86,16 +94,18 @@ export const ScenarioQueriesDetailsPage = () => {
                   renderItem={(item) => (
                     <List.Item key={item.key}>
                       <List.Item.Meta
-                        title={<Text strong>{item.topic}</Text>}
+                        title={<Title level={3}>{item.topic}</Title>}
                         description={
                           <div>
                             <div style={{ marginBottom: 8 }}>
-                              Краткое описание:
+                              <Title level={5}>Краткое описание:</Title>
                               <Text>{" " + item.short_description}</Text>
                             </div>
                             <div style={{ marginBottom: 8 }}>
-                              Основной текст:
-                              <Text>{" " + item.main_text}</Text>
+                              <Title level={5}>Основной текст:</Title>
+                              <Text>
+                                <div>{formatMainText(item.main_text)}</div>
+                              </Text>
                             </div>
                             <div>
                               <Text type="secondary">{item.hashtags}</Text>

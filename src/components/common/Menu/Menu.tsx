@@ -85,7 +85,13 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
     {
       key: "8",
       icon: <CalendarOutlined />,
-      label: <Link to="/content-plan">Контент план</Link>,
+      // label: <Link to="/content-plan">Контент план</Link>,
+      label: (
+        <div className={styles.soon}>
+          <Link to="/content-plan">Контент план</Link>
+          <Badge count={"скоро"} />
+        </div>
+      ),
     },
     {
       key: "9",

@@ -82,7 +82,7 @@ export const IdeaQueriesDetailsPage = () => {
                   renderItem={(item) => (
                     <List.Item key={item.key}>
                       <List.Item.Meta
-                        title={<Text strong>{item.Idea}</Text>}
+                        title={<Title level={4}>{item.Idea}</Title>}
                         description={<Text>{item.Description}</Text>}
                       />
                     </List.Item>
