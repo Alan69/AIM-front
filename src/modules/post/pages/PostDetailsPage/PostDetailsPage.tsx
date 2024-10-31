@@ -230,12 +230,31 @@ export const PostDetailsPage = () => {
                               icon={<DownloadOutlined />}
                               shape="circle"
                               onClick={async () => {
-                                try {
-                                  // @ts-ignore
-                                  const response = await fetch(post?.picture);
+                                // try {
+                                //   // @ts-ignore
+                                //   const response = await fetch(post?.picture);
+                                //   const blob = await response.blob();
+                                //   const url = window.URL.createObjectURL(blob);
+
+                                //   const link = document.createElement('a');
+                                //   link.href = url;
+                                //   link.setAttribute('download', 'image.jpg');
+                                //   document.body.appendChild(link);
+                                //   link.click();
+                                //   document.body.removeChild(link);
+                                //   window.URL.revokeObjectURL(url);
+                                //   message.success('Изображение скачано успешно!')
+                                // } catch (error) {
+                                //   message.error('Ошибка при загрузке изображения:');
+                                // }
+                                if (post?.picture) {
+                                  const response = await fetch(post.picture, {
+                                    method: 'GET',
+                                    mode: 'cors', // Optional: add if CORS is needed
+                                  });
                                   const blob = await response.blob();
                                   const url = window.URL.createObjectURL(blob);
-
+                                
                                   const link = document.createElement('a');
                                   link.href = url;
                                   link.setAttribute('download', 'image.jpg');
@@ -243,9 +262,9 @@ export const PostDetailsPage = () => {
                                   link.click();
                                   document.body.removeChild(link);
                                   window.URL.revokeObjectURL(url);
-                                  message.success('Изображение скачано успешно!')
-                                } catch (error) {
-                                  message.error('Ошибка при загрузке изображения:');
+                                  message.success('Изображение скачано успешно!');
+                                } else {
+                                  message.error('Изображение не найдено.');
                                 }
                               }}
                             />
