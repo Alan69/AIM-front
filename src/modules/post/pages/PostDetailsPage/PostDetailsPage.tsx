@@ -248,9 +248,10 @@ export const PostDetailsPage = () => {
                                 //   message.error('Ошибка при загрузке изображения:');
                                 // }
                                 if (post?.picture) {
-                                  const response = await fetch(post.picture, {
+                                  const response = await fetch(post?.picture, {
                                     method: 'GET',
-                                    mode: 'cors', // Optional: add if CORS is needed
+                                    mode: 'cors',
+                                    referrerPolicy: 'no-referrer-when-downgrade', // Adjust as needed
                                   });
                                   const blob = await response.blob();
                                   const url = window.URL.createObjectURL(blob);
