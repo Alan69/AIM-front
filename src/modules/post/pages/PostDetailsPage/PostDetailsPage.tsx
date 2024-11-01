@@ -231,8 +231,24 @@ export const PostDetailsPage = () => {
                               shape="circle"
                               onClick={async () => {
                                 try {
-                                  // @ts-ignore
-                                  const response = await fetch(post?.picture);
+                                  // Ensure the URL is defined and correct
+                                  if (!post?.picture) {
+                                    message.error('Изображение не найдено');
+                                    return;
+                                  }
+
+                                  // Adjust the fetch request to include credentials if needed
+                                  const response = await fetch(post.picture, {
+                                    method: 'GET',
+                                    mode: 'cors', // Ensure CORS mode is set
+                                    credentials: 'include' // Include credentials if the server requires them
+                                  });
+
+                                  // Check if the response is okay
+                                  if (!response.ok) {
+                                    throw new Error('Ошибка загрузки изображения');
+                                  }
+
                                   const blob = await response.blob();
                                   const url = window.URL.createObjectURL(blob);
 
@@ -243,9 +259,10 @@ export const PostDetailsPage = () => {
                                   link.click();
                                   document.body.removeChild(link);
                                   window.URL.revokeObjectURL(url);
-                                  message.success('Изображение скачано успешно!')
+                                  message.success('Изображение скачано успешно!');
                                 } catch (error) {
-                                  message.error('Ошибка при загрузке изображения:');
+                                  console.error('Ошибка при загрузке изображения:', error);
+                                  message.error('Ошибка при загрузке изображения');
                                 }
                               }}
                             />
