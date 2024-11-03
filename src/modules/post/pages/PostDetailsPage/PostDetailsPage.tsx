@@ -231,20 +231,17 @@ export const PostDetailsPage = () => {
                               shape="circle"
                               onClick={async () => {
                                 try {
-                                  // Ensure the URL is defined and correct
                                   if (!post?.picture) {
                                     message.error('Изображение не найдено');
                                     return;
                                   }
 
-                                  // Adjust the fetch request to include credentials if needed
                                   const response = await fetch(post.picture, {
                                     method: 'GET',
-                                    mode: 'cors', // Ensure CORS mode is set
-                                    credentials: 'include' // Include credentials if the server requires them
+                                    mode: 'cors', 
+                                    credentials: 'include'
                                   });
 
-                                  // Check if the response is okay
                                   if (!response.ok) {
                                     throw new Error('Ошибка загрузки изображения');
                                   }
