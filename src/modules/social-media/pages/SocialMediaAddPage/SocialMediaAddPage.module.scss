@@ -1,39 +1,45 @@
 .list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  &__item {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
-    &__item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px;
-        border-radius: 16px;
-        background-color: #e6f4ff;
-        border: 1px solid transparent;
-        cursor: pointer;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 16px;
+    background-color: transparent;
+    border: 1px solid #1b1b1b;
+    cursor: pointer;
+    transition: 0.3s all;
+    &:hover {
+      border: 1px solid #005faa;
+      transition: 0.3s all;
+
+      .list__item__title {
+        color: #005faa !important;
         transition: 0.3s all;
-        &:hover {
-            border: 1px solid #1677ff;
-            transition: 0.3s all;
-        }
-        &__title {
-            color: #1677ff !important;
-            text-transform: capitalize;
-            margin-bottom: 0 !important;
-        }
-        img {
-            width: 32px;
-            height: 32px;
-        }
+      }
     }
+    &__title {
+      color: #1b1b1b !important;
+      text-transform: capitalize;
+      margin-bottom: 0 !important;
+      transition: 0.3s all;
+    }
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
 }
 
 .wrapper {
-    padding: 24px;
-    background: #fff;
-    border-radius: 12px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
 }
 
 .backBtn {
-    margin-top: 16px;
+  margin-top: 16px;
 }

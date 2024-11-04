@@ -44,6 +44,21 @@
   }
 }
 
+.postContent {
+  &__titleBlock {
+    display: flex;
+    gap: 12px;
+  }
+  &__title {
+    width: calc(100% - 12px - 32px);
+  }
+  &__icon {
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
 .postContent,
 .postHashtags,
 .postLike,

@@ -194,7 +194,7 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Стилистика"
+            label="Тематика"
             validateStatus={errors.theme ? "error" : ""}
             help={errors.theme && "Заполните это поле."}
           >

@@ -28,7 +28,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: "Тип сценария",
+      title: "Вид контента",
       dataIndex: "scenario_type",
       key: "scenario_type",
       render: (text, record) => (

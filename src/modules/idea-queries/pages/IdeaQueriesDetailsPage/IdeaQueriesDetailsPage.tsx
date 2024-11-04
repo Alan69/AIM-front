@@ -2,7 +2,9 @@ import React, { useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useGetIdeaQueriesByIdQuery } from "../../redux/api";
 
-import { Layout, Typography, List } from "antd";
+import { Layout, Typography, List, Button, message } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
+
 import styles from "./IdeaQueriesDetailsPage.module.scss";
 import { useGetIdeasListQuery } from "modules/ideas/redux/api";
 
@@ -82,7 +84,31 @@ export const IdeaQueriesDetailsPage = () => {
                   renderItem={(item) => (
                     <List.Item key={item.key}>
                       <List.Item.Meta
-                        title={<Title level={4}>{item.Idea}</Title>}
+                        title={
+                          <div className={styles.titleBlock}>
+                            <Title level={4}>{item.Idea}</Title>
+                            <Button
+                              className={styles.postContent__icon}
+                              icon={<CopyOutlined />}
+                              onClick={() => {
+                                if (item.Idea) {
+                                  navigator.clipboard.writeText(item.Idea).then(
+                                    () => {
+                                      message.success(
+                                        "Заголовок скопирован в буфер обмена!"
+                                      );
+                                    },
+                                    (err) => {
+                                      message.error(
+                                        "Ошибка при копировании заголовка."
+                                      );
+                                    }
+                                  );
+                                }
+                              }}
+                            />
+                          </div>
+                        }
                         description={<Text>{item.Description}</Text>}
                       />
                     </List.Item>

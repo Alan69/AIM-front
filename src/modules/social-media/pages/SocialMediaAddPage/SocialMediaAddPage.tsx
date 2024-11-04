@@ -1,7 +1,7 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom';
-import { Layout, Button, Typography, message } from 'antd';
-import styles from './SocialMediaAddPage.module.scss';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Layout, Button, Typography, message } from "antd";
+import styles from "./SocialMediaAddPage.module.scss";
 import {
   TSocialMediaData,
   useGetSocialMediaListQuery,
@@ -15,7 +15,7 @@ import {
   useLazyAddTumblrQuery,
   useLazyAddTwitterQuery,
   useLazyAddVkQuery,
-} from 'modules/social-media/redux/api';
+} from "modules/social-media/redux/api";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -52,37 +52,47 @@ export const SocialMediaAddPage = () => {
     const addAction = addSocialMediaActions[item.name];
 
     if (addAction) {
-      addAction().unwrap()
+      addAction()
+        .unwrap()
         .then((authUrl: string) => {
-          if (authUrl) window.open(authUrl, '_self');
+          if (authUrl) window.open(authUrl, "_self");
         })
         .catch((err: string) => {
-          message.error(`Error adding ${item.name.charAt(0).toUpperCase() + item.name.slice(1)}: ${err}`);
+          message.error(
+            `Error adding ${item.name.charAt(0).toUpperCase() + item.name.slice(1)}: ${err}`
+          );
         });
     } else {
-      message.error('Social media integration not available.');
+      message.error("Social media integration not available.");
     }
   };
 
   return (
     <Layout>
-      <Content className='page-layout'>
-        <h1 className='main-title'>Добавление социальной сети</h1>
+      <Content className="page-layout">
+        <h1 className="main-title">Добавление социальной сети</h1>
         <Layout>
           <Content className={styles.wrapper}>
             <div className={styles.list}>
               {socialMediaList?.map((item) => (
-                <div key={item.id} className={styles.list__item} onClick={() => handleAddSocialMedia(item)}>
-                  <Title level={4} className={styles.list__item__title}>{item.name}</Title>
+                <div
+                  key={item.id}
+                  className={styles.list__item}
+                  onClick={() => handleAddSocialMedia(item)}
+                >
+                  <Title level={4} className={styles.list__item__title}>
+                    {item.name}
+                  </Title>
                   <img src={item.icon} alt={item.name} />
                 </div>
               ))}
             </div>
+
             <Button
               htmlType="button"
               className={styles.backBtn}
-              style={{ color: '#faad14', borderColor: '#faad14' }}
-              onClick={() => navigate('/company/current_company?.id/')}
+              type="default"
+              onClick={() => navigate(-1)}
             >
               Назад
             </Button>
@@ -90,5 +100,5 @@ export const SocialMediaAddPage = () => {
         </Layout>
       </Content>
     </Layout>
-  )
-}
+  );
+};

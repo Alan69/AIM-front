@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
-import { Layout, Typography, List } from "antd";
+import { Layout, Typography, List, Button, message } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
 import styles from "./ScenarioQueriesDetailsPage.module.scss";
 import { useGetScenarioQueriesByIdQuery } from "modules/scenario-queries/redux/api";
 import { useGetScenariosListQuery } from "modules/scenarios/redux/api";
@@ -59,7 +60,7 @@ export const ScenarioQueriesDetailsPage = () => {
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  Тип сценария: {scenarioQuery?.scenario_type?.name}
+                  Вид контента: {scenarioQuery?.scenario_type?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
@@ -94,7 +95,33 @@ export const ScenarioQueriesDetailsPage = () => {
                   renderItem={(item) => (
                     <List.Item key={item.key}>
                       <List.Item.Meta
-                        title={<Title level={3}>{item.topic}</Title>}
+                        title={
+                          <div className={styles.titleBlock}>
+                            <Title level={3}>{item.topic}</Title>
+                            <Button
+                              className={styles.postContent__icon}
+                              icon={<CopyOutlined />}
+                              onClick={() => {
+                                if (item.topic) {
+                                  navigator.clipboard
+                                    .writeText(item.topic)
+                                    .then(
+                                      () => {
+                                        message.success(
+                                          "Заголовок скопирован в буфер обмена!"
+                                        );
+                                      },
+                                      (err) => {
+                                        message.error(
+                                          "Ошибка при копировании заголовка."
+                                        );
+                                      }
+                                    );
+                                }
+                              }}
+                            />
+                          </div>
+                        }
                         description={
                           <div>
                             <div style={{ marginBottom: 8 }}>

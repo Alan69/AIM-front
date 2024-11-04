@@ -1,11 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Tooltip } from 'antd';
-import {
-  QuestionCircleOutlined
-} from '@ant-design/icons';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import styles from './OfferInfo.module.scss';
+import React from "react";
+import { Link } from "react-router-dom";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import styles from "./OfferInfo.module.scss";
 
 const OfferInfo: React.FC = () => {
   const { user } = useTypedSelector((state) => state.auth);
@@ -16,15 +12,16 @@ const OfferInfo: React.FC = () => {
         <div className={styles.details}>
           <div className={styles.name}>
             Ваш тариф
-            {user?.profile.user.tariff.is_active ?
-              `${' активен ' + user?.profile.user.tariff.days + ' дней'}`
-              : ' Free'
-            }
-            {/* <Tooltip title="1 монета = 1 генерация">
-              <span style={{ marginLeft: '4px' }}><QuestionCircleOutlined /></span>
-            </Tooltip> */}
+            {user?.profile.user.tariff.is_active ? `${" активен "}` : ""}
+            <div style={{ margin: "12px 0", fontSize: 24 }}>
+              {user?.profile.user.tariff.is_active
+                ? `${user?.profile.user.tariff.days + " дней"}`
+                : " Free"}
+            </div>
           </div>
-          <Link to="/tariffs" className={styles.link}>Купить тарифный план</Link>
+          <Link to="/tariffs" className={styles.link}>
+            Купить тарифный план
+          </Link>
         </div>
       </div>
     </Link>

@@ -1,39 +1,41 @@
 .userInfo {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    width: 100%;
-    box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-right: 16px;
 }
 
 .details {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .name {
-    height: auto;
-    font-size: 16px;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  height: auto;
+  font-size: 18px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 24px;
 }
 
 .email {
-    height: auto;
-    font-size: 14px;
-    line-height: unset;
-    color: gray;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  height: auto;
+  font-size: 14px;
+  line-height: unset;
+  color: gray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 24px;
 }

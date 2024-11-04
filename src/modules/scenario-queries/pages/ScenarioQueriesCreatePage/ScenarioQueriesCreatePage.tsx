@@ -174,7 +174,7 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item> */}
 
           <Form.Item
-            label="Тип сценария"
+            label="Вид контента"
             validateStatus={errors.scenario_type ? "error" : ""}
             help={errors.scenario_type && "Заполните это поле."}
           >
@@ -196,7 +196,7 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Стилистика сценария"
+            label="Тематика"
             validateStatus={errors.scenario_theme ? "error" : ""}
             help={errors.scenario_theme && "Заполните это поле."}
           >
@@ -249,31 +249,33 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Описание"
-            validateStatus={errors.description ? "error" : ""}
-            help={errors.description && "Заполните это поле."}
-          >
-            <Controller
-              name="description"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Input.TextArea
-                  rows={4}
-                  {...field}
-                  disabled={isScenarioCreating}
-                />
-              )}
-            />
-          </Form.Item>
-
-          <Form.Item
             label="Длительность"
             validateStatus={errors.latency ? "error" : ""}
             help={errors.latency && "Заполните это поле."}
           >
             <Controller
               name="latency"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Select {...field} disabled={isScenarioCreating}>
+                  <Select.Option value={15}>15 секунд</Select.Option>
+                  <Select.Option value={30}>30 секунд</Select.Option>
+                  <Select.Option value={45}>45 секунд</Select.Option>
+                  <Select.Option value={60}>60 секунд</Select.Option>
+                  <Select.Option value={90}>90 секунд</Select.Option>
+                </Select>
+              )}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Описание"
+            validateStatus={errors.description ? "error" : ""}
+            help={errors.description && "Заполните это поле."}
+          >
+            <Controller
+              name="description"
               control={control}
               rules={{ required: true }}
               render={({ field }) => (

@@ -1,26 +1,51 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
-import { useGetPostByIdQuery, usePostNowMutation, useRecreatePostImageMutation, useRecreatePostTextMutation, useUpdatePostMutation } from '../../redux/api';
-import { Layout, Typography, Image, Button, Collapse, Radio, Input, message } from 'antd';
+import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  useGetPostByIdQuery,
+  usePostNowMutation,
+  useRecreatePostImageMutation,
+  useRecreatePostTextMutation,
+  useUpdatePostMutation,
+} from "../../redux/api";
+import {
+  Layout,
+  Typography,
+  Image,
+  Button,
+  Collapse,
+  Radio,
+  Input,
+  message,
+} from "antd";
 import {
   ReloadOutlined,
   LoadingOutlined,
   HeartTwoTone,
-  DownloadOutlined
-} from '@ant-design/icons';
+  DownloadOutlined,
+  CopyOutlined,
+} from "@ant-design/icons";
 
-import cn from 'classnames'
+import cn from "classnames";
 
-import styles from './PostDetailsPage.module.scss';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import avatar from 'assets/avatar.png';
-import { Controller, useForm } from 'react-hook-form';
-import { ModalImageStylesList } from 'modules/post-query/components/ModalImageStylesList/ModalImageStylesList';
-import { TImgStylesData, useGetImgStylesListQuery } from '../../../../redux/api/imgStyles/imgStylesApi';
-import { ContentPlanSocialMediaListModal } from 'modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal';
-import { useGetSocialMediaListByCurrentCompanyQuery, TSocialMediaByCurrentCompanyData } from 'modules/social-media/redux/api';
-import { ContentPlanAddPostModal } from 'modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal';
-import { TAddToSchedulersData, useAddToSchedulersMutation } from 'modules/content-plan/redux/api';
+import styles from "./PostDetailsPage.module.scss";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import avatar from "assets/avatar.png";
+import { Controller, useForm } from "react-hook-form";
+import { ModalImageStylesList } from "modules/post-query/components/ModalImageStylesList/ModalImageStylesList";
+import {
+  TImgStylesData,
+  useGetImgStylesListQuery,
+} from "../../../../redux/api/imgStyles/imgStylesApi";
+import { ContentPlanSocialMediaListModal } from "modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal";
+import {
+  useGetSocialMediaListByCurrentCompanyQuery,
+  TSocialMediaByCurrentCompanyData,
+} from "modules/social-media/redux/api";
+import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
+import {
+  TAddToSchedulersData,
+  useAddToSchedulersMutation,
+} from "modules/content-plan/redux/api";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -31,110 +56,136 @@ export const PostDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
+  const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || "");
   const { data: imgStylesList } = useGetImgStylesListQuery();
-  const { data: socialMediaList, refetch: refetchSocialMediaList } = useGetSocialMediaListByCurrentCompanyQuery();
-  const [recreatePostImage, { isLoading: isRecreatePostImageLoading }] = useRecreatePostImageMutation();
-  const [recreatePostText, { isLoading: isRecreatePostTextLoading }] = useRecreatePostTextMutation();
-  const [addToSchedulers, { isLoading: isAddingToSchedulers }] = useAddToSchedulersMutation();
+  const { data: socialMediaList, refetch: refetchSocialMediaList } =
+    useGetSocialMediaListByCurrentCompanyQuery();
+  const [recreatePostImage, { isLoading: isRecreatePostImageLoading }] =
+    useRecreatePostImageMutation();
+  const [recreatePostText, { isLoading: isRecreatePostTextLoading }] =
+    useRecreatePostTextMutation();
+  const [addToSchedulers, { isLoading: isAddingToSchedulers }] =
+    useAddToSchedulersMutation();
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
   const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
 
   const [currentImgStyle, setCurrentImgStyle] = useState(post?.img_style);
-  const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>([]);
+  const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<
+    TSocialMediaByCurrentCompanyData[]
+  >([]);
   const [isEditBlockShow, setIsEditBlockShow] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] = useState(false);
-  const [isContentPlanSocialMediaListModalOpen, setIsContentPlanSocialMediaListModalOpen] = useState(false);
+  const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] =
+    useState(false);
+  const [
+    isContentPlanSocialMediaListModalOpen,
+    setIsContentPlanSocialMediaListModalOpen,
+  ] = useState(false);
   const [isPostPageOpen, setIsPostPageOpen] = useState(true);
 
-  const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
+  const profileImage = user?.profile.picture
+    ? `${user.profile.picture}`
+    : avatar;
 
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
-      imageOption: 'keepImage',
-      textOption: 'keepText',
-      imageDescription: '',
-      textDescription: '',
+      imageOption: "keepImage",
+      textOption: "keepText",
+      imageDescription: "",
+      textDescription: "",
     },
   });
 
   const formValues = watch();
-  const imageOption = watch('imageOption');
-  const textOption = watch('textOption');
+  const imageOption = watch("imageOption");
+  const textOption = watch("textOption");
 
   const handleChangeCurrentImgStyle = (style: TImgStylesData | undefined) => {
     setCurrentImgStyle(style);
     setIsModalOpen(false);
-  }
+  };
 
   const handleOpenModal = () => setIsModalOpen(true);
 
   const handleShowContentPlanSocialMediaListModal = () => {
     refetchSocialMediaList();
     setIsContentPlanSocialMediaListModalOpen(true);
-  }
+  };
 
   const handleShowContentPlanAddPostModal = () => {
     refetchSocialMediaList();
     setIsPostPageOpen(false);
     setIsContentPlanAddPostModalOpen(true);
-  }
+  };
 
-  const handleSelectNewSocialMedias = (socialMedias: TSocialMediaByCurrentCompanyData[]) => setSelectedNewSocialMedias(socialMedias);
+  const handleSelectNewSocialMedias = (
+    socialMedias: TSocialMediaByCurrentCompanyData[]
+  ) => setSelectedNewSocialMedias(socialMedias);
 
   // @ts-ignore
   const onSubmit = (data) => {
-    if (formValues.imageOption !== 'keepImage') {
+    if (formValues.imageOption !== "keepImage") {
       recreatePostImage({
         id: post?.id,
         img_prompt: data.imageDescription,
-        img_style: currentImgStyle?.id
-      }).unwrap().then(() => {
-        refetch()
-      }).catch((error) => {
-        // refetch().unwrap().then(() => message.error(error.data.error))
-        refetch()
+        img_style: currentImgStyle?.id,
       })
+        .unwrap()
+        .then(() => {
+          refetch();
+        })
+        .catch((error) => {
+          // refetch().unwrap().then(() => message.error(error.data.error))
+          refetch();
+        });
     }
-    if (formValues.textOption !== 'keepText') {
+    if (formValues.textOption !== "keepText") {
       recreatePostText({
         id: post?.id,
         txt_prompt: data.textDescription,
-        main_text: post?.main_text
-      }).unwrap().then(() => {
-        refetch()
-      }).catch((error) => {
-        // refetch().unwrap().then(() => message.error(error.data.error))
-        refetch()
+        main_text: post?.main_text,
       })
+        .unwrap()
+        .then(() => {
+          refetch();
+        })
+        .catch((error) => {
+          // refetch().unwrap().then(() => message.error(error.data.error))
+          refetch();
+        });
     }
   };
 
   const handleAddToSchedulers = (item: TAddToSchedulersData) => {
-    addToSchedulers(item).unwrap().then(() => {
-      setIsPostPageOpen(true);
-      setIsContentPlanAddPostModalOpen(false);
-      message.success('Пост успешно добавлен в планировщик.');
-    });
-  }
+    addToSchedulers(item)
+      .unwrap()
+      .then(() => {
+        setIsPostPageOpen(true);
+        setIsContentPlanAddPostModalOpen(false);
+        message.success("Пост успешно добавлен в планировщик.");
+      });
+  };
 
   const handleClearAddModalParams = () => {
     setSelectedNewSocialMedias([]);
-  }
+  };
 
   const handlePostNow = () => {
     if (post?.id) {
       postNow({
         post_id: post.id,
-        social_media_account_ids: selectedNewSocialMedias.map((media) => media.id)
-      }).unwrap().then((res) => {
-        setIsContentPlanSocialMediaListModalOpen(false);
-        setSelectedNewSocialMedias([]);
-        message.success(res.message);
+        social_media_account_ids: selectedNewSocialMedias.map(
+          (media) => media.id
+        ),
       })
+        .unwrap()
+        .then((res) => {
+          setIsContentPlanSocialMediaListModalOpen(false);
+          setSelectedNewSocialMedias([]);
+          message.success(res.message);
+        });
     }
   };
 
@@ -155,11 +206,19 @@ export const PostDetailsPage = () => {
       };
 
       // @ts-ignore
-      updatePost(updatedData).unwrap().then(() => {
-        refetch().unwrap().then(() => {
-          message.success(post?.like ? 'Вы успешно удалили из избранных!' : 'Вы успешно добавили в избранные!')
+      updatePost(updatedData)
+        .unwrap()
+        .then(() => {
+          refetch()
+            .unwrap()
+            .then(() => {
+              message.success(
+                post?.like
+                  ? "Вы успешно удалили из избранных!"
+                  : "Вы успешно добавили в избранные!"
+              );
+            });
         });
-      });
     }
   };
 
@@ -167,13 +226,21 @@ export const PostDetailsPage = () => {
     let interval: NodeJS.Timeout | null = null;
 
     if (post) {
-      const { main_text, title, hashtags, picture, img_prompt, txt_prompt, img_style } = post;
+      const {
+        main_text,
+        title,
+        hashtags,
+        picture,
+        img_prompt,
+        txt_prompt,
+        img_style,
+      } = post;
 
-      setValue('imageDescription', img_prompt || '');
-      setValue('textDescription', txt_prompt || '');
+      setValue("imageDescription", img_prompt || "");
+      setValue("textDescription", txt_prompt || "");
       setCurrentImgStyle(img_style);
 
-      if (!main_text || !title || !hashtags || picture?.includes('no_img')) {
+      if (!main_text || !title || !hashtags || picture?.includes("no_img")) {
         interval = setInterval(() => {
           refetch();
         }, 5000);
@@ -185,14 +252,17 @@ export const PostDetailsPage = () => {
     };
   }, [post, refetch, setValue]);
 
-  if (isLoading) return <div className={styles.postDescr}>
-    <LoadingOutlined className={styles.loader} />
-  </div>;
+  if (isLoading)
+    return (
+      <div className={styles.postDescr}>
+        <LoadingOutlined className={styles.loader} />
+      </div>
+    );
 
   return (
     <>
       <Layout>
-        <Content className='page-layout'>
+        <Content className="page-layout">
           <Layout>
             <Content>
               <div className={styles.postDescr}>
@@ -202,17 +272,19 @@ export const PostDetailsPage = () => {
                       <div className={styles.userInfo}>
                         <img
                           src={profileImage}
-                          alt={user ? user.profile.user.first_name : '-'}
+                          alt={user ? user.profile.user.first_name : "-"}
                           className={styles.avatar}
                         />
                         <div className={styles.details}>
-                          <div className={styles.name}>{user ? user.profile.user.first_name : '-'}</div>
+                          <div className={styles.name}>
+                            {user ? user.profile.user.first_name : "-"}
+                          </div>
                         </div>
                       </div>
                       <div className={styles.pictureBlock}>
-                        {post?.picture?.includes('no_img') ?
+                        {post?.picture?.includes("no_img") ? (
                           <LoadingOutlined className={styles.loader} />
-                          :
+                        ) : (
                           <>
                             <Image
                               src={post?.picture}
@@ -223,7 +295,9 @@ export const PostDetailsPage = () => {
                               className={styles.reloadButton}
                               icon={<ReloadOutlined />}
                               shape="circle"
-                              onClick={() => setIsEditBlockShow(!isEditBlockShow)}
+                              onClick={() =>
+                                setIsEditBlockShow(!isEditBlockShow)
+                              }
                             />
                             <Button
                               className={styles.downloadButton}
@@ -232,39 +306,48 @@ export const PostDetailsPage = () => {
                               onClick={async () => {
                                 try {
                                   if (!post?.picture) {
-                                    message.error('Изображение не найдено');
+                                    message.error("Изображение не найдено");
                                     return;
                                   }
 
                                   const response = await fetch(post.picture, {
-                                    method: 'GET',
-                                    mode: 'cors', 
-                                    credentials: 'include'
+                                    method: "GET",
+                                    mode: "cors",
+                                    credentials: "include",
                                   });
 
                                   if (!response.ok) {
-                                    throw new Error('Ошибка загрузки изображения');
+                                    throw new Error(
+                                      "Ошибка загрузки изображения"
+                                    );
                                   }
 
                                   const blob = await response.blob();
                                   const url = window.URL.createObjectURL(blob);
 
-                                  const link = document.createElement('a');
+                                  const link = document.createElement("a");
                                   link.href = url;
-                                  link.setAttribute('download', 'image.jpg');
+                                  link.setAttribute("download", "image.jpg");
                                   document.body.appendChild(link);
                                   link.click();
                                   document.body.removeChild(link);
                                   window.URL.revokeObjectURL(url);
-                                  message.success('Изображение скачано успешно!');
+                                  message.success(
+                                    "Изображение скачано успешно!"
+                                  );
                                 } catch (error) {
-                                  console.error('Ошибка при загрузке изображения:', error);
-                                  message.error('Ошибка при загрузке изображения');
+                                  console.error(
+                                    "Ошибка при загрузке изображения:",
+                                    error
+                                  );
+                                  message.error(
+                                    "Ошибка при загрузке изображения"
+                                  );
                                 }
                               }}
                             />
                           </>
-                        }
+                        )}
                       </div>
 
                       {/* <Collapse className={styles.postDescription}>
@@ -274,9 +357,30 @@ export const PostDetailsPage = () => {
                   </Collapse> */}
                     </div>
                     <div className={styles.postContent}>
-                      <Title level={3}>{post?.title}</Title>
+                      <div className={styles.postContent__titleBlock}>
+                        <Title level={3}>{post?.title}</Title>
+                        <Button
+                          className={styles.postContent__icon}
+                          icon={<CopyOutlined />}
+                          onClick={() => {
+                            if (post?.title) {
+                              navigator.clipboard.writeText(post.title).then(
+                                () => {
+                                  message.success(
+                                    "Заголовок скопирован в буфер обмена!"
+                                  );
+                                },
+                                (err) => {
+                                  message.error(
+                                    "Ошибка при копировании заголовка."
+                                  );
+                                }
+                              );
+                            }
+                          }}
+                        />
+                      </div>
                       <Text>{post?.main_text}</Text>
-
                       <div className={styles.postHashtags}>
                         <Text>{post?.hashtags}</Text>
                       </div>
@@ -285,7 +389,10 @@ export const PostDetailsPage = () => {
                       <HeartTwoTone
                         height={24}
                         width={24}
-                        className={cn(styles.iconHeart, post?.like ? styles.iconHeart__active : '')}
+                        className={cn(
+                          styles.iconHeart,
+                          post?.like ? styles.iconHeart__active : ""
+                        )}
                         onClick={handleUpdateLike}
                       />
                       <Text>В избранные для публикации</Text>
@@ -293,7 +400,11 @@ export const PostDetailsPage = () => {
                     <div className={styles.postActions}>
                       <Button
                         type="primary"
-                        onClick={() => navigate(`/post/${post?.post_query}/${post?.id}/update`)}
+                        onClick={() =>
+                          navigate(
+                            `/post/${post?.post_query}/${post?.id}/update`
+                          )
+                        }
                       >
                         Редактировать
                       </Button>
@@ -311,7 +422,7 @@ export const PostDetailsPage = () => {
                       </Button>
                       <Button
                         htmlType="button"
-                        type='default'
+                        type="default"
                         onClick={() => navigate(-1)}
                       >
                         Отменить
@@ -331,21 +442,56 @@ export const PostDetailsPage = () => {
                                 {...field}
                                 className={styles.radioGroup}
                               >
-                                <Radio value="keepImage" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Оставить без изменения</Radio>
-                                <Radio value="newImage" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать заново</Radio>
-                                <Radio value="newDescriptionImage" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать с новым описанием</Radio>
+                                <Radio
+                                  value="keepImage"
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
+                                >
+                                  Оставить без изменения
+                                </Radio>
+                                <Radio
+                                  value="newImage"
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
+                                >
+                                  Создать заново
+                                </Radio>
+                                <Radio
+                                  value="newDescriptionImage"
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
+                                >
+                                  Создать с новым описанием
+                                </Radio>
                               </Radio.Group>
                             )}
                           />
-                          {imageOption === 'newDescriptionImage' && (
+                          {imageOption === "newDescriptionImage" && (
                             <div className={styles.imageBlock}>
-                              <div className={styles.imageStyleBlock} onClick={() => {
-                                if (!isRecreatePostImageLoading || !isRecreatePostTextLoading) {
-                                  handleOpenModal()
-                                }
-                              }}>
-                                <Title level={4} >Стиль рисунка: {currentImgStyle?.name}</Title>
-                                <img src={currentImgStyle?.picture} alt={currentImgStyle?.name} />
+                              <div
+                                className={styles.imageStyleBlock}
+                                onClick={() => {
+                                  if (
+                                    !isRecreatePostImageLoading ||
+                                    !isRecreatePostTextLoading
+                                  ) {
+                                    handleOpenModal();
+                                  }
+                                }}
+                              >
+                                <Title level={4}>
+                                  Стиль рисунка: {currentImgStyle?.name}
+                                </Title>
+                                <img
+                                  src={currentImgStyle?.picture}
+                                  alt={currentImgStyle?.name}
+                                />
                               </div>
                               <Controller
                                 control={control}
@@ -356,7 +502,10 @@ export const PostDetailsPage = () => {
                                     rows={6}
                                     placeholder="Введите описание изображения..."
                                     className={styles.textArea}
-                                    disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}
+                                    disabled={
+                                      isRecreatePostImageLoading ||
+                                      isRecreatePostTextLoading
+                                    }
                                   />
                                 )}
                               />
@@ -371,13 +520,37 @@ export const PostDetailsPage = () => {
                                 {...field}
                                 className={styles.radioGroup}
                               >
-                                <Radio value="keepText" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Оставить без изменения</Radio>
-                                <Radio value="newText" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать заново</Radio>
-                                <Radio value="newDescriptionText" disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}>Создать с новым описанием</Radio>
+                                <Radio
+                                  value="keepText"
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
+                                >
+                                  Оставить без изменения
+                                </Radio>
+                                <Radio
+                                  value="newText"
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
+                                >
+                                  Создать заново
+                                </Radio>
+                                <Radio
+                                  value="newDescriptionText"
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
+                                >
+                                  Создать с новым описанием
+                                </Radio>
                               </Radio.Group>
                             )}
                           />
-                          {textOption === 'newDescriptionText' && (
+                          {textOption === "newDescriptionText" && (
                             <Controller
                               control={control}
                               name="textDescription"
@@ -387,7 +560,10 @@ export const PostDetailsPage = () => {
                                   rows={6}
                                   placeholder="Введите описание текста..."
                                   className={styles.textArea}
-                                  disabled={isRecreatePostImageLoading || isRecreatePostTextLoading}
+                                  disabled={
+                                    isRecreatePostImageLoading ||
+                                    isRecreatePostTextLoading
+                                  }
                                 />
                               )}
                             />
@@ -397,8 +573,16 @@ export const PostDetailsPage = () => {
                           type="primary"
                           htmlType="submit"
                           className={styles.submitButton}
-                          disabled={isRecreatePostImageLoading || isRecreatePostTextLoading || (imageOption === 'keepImage' && textOption === 'keepText')}
-                          loading={isRecreatePostImageLoading || isRecreatePostTextLoading}
+                          disabled={
+                            isRecreatePostImageLoading ||
+                            isRecreatePostTextLoading ||
+                            (imageOption === "keepImage" &&
+                              textOption === "keepText")
+                          }
+                          loading={
+                            isRecreatePostImageLoading ||
+                            isRecreatePostTextLoading
+                          }
                         >
                           Отправить запрос
                         </Button>
@@ -409,8 +593,8 @@ export const PostDetailsPage = () => {
               </div>
             </Content>
           </Layout>
-        </Content >
-      </Layout >
+        </Content>
+      </Layout>
       <ModalImageStylesList
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
@@ -420,7 +604,9 @@ export const PostDetailsPage = () => {
       <ContentPlanAddPostModal
         isModalOpen={isContentPlanAddPostModalOpen}
         setIsModalOpen={setIsContentPlanAddPostModalOpen}
-        handleShowContentPlanSocialMediaListModal={handleShowContentPlanSocialMediaListModal}
+        handleShowContentPlanSocialMediaListModal={
+          handleShowContentPlanSocialMediaListModal
+        }
         selectNewPost={post}
         selectedNewSocialMedias={selectedNewSocialMedias}
         isAddingToSchedulers={isAddingToSchedulers}
