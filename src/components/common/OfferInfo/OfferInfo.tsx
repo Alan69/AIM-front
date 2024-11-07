@@ -19,9 +19,6 @@ const OfferInfo: React.FC = () => {
                 : " Free"}
             </div>
           </div>
-          <Link to="/tariffs" className={styles.link}>
-            Купить тарифный план
-          </Link>
         </div>
       </div>
     </Link>
