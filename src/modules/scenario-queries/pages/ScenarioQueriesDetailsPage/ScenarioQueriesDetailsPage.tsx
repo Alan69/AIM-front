@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-import { Layout, Typography, List, Button, message } from "antd";
+import { Layout, Typography, List, Button, message, Tooltip } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import styles from "./ScenarioQueriesDetailsPage.module.scss";
 import {
@@ -140,42 +140,44 @@ export const ScenarioQueriesDetailsPage = () => {
                         title={
                           <div className={styles.titleBlock}>
                             <Title level={3}>{item.topic}</Title>
-                            <Button
-                              className={styles.postContent__icon}
-                              icon={<CopyOutlined />}
-                              onClick={() => {
-                                if (
-                                  item.topic ||
-                                  item.short_description ||
-                                  item.main_text ||
-                                  item.hashtags
-                                ) {
-                                  const textToCopy = [
-                                    item.topic,
-                                    item.short_description,
-                                    item.main_text,
-                                    item.hashtags,
-                                  ]
-                                    .filter(Boolean)
-                                    .join("\n\n");
+                            <Tooltip title="Скопировать">
+                              <Button
+                                className={styles.postContent__icon}
+                                icon={<CopyOutlined />}
+                                onClick={() => {
+                                  if (
+                                    item.topic ||
+                                    item.short_description ||
+                                    item.main_text ||
+                                    item.hashtags
+                                  ) {
+                                    const textToCopy = [
+                                      item.topic,
+                                      item.short_description,
+                                      item.main_text,
+                                      item.hashtags,
+                                    ]
+                                      .filter(Boolean)
+                                      .join("\n\n");
 
-                                  navigator.clipboard
-                                    .writeText(textToCopy)
-                                    .then(
-                                      () => {
-                                        message.success(
-                                          "Содержимое скопировано в буфер обмена!"
-                                        );
-                                      },
-                                      (err) => {
-                                        message.error(
-                                          "Ошибка при копировании содержимого."
-                                        );
-                                      }
-                                    );
-                                }
-                              }}
-                            />
+                                    navigator.clipboard
+                                      .writeText(textToCopy)
+                                      .then(
+                                        () => {
+                                          message.success(
+                                            "Содержимое скопировано в буфер обмена!"
+                                          );
+                                        },
+                                        (err) => {
+                                          message.error(
+                                            "Ошибка при копировании содержимого."
+                                          );
+                                        }
+                                      );
+                                  }
+                                }}
+                              />
+                            </Tooltip>
                           </div>
                         }
                         description={

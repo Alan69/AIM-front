@@ -5,7 +5,7 @@ import {
   useGetIdeaQueriesByIdQuery,
 } from "../../redux/api";
 
-import { Layout, Typography, List, Button, message } from "antd";
+import { Layout, Typography, List, Button, message, Tooltip } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 
 import styles from "./IdeaQueriesDetailsPage.module.scss";
@@ -126,42 +126,46 @@ export const IdeaQueriesDetailsPage = () => {
                         title={
                           <div className={styles.titleBlock}>
                             <Title level={4}>{item.Idea}</Title>
-                            <Button
-                              className={styles.postContent__icon}
-                              icon={<CopyOutlined />}
-                              onClick={() => {
-                                if (item.Idea && item.Description) {
-                                  const textToCopy = `${item.Idea}\n\n${item.Description}`;
-                                  navigator.clipboard
-                                    .writeText(textToCopy)
-                                    .then(
-                                      () => {
-                                        message.success(
-                                          "Заголовок и описание скопированы в буфер обмена!"
-                                        );
-                                      },
-                                      (err) => {
-                                        message.error(
-                                          "Ошибка при копировании заголовка и описания."
-                                        );
-                                      }
-                                    );
-                                } else if (item.Idea) {
-                                  navigator.clipboard.writeText(item.Idea).then(
-                                    () => {
-                                      message.success(
-                                        "Заголовок скопирован в буфер обмена!"
+                            <Tooltip title="Скопировать">
+                              <Button
+                                className={styles.postContent__icon}
+                                icon={<CopyOutlined />}
+                                onClick={() => {
+                                  if (item.Idea && item.Description) {
+                                    const textToCopy = `${item.Idea}\n\n${item.Description}`;
+                                    navigator.clipboard
+                                      .writeText(textToCopy)
+                                      .then(
+                                        () => {
+                                          message.success(
+                                            "Заголовок и описание скопированы в буфер обмена!"
+                                          );
+                                        },
+                                        (err) => {
+                                          message.error(
+                                            "Ошибка при копировании заголовка и описания."
+                                          );
+                                        }
                                       );
-                                    },
-                                    (err) => {
-                                      message.error(
-                                        "Ошибка при копировании заголовка."
+                                  } else if (item.Idea) {
+                                    navigator.clipboard
+                                      .writeText(item.Idea)
+                                      .then(
+                                        () => {
+                                          message.success(
+                                            "Заголовок скопирован в буфер обмена!"
+                                          );
+                                        },
+                                        (err) => {
+                                          message.error(
+                                            "Ошибка при копировании заголовка."
+                                          );
+                                        }
                                       );
-                                    }
-                                  );
-                                }
-                              }}
-                            />
+                                  }
+                                }}
+                              />
+                            </Tooltip>
                           </div>
                         }
                         description={<Text>{item.Description}</Text>}

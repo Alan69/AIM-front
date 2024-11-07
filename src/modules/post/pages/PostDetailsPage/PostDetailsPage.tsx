@@ -16,6 +16,7 @@ import {
   Radio,
   Input,
   message,
+  Tooltip,
 } from "antd";
 import {
   ReloadOutlined,
@@ -359,42 +360,44 @@ export const PostDetailsPage = () => {
                     <div className={styles.postContent}>
                       <div className={styles.postContent__titleBlock}>
                         <Title level={3}>{post?.title}</Title>
-                        <Button
-                          className={styles.postContent__icon}
-                          icon={<CopyOutlined />}
-                          onClick={() => {
-                            if (
-                              post?.title ||
-                              post?.main_text ||
-                              post?.hashtags
-                            ) {
-                              const mainTextCleaned = post.main_text?.replace(
-                                /\n\n/g,
-                                " "
-                              );
-                              const textToCopy = [
-                                post.title,
-                                mainTextCleaned,
-                                post.hashtags,
-                              ]
-                                .filter(Boolean)
-                                .join("\n\n");
+                        <Tooltip title="Скопировать">
+                          <Button
+                            className={styles.postContent__icon}
+                            icon={<CopyOutlined />}
+                            onClick={() => {
+                              if (
+                                post?.title ||
+                                post?.main_text ||
+                                post?.hashtags
+                              ) {
+                                const mainTextCleaned = post.main_text?.replace(
+                                  /\n\n/g,
+                                  " "
+                                );
+                                const textToCopy = [
+                                  post.title,
+                                  mainTextCleaned,
+                                  post.hashtags,
+                                ]
+                                  .filter(Boolean)
+                                  .join("\n\n");
 
-                              navigator.clipboard.writeText(textToCopy).then(
-                                () => {
-                                  message.success(
-                                    "Содержимое поста скопировано в буфер обмена!"
-                                  );
-                                },
-                                (err) => {
-                                  message.error(
-                                    "Ошибка при копировании содержимого поста."
-                                  );
-                                }
-                              );
-                            }
-                          }}
-                        />
+                                navigator.clipboard.writeText(textToCopy).then(
+                                  () => {
+                                    message.success(
+                                      "Содержимое поста скопировано в буфер обмена!"
+                                    );
+                                  },
+                                  (err) => {
+                                    message.error(
+                                      "Ошибка при копировании содержимого поста."
+                                    );
+                                  }
+                                );
+                              }
+                            }}
+                          />
+                        </Tooltip>
                       </div>
                       <Text>{post?.main_text}</Text>
                       <div className={styles.postHashtags}>
