@@ -20,6 +20,7 @@ export type TIdeaQueriesData = {
 }
 
 export type TIdeaQueriesCreateData = {
+  id?: string;
   company: string | undefined;
   product: string;
   target_audience: string; 
@@ -31,6 +32,7 @@ export type TIdeaQueriesCreateData = {
 
 export type TIdeaQueriesCreateResponse = {
   id: string;
+  ai_response?: string;
 }
 
 export const ideaQueriesApi = baseApi.injectEndpoints({
@@ -65,6 +67,22 @@ export const ideaQueriesApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TIdeaQueriesCreateResponse) => response,
     }),
+    createIdeaQueriesReplay: build.mutation<TIdeaQueriesCreateResponse, TIdeaQueriesCreateData>({
+      query: ({ id, company, product, target_audience, content_type, theme, language, description }) => ({
+        url: `/idea-queries/${id}/replay/`,
+        method: 'POST',
+        body: {
+          company,
+          product,
+          target_audience,
+          content_type,
+          theme,
+          language,
+          description
+        }
+      }),
+      transformResponse: (response: TIdeaQueriesCreateResponse) => response,
+    }),
   }),
   overrideExisting: false,
 });
@@ -72,5 +90,6 @@ export const ideaQueriesApi = baseApi.injectEndpoints({
 export const {
   useGetIdeaQueriesListQuery,
   useGetIdeaQueriesByIdQuery,
-  useCreateIdeaQueriesMutation
+  useCreateIdeaQueriesMutation,
+  useCreateIdeaQueriesReplayMutation
 } = ideaQueriesApi;

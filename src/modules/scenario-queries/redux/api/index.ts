@@ -21,6 +21,7 @@ export type TScenarioQueriesData = {
 }
 
 export type TScenarioQueriesCreateData = {
+  id?: string;
   latency: string;
   description: string;
   company: string | undefined;
@@ -68,6 +69,23 @@ export const scenarioQueriesApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TIdeaQueriesCreateResponse) => response,
     }),
+    createScenarioQueriesReplay: build.mutation<TIdeaQueriesCreateResponse, TScenarioQueriesCreateData>({
+      query: ({ id, latency, description, company, product, target_audience, scenario_type, scenario_theme, language }) => ({
+        url: `/scenario-queries/${id}/replay/`,
+        method: 'POST',
+        body: {
+          latency,
+          description,
+          company,
+          product,
+          target_audience,
+          scenario_type,
+          scenario_theme,
+          language,
+        }
+      }),
+      transformResponse: (response: TIdeaQueriesCreateResponse) => response,
+    }),
   }),
   overrideExisting: false,
 });
@@ -75,5 +93,6 @@ export const scenarioQueriesApi = baseApi.injectEndpoints({
 export const {
   useGetScenarioQueriesListQuery,
   useGetScenarioQueriesByIdQuery,
-  useCreateScenarioQueriesMutation
+  useCreateScenarioQueriesMutation,
+  useCreateScenarioQueriesReplayMutation
 } = scenarioQueriesApi;

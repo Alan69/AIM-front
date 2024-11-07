@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { useGetIdeaQueriesByIdQuery } from "../../redux/api";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  useCreateIdeaQueriesReplayMutation,
+  useGetIdeaQueriesByIdQuery,
+} from "../../redux/api";
 
 import { Layout, Typography, List, Button, message } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
@@ -13,6 +16,7 @@ const { Content } = Layout;
 
 export const IdeaQueriesDetailsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { id } = useParams<{ id: string }>();
 
@@ -24,6 +28,8 @@ export const IdeaQueriesDetailsPage = () => {
   const { data: ideas, refetch: refetchIdeasList } = useGetIdeasListQuery(
     ideaQuery?.id || ""
   );
+  const [createIdeaQueriesReplay, { isLoading: isIdeaQueriesRecreating }] =
+    useCreateIdeaQueriesReplayMutation();
 
   const data =
     ideas?.flatMap((idea) =>
@@ -33,6 +39,31 @@ export const IdeaQueriesDetailsPage = () => {
         Description: idea_text_item.Description,
       }))
     ) || [];
+
+  const handleCreateIdeaQueriesReplay = () => {
+    const updatedData = {
+      id: ideaQuery?.id || "",
+      company: ideaQuery?.company?.id || "",
+      product: ideaQuery?.product?.id || "",
+      target_audience: ideaQuery?.target_audience || "",
+      content_type: ideaQuery?.content_type || "",
+      theme: ideaQuery?.theme?.id || "",
+      language: ideaQuery?.language?.id || "",
+      description: ideaQuery?.description || "",
+    };
+
+    // @ts-ignore
+    createIdeaQueriesReplay(updatedData)
+      .unwrap()
+      .then((response) => {
+        navigate(`/idea-queries/${response.id}`);
+        refetch();
+        refetchIdeasList();
+      })
+      .catch((error) => {
+        message.error(error.data.error);
+      });
+  };
 
   useEffect(() => {
     refetch();
@@ -66,6 +97,14 @@ export const IdeaQueriesDetailsPage = () => {
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>Описание: {ideaQuery?.description}</Title>
               </div>
+              <Button
+                type="primary"
+                disabled={isLoading}
+                loading={isIdeaQueriesRecreating}
+                onClick={handleCreateIdeaQueriesReplay}
+              >
+                Повторить запрос
+              </Button>
             </div>
           </Content>
         </Layout>
@@ -91,7 +130,23 @@ export const IdeaQueriesDetailsPage = () => {
                               className={styles.postContent__icon}
                               icon={<CopyOutlined />}
                               onClick={() => {
-                                if (item.Idea) {
+                                if (item.Idea && item.Description) {
+                                  const textToCopy = `${item.Idea}\n\n${item.Description}`;
+                                  navigator.clipboard
+                                    .writeText(textToCopy)
+                                    .then(
+                                      () => {
+                                        message.success(
+                                          "Заголовок и описание скопированы в буфер обмена!"
+                                        );
+                                      },
+                                      (err) => {
+                                        message.error(
+                                          "Ошибка при копировании заголовка и описания."
+                                        );
+                                      }
+                                    );
+                                } else if (item.Idea) {
                                   navigator.clipboard.writeText(item.Idea).then(
                                     () => {
                                       message.success(

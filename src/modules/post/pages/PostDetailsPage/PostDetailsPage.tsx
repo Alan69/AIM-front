@@ -363,16 +363,32 @@ export const PostDetailsPage = () => {
                           className={styles.postContent__icon}
                           icon={<CopyOutlined />}
                           onClick={() => {
-                            if (post?.title) {
-                              navigator.clipboard.writeText(post.title).then(
+                            if (
+                              post?.title ||
+                              post?.main_text ||
+                              post?.hashtags
+                            ) {
+                              const mainTextCleaned = post.main_text?.replace(
+                                /\n\n/g,
+                                " "
+                              );
+                              const textToCopy = [
+                                post.title,
+                                mainTextCleaned,
+                                post.hashtags,
+                              ]
+                                .filter(Boolean)
+                                .join("\n\n");
+
+                              navigator.clipboard.writeText(textToCopy).then(
                                 () => {
                                   message.success(
-                                    "Заголовок скопирован в буфер обмена!"
+                                    "Содержимое поста скопировано в буфер обмена!"
                                   );
                                 },
                                 (err) => {
                                   message.error(
-                                    "Ошибка при копировании заголовка."
+                                    "Ошибка при копировании содержимого поста."
                                   );
                                 }
                               );

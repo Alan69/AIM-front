@@ -1,10 +1,13 @@
 import React, { useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { Layout, Typography, List, Button, message } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import styles from "./ScenarioQueriesDetailsPage.module.scss";
-import { useGetScenarioQueriesByIdQuery } from "modules/scenario-queries/redux/api";
+import {
+  useCreateScenarioQueriesReplayMutation,
+  useGetScenarioQueriesByIdQuery,
+} from "modules/scenario-queries/redux/api";
 import { useGetScenariosListQuery } from "modules/scenarios/redux/api";
 
 const { Title, Text } = Typography;
@@ -12,6 +15,7 @@ const { Content } = Layout;
 
 export const ScenarioQueriesDetailsPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { id } = useParams<{ id: string }>();
 
@@ -22,6 +26,10 @@ export const ScenarioQueriesDetailsPage = () => {
   } = useGetScenarioQueriesByIdQuery(id || "");
   const { data: scenarios, refetch: refetchScenariosList } =
     useGetScenariosListQuery(scenarioQuery?.id || "");
+  const [
+    createScenarioQueriesReplay,
+    { isLoading: isScenarioQueriesRecreating },
+  ] = useCreateScenarioQueriesReplayMutation();
 
   const data =
     scenarios?.map((item) => ({
@@ -38,6 +46,32 @@ export const ScenarioQueriesDetailsPage = () => {
         {line}
       </p>
     ));
+  };
+
+  const handleCreateScenarioQueriesReplay = () => {
+    const updatedData = {
+      id: scenarioQuery?.id || "",
+      latency: scenarioQuery?.latency || "",
+      description: scenarioQuery?.description || "",
+      company: scenarioQuery?.company?.id || "",
+      product: scenarioQuery?.product?.id || "",
+      target_audience: scenarioQuery?.target_audience || "",
+      scenario_type: scenarioQuery?.scenario_type || "",
+      scenario_theme: scenarioQuery?.scenario_theme?.id || "",
+      language: scenarioQuery?.language?.id || "",
+    };
+
+    // @ts-ignore
+    createScenarioQueriesReplay(updatedData)
+      .unwrap()
+      .then((response) => {
+        navigate(`/scenario-queries/${response.id}`);
+        refetch();
+        refetchScenariosList();
+      })
+      .catch((error) => {
+        message.error(error.data.error);
+      });
   };
 
   useEffect(() => {
@@ -77,6 +111,14 @@ export const ScenarioQueriesDetailsPage = () => {
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>Длительность: {scenarioQuery?.latency}</Title>
               </div>
+              <Button
+                type="primary"
+                disabled={isLoading}
+                loading={isScenarioQueriesRecreating}
+                onClick={handleCreateScenarioQueriesReplay}
+              >
+                Повторить запрос
+              </Button>
             </div>
           </Content>
         </Layout>
@@ -102,18 +144,32 @@ export const ScenarioQueriesDetailsPage = () => {
                               className={styles.postContent__icon}
                               icon={<CopyOutlined />}
                               onClick={() => {
-                                if (item.topic) {
+                                if (
+                                  item.topic ||
+                                  item.short_description ||
+                                  item.main_text ||
+                                  item.hashtags
+                                ) {
+                                  const textToCopy = [
+                                    item.topic,
+                                    item.short_description,
+                                    item.main_text,
+                                    item.hashtags,
+                                  ]
+                                    .filter(Boolean)
+                                    .join("\n\n");
+
                                   navigator.clipboard
-                                    .writeText(item.topic)
+                                    .writeText(textToCopy)
                                     .then(
                                       () => {
                                         message.success(
-                                          "Заголовок скопирован в буфер обмена!"
+                                          "Содержимое скопировано в буфер обмена!"
                                         );
                                       },
                                       (err) => {
                                         message.error(
-                                          "Ошибка при копировании заголовка."
+                                          "Ошибка при копировании содержимого."
                                         );
                                       }
                                     );
