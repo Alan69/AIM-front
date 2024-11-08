@@ -1,0 +1,100 @@
+.chatButton {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: #1f73b7;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+
+  &:hover {
+    background-color: #145a86;
+  }
+}
+
+.chatModal {
+  .ant-modal-content {
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .ant-modal-header {
+    border-bottom: none;
+  }
+
+  .ant-modal-title {
+    font-size: 20px;
+    color: #333;
+  }
+
+  .ant-modal-close-x {
+    color: #333;
+  }
+
+  .chatForm {
+    text-align: center;
+
+    h3 {
+      margin-top: 16px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .formBody {
+      display: flex;
+      flex-direction: column;
+      margin-top: 16px;
+    }
+
+    label {
+      font-size: 14px;
+      color: #333;
+    }
+
+    button {
+      background-color: #1f73b7;
+      color: #fff;
+
+      &:hover {
+        background-color: #145a86;
+      }
+    }
+  }
+}
+
+.messageButton {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 1000;
+  width: 64px !important;
+  height: 64px !important;
+  font-size: 24px;
+
+  span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media (max-width: 1263px) {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  @media (max-width: 768px) {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .iconMessage {
+    font-size: 24px !important;
+  }
+}

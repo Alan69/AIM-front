@@ -164,15 +164,12 @@
 
 .showScrollButton {
   position: fixed;
-  bottom: 40px;
+  bottom: 120px;
   right: 40px;
   z-index: 1000;
   width: 64px !important;
   height: 64px !important;
   font-size: 24px;
-  background-color: #005faa;
-  border-color: #005faa;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   @media (max-width: 1263px) {
     width: 56px !important;
@@ -180,7 +177,7 @@
   }
 
   @media (max-width: 768px) {
-    bottom: 20px;
+    bottom: 80px;
     right: 20px;
   }
 }

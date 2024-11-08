@@ -1,22 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import cn from 'classnames'
+import React, { useState, useEffect } from "react";
+import { Button } from "antd";
+import { useNavigate } from "react-router-dom";
+import cn from "classnames";
+import { ArrowUpOutlined } from "@ant-design/icons";
+import { useTypedSelector } from "hooks/useTypedSelector";
 
-import { ArrowUpOutlined } from '@ant-design/icons';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { HeroSection } from '../components/HeroSection/HeroSection';
-import { VideoSection } from '../components/VideoSection/VideoSection';
-import { OurWorksSection } from '../components/OurWorksSection/OurWorksSection';
-import { WorkWithSection } from '../components/WorkWithSection/WorkWithSection';
-import { HowItWorkSection } from '../components/HowItWorkSection/HowItWorkSection';
-import { AdvantagesSection } from '../components/AdvantagesSection/AdvantagesSection';
-import { WhatYouGetSection } from '../components/WhatYouGetSection/WhatYouGetSection';
-import { TariffSelectorSection } from '../components/TariffSelectorSection/TariffSelectorSection';
-import { FAQSection } from '../components/FAQSection/FAQSection';
-import { StartAISection } from '../components/StartAISection/StartAISection';
-import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
-import styles from '../UnauthorisedLayout.module.scss';
+import { HeroSection } from "../components/HeroSection/HeroSection";
+import { VideoSection } from "../components/VideoSection/VideoSection";
+import { OurWorksSection } from "../components/OurWorksSection/OurWorksSection";
+import { WorkWithSection } from "../components/WorkWithSection/WorkWithSection";
+import { HowItWorkSection } from "../components/HowItWorkSection/HowItWorkSection";
+import { AdvantagesSection } from "../components/AdvantagesSection/AdvantagesSection";
+import { WhatYouGetSection } from "../components/WhatYouGetSection/WhatYouGetSection";
+import { TariffSelectorSection } from "../components/TariffSelectorSection/TariffSelectorSection";
+import { FAQSection } from "../components/FAQSection/FAQSection";
+import { StartAISection } from "../components/StartAISection/StartAISection";
+
+import { ReactComponent as IconPlus } from "assets/plus-white.svg";
+import styles from "../UnauthorisedLayout.module.scss";
+import ChatButtonWithForm from "../components/ChatButtonWithForm/ChatButtonWithForm";
 
 export const LandingPage = () => {
   const navigate = useNavigate();
@@ -25,8 +27,8 @@ export const LandingPage = () => {
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   const handleScroll = () => {
-    const tariffSection = document.getElementById('tariff-section');
-    const heroSection = document.getElementById('hero-section');
+    const tariffSection = document.getElementById("tariff-section");
+    const heroSection = document.getElementById("hero-section");
 
     if (tariffSection && heroSection) {
       const tariffTop = tariffSection.getBoundingClientRect().top;
@@ -35,7 +37,10 @@ export const LandingPage = () => {
       const heroHeight = heroSection.getBoundingClientRect().height;
       const windowHeight = window.innerHeight;
 
-      if (heroTop < -heroHeight / 2 && tariffTop > windowHeight - tariffHeight / 6) {
+      if (
+        heroTop < -heroHeight / 2 &&
+        tariffTop > windowHeight - tariffHeight / 6
+      ) {
         setSticky(true);
       } else {
         setSticky(false);
@@ -50,15 +55,16 @@ export const LandingPage = () => {
   };
 
   const scrollToTariff = () => {
-    const tariffSection = document.getElementById('tariff-section');
+    const tariffSection = document.getElementById("tariff-section");
     if (tariffSection) {
       const offset = -124;
-      const elementPosition = tariffSection.getBoundingClientRect().top + window.pageYOffset;
+      const elementPosition =
+        tariffSection.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition + offset;
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     }
   };
@@ -66,22 +72,34 @@ export const LandingPage = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   return (
     <>
-      <div className={cn(styles.stickyActions, isSticky ? styles.stickyActions__visible : '')}>
-        <Button className={styles.tariffBtn} onClick={scrollToTariff}>Тарифы</Button>
-        <Button className={styles.startBtn} onClick={() => navigate(token ? '/tariffs' : '/login')} >Начать сейчас <IconPlus className={styles.iconPlus} /></Button>
+      <div
+        className={cn(
+          styles.stickyActions,
+          isSticky ? styles.stickyActions__visible : ""
+        )}
+      >
+        <Button className={styles.tariffBtn} onClick={scrollToTariff}>
+          Тарифы
+        </Button>
+        <Button
+          className={styles.startBtn}
+          onClick={() => navigate(token ? "/tariffs" : "/login")}
+        >
+          Начать сейчас <IconPlus className={styles.iconPlus} />
+        </Button>
       </div>
 
       <HeroSection isSticky={isSticky} />
@@ -105,6 +123,8 @@ export const LandingPage = () => {
           onClick={scrollToTop}
         />
       )}
+
+      <ChatButtonWithForm />
     </>
   );
 };
