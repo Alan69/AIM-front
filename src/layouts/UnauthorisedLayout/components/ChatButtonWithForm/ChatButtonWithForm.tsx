@@ -67,15 +67,14 @@ const ChatButtonWithForm: React.FC = () => {
       />
 
       <Modal
-        title="Привет! Чем мы можем помочь?"
+        title="Нужна консультация?"
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
         className={styles.chatModal}
       >
         <div className={styles.chatForm}>
-          <h3>Отправьте нам сообщение</h3>
-          <p>Мы ответим, как только сможем</p>
+          <h3>Оставьте заявку и мы с вами свяжемся</h3>
 
           <Form
             form={form}
@@ -124,7 +123,7 @@ const ChatButtonWithForm: React.FC = () => {
                 block
                 loading={isLoading}
               >
-                Отправить сообщение
+                Получить консультацию
               </Button>
             </Form.Item>
           </Form>
