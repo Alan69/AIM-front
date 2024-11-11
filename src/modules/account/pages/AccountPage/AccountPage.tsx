@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { useUpdateProfilesMutation } from '../../redux/api';
-import { Layout, Button, Form, Input, Upload, Select, Image, message, Breadcrumb } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { useGetJobTypesListQuery } from '../../../../redux/api/jobTypes/jobTypesApi';
-import { useGetContriesListQuery } from '../../../../redux/api/contries/contriesApi';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { useLazyGetAuthUserQuery } from 'modules/auth/redux/api';
-import avatar from 'assets/avatar.png';
-import styles from './AccountPage.module.scss'
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { useUpdateProfilesMutation } from "../../redux/api";
+import {
+  Layout,
+  Button,
+  Form,
+  Input,
+  Upload,
+  Select,
+  Image,
+  message,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { useGetJobTypesListQuery } from "../../../../redux/api/jobTypes/jobTypesApi";
+import { useGetContriesListQuery } from "../../../../redux/api/contries/contriesApi";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import { useLazyGetAuthUserQuery } from "modules/auth/redux/api";
+import avatar from "assets/avatar.png";
+import styles from "./AccountPage.module.scss";
 
 type TUpdateProfilesForm = {
   user: string;
@@ -17,14 +25,15 @@ type TUpdateProfilesForm = {
   last_name?: string;
   email?: string;
   bd_year: number;
+  phone_number?: string;
   job?: {
     id: string;
     name: string;
-  }
+  };
   location?: {
     id: string;
     name: string;
-  }
+  };
   picture?: string | null;
 };
 
@@ -34,46 +43,58 @@ export const AccountPage = () => {
   const { user } = useTypedSelector((state) => state.auth);
   const [file, setFile] = useState<File | null>(null);
 
-  const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
+  const profileImage = user?.profile.picture
+    ? `${user.profile.picture}`
+    : avatar;
 
   const [getAuthUser] = useLazyGetAuthUserQuery();
-  const [updateProfiles, { isLoading: isUpdating }] = useUpdateProfilesMutation();
-  const { data: jobTypesList, isLoading: isJobTypesListUpdating } = useGetJobTypesListQuery()
-  const { data: contriesList, isLoading: isContriesListUpdating } = useGetContriesListQuery()
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<TUpdateProfilesForm>({
+  const [updateProfiles, { isLoading: isUpdating }] =
+    useUpdateProfilesMutation();
+  const { data: jobTypesList, isLoading: isJobTypesListUpdating } =
+    useGetJobTypesListQuery();
+  const { data: contriesList, isLoading: isContriesListUpdating } =
+    useGetContriesListQuery();
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TUpdateProfilesForm>({
     defaultValues: {
-      first_name: '',
-      last_name: '',
-      email: '',
+      first_name: "",
+      last_name: "",
+      email: "",
       bd_year: 0,
+      phone_number: "",
       job: {
-        id: '',
-        name: ''
+        id: "",
+        name: "",
       },
       location: {
-        id: '',
-        name: ''
+        id: "",
+        name: "",
       },
-      picture: '',
-    }
+      picture: "",
+    },
   });
 
   useEffect(() => {
     if (user) {
       reset({
-        first_name: user.profile.user.first_name || '',
-        last_name: user.profile.user.last_name || '',
-        email: user.profile.user.email || '',
+        first_name: user.profile.user.first_name || "",
+        last_name: user.profile.user.last_name || "",
+        email: user.profile.user.email || "",
         bd_year: user.profile.bd_year,
+        phone_number: user.profile.phone_number || "",
         job: {
-          id: user.profile.job?.id || '',
-          name: user.profile.job?.name || ''
+          id: user.profile.job?.id || "",
+          name: user.profile.job?.name || "",
         },
         location: {
-          id: user.profile.location?.id || '',
-          name: user.profile.location?.name || ''
+          id: user.profile.location?.id || "",
+          name: user.profile.location?.name || "",
         },
-        picture: user.profile.picture || '',
+        picture: user.profile.picture || "",
       });
     }
   }, [user, reset]);
@@ -93,12 +114,15 @@ export const AccountPage = () => {
       };
 
       // @ts-ignore
-      updateProfiles(updatedData).unwrap().then(() => {
-        getAuthUser().refetch();
-        message.success('Ваш профиль был успешно изменен!')
-      }).catch(() => {
-        message.error('Произошла ошибка! Ваш профиль не был изменен!')
-      });
+      updateProfiles(updatedData)
+        .unwrap()
+        .then(() => {
+          getAuthUser().refetch();
+          message.success("Ваш профиль был успешно изменен!");
+        })
+        .catch(() => {
+          message.error("Произошла ошибка! Ваш профиль не был изменен!");
+        });
     }
   };
 
@@ -108,10 +132,10 @@ export const AccountPage = () => {
     const fileList = info.fileList;
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      if (lastFile.type === 'image/jpeg' || lastFile.type === 'image/png') {
+      if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
         setFile(lastFile.originFileObj);
       } else {
-        message.error('Пожалуйста, загрузите файл формата JPEG или PNG');
+        message.error("Пожалуйста, загрузите файл формата JPEG или PNG");
       }
     } else {
       setFile(null);
@@ -120,13 +144,17 @@ export const AccountPage = () => {
 
   return (
     <Layout>
-      <Content className='page-layout'>
-        <h1 className='main-title'>Профиль</h1>
+      <Content className="page-layout">
+        <h1 className="main-title">Профиль</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item label="">
             <div className={styles.photo}>
               {user && (
-                <Image width={200} src={profileImage} alt={user.profile.picture ? user.profile.picture : 'Аватар'} />
+                <Image
+                  width={200}
+                  src={profileImage}
+                  alt={user.profile.picture ? user.profile.picture : "Аватар"}
+                />
               )}
               <Controller
                 name="picture"
@@ -147,7 +175,11 @@ export const AccountPage = () => {
             </div>
           </Form.Item>
 
-          <Form.Item label="Email" validateStatus={errors.email ? 'error' : ''} help={errors.email && 'Заполните это поле.'}>
+          <Form.Item
+            label="Email"
+            validateStatus={errors.email ? "error" : ""}
+            help={errors.email && "Заполните это поле."}
+          >
             <Controller
               name="email"
               control={control}
@@ -157,33 +189,68 @@ export const AccountPage = () => {
           </Form.Item>
 
           <Form.Item label="Имя">
-            <Controller name="first_name" control={control} render={({ field }) => <Input {...field} />} />
+            <Controller
+              name="first_name"
+              control={control}
+              render={({ field }) => <Input {...field} />}
+            />
           </Form.Item>
 
           <Form.Item label="Фамилия">
-            <Controller name="last_name" control={control} render={({ field }) => <Input {...field} />} />
+            <Controller
+              name="last_name"
+              control={control}
+              render={({ field }) => <Input {...field} />}
+            />
           </Form.Item>
 
-          <Form.Item label="Год рождения" validateStatus={errors.bd_year ? 'error' : undefined} help={errors.bd_year?.message}>
+          <Form.Item
+            label="Год рождения"
+            validateStatus={errors.bd_year ? "error" : undefined}
+            help={errors.bd_year?.message}
+          >
             <Controller
               name="bd_year"
               control={control}
               rules={{
-                required: 'Год рождения обязателен.',
+                required: "Год рождения обязателен.",
                 min: {
                   value: 1964,
-                  message: 'Год рождения не может быть меньше 1964.'
+                  message: "Год рождения не может быть меньше 1964.",
                 },
                 max: {
                   value: currentYear,
-                  message: `Год рождения не может быть больше ${currentYear}.`
+                  message: `Год рождения не может быть больше ${currentYear}.`,
                 },
                 pattern: {
                   value: /^\d{4}$/,
-                  message: 'Год рождения должен содержать ровно четыре цифры.'
-                }
+                  message: "Год рождения должен содержать ровно четыре цифры.",
+                },
               }}
               render={({ field }) => <Input {...field} type="number" />}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Номер телефона"
+            validateStatus={errors.phone_number ? "error" : ""}
+            help={
+              errors.phone_number &&
+              "Введите корректный номер телефона в формате +7XXXXXXXXXX."
+            }
+          >
+            <Controller
+              name="phone_number"
+              control={control}
+              rules={{
+                required: "Номер телефона обязателен.",
+                pattern: {
+                  value: /^\+7\d{10}$/,
+                  message:
+                    "Номер телефона должен быть в формате +7XXXXXXXXXX (10 цифр после +7).",
+                },
+              }}
+              render={({ field }) => <Input {...field} />}
             />
           </Form.Item>
 
@@ -225,7 +292,7 @@ export const AccountPage = () => {
             <Button type="primary" htmlType="submit" loading={isUpdating}>
               Сохранить
             </Button>
-            <Button htmlType="button" style={{ margin: '0 8px' }}>
+            <Button htmlType="button" style={{ margin: "0 8px" }}>
               Изменить пароль
             </Button>
           </Form.Item>

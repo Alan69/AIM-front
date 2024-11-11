@@ -25,6 +25,7 @@ export type TProfileData = {
     time_create?: string;
     time_update?: string;
     user: TUserData;
+    phone_number: string;
   }
 }
 
@@ -37,12 +38,13 @@ export type TUpdateProfilesData = {
   first_name?: string;
   last_name?: string;
   id: string;
+  phone_number?: string;
 }
 
 export const profilesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     updateProfiles: build.mutation<TUpdateProfilesData, TUpdateProfilesData>({
-      query: ({ location, job, bd_year, picture, email, first_name, last_name, id }) => {
+      query: ({ location, job, bd_year, picture, email, first_name, last_name, id, phone_number }) => {
         const formData = new FormData();
         formData.append('location', location.id || '');
         formData.append('job', job.id || '');
@@ -50,6 +52,7 @@ export const profilesApi = baseApi.injectEndpoints({
         formData.append('email', email || '');
         formData.append('first_name', first_name || '');
         formData.append('last_name', last_name || '');
+        formData.append('phone_number', phone_number || '');
         
         if (picture) {
           formData.append('picture', picture);
