@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Input, Form, message } from "antd";
 import { MessageOutlined } from "@ant-design/icons";
 import { useSubmitFeedbackMutation } from "../../../../redux/api/feedback/feedbackApi";
 import styles from "./ChatButtonWithForm.module.scss";
+import Title from "antd/es/typography/Title";
 
 const ChatButtonWithForm: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [phoneNumber, setPhoneNumber] = useState<string>("+7"); // Начальное значение с +7
+  const [phoneNumber, setPhoneNumber] = useState<string>("+7");
   const [submitFeedback, { isLoading }] = useSubmitFeedbackMutation();
   const [form] = Form.useForm();
 
@@ -55,6 +56,12 @@ const ChatButtonWithForm: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setIsModalVisible(true);
+    }, 3000);
+  }, []);
+
   return (
     <>
       <Button
@@ -67,7 +74,11 @@ const ChatButtonWithForm: React.FC = () => {
       />
 
       <Modal
-        title="Нужна консультация?"
+        title={
+          <Title level={2} style={{ textAlign: "center" }}>
+            Нужна консультация?
+          </Title>
+        }
         open={isModalVisible}
         onCancel={handleCancel}
         footer={null}
