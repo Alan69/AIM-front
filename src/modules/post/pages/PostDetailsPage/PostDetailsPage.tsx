@@ -103,6 +103,14 @@ export const PostDetailsPage = () => {
   const imageOption = watch("imageOption");
   const textOption = watch("textOption");
 
+  const formatText = (text: string) => {
+    return text
+      .split("\n\n")
+      .map((paragraph, index) => (
+        <Typography.Paragraph key={index}>{paragraph}</Typography.Paragraph>
+      ));
+  };
+
   const handleChangeCurrentImgStyle = (style: TImgStylesData | undefined) => {
     setCurrentImgStyle(style);
     setIsModalOpen(false);
@@ -399,7 +407,10 @@ export const PostDetailsPage = () => {
                           />
                         </Tooltip>
                       </div>
-                      <Text>{post?.main_text}</Text>
+                      <div className={styles.postContent__text}>
+                        {post?.main_text ? formatText(post.main_text) : null}
+                      </div>
+
                       <div className={styles.postHashtags}>
                         <Text>{post?.hashtags}</Text>
                       </div>
