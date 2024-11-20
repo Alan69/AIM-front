@@ -18,14 +18,14 @@ import cn from "classnames";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import "moment/locale/ru";
+import "moment/locale/en-gb";
 import styles from "./ContentPlanAddPostModal.module.scss";
 import { TPostData } from "modules/post/redux/api";
 import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
 import { TAddToSchedulersData } from "modules/content-plan/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useIsMobile } from "hooks/media";
-
-moment.locale("ru");
+import { useTranslation } from "react-i18next";
 
 type TProps = {
   isModalOpen: boolean;
@@ -58,6 +58,7 @@ export const ContentPlanAddPostModal = ({
   handlePostNow,
   isPostPage = false,
 }: TProps) => {
+  const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
   const { current_company } = useTypedSelector((state) => state.auth);
 
@@ -77,7 +78,9 @@ export const ContentPlanAddPostModal = ({
       const minutes = time.minute();
       if (minutes % 15 !== 0) {
         setSelectedTime(null);
-        message.warning("Минуты должны быть кратны 15. Выберите другое время.");
+        message.warning(
+          t("content_plan.content_plan_add_post_modal.time_invalid")
+        );
         return;
       }
     }
@@ -160,7 +163,9 @@ export const ContentPlanAddPostModal = ({
         });
 
         if (now.isAfter(selectedDateTime)) {
-          message.warning("Выбранное время прошло, сбрасываем выбор времени.");
+          message.warning(
+            t("content_plan.content_plan_add_post_modal.time_passed")
+          );
           setSelectedTime(null);
         }
       }
@@ -173,9 +178,17 @@ export const ContentPlanAddPostModal = ({
     setSelectedTime(null);
   }, [selectedDate]);
 
+  useEffect(() => {
+    moment.locale(i18n.language);
+  }, [i18n.language]);
+
   return (
     <Modal
-      title={isPostPage ? "Добавление в планировщик" : "Добавить контент"}
+      title={
+        isPostPage
+          ? t("content_plan.content_plan_add_post_modal.scheduler_title")
+          : t("content_plan.content_plan_add_post_modal.add_content_title")
+      }
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => {
@@ -210,7 +223,7 @@ export const ContentPlanAddPostModal = ({
               disabled={!selectNewPost || selectedNewSocialMedias.length === 0}
               loading={isPostNowLoading}
             >
-              Опубликовать сейчас
+              {t("content_plan.content_plan_add_post_modal.publish_now")}
             </Button>
           )}
           <Button
@@ -234,7 +247,7 @@ export const ContentPlanAddPostModal = ({
             }
             loading={isAddingToSchedulers}
           >
-            В планировщик
+            {t("content_plan.content_plan_add_post_modal.add_to_scheduler")}
           </Button>
           {isPostPage ? (
             ""
@@ -248,7 +261,7 @@ export const ContentPlanAddPostModal = ({
                 width: isMobile ? "100%" : "33.33%",
               }}
             >
-              Черновик
+              {t("content_plan.content_plan_add_post_modal.draft")}
             </Button>
           )}
         </Button.Group>,
@@ -268,13 +281,13 @@ export const ContentPlanAddPostModal = ({
                 selectNewPost?.id ? styles.addBtn__isActive : ""
               )}
             >
-              Пост
+              {t("content_plan.content_plan_add_post_modal.post")}
             </Button>
             <Button icon={<VideoCameraOutlined />} disabled>
-              Reels
+              {t("content_plan.content_plan_add_post_modal.reels")}
             </Button>
             <Button icon={<PlayCircleOutlined />} disabled>
-              Stories
+              {t("content_plan.content_plan_add_post_modal.stories")}
             </Button>
           </div>
           <Divider />
@@ -309,7 +322,11 @@ export const ContentPlanAddPostModal = ({
                         type="link"
                         onClick={() => setExpandedKeys(!expandedKeys)}
                       >
-                        {expandedKeys ? "Скрыть" : "Развернуть"}
+                        {expandedKeys
+                          ? t("content_plan.content_plan_add_post_modal.hide")
+                          : t(
+                              "content_plan.content_plan_add_post_modal.expand"
+                            )}
                       </Button>
                     </div>
                   </>
@@ -324,7 +341,7 @@ export const ContentPlanAddPostModal = ({
         onClick={handleShowContentPlanSocialMediaListModal}
         className={styles.socialMediaAddBtn}
       >
-        Добавить социальную сеть
+        {t("content_plan.content_plan_add_post_modal.add_social_media")}
       </Button>
 
       {selectedNewSocialMedias.length > 0 ? (
@@ -359,7 +376,9 @@ export const ContentPlanAddPostModal = ({
           onChange={handleDateChange}
           value={selectedDate}
           format="DD-MM-YYYY"
-          placeholder="Выберите дату"
+          placeholder={t(
+            "content_plan.content_plan_add_post_modal.choose_date"
+          )}
         />
         <TimePicker
           className={styles.timePicker}
@@ -377,7 +396,9 @@ export const ContentPlanAddPostModal = ({
               disabledMinutes: () => disableMinutes(selectedHour),
             };
           }}
-          placeholder="Выберите время"
+          placeholder={t(
+            "content_plan.content_plan_add_post_modal.choose_time"
+          )}
           showNow={false}
           onOpenChange={(open) => {
             if (open) {

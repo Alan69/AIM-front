@@ -6,25 +6,25 @@ import { useSignUpMutation } from "modules/auth/redux/api";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "modules/auth/redux/slices/auth.slice";
+import { useTranslation } from "react-i18next";
 
 export const SignUpForm = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [signUp, { isLoading }] = useSignUpMutation();
 
   const passwordValidator = (rule: any, value: any) => {
     if (!value) {
-      return Promise.reject("Пожалуйста, введите пароль!");
+      return Promise.reject(t("sign_up_form.password_required"));
     }
     if (value.length < 8) {
-      return Promise.reject("Пароль должен содержать минимум 8 символов.");
+      return Promise.reject(t("sign_up_form.password_invalid"));
     }
     if (!/\d.*\d/.test(value)) {
-      return Promise.reject("Пароль должен содержать как минимум два числа.");
+      return Promise.reject(t("sign_up_form.password_invalid"));
     }
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-      return Promise.reject(
-        "Пароль должен содержать как минимум один спецсимвол."
-      );
+      return Promise.reject(t("sign_up_form.password_invalid"));
     }
     return Promise.resolve();
   };
@@ -34,7 +34,7 @@ export const SignUpForm = () => {
       if (!value || getFieldValue("password") === value) {
         return Promise.resolve();
       }
-      return Promise.reject("Пароли не совпадают!");
+      return Promise.reject(t("sign_up_form.password_mismatch"));
     },
   });
 
@@ -50,19 +50,17 @@ export const SignUpForm = () => {
         const { access: token, refresh: refreshToken } = response;
 
         dispatch(authActions.setToken({ token, refreshToken }));
-        message.success("Регистрация успешна! Пожалуйста, войдите в систему.");
+        message.success(t("sign_up_form.success_message"));
       })
       .catch((error) => {
-        const errorMsg =
-          error?.data?.error ||
-          "Ошибка регистрации. Пожалуйста, проверьте введенные данные.";
+        const errorMsg = error?.data?.error || t("sign_up_form.error_message");
         message.error(errorMsg);
       });
   };
 
   return (
     <div className={styles.signUpBox}>
-      <h2>Регистрация</h2>
+      <h2>{t("sign_up_form.title")}</h2>
       <Form
         name="signup_form"
         className={styles.signUpForm}
@@ -71,32 +69,32 @@ export const SignUpForm = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: "Пожалуйста, введите email!" },
+            { required: true, message: t("sign_up_form.email_required") },
             {
               type: "email",
-              message: "Некорректный формат email!",
+              message: t("sign_up_form.email_invalid"),
             },
           ]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Email"
+            placeholder={t("sign_up_form.email_placeholder")}
           />
         </Form.Item>
 
         <Form.Item
           name="phone_number"
           rules={[
-            { required: true, message: "Пожалуйста, введите номер телефона!" },
+            { required: true, message: t("sign_up_form.phone_required") },
             {
               pattern: /^\+7\d{10}$/,
-              message: "Номер телефона должен быть в формате +7XXXXXXXXXX.",
+              message: t("sign_up_form.phone_invalid"),
             },
           ]}
         >
           <Input
             prefix={<PhoneOutlined className="site-form-item-icon" />}
-            placeholder="Номер телефона"
+            placeholder={t("sign_up_form.phone_placeholder")}
           />
         </Form.Item>
 
@@ -107,7 +105,7 @@ export const SignUpForm = () => {
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             type="password"
-            placeholder="Пароль"
+            placeholder={t("sign_up_form.password_placeholder")}
           />
         </Form.Item>
 
@@ -115,14 +113,17 @@ export const SignUpForm = () => {
           name="password2"
           dependencies={["password"]}
           rules={[
-            { required: true, message: "Пожалуйста, подтвердите пароль!" },
+            {
+              required: true,
+              message: t("sign_up_form.confirm_password_placeholder"),
+            },
             confirmPasswordValidator,
           ]}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             type="password"
-            placeholder="Подтверждение пароля"
+            placeholder={t("sign_up_form.confirm_password_placeholder")}
           />
         </Form.Item>
 
@@ -133,12 +134,12 @@ export const SignUpForm = () => {
             className={styles.signUpFormButton}
             loading={isLoading}
           >
-            Создать
+            {t("sign_up_form.submit_button")}
           </Button>
         </Form.Item>
 
         <Form.Item>
-          <Link to="/login">Есть аккаунт?</Link>
+          <Link to="/login">{t("sign_up_form.login_link")}</Link>
         </Form.Item>
       </Form>
     </div>

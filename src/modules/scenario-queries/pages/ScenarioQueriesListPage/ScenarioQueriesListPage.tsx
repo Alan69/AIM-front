@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Layout, Table } from "antd";
 import type { TableProps } from "antd";
 import cn from "classnames";
+import { useTranslation } from "react-i18next";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import styles from "./ScenarioQueriesListPage.module.scss";
 import {
@@ -13,13 +14,15 @@ import {
 const { Content } = Layout;
 
 export const ScenarioQueriesListPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
-  const { data: ideaQueriesList, refetch } = useGetScenarioQueriesListQuery();
+  const { data: scenarioQueriesList, refetch } =
+    useGetScenarioQueriesListQuery();
 
   const columns: TableProps<TScenarioQueriesData>["columns"] = [
     {
-      title: "Продукт",
+      title: t("scenario_queries_list.columns.product"),
       dataIndex: "product",
       key: "product",
       fixed: "left",
@@ -28,7 +31,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: "Вид контента",
+      title: t("scenario_queries_list.columns.scenario_type"),
       dataIndex: "scenario_type",
       key: "scenario_type",
       render: (text, record) => (
@@ -36,7 +39,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: "Тематика сценария",
+      title: t("scenario_queries_list.columns.scenario_theme"),
       dataIndex: "scenario_theme",
       key: "scenario_theme",
       render: (text, record) => (
@@ -44,7 +47,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: "Дата cоздания",
+      title: t("scenario_queries_list.columns.date"),
       dataIndex: "date",
       key: "date",
       render: (text, record) => (
@@ -55,7 +58,7 @@ export const ScenarioQueriesListPage = () => {
 
   const formatDate = (dateString: string | undefined) => {
     const date = new Date(dateString ? dateString : "");
-    return new Intl.DateTimeFormat("ru-RU", {
+    return new Intl.DateTimeFormat(t("date.locale"), {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -64,7 +67,7 @@ export const ScenarioQueriesListPage = () => {
     }).format(date);
   };
 
-  const data = ideaQueriesList?.map((item) => ({
+  const data = scenarioQueriesList?.map((item) => ({
     id: item.id,
     product: item?.product?.name,
     scenario_type: item?.scenario_type?.name,
@@ -80,13 +83,13 @@ export const ScenarioQueriesListPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className={cn("main-title", styles.title)}>
-          История создания сценарии - {current_company?.name}
+          {t("scenario_queries_list.title")} - {current_company?.name}
           <Button
             color="default"
             className={styles.addBtn}
             onClick={() => navigate("/scenario-queries/create")}
           >
-            Создать
+            {t("scenario_queries_list.create_button")}
           </Button>
         </h1>
         <Table

@@ -1,25 +1,27 @@
-import React from 'react'
-import { TPostSerializer } from 'modules/content-plan/types'
-import { Layout, Typography, Image, Collapse } from 'antd';
-import {
-  HeartTwoTone
-} from '@ant-design/icons';
-import cn from 'classnames'
-import styles from './SelectedPostPreview.module.scss';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import avatar from 'assets/avatar.png';
+import React from "react";
+import { TPostSerializer } from "modules/content-plan/types";
+import { Layout, Typography, Image, Collapse } from "antd";
+import { HeartTwoTone } from "@ant-design/icons";
+import cn from "classnames";
+import styles from "./SelectedPostPreview.module.scss";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import avatar from "assets/avatar.png";
+import { useTranslation } from "react-i18next";
 
 type TProps = {
-  selectedPost: TPostSerializer | null | undefined
-}
+  selectedPost: TPostSerializer | null | undefined;
+};
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 export const SelectedPostPreview = ({ selectedPost }: TProps) => {
+  const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
-  const profileImage = user?.profile.picture ? `${user.profile.picture}` : avatar;
+  const profileImage = user?.profile.picture
+    ? `${user.profile.picture}`
+    : avatar;
 
   return (
     <Layout>
@@ -30,11 +32,13 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
               <div className={styles.userInfo}>
                 <img
                   src={profileImage}
-                  alt={user ? user.profile.user.first_name : '-'}
+                  alt={user ? user.profile.user.first_name : "-"}
                   className={styles.avatar}
                 />
                 <div className={styles.details}>
-                  <div className={styles.name}>{user ? user.profile.user.first_name : '-'}</div>
+                  <div className={styles.name}>
+                    {user ? user.profile.user.first_name : "-"}
+                  </div>
                 </div>
               </div>
               <div className={styles.pictureBlock}>
@@ -42,7 +46,7 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
                   // width={200}
                   src={selectedPost?.picture}
                   className={styles.picture}
-                  alt="Post Image"
+                  alt={t("content_plan.selected_post_preview.image_alt")}
                 />
               </div>
 
@@ -66,13 +70,18 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
               <HeartTwoTone
                 height={24}
                 width={24}
-                className={cn(styles.iconHeart, selectedPost?.like ? styles.iconHeart__active : '')}
+                className={cn(
+                  styles.iconHeart,
+                  selectedPost?.like ? styles.iconHeart__active : ""
+                )}
               />
-              <Text>В избранные для публикации</Text>
+              <Text>
+                {t("content_plan.selected_post_preview.add_to_favorites")}
+              </Text>{" "}
             </div>
           </div>
         </div>
       </Content>
     </Layout>
-  )
-}
+  );
+};

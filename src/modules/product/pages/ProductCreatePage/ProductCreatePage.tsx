@@ -1,50 +1,63 @@
-import React, { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { useCreateProductMutation, useGetProductListByCompanyIdQuery } from '../../redux/api';
-import { useForm, Controller } from 'react-hook-form';
-import { Layout, Button, Form, Input } from 'antd';
-import styles from './ProductCreatePage.module.scss';
-import { useTypedSelector } from 'hooks/useTypedSelector';
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useCreateProductMutation,
+  useGetProductListByCompanyIdQuery,
+} from "../../redux/api";
+import { useForm, Controller } from "react-hook-form";
+import { Layout, Button, Form, Input } from "antd";
+import { useTranslation } from "react-i18next";
+import styles from "./ProductCreatePage.module.scss";
+import { useTypedSelector } from "hooks/useTypedSelector";
 
 type TCreateProductForm = {
   name: string;
   scope: string;
   comment?: string;
-  company: string
+  company: string;
 };
 
 const { Content } = Layout;
 
 export const ProductCreatePage = () => {
+  const { t } = useTranslation();
   const { companyId } = useParams<{ companyId: string }>();
   const { user } = useTypedSelector((state) => state.auth);
 
-  const navigate = useNavigate()
-  const { control, handleSubmit, formState: { errors } } = useForm<TCreateProductForm>();
+  const navigate = useNavigate();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TCreateProductForm>();
   const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
-  const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(companyId || '');
+  const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(
+    companyId || ""
+  );
 
   const onSubmit = (payload: TCreateProductForm) => {
     const updatedData = {
       ...payload,
       author: user?.profile.id,
-      companyId: companyId ? companyId : ''
+      companyId: companyId ? companyId : "",
     };
 
-    createProduct(updatedData).unwrap().then(() => {
-      navigate(`/company/${companyId}`);
-      refetchProductList();
-    })
+    createProduct(updatedData)
+      .unwrap()
+      .then(() => {
+        navigate(`/company/${companyId}`);
+        refetchProductList();
+      });
   };
 
   useEffect(() => {
     refetchProductList();
-  }, [refetchProductList])
+  }, [refetchProductList]);
 
   return (
     <Layout>
-      <Content className='page-layout'>
-        <h1 className='main-title'>Добавление продукта</h1>
+      <Content className="page-layout">
+        <h1 className="main-title">{t("product_create.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -54,9 +67,9 @@ export const ProductCreatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label="Название"
-                  validateStatus={errors.name ? 'error' : ''}
-                  help={errors.name && 'Заполните это поле.'}
+                  label={t("product_create.fields.name")}
+                  validateStatus={errors.name ? "error" : ""}
+                  help={errors.name && t("product_create.errors.required")}
                 >
                   <Controller
                     name="name"
@@ -67,9 +80,9 @@ export const ProductCreatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label="Назначение"
-                  validateStatus={errors.scope ? 'error' : ''}
-                  help={errors.scope && 'Заполните это поле.'}
+                  label={t("product_create.fields.scope")}
+                  validateStatus={errors.scope ? "error" : ""}
+                  help={errors.scope && t("product_create.errors.required")}
                 >
                   <Controller
                     name="scope"
@@ -79,7 +92,7 @@ export const ProductCreatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label="Описание">
+                <Form.Item label={t("product_create.fields.comment")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -89,18 +102,21 @@ export const ProductCreatePage = () => {
 
                 <Form.Item>
                   <div className={styles.postActions}>
-                    <Button type="primary" htmlType="submit" loading={isCreating}>
-                      Сохранить
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={isCreating}
+                    >
+                      {t("product_create.buttons.save")}
                     </Button>
                     <Button
                       htmlType="button"
-                      type='default'
+                      type="default"
                       onClick={() => navigate(-1)}
                     >
-                      Отменить
+                      {t("product_create.buttons.cancel")}
                     </Button>
                   </div>
-
                 </Form.Item>
               </Form>
             </div>
@@ -108,5 +124,5 @@ export const ProductCreatePage = () => {
         </Layout>
       </Content>
     </Layout>
-  )
-}
+  );
+};

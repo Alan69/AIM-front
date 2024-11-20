@@ -1,0 +1,721 @@
+{
+  "header-landing": {
+    "language_ru": "РУС",
+    "language_en": "ENG",
+    "start_button": "Start",
+    "language_menu": {
+      "english": "English",
+      "russian": "Russian"
+    }
+  },
+  "menu-landing": {
+    "examples": "Examples",
+    "how_it_works": "How it works",
+    "benefits": "Benefits",
+    "what_you_get": "What you get",
+    "faq": "FAQ"
+  },
+  "landing_page": {
+    "tariffs": "Tariffs",
+    "start_now": "Start Now"
+  },
+  "login_form": {
+    "title": "Login",
+    "email_placeholder": "Username",
+    "password_placeholder": "Password",
+    "submit_button": "Login",
+    "login_error": "Login failed. Please check your credentials.",
+    "registration_link": "Sign up",
+    "forgot_password_link": "Forgot password?",
+    "login_success": "Login successful!"
+  },
+  "sign_up_form": {
+    "title": "Sign Up",
+    "email_placeholder": "Email",
+    "phone_placeholder": "Phone number",
+    "password_placeholder": "Password",
+    "confirm_password_placeholder": "Confirm password",
+    "submit_button": "Create account",
+    "email_required": "Please enter your email!",
+    "email_invalid": "Invalid email format!",
+    "phone_required": "Please enter your phone number!",
+    "phone_invalid": "Phone number must be in the format +7XXXXXXXXXX.",
+    "password_required": "Please enter a password!",
+    "password_invalid": "Password must contain at least 8 characters, two numbers, and one special character.",
+    "password_mismatch": "Passwords do not match!",
+    "success_message": "Registration successful! Please log in.",
+    "error_message": "Registration failed. Please check your input data.",
+    "login_link": "Already have an account?"
+  },
+  "hero": {
+    "title": "Create stunning content with AIM",
+    "subtitle": "Ideas, publications, and analytics — the key to business success!",
+    "tariffs_button": "Tariffs",
+    "start_button": "Start now",
+    "features": [
+      "Marketing strategy",
+      "Sales funnel",
+      "Creating posts and reels",
+      "Auto-posting",
+      "Analytics",
+      "Unified chat hub"
+    ]
+  },
+  "our_works": {
+    "title": "Works created by our AI"
+  },
+  "work_with": {
+    "title": "AIM creates content for..."
+  },
+  "how_it_works": {
+    "title": "How it works",
+    "steps": [
+      {
+        "number": "01",
+        "title": "Subscribe",
+        "description": "Get up-to-date data and analytical reports tailored to your marketing goals."
+      },
+      {
+        "number": "02",
+        "title": "Create",
+        "description": "Generate creative content and campaigns using the platform's intelligent tools."
+      },
+      {
+        "number": "03",
+        "title": "Plan and Publish",
+        "description": "Manage content and launch campaigns on a pre-set schedule for maximum efficiency."
+      }
+    ]
+  },
+  "advantages": {
+    "title": "Advantages of working with AIM",
+    "items": [
+      "Step-by-step plan for achieving marketing goals",
+      "Clear algorithm for creating a marketing strategy",
+      "Detailed sales funnel",
+      "Posts adapted to the target audience",
+      "Intuitive interface",
+      "Guaranteed publications on social networks",
+      "Unified chat and comment management window",
+      "Results analysis"
+    ]
+  },
+  "what_you_get": {
+    "label": "Best solutions",
+    "title": "What you get",
+    "benefits": [
+      {
+        "title": "Brand recognition",
+        "description": "Helps stand out among competitors and increase memorability"
+      },
+      {
+        "title": "Increased sales",
+        "description": "Attract more customers and boost conversions with effective marketing"
+      },
+      {
+        "title": "Customer loyalty",
+        "description": "Build long-term relationships with customers, ensuring high satisfaction"
+      },
+      {
+        "title": "Detailed brand analysis",
+        "description": "Deep analysis of all brand aspects, including its values and positioning"
+      },
+      {
+        "title": "Efficiency improvement",
+        "description": "Implement innovative AI solutions for data analysis and routine task automation"
+      },
+      {
+        "title": "Forecasting and personalization",
+        "description": "Use AI to predict customer behavior and provide personalized offers"
+      }
+    ]
+  },
+  "tariff_selector": {
+    "title": "Select your tariff",
+    "subtitle": "Promotion: buy an annual tariff and get 2 months free",
+    "sliders": {
+      "companies": "Number of companies",
+      "duration": "Duration, months"
+    },
+    "discount_label": "Your discount:",
+    "card": {
+      "title": "Your unique tariff",
+      "items": [
+        "Marketing strategy generation",
+        "Sales funnel generation",
+        "Post generation",
+        "Number of products"
+      ],
+      "price_label": "Price:",
+      "button_text": "Subscribe"
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "items": [
+      {
+        "question": "What is AI?",
+        "answer": "AI is artificial intelligence that helps automate processes and improve marketing results."
+      },
+      {
+        "question": "What is your AI platform?",
+        "answer": "It helps automate routine tasks such as audience segmentation, content personalization, campaign management, and data analysis."
+      },
+      {
+        "question": "How does AI optimize marketing?",
+        "answer": "AI analyzes data and helps create more precise and effective marketing campaigns."
+      },
+      {
+        "question": "Is your platform suitable for small businesses?",
+        "answer": "Yes, our platform is suitable for businesses of any size, including small businesses."
+      },
+      {
+        "question": "How can we integrate the platform with our current marketing tools?",
+        "answer": "Our platform supports integration with most popular marketing tools."
+      },
+      {
+        "question": "What support do you offer?",
+        "answer": "We provide 24/7 support and detailed documentation for all our users."
+      }
+    ]
+  },
+  "start_ai": {
+    "label": "We are ready, are you?",
+    "title": "Start working with our AI platform right now!",
+    "subtitle": "Automate marketing, optimize processes, and increase conversions with AI",
+    "button": "Start now"
+  },
+  "footer-landing": {
+    "columns": {
+      "blog": "Blog",
+      "latest_generations": "Latest generations",
+      "terms_of_use": "Terms of use",
+      "reviews": "Reviews",
+      "follow_us": "Follow our news and updates",
+      "contact_us": {
+        "title": "For any questions, write to us",
+        "email": "info@aimmagic.com"
+      }
+    },
+    "bottom": {
+      "text": "© 2024 AIM - helping businesses thrive. All rights reserved.",
+      "links": {
+        "agreement": "Terms of agreement",
+        "privacy_policy": "Privacy policy"
+      }
+    }
+  },
+  "chat_button": {
+    "modal_title": "Need consultation?",
+    "form_title": "Leave a request and we will contact you",
+    "form": {
+      "name_label": "Name",
+      "name_placeholder": "Enter your name",
+      "phone_label": "Phone number",
+      "phone_placeholder": "Enter your phone number",
+      "phone_error": "Please enter your phone number",
+      "phone_format_error": "Enter a valid phone number in the format +7XXXXXXXXXX",
+      "submit_button": "Get consultation",
+      "name_error": "Please enter your name",
+      "error_message": "Failed to send the message. Please try again.",
+      "success_message": "Your message has been sent successfully!"
+    }
+  },
+  "account_page": {
+    "profile": "Profile",
+    "photo": {
+      "upload_button": "Choose file",
+      "alt_text": "Avatar"
+    },
+    "form": {
+      "email_label": "Email",
+      "first_name_label": "First name",
+      "last_name_label": "Last name",
+      "birth_year_label": "Year of birth",
+      "phone_number_label": "Phone number",
+      "job_label": "Job",
+      "country_label": "Country",
+      "email_error": "This field is required.",
+      "birth_year_error": {
+        "required": "Year of birth is required.",
+        "min": "Year of birth cannot be less than 1964.",
+        "max": "Year of birth cannot exceed the current year.",
+        "pattern": "Year of birth must be a four-digit number."
+      },
+      "phone_number_error": {
+        "required": "Phone number is required.",
+        "pattern": "Phone number must be in the format +7XXXXXXXXXX."
+      }
+    },
+    "buttons": {
+      "save": "Save",
+      "change_password": "Change password"
+    },
+    "messages": {
+      "success": "Your profile has been successfully updated!",
+      "error": "An error occurred! Your profile has not been updated.",
+      "invalid_file": "Please upload a JPEG or PNG file."
+    }
+  },
+  "menu": {
+    "logout": "Logout",
+    "soon": "soon",
+    "items": {
+      "ideas": "Ideas",
+      "posts": "Posts",
+      "scenarios": "Scenarios",
+      "content_plan": "Content Plan",
+      "marketing_strategy": "Marketing Strategy",
+      "sales_funnel": "Sales Funnel",
+      "chat_hub": "Unified Chat Hub",
+      "analytics": "Analytics"
+    }
+  },
+  "tariff_page": {
+    "title": "Your tariff expires in {{days}} days.",
+    "subtitle": "Pick your plan",
+    "promotion": "Promotion: Buy an annual plan and get 2 months free",
+    "sliders": {
+      "company_count": "Number of companies",
+      "duration": "Duration, months"
+    },
+    "discount_label": "Your discount:",
+    "card": {
+      "title": "Your unique plan",
+      "features": {
+        "marketing_strategy": "Marketing strategy generation",
+        "sales_funnel": "Sales funnel generation",
+        "posts_generation": "Unlimited post generation",
+        "products": "Unlimited products"
+      },
+      "price_label": "Cost:",
+      "button": "Subscribe"
+    }
+  },
+  "offer_info": {
+    "your_tariff": "Your tariff",
+    "is_active": "is active",
+    "days_left": "days",
+    "free": "Free"
+  },
+  "current_company_info": {
+    "current_company": "Current company",
+    "add_company": "Add company",
+    "company_list": "Company list",
+    "add_new_company": "Add a company"
+  },
+  "company_create": {
+    "title": "Add a company",
+    "form": {
+      "name": {
+        "label": "Name",
+        "error": "Please fill out this field."
+      },
+      "scope": {
+        "label": "Scope",
+        "error": "Please fill out this field."
+      },
+      "comment": {
+        "label": "Description"
+      },
+      "submit": "Save"
+    },
+    "success_message": "Company successfully created!",
+    "error_message": "Failed to create company. Please try again."
+  },
+  "company_details": {
+    "title": "Company: {{name}}",
+    "fields": {
+      "products": "Products",
+      "description": "Description",
+      "actions": "Actions",
+      "scope": "Scope",
+      "social_media": "Social Media",
+      "target_audience": "Target Audience"
+    },
+    "placeholders": {
+      "no_target_audience": "Currently, there are no target audiences. You can add a new target audience.",
+      "no_social_media": "Currently, there are no social media accounts. You can add a new one."
+    },
+    "actions": {
+      "add_target_audience": "Add Target Audience",
+      "add_social_media": "Add Social Media",
+      "add_product": "Add Product"
+    },
+    "buttons": {
+      "show_more": "Show More",
+      "hide": "Hide"
+    }
+  },
+  "company_update": {
+    "title": "Edit Company Information",
+    "fields": {
+      "name": "Name",
+      "scope": "Scope",
+      "description": "Description"
+    },
+    "errors": {
+      "required": "This field is required"
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "company_delete": {
+    "title": "Delete Company",
+    "confirm": "Are you sure you want to delete the company {{name}}?",
+    "buttons": {
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "product_create": {
+    "title": "Add Product",
+    "fields": {
+      "name": "Name",
+      "scope": "Scope",
+      "comment": "Description"
+    },
+    "errors": {
+      "required": "This field is required"
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "product_update": {
+    "title": "Edit Product",
+    "fields": {
+      "name": "Name",
+      "scope": "Scope",
+      "comment": "Description"
+    },
+    "errors": {
+      "required": "This field is required"
+    },
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "product_delete": {
+    "title": "Delete Product",
+    "confirmation": "Are you sure you want to delete the product \"{{name}}\"?",
+    "buttons": {
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "target_audience": {
+    "title": "Target Audience",
+    "create": "Create",
+    "save": "Save",
+    "recreate": "Recreate",
+    "success_save": "Target audience successfully saved",
+    "error_save": "Error saving target audience",
+    "error_create": "Error creating target audience",
+    "no_data": "No data available"
+  },
+  "social_media_add": {
+    "title": "Add Social Media",
+    "error": "Error adding {{name}}: {{error}}",
+    "not_available": "Social media integration not available.",
+    "back_button": "Back",
+    "platforms": {
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "linkedin": "LinkedIn",
+      "reddit": "Reddit",
+      "snapchat": "Snapchat",
+      "telegram": "Telegram",
+      "tiktok": "TikTok",
+      "tumblr": "Tumblr",
+      "twitter": "Twitter",
+      "vk": "VK"
+    }
+  },
+  "idea_queries_list": {
+    "title": "Idea creation history - {{company}}",
+    "default_company": "Company",
+    "create_button": "Create",
+    "fields": {
+      "product": "Product",
+      "content_type": "Content Type",
+      "theme": "Theme",
+      "date_created": "Date Created"
+    }
+  },
+  "locale": "en-US",
+  "idea_queries_create": {
+    "title": "Create Idea Query",
+    "fields": {
+      "company": "Company",
+      "product": "Product",
+      "content_type": "Content Type",
+      "theme": "Theme",
+      "language": "Language",
+      "description": "Description"
+    },
+    "validation": {
+      "required": "This field is required."
+    },
+    "hints": {
+      "no_company": "(If empty, select or add a current company from the left menu.)"
+    },
+    "buttons": {
+      "submit": "Submit"
+    }
+  },
+  "idea_queries_details": {
+    "loading": "Loading...",
+    "content_type": "Content Type",
+    "theme": "Theme",
+    "language": "Language",
+    "description": "Description",
+    "repeat_request": "Repeat Request",
+    "ideas": "Ideas",
+    "no_ideas": "No ideas found. Add ideas.",
+    "copy": "Copy",
+    "copy_success": "Title and description copied to clipboard!",
+    "copy_error": "Error copying title and description.",
+    "copy_success_title": "Title copied to clipboard!",
+    "copy_error_title": "Error copying title."
+  },
+  "scenario_queries_list": {
+    "title": "Scenario creation history",
+    "columns": {
+      "product": "Product",
+      "scenario_type": "Scenario Type",
+      "scenario_theme": "Scenario Theme",
+      "date": "Creation Date"
+    },
+    "create_button": "Create"
+  },
+  "date": {
+    "locale": "en-US"
+  },
+  "scenario_queries_create": {
+    "title": "Create Scenario",
+    "company": "Company",
+    "no_company": "(If this field is empty, you can select or add the current company in the menu on the left)",
+    "product": "Product",
+    "scenario_type": "Scenario Type",
+    "scenario_theme": "Scenario Theme",
+    "language": "Language",
+    "latency": "Duration",
+    "seconds": "seconds",
+    "description": "Description",
+    "errors": {
+      "required": "This field is required"
+    },
+    "submit_button": "Submit Query"
+  },
+  "scenario_queries_details": {
+    "title": "{{company}} - {{product}}",
+    "fields": {
+      "content_type": "Content type: {{content_type}}",
+      "theme": "Scenario theme: {{theme}}",
+      "language": "Language: {{language}}",
+      "description": "Description: {{description}}",
+      "latency": "Duration: {{latency}}"
+    },
+    "actions": {
+      "replay_button": "Repeat query"
+    },
+    "scenarios_section": {
+      "title": "Scenarios:",
+      "not_found": "No scenarios found. Please add a scenario."
+    },
+    "copy_tooltip": "Copy",
+    "copy_success": "Content copied to clipboard!",
+    "copy_error": "Error copying content to clipboard.",
+    "short_description": "Short description:",
+    "main_text": "Main text:"
+  },
+  "post_queries_list": {
+    "title": "Post Creation History - {{company}}",
+    "create_button": "Create",
+    "fields": {
+      "product": "Product",
+      "post_type": "Post Type",
+      "text_style": "Text Style",
+      "date": "Creation Date"
+    }
+  },
+  "post_query_create": {
+    "title": "Create Post",
+    "fields": {
+      "company": "Company",
+      "product": "Product",
+      "post_type": "Post Type",
+      "text_style": "Text Style",
+      "lang": "Language",
+      "content": "Description"
+    },
+    "errors": {
+      "required": "This field is required"
+    },
+    "no_company": "If the field is empty, you can select or add a current company in the left menu.",
+    "submit_button": "Submit Request"
+  },
+  "post_query_details": {
+    "table": {
+      "title": "Title",
+      "favorite": "Add to favorites",
+      "created_date": "Creation date",
+      "actions": "Actions"
+    },
+    "fields": {
+      "post_type": "Post type",
+      "text_style": "Text style",
+      "lang": "Language",
+      "content": "Description"
+    },
+    "buttons": {
+      "recreate_request": "Recreate request"
+    },
+    "posts_title": "Posts:",
+    "errors": {
+      "invalid_date": "Invalid date",
+      "no_posts": "No posts found. Add a post."
+    }
+  },
+  "post_details": {
+    "image_alt": "Post Image",
+    "image_not_found": "Image not found",
+    "image_download_success": "Image downloaded successfully!",
+    "image_download_error": "Error downloading the image.",
+    "copy_success": "Post content copied to clipboard!",
+    "copy_error": "Error copying post content.",
+    "add_to_favorites": "Add to favorites for publication",
+    "publish_now": "Publish Now",
+    "add_to_scheduler": "Add to Scheduler",
+    "no_name": "No Name",
+    "copy": "Copy",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "image_parameters": "Image Parameters",
+    "text_parameters": "Text Parameters",
+    "keep_image": "Keep the current image",
+    "create_new_image": "Create a new image",
+    "create_with_new_description": "Create with a new description",
+    "image_style": "Image Style",
+    "enter_image_description": "Enter the image description...",
+    "keep_text": "Keep the current text",
+    "create_new_text": "Create a new text",
+    "enter_text_description": "Enter the text description...",
+    "submit_request": "Submit Request"
+  },
+  "post_update": {
+    "invalid_file_type": "Please upload a JPEG or PNG file",
+    "update_success": "Post updated successfully!",
+    "image_alt": "Post Image",
+    "upload_image": "Upload New Image",
+    "select_file": "Select File",
+    "title": "Title",
+    "main_text": "Main Text",
+    "hashtags": "Hashtags",
+    "add_to_favorites": "Add to Favorites",
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "post_delete": {
+    "title": "Delete Post",
+    "confirmation_text": "Are you sure you want to delete the post \"{{postTitle}}\"?",
+    "success": "Post deleted successfully!",
+    "buttons": {
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "content_plan": {
+    "calendar": "Calendar",
+    "tile": "Tile",
+    "list": "List",
+    "add_content": "Add Content",
+    "post_added": "Post successfully added to the scheduler.",
+    "no_active_posts": "No active posts",
+    "title": "Content Plan",
+    "publish_now": "Publish Now",
+    "add_to_scheduler": "Add to Scheduler",
+    "content_plan_calendar": {
+      "all_day": "All day",
+      "previous": "Previous",
+      "next": "Next",
+      "today": "Today",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "agenda": "Agenda",
+      "date": "Date",
+      "time": "Time",
+      "event": "Event",
+      "no_events_in_range": "No events in range",
+      "show_more": "Show more ({{total}})"
+    },
+    "selected_post_preview": {
+      "image_alt": "Post Image",
+      "add_to_favorites": "Add to favorites for publication"
+    },
+    "content_plan_add_post_modal": {
+      "add_content_title": "Add content",
+      "scheduler_title": "Add to scheduler",
+      "publish_now": "Publish now",
+      "add_to_scheduler": "Add to scheduler",
+      "draft": "Draft",
+      "post": "Post",
+      "reels": "Reels",
+      "stories": "Stories",
+      "expand": "Expand",
+      "hide": "Hide",
+      "add_social_media": "Add social media",
+      "choose_date": "Choose a date",
+      "choose_time": "Choose a time",
+      "time_invalid": "Minutes must be a multiple of 15. Please select a different time.",
+      "time_passed": "The selected time has passed, resetting the time selection.",
+      "select_date": "Select a date",
+      "select_time": "Select a time",
+      "no_post_selected": "No post selected"
+    },
+    "content_plan_posts_list_modal": {
+      "select_post": "Select Post",
+      "create_post": "Create Post",
+      "generate_post": "Generate Post",
+      "favorite_posts": "Favorite Posts",
+      "select": "Select"
+    },
+    "post_create_form": {
+      "error_image_format": "Please upload a file in JPEG or PNG format",
+      "image_alt": "Post Image",
+      "upload_image": "Upload New Image",
+      "select_file": "Select File",
+      "title": "Title",
+      "main_text": "Main Text",
+      "hashtags": "Hashtags",
+      "create_post": "Create Post"
+    },
+    "post_query_generate_form": {
+      "company": "Company",
+      "product": "Product",
+      "post_type": "Post Type",
+      "text_style": "Text Style",
+      "lang": "Language",
+      "content": "Content",
+      "field_required": "This field is required",
+      "post_image_alt": "Post Image",
+      "submit_request": "Submit Request"
+    },
+    "expand_more": "Expand",
+    "expand_less": "Collapse",
+    "select_social_networks": "Select Social Networks",
+    "select": "Select",
+    "no_social_networks": "You have no connected social networks.",
+    "connect_social_network": "Connect a social network",
+    "select_all": "Select All"
+  }
+}

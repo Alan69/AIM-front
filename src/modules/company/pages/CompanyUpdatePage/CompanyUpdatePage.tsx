@@ -1,10 +1,15 @@
-import React, { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { useUpdateCompanyMutation, useGetCompanyByIdQuery, useGetCompanyListQuery } from '../../redux/api';
-import { useForm, Controller } from 'react-hook-form';
-import { Layout, Button, Form, Input } from 'antd';
-import styles from './CompanyUpdatePage.module.scss';
-import { useTypedSelector } from 'hooks/useTypedSelector';
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useUpdateCompanyMutation,
+  useGetCompanyByIdQuery,
+  useGetCompanyListQuery,
+} from "../../redux/api";
+import { useForm, Controller } from "react-hook-form";
+import { Layout, Button, Form, Input } from "antd";
+import { useTranslation } from "react-i18next";
+import styles from "./CompanyUpdatePage.module.scss";
+import { useTypedSelector } from "hooks/useTypedSelector";
 
 type TUpdateCompanyForm = {
   id: number;
@@ -19,18 +24,26 @@ export const CompanyUpdatePage = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useTypedSelector((state) => state.auth);
 
-  const { data: company } = useGetCompanyByIdQuery(id || '');
-  const navigate = useNavigate()
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<TUpdateCompanyForm>({
+  const { t } = useTranslation();
+  const { data: company } = useGetCompanyByIdQuery(id || "");
+  const navigate = useNavigate();
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TUpdateCompanyForm>({
     defaultValues: {
-      name: '',
-      scope: '',
-      comment: '',
-    }
+      name: "",
+      scope: "",
+      comment: "",
+    },
   });
 
   const [updateCompany, { isLoading: isUpdating }] = useUpdateCompanyMutation();
-  const { refetch: refetchCompanyList } = useGetCompanyListQuery(user?.profile.id);
+  const { refetch: refetchCompanyList } = useGetCompanyListQuery(
+    user?.profile.id
+  );
 
   const onSubmit = (payload: TUpdateCompanyForm) => {
     const updatedData = {
@@ -39,10 +52,12 @@ export const CompanyUpdatePage = () => {
     };
 
     if (company) {
-      updateCompany({ ...updatedData, id: company.id }).unwrap().then((response) => {
-        navigate(`/company/${response.id}`);
-        refetchCompanyList();
-      });
+      updateCompany({ ...updatedData, id: company.id })
+        .unwrap()
+        .then((response) => {
+          navigate(`/company/${response.id}`);
+          refetchCompanyList();
+        });
     }
   };
 
@@ -51,15 +66,15 @@ export const CompanyUpdatePage = () => {
       reset({
         name: company.name,
         scope: company.scope,
-        comment: company.comment || '',
+        comment: company.comment || "",
       });
     }
   }, [company, reset]);
 
   return (
     <Layout>
-      <Content className='page-layout'>
-        <h1 className='main-title'>Редактирование данных</h1>
+      <Content className="page-layout">
+        <h1 className="main-title">{t("company_update.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -69,9 +84,9 @@ export const CompanyUpdatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label="Название"
-                  validateStatus={errors.name ? 'error' : ''}
-                  help={errors.name && 'Заполните это поле.'}
+                  label={t("company_update.fields.name")}
+                  validateStatus={errors.name ? "error" : ""}
+                  help={errors.name && t("company_update.errors.required")}
                 >
                   <Controller
                     name="name"
@@ -82,9 +97,9 @@ export const CompanyUpdatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label="Сфера деятельности"
-                  validateStatus={errors.scope ? 'error' : ''}
-                  help={errors.scope && 'Заполните это поле.'}
+                  label={t("company_update.fields.scope")}
+                  validateStatus={errors.scope ? "error" : ""}
+                  help={errors.scope && t("company_update.errors.required")}
                 >
                   <Controller
                     name="scope"
@@ -94,7 +109,7 @@ export const CompanyUpdatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label="Описание">
+                <Form.Item label={t("company_update.fields.description")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -103,16 +118,21 @@ export const CompanyUpdatePage = () => {
                 </Form.Item>
                 <Form.Item>
                   <div className={styles.buttons}>
-                    <Button type="primary" htmlType="submit" loading={isUpdating}>
-                      Сохранить
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={isUpdating}
+                    >
+                      {t("company_update.buttons.save")}
                     </Button>
                     <Button
                       type="default"
                       onClick={() => {
-                        navigate(`/company/${company?.id}`)
+                        navigate(`/company/${company?.id}`);
                       }}
-                      loading={isUpdating}>
-                      Отмена
+                      loading={isUpdating}
+                    >
+                      {t("company_update.buttons.cancel")}
                     </Button>
                   </div>
                 </Form.Item>
@@ -122,5 +142,5 @@ export const CompanyUpdatePage = () => {
         </Layout>
       </Content>
     </Layout>
-  )
-}
+  );
+};

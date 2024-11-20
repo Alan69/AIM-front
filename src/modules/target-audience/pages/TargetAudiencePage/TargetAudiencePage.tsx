@@ -8,13 +8,15 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import { useNavigate } from "react-router-dom";
 import { RedoOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 const { Content } = Layout;
 
 export const TargetAudiencePage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
-
   const { current_company } = useTypedSelector((state) => state.auth);
+
   const [createTargetAudience, { isLoading: isCreating }] =
     useCreateTargetAudienceMutation();
   const [saveTargetAudience, { isLoading: isSaving }] =
@@ -34,7 +36,7 @@ export const TargetAudiencePage = () => {
       const formattedText = formatResponse(result);
       setFormattedResponse(formattedText);
     } catch (error) {
-      setFormattedResponse("Error creating target audience");
+      setFormattedResponse(t("target_audience.error_create"));
     }
   };
 
@@ -44,13 +46,15 @@ export const TargetAudiencePage = () => {
         .unwrap()
         .then(() => {
           navigate(`/company/${current_company?.id}`);
-          message.success("Целевая аудитория успешно сохранена");
+          message.success(t("target_audience.success_save"));
         });
-    } catch (error) {}
+    } catch (error) {
+      message.error(t("target_audience.error_save"));
+    }
   };
 
   const formatResponse = (data: any) => {
-    if (!data?.result) return "";
+    if (!data?.result) return t("target_audience.no_data");
 
     return Object.entries(data.result)
       .map(([section, details]) => {
@@ -67,7 +71,7 @@ export const TargetAudiencePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Целевая аудитория</h1>
+        <h1 className="main-title">{t("target_audience.title")}</h1>
         <Layout>
           <Content>
             <div style={{ position: "relative" }}>
@@ -99,7 +103,7 @@ export const TargetAudiencePage = () => {
                     onClick={handleCreate}
                     loading={isCreating || isSaving}
                   >
-                    Создать
+                    {t("target_audience.create")}
                   </Button>
                 </div>
               )}
@@ -113,7 +117,7 @@ export const TargetAudiencePage = () => {
                 disabled={!formattedResponse}
                 style={{ marginRight: "10px" }}
               >
-                Сохранить
+                {t("target_audience.save")}
               </Button>
               {formattedResponse && (
                 <Button
@@ -122,7 +126,7 @@ export const TargetAudiencePage = () => {
                   onClick={handleCreate}
                   loading={isCreating || isSaving}
                 >
-                  Пересоздать
+                  {t("target_audience.recreate")}
                 </Button>
               )}
             </div>

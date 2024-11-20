@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { Layout, Button, Form, Input, Select, message } from "antd";
 import { useTypedSelector } from "hooks/useTypedSelector";
+import { useTranslation } from "react-i18next";
 import { useGetContentTypesListQuery } from "../../../../redux/api/contentTypes/contentTypesApi";
 import { useGetThemesListQuery } from "../../../../redux/api/themes/themesApi";
 import { useGetLanguagesListQuery } from "../../../../redux/api/languages/languagesApi";
@@ -12,16 +13,14 @@ import {
   TIdeaQueriesCreateData,
   useCreateIdeaQueriesMutation,
 } from "modules/idea-queries/redux/api";
-import {
-  useGetCurrentTargetAudienceQuery,
-  useGetTargetAudienceListQuery,
-} from "modules/target-audience/redux/api";
+import { useGetCurrentTargetAudienceQuery } from "modules/target-audience/redux/api";
 
 const { Content } = Layout;
 
 export const IdeaQueriesCreatePage = () => {
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const [createIdeaQueries, { isLoading: isIdeaCreating }] =
     useCreateIdeaQueriesMutation();
@@ -31,10 +30,7 @@ export const IdeaQueriesCreatePage = () => {
   ] = useLazyGetProductListByCompanyIdQuery();
   const { data: contentTypesList, isLoading: isContentTypesListLoading } =
     useGetContentTypesListQuery();
-  // const { data: targetAudienceList, isLoading: isTargetAudienceListLoading } =
-  //   useGetTargetAudienceListQuery();
-  const { data: targetAudience, isLoading: isTargetAudienceLoading } =
-    useGetCurrentTargetAudienceQuery();
+  const { data: targetAudience } = useGetCurrentTargetAudienceQuery();
   const { data: themesList, isLoading: isThemesListLoading } =
     useGetThemesListQuery();
   const { data: languagesList, isLoading: isLanguagesListLoading } =
@@ -89,12 +85,14 @@ export const IdeaQueriesCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Создать идею</h1>
+        <h1 className="main-title">{t("idea_queries_create.title")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label="Компания"
+            label={t("idea_queries_create.fields.company")}
             validateStatus={errors.company ? "error" : ""}
-            help={errors.company && "Заполните это поле."}
+            help={
+              errors.company && t("idea_queries_create.validation.required")
+            }
           >
             <Controller
               name="company"
@@ -118,15 +116,12 @@ export const IdeaQueriesCreatePage = () => {
             />
             {!current_company?.id ? (
               <div className={styles.noContent}>
-                (Если поле пустое, вы можете выбрать или добавить текущую
-                компанию в меню слева)
+                {t("idea_queries_create.hints.no_company")}
               </div>
-            ) : (
-              ""
-            )}
+            ) : null}
           </Form.Item>
 
-          <Form.Item label="Продукт">
+          <Form.Item label={t("idea_queries_create.fields.product")}>
             <Controller
               name="product"
               control={control}
@@ -147,34 +142,13 @@ export const IdeaQueriesCreatePage = () => {
             />
           </Form.Item>
 
-          {/* <Form.Item label="Целевая аудитория">
-            <Controller
-              name="target_audience"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  loading={isTargetAudienceListLoading}
-                  disabled={isIdeaCreating}
-                  allowClear
-                >
-                  {targetAudienceList?.map((target_audience) => (
-                    <Select.Option
-                      key={target_audience.id}
-                      value={target_audience.id}
-                    >
-                      {target_audience.prompt}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-            />
-          </Form.Item> */}
-
           <Form.Item
-            label="Вид контента"
+            label={t("idea_queries_create.fields.content_type")}
             validateStatus={errors.content_type ? "error" : ""}
-            help={errors.content_type && "Заполните это поле."}
+            help={
+              errors.content_type &&
+              t("idea_queries_create.validation.required")
+            }
           >
             <Controller
               name="content_type"
@@ -194,9 +168,9 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Тематика"
+            label={t("idea_queries_create.fields.theme")}
             validateStatus={errors.theme ? "error" : ""}
-            help={errors.theme && "Заполните это поле."}
+            help={errors.theme && t("idea_queries_create.validation.required")}
           >
             <Controller
               name="theme"
@@ -216,9 +190,11 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Язык"
+            label={t("idea_queries_create.fields.language")}
             validateStatus={errors.language ? "error" : ""}
-            help={errors.language && "Заполните это поле."}
+            help={
+              errors.language && t("idea_queries_create.validation.required")
+            }
           >
             <Controller
               name="language"
@@ -247,9 +223,11 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Описание"
+            label={t("idea_queries_create.fields.description")}
             validateStatus={errors.description ? "error" : ""}
-            help={errors.description && "Заполните это поле."}
+            help={
+              errors.description && t("idea_queries_create.validation.required")
+            }
           >
             <Controller
               name="description"
@@ -263,7 +241,7 @@ export const IdeaQueriesCreatePage = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isIdeaCreating}>
-              Отправить запрос
+              {t("idea_queries_create.buttons.submit")}
             </Button>
           </Form.Item>
         </Form>

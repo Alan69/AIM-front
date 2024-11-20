@@ -4,8 +4,10 @@ import { MessageOutlined } from "@ant-design/icons";
 import { useSubmitFeedbackMutation } from "../../../../redux/api/feedback/feedbackApi";
 import styles from "./ChatButtonWithForm.module.scss";
 import Title from "antd/es/typography/Title";
+import { useTranslation } from "react-i18next";
 
 const ChatButtonWithForm: React.FC = () => {
+  const { t } = useTranslation();
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [phoneNumber, setPhoneNumber] = useState<string>("+7");
   const [submitFeedback, { isLoading }] = useSubmitFeedbackMutation();
@@ -36,9 +38,7 @@ const ChatButtonWithForm: React.FC = () => {
       setPhoneNumber("+7");
       setIsModalVisible(false);
     } catch (error) {
-      message.error(
-        "Не удалось отправить сообщение. Пожалуйста, попробуйте еще раз."
-      );
+      message.error(t("chat_button.form.error_message"));
     }
   };
 
@@ -76,7 +76,7 @@ const ChatButtonWithForm: React.FC = () => {
       <Modal
         title={
           <Title level={2} style={{ textAlign: "center" }}>
-            Нужна консультация?
+            {t("chat_button.modal_title")}
           </Title>
         }
         open={isModalVisible}
@@ -85,7 +85,7 @@ const ChatButtonWithForm: React.FC = () => {
         className={styles.chatModal}
       >
         <div className={styles.chatForm}>
-          <h3>Оставьте заявку и мы с вами свяжемся</h3>
+          <h3>{t("chat_button.form_title")}</h3>
 
           <Form
             form={form}
@@ -95,34 +95,33 @@ const ChatButtonWithForm: React.FC = () => {
             initialValues={{ phone_number: phoneNumber }}
           >
             <Form.Item
-              label="Имя"
+              label={t("chat_button.form.name_label")}
               name="name"
               rules={[
-                { required: true, message: "Пожалуйста, введите ваше имя" },
+                { required: true, message: t("chat_button.form.name_error") },
               ]}
             >
-              <Input placeholder="Введите ваше имя" />
+              <Input placeholder={t("chat_button.form.name_placeholder")} />
             </Form.Item>
 
             <Form.Item
-              label="Номер телефона"
+              label={t("chat_button.form.phone_label")}
               name="phone_number"
               rules={[
                 {
                   required: true,
-                  message: "Пожалуйста, введите ваш номер телефона",
+                  message: t("chat_button.form.phone_error"),
                 },
                 {
                   pattern: /^\+7\d{10}$/,
-                  message:
-                    "Введите корректный номер телефона в формате +7XXXXXXXXXX",
+                  message: t("chat_button.form.phone_format_error"),
                 },
               ]}
             >
               <Input
                 value={phoneNumber}
                 onChange={handlePhoneNumberChange}
-                placeholder="Введите ваш номер телефона"
+                placeholder={t("chat_button.form.phone_placeholder")}
                 maxLength={12}
               />
             </Form.Item>
@@ -134,7 +133,7 @@ const ChatButtonWithForm: React.FC = () => {
                 block
                 loading={isLoading}
               >
-                Получить консультацию
+                {t("chat_button.form.submit_button")}
               </Button>
             </Form.Item>
           </Form>

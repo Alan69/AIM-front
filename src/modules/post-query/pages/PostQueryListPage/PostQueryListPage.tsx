@@ -5,6 +5,7 @@ import type { TableProps } from "antd";
 import cn from "classnames";
 import { TPostQueryData, useGetPostQueriesListQuery } from "../../redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
+import { useTranslation } from "react-i18next";
 import styles from "./PostQueryListPage.module.scss";
 
 const { Content } = Layout;
@@ -13,10 +14,11 @@ export const PostQueryListPage = () => {
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
   const { data: postQueriesList, refetch } = useGetPostQueriesListQuery();
+  const { t } = useTranslation();
 
   const columns: TableProps<TPostQueryData>["columns"] = [
     {
-      title: "Продукт",
+      title: t("post_queries_list.fields.product"),
       dataIndex: "product",
       key: "product",
       fixed: "left",
@@ -25,7 +27,7 @@ export const PostQueryListPage = () => {
       ),
     },
     {
-      title: "Тип поста",
+      title: t("post_queries_list.fields.post_type"),
       dataIndex: "post_type",
       key: "post_type",
       render: (text, record) => (
@@ -33,7 +35,7 @@ export const PostQueryListPage = () => {
       ),
     },
     {
-      title: "Стилистика",
+      title: t("post_queries_list.fields.text_style"),
       dataIndex: "text_style",
       key: "text_style",
       render: (text, record) => (
@@ -41,7 +43,7 @@ export const PostQueryListPage = () => {
       ),
     },
     {
-      title: "Дата cоздания",
+      title: t("post_queries_list.fields.date"),
       dataIndex: "date",
       key: "date",
       render: (text, record) => (
@@ -77,13 +79,13 @@ export const PostQueryListPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className={cn("main-title", styles.title)}>
-          История создания постов - {current_company?.name}
+          {t("post_queries_list.title", { company: current_company?.name })}
           <Button
             color="default"
             className={styles.addBtn}
             onClick={() => navigate("/post-query/create")}
           >
-            Создать
+            {t("post_queries_list.create_button")}
           </Button>
         </h1>
         <Table

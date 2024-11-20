@@ -1,19 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useGetPostByIdQuery, useUpdatePostMutation } from '../../redux/api';
-import { Layout, Image, Button, Checkbox, Form, Input, Upload, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import styles from './PostUpdatePage.module.scss';
-import { useTypedSelector } from 'hooks/useTypedSelector';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useGetPostByIdQuery, useUpdatePostMutation } from "../../redux/api";
+import {
+  Layout,
+  Image,
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  Upload,
+  message,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
+import styles from "./PostUpdatePage.module.scss";
+import { useTypedSelector } from "hooks/useTypedSelector";
 
 const { Content } = Layout;
 
 export const PostUpdatePage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useTypedSelector((state) => state.auth);
 
   const { id } = useParams<{ id: string }>();
-  const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || '');
+  const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || "");
   const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
 
   const [file, setFile] = useState<File | null>(null);
@@ -26,10 +37,10 @@ export const PostUpdatePage = () => {
     const fileList = info.fileList;
     if (fileList.length > 0) {
       const lastFile = fileList[fileList.length - 1];
-      if (lastFile.type === 'image/jpeg' || lastFile.type === 'image/png') {
+      if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
         setFile(lastFile.originFileObj);
       } else {
-        message.error('Пожалуйста, загрузите файл формата JPEG или PNG');
+        message.error(t("post_update.invalid_file_type"));
       }
     } else {
       setFile(null);
@@ -47,23 +58,27 @@ export const PostUpdatePage = () => {
         post_query: post.post_query,
         id: id,
         author: user?.profile.id,
-        picture: file
+        picture: file,
       };
 
-      updatePost(updatedData).unwrap().then((response) => {
-        navigate(`/post/${response.post_query.id}/${response.id}`);
-        refetch().unwrap().then(() => {
-          message.success('Вы успешно обновили пост!');
+      updatePost(updatedData)
+        .unwrap()
+        .then((response) => {
+          navigate(`/post/${response.post_query.id}/${response.id}`);
+          refetch()
+            .unwrap()
+            .then(() => {
+              message.success(t("post_update.update_success"));
+            });
         });
-      });
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>{t("common.loading")}</div>;
 
   return (
     <Layout>
-      <Content className='page-layout'>
+      <Content className="page-layout">
         <Layout>
           <Content>
             <div className={styles.postDescr}>
@@ -73,7 +88,7 @@ export const PostUpdatePage = () => {
                     <Image
                       src={post?.picture}
                       className={styles.picture}
-                      alt="Post Image"
+                      alt={t("post_update.image_alt")}
                     />
                   </div>
                 </div>
@@ -88,40 +103,59 @@ export const PostUpdatePage = () => {
                     like: post?.like,
                   }}
                 >
-                  <Form.Item name="picture" label="Загрузить новое изображение">
-                    <Upload name="picture" listType="picture" accept="image/jpeg, image/png" maxCount={1} beforeUpload={() => false} onChange={handleFileChange}>
-                      <Button icon={<UploadOutlined />}>Выберите файл</Button>
+                  <Form.Item
+                    name="picture"
+                    label={t("post_update.upload_image")}
+                  >
+                    <Upload
+                      name="picture"
+                      listType="picture"
+                      accept="image/jpeg, image/png"
+                      maxCount={1}
+                      beforeUpload={() => false}
+                      onChange={handleFileChange}
+                    >
+                      <Button icon={<UploadOutlined />}>
+                        {t("post_update.select_file")}
+                      </Button>
                     </Upload>
                   </Form.Item>
 
-                  <Form.Item name="title" label="Заголовок">
+                  <Form.Item name="title" label={t("post_update.title")}>
                     <Input />
                   </Form.Item>
 
-                  <Form.Item name="main_text" label="Основной текст">
+                  <Form.Item
+                    name="main_text"
+                    label={t("post_update.main_text")}
+                  >
                     <Input.TextArea rows={8} />
                   </Form.Item>
 
-                  <Form.Item name="hashtags" label="Хэштеги">
+                  <Form.Item name="hashtags" label={t("post_update.hashtags")}>
                     <Input.TextArea rows={4} />
                   </Form.Item>
 
                   <Form.Item name="like" valuePropName="checked">
-                    <Checkbox>В избранные для публикации</Checkbox>
+                    <Checkbox>{t("post_update.add_to_favorites")}</Checkbox>
                   </Form.Item>
 
                   <Form.Item>
                     <div className={styles.postActions}>
-                      <Button type="primary" htmlType="submit" loading={isUpdating}>
-                        Сохранить
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={isUpdating}
+                      >
+                        {t("post_update.buttons.save")}
                       </Button>
                       <Button
                         htmlType="button"
-                        type='default'
+                        type="default"
                         onClick={() => navigate(-1)}
                         loading={isUpdating}
                       >
-                        Отменить
+                        {t("post_update.buttons.cancel")}
                       </Button>
                     </div>
                   </Form.Item>

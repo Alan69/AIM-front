@@ -4,6 +4,7 @@ import { Button, Layout, Table } from "antd";
 import type { TableProps } from "antd";
 import cn from "classnames";
 import { useTypedSelector } from "hooks/useTypedSelector";
+import { useTranslation } from "react-i18next";
 import styles from "./IdeaQueriesListPage.module.scss";
 import {
   TIdeaQueriesData,
@@ -16,10 +17,11 @@ export const IdeaQueriesListPage = () => {
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
   const { data: ideaQueriesList, refetch } = useGetIdeaQueriesListQuery();
+  const { t } = useTranslation();
 
   const columns: TableProps<TIdeaQueriesData>["columns"] = [
     {
-      title: "Продукт",
+      title: t("idea_queries_list.fields.product"),
       dataIndex: "product",
       key: "product",
       fixed: "left",
@@ -28,7 +30,7 @@ export const IdeaQueriesListPage = () => {
       ),
     },
     {
-      title: "Тип контента",
+      title: t("idea_queries_list.fields.content_type"),
       dataIndex: "content_type",
       key: "content_type",
       render: (text, record) => (
@@ -36,7 +38,7 @@ export const IdeaQueriesListPage = () => {
       ),
     },
     {
-      title: "Тематика",
+      title: t("idea_queries_list.fields.theme"),
       dataIndex: "theme",
       key: "theme",
       render: (text, record) => (
@@ -44,7 +46,7 @@ export const IdeaQueriesListPage = () => {
       ),
     },
     {
-      title: "Дата cоздания",
+      title: t("idea_queries_list.fields.date_created"),
       dataIndex: "date",
       key: "date",
       render: (text, record) => (
@@ -54,8 +56,8 @@ export const IdeaQueriesListPage = () => {
   ];
 
   const formatDate = (dateString: string | undefined) => {
-    const date = new Date(dateString ? dateString : "");
-    return new Intl.DateTimeFormat("ru-RU", {
+    const date = new Date(dateString || "");
+    return new Intl.DateTimeFormat(t("locale"), {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -80,13 +82,16 @@ export const IdeaQueriesListPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className={cn("main-title", styles.title)}>
-          История создания идеи - {current_company?.name}
+          {t("idea_queries_list.title", {
+            company:
+              current_company?.name || t("idea_queries_list.default_company"),
+          })}
           <Button
             color="default"
             className={styles.addBtn}
             onClick={() => navigate("/idea-queries/create")}
           >
-            Создать
+            {t("idea_queries_list.create_button")}
           </Button>
         </h1>
         <Table

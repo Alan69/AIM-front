@@ -19,6 +19,7 @@ import {
 } from "modules/social-media/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useGetCurrentTargetAudienceQuery } from "modules/target-audience/redux/api";
+import { useTranslation } from "react-i18next";
 
 interface DataType {
   key: string;
@@ -30,6 +31,7 @@ const { Title, Text } = Typography;
 const { Content } = Layout;
 
 export const CompanyDetailsPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { current_company } = useTypedSelector((state) => state.auth);
@@ -55,19 +57,19 @@ export const CompanyDetailsPage = () => {
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "Название",
+      title: t("company_details.fields.products"),
       dataIndex: "product_name",
       key: "product_name",
       render: (text) => <div>{text}</div>,
       fixed: "left",
     },
     {
-      title: "Назначение",
+      title: t("company_details.fields.description"),
       dataIndex: "product_assignment",
       key: "product_assignment",
     },
     {
-      title: "Действия",
+      title: t("company_details.fields.actions"),
       dataIndex: "product_action",
       key: "product_action",
     },
@@ -100,13 +102,13 @@ export const CompanyDetailsPage = () => {
   const socialMediaListColumns: TableProps<TSocialMediaByCurrentCompanyData>["columns"] =
     [
       {
-        title: "Название социальной сети",
+        title: t("company_details.fields.social_media"),
         dataIndex: "platform",
         key: "platform",
         fixed: "left",
       },
       {
-        title: "Имя пользователя",
+        title: t("company_details.fields.description"),
         dataIndex: "username",
         key: "username",
       },
@@ -138,7 +140,9 @@ export const CompanyDetailsPage = () => {
             {isExpanded ? targetText : textLines.slice(0, 5).join("\n")}
           </Text>
           <Button type="link" onClick={handleToggleExpand}>
-            {isExpanded ? "Скрыть" : "Показать больше"}
+            {isExpanded
+              ? t("company_details.buttons.hide")
+              : t("company_details.buttons.show_more")}
           </Button>
         </div>
       );
@@ -150,13 +154,15 @@ export const CompanyDetailsPage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Компания: {company?.name}</h1>
+        <h1 className="main-title">
+          {t("company_details.title", { name: company?.name })}
+        </h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
               <div className={styles.companyDescr__title}>
                 <Title level={4}>
-                  Сфера деятельности:{" "}
+                  {t("company_details.fields.scope")}:{" "}
                   <span className={styles.companyDescr__title__value}>
                     {company?.scope}
                   </span>
@@ -170,14 +176,16 @@ export const CompanyDetailsPage = () => {
                   </Link>
                 </div>
               </div>
-              <Title level={5}>Описание: {company?.comment}</Title>
+              <Title level={5}>
+                {t("company_details.fields.description")}: {company?.comment}
+              </Title>
             </div>
           </Content>
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            Целевая аудитория
-            <Tooltip title="Добавить целевую аудиторию">
+            {t("company_details.fields.target_audience")}
+            <Tooltip title={t("company_details.actions.add_target_audience")}>
               <Button
                 type="primary"
                 shape="circle"
@@ -199,8 +207,7 @@ export const CompanyDetailsPage = () => {
                 renderTargetAudienceText()
               ) : (
                 <Text>
-                  На данный момент отсутствуют целевые аудитории. Вы можете
-                  добавить новую целевую аудиторию.
+                  {t("company_details.placeholders.no_target_audience")}
                 </Text>
               )}
               {targetAudience?.text ? (
@@ -215,13 +222,13 @@ export const CompanyDetailsPage = () => {
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            Продукты
-            <Tooltip title="Добавить продукт">
+            {t("company_details.fields.products")}
+            <Tooltip title={t("company_details.actions.add_product")}>
               <Button
                 type="primary"
                 shape="circle"
                 className={styles.addButton}
-                icon={<PlusCircleOutlined className={styles.addIcon} />}
+                icon={<PlusCircleOutlined />}
                 onClick={() => navigate(`/product/${company?.id}/create`)}
               />
             </Tooltip>
@@ -230,10 +237,7 @@ export const CompanyDetailsPage = () => {
             <div className={styles.companyDescr}>
               {!productListByCompanyId?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
-                  <Text>
-                    На данный момент отсутствуют продукты или бренды. Вы можете
-                    добавить новый продукт или бренд.
-                  </Text>
+                  <Text>{t("company_details.placeholders.no_products")}</Text>
                 </div>
               ) : (
                 ""
@@ -249,13 +253,13 @@ export const CompanyDetailsPage = () => {
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            Социальные сети
-            <Tooltip title="Добавить социальную сеть">
+            {t("company_details.fields.social_media")}
+            <Tooltip title={t("company_details.actions.add_social_media")}>
               <Button
                 type="primary"
                 shape="circle"
                 className={styles.addButton}
-                icon={<PlusCircleOutlined className={styles.addIcon} />}
+                icon={<PlusCircleOutlined />}
                 onClick={() => navigate(`/social-media/${company?.id}/add`)}
               />
             </Tooltip>
@@ -265,8 +269,7 @@ export const CompanyDetailsPage = () => {
               {!productListByCompanyId?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
                   <Text>
-                    На данный момент отсутствуют социальные сети. Вы можете
-                    добавить новую социальную сеть.
+                    {t("company_details.placeholders.no_social_media")}
                   </Text>
                 </div>
               ) : (

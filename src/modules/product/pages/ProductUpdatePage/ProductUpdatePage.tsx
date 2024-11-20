@@ -1,11 +1,16 @@
-import React, { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { useUpdateProductMutation, useGetProductByIdQuery, useGetProductListByCompanyIdQuery } from '../../redux/api';
-import { useForm, Controller } from 'react-hook-form';
-import { Layout, Button, Form, Input } from 'antd';
-import styles from './ProductUpdatePage.module.scss';
-import { useGetCompanyByIdQuery } from '../../../company/redux/api';
-import { useTypedSelector } from 'hooks/useTypedSelector';
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useUpdateProductMutation,
+  useGetProductByIdQuery,
+  useGetProductListByCompanyIdQuery,
+} from "../../redux/api";
+import { useForm, Controller } from "react-hook-form";
+import { Layout, Button, Form, Input } from "antd";
+import { useTranslation } from "react-i18next";
+import styles from "./ProductUpdatePage.module.scss";
+import { useGetCompanyByIdQuery } from "../../../company/redux/api";
+import { useTypedSelector } from "hooks/useTypedSelector";
 
 type TUpdateProductForm = {
   id: number;
@@ -17,20 +22,33 @@ type TUpdateProductForm = {
 const { Content } = Layout;
 
 export const ProductUpdatePage = () => {
+  const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
 
-  const { id, companyId } = useParams<{ id: string, companyId: string }>();
-  const { data: company } = useGetCompanyByIdQuery(companyId || '');
-  const { data: product, isLoading, isFetching, refetch: refetchProduct } = useGetProductByIdQuery(id || '');
-  const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(company?.id || '');
+  const { id, companyId } = useParams<{ id: string; companyId: string }>();
+  const { data: company } = useGetCompanyByIdQuery(companyId || "");
+  const {
+    data: product,
+    isLoading,
+    isFetching,
+    refetch: refetchProduct,
+  } = useGetProductByIdQuery(id || "");
+  const { refetch: refetchProductList } = useGetProductListByCompanyIdQuery(
+    company?.id || ""
+  );
 
-  const navigate = useNavigate()
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<TUpdateProductForm>({
+  const navigate = useNavigate();
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TUpdateProductForm>({
     defaultValues: {
-      name: '',
-      scope: '',
-      comment: '',
-    }
+      name: "",
+      scope: "",
+      comment: "",
+    },
   });
 
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
@@ -40,15 +58,17 @@ export const ProductUpdatePage = () => {
       const updatedData = {
         ...payload,
         id: product.id,
-        companyId: companyId ? companyId : '',
+        companyId: companyId ? companyId : "",
         author: user?.profile.id,
       };
 
-      updateProduct(updatedData).unwrap().then(() => {
-        navigate(`/company/${company?.id}`);
-        refetchProductList();
-        refetchProduct();
-      });
+      updateProduct(updatedData)
+        .unwrap()
+        .then(() => {
+          navigate(`/company/${company?.id}`);
+          refetchProductList();
+          refetchProduct();
+        });
     }
   };
 
@@ -57,7 +77,7 @@ export const ProductUpdatePage = () => {
       reset({
         name: product.name,
         scope: product.scope,
-        comment: product.comment || '',
+        comment: product.comment || "",
       });
     }
   }, [product, reset]);
@@ -65,12 +85,12 @@ export const ProductUpdatePage = () => {
   useEffect(() => {
     refetchProductList();
     refetchProduct();
-  }, [refetchProductList, refetchProduct])
+  }, [refetchProductList, refetchProduct]);
 
   return (
     <Layout>
-      <Content className='page-layout'>
-        <h1 className='main-title'>Редактирование данных</h1>
+      <Content className="page-layout">
+        <h1 className="main-title">{t("product_update.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -80,9 +100,9 @@ export const ProductUpdatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label="Название"
-                  validateStatus={errors.name ? 'error' : ''}
-                  help={errors.name && 'Заполните это поле.'}
+                  label={t("product_update.fields.name")}
+                  validateStatus={errors.name ? "error" : ""}
+                  help={errors.name && t("product_update.errors.required")}
                 >
                   <Controller
                     name="name"
@@ -94,9 +114,9 @@ export const ProductUpdatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label="Сфера деятельности"
-                  validateStatus={errors.scope ? 'error' : ''}
-                  help={errors.scope && 'Заполните это поле.'}
+                  label={t("product_update.fields.scope")}
+                  validateStatus={errors.scope ? "error" : ""}
+                  help={errors.scope && t("product_update.errors.required")}
                 >
                   <Controller
                     name="scope"
@@ -107,7 +127,7 @@ export const ProductUpdatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label="Описание">
+                <Form.Item label={t("product_update.fields.comment")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -117,18 +137,23 @@ export const ProductUpdatePage = () => {
                 </Form.Item>
                 <Form.Item>
                   <div className={styles.buttons}>
-                    <Button type="primary" htmlType="submit" disabled={isLoading || isFetching} loading={isUpdating}>
-                      Сохранить
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      disabled={isLoading || isFetching}
+                      loading={isUpdating}
+                    >
+                      {t("product_update.buttons.save")}
                     </Button>
                     <Button
                       type="default"
                       disabled={isLoading || isFetching}
                       loading={isUpdating}
                       onClick={() => {
-                        navigate(`/company/${company?.id}`)
+                        navigate(`/company/${company?.id}`);
                       }}
                     >
-                      Отмена
+                      {t("product_update.buttons.cancel")}
                     </Button>
                   </div>
                 </Form.Item>
@@ -138,5 +163,5 @@ export const ProductUpdatePage = () => {
         </Layout>
       </Content>
     </Layout>
-  )
-}
+  );
+};

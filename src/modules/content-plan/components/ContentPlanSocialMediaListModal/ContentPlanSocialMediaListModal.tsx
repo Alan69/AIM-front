@@ -1,25 +1,27 @@
-import { Modal, Button, Divider, Typography } from 'antd';
-import cn from 'classnames'
+import React, { useState } from "react";
+import { Modal, Button, Divider, Typography } from "antd";
+import cn from "classnames";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
-import React, { useState } from 'react';
-import 'moment/locale/ru';
-import styles from './ContentPlanSocialMediaListModal.module.scss'
-import { TSocialMediaByCurrentCompanyData } from 'modules/social-media/redux/api';
-import { Link } from 'react-router-dom';
-import { useTypedSelector } from 'hooks/useTypedSelector';
+import styles from "./ContentPlanSocialMediaListModal.module.scss";
+import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
+import { useTypedSelector } from "hooks/useTypedSelector";
+
+const { Title } = Typography;
 
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   socialMediaList: TSocialMediaByCurrentCompanyData[] | undefined;
-  handleSelectNewSocialMedias: (socialMedias: TSocialMediaByCurrentCompanyData[]) => void;
+  handleSelectNewSocialMedias: (
+    socialMedias: TSocialMediaByCurrentCompanyData[]
+  ) => void;
   selectedNewSocialMedias: TSocialMediaByCurrentCompanyData[];
   isPostNow?: boolean;
-  isPostNowLoading?: boolean
-  handlePostNow?: () => void
+  isPostNowLoading?: boolean;
+  handlePostNow?: () => void;
 };
-
-const { Title } = Typography;
 
 export const ContentPlanSocialMediaListModal = ({
   isModalOpen,
@@ -29,26 +31,33 @@ export const ContentPlanSocialMediaListModal = ({
   selectedNewSocialMedias,
   isPostNow = false,
   isPostNowLoading,
-  handlePostNow
+  handlePostNow,
 }: TProps) => {
+  const { t } = useTranslation();
   const { current_company } = useTypedSelector((state) => state.auth);
 
-  const [selectCurrentSocialMedias, setSelectCurrentSocialMedias] = useState<TSocialMediaByCurrentCompanyData[]>(selectedNewSocialMedias);
+  const [selectCurrentSocialMedias, setSelectCurrentSocialMedias] = useState<
+    TSocialMediaByCurrentCompanyData[]
+  >(selectedNewSocialMedias);
 
   const handleSelectSocialMedia = (item: TSocialMediaByCurrentCompanyData) => {
     if (isPostNow) {
       if (!selectCurrentSocialMedias.some((social) => social.id === item.id)) {
         const updatedSelection = [...selectCurrentSocialMedias, item];
         setSelectCurrentSocialMedias(updatedSelection);
-        handleSelectNewSocialMedias(updatedSelection)
+        handleSelectNewSocialMedias(updatedSelection);
       } else {
-        const updatedSelection = selectCurrentSocialMedias.filter((social) => social.id !== item.id);
+        const updatedSelection = selectCurrentSocialMedias.filter(
+          (social) => social.id !== item.id
+        );
         setSelectCurrentSocialMedias(updatedSelection);
         handleSelectNewSocialMedias(updatedSelection);
       }
     } else {
       if (selectCurrentSocialMedias.some((social) => social.id === item.id)) {
-        setSelectCurrentSocialMedias(selectCurrentSocialMedias.filter((social) => social.id !== item.id));
+        setSelectCurrentSocialMedias(
+          selectCurrentSocialMedias.filter((social) => social.id !== item.id)
+        );
       } else {
         setSelectCurrentSocialMedias([...selectCurrentSocialMedias, item]);
       }
@@ -63,7 +72,7 @@ export const ContentPlanSocialMediaListModal = ({
         setIsModalOpen(false);
       }
     }
-  }
+  };
 
   const handleSelect = () => {
     if (isPostNow) {
@@ -72,11 +81,11 @@ export const ContentPlanSocialMediaListModal = ({
       handleSelectNewSocialMedias(selectCurrentSocialMedias);
       setIsModalOpen(false);
     }
-  }
+  };
 
   return (
     <Modal
-      title="Выбрать социальные сети"
+      title={t("content_plan.select_social_networks")}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -87,36 +96,60 @@ export const ContentPlanSocialMediaListModal = ({
           type="default"
           onClick={handleSelect}
           style={{
-            borderRadius: '16px',
-            width: '100%',
+            borderRadius: "16px",
+            width: "100%",
           }}
-          disabled={isPostNow ? (isPostNowLoading || selectCurrentSocialMedias.length === 0) : selectCurrentSocialMedias.length === 0}
+          disabled={
+            isPostNow
+              ? isPostNowLoading || selectCurrentSocialMedias.length === 0
+              : selectCurrentSocialMedias.length === 0
+          }
           loading={isPostNowLoading}
         >
-          {isPostNow ? 'Опубликовать сейчас' : 'Выбрать'}
-        </Button>
+          {isPostNow ? t("content_plan.publish_now") : t("content_plan.select")}
+        </Button>,
       ]}
     >
       <Divider />
       <div className={styles.itemList}>
-        {socialMediaList?.length ?
+        {socialMediaList?.length ? (
           socialMediaList?.map((item) => (
             <div
               key={item.id}
               className={cn(
                 styles.item,
-                selectCurrentSocialMedias.some((social) => social.id === item.id) ? styles.item__isActive : ''
+                selectCurrentSocialMedias.some(
+                  (social) => social.id === item.id
+                )
+                  ? styles.item__isActive
+                  : ""
               )}
               onClick={() => handleSelectSocialMedia(item)}
             >
-              <img width={32} height={32} src={item?.platform.icon} alt={item?.username} />
-              <Title level={5} className={styles.username}>{item?.username}</Title>
+              <img
+                width={32}
+                height={32}
+                src={item?.platform.icon}
+                alt={item?.username}
+              />
+              <Title level={5} className={styles.username}>
+                {item?.username}
+              </Title>
             </div>
-          )) : <div className={styles.noContent}>
-            <div className={styles.noContent__text}>У вас нет подключенных социльаных сетей</div>
-            <Link to={`/social-media/${current_company?.id}/add`} className={styles.noContent__link}>Подключить социальную сеть</Link>
+          ))
+        ) : (
+          <div className={styles.noContent}>
+            <div className={styles.noContent__text}>
+              {t("content_plan.no_social_networks")}
+            </div>
+            <Link
+              to={`/social-media/${current_company?.id}/add`}
+              className={styles.noContent__link}
+            >
+              {t("content_plan.connect_social_network")}
+            </Link>
           </div>
-        }
+        )}
       </div>
       <Divider />
       <Button
@@ -124,13 +157,13 @@ export const ContentPlanSocialMediaListModal = ({
         type="default"
         onClick={handleSelectAll}
         style={{
-          borderRadius: '16px',
-          width: '100%',
+          borderRadius: "16px",
+          width: "100%",
         }}
         disabled={socialMediaList?.length === 0}
         loading={isPostNowLoading}
       >
-        Выбрать всё
+        {t("content_plan.select_all")}
       </Button>
     </Modal>
   );

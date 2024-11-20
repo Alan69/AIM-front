@@ -47,6 +47,7 @@ import {
   TAddToSchedulersData,
   useAddToSchedulersMutation,
 } from "modules/content-plan/redux/api";
+import { useTranslation } from "react-i18next";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -54,6 +55,8 @@ const { TextArea } = Input;
 const { Panel } = Collapse;
 
 export const PostDetailsPage = () => {
+  const { t } = useTranslation();
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -298,7 +301,7 @@ export const PostDetailsPage = () => {
                             <Image
                               src={post?.picture}
                               className={styles.picture}
-                              alt="Post Image"
+                              alt={t("post_details.image_alt")}
                             />
                             <Button
                               className={styles.reloadButton}
@@ -315,7 +318,9 @@ export const PostDetailsPage = () => {
                               onClick={async () => {
                                 try {
                                   if (!post?.picture) {
-                                    message.error("Изображение не найдено");
+                                    message.error(
+                                      t("post_details.image_not_found")
+                                    );
                                     return;
                                   }
 
@@ -327,7 +332,7 @@ export const PostDetailsPage = () => {
 
                                   if (!response.ok) {
                                     throw new Error(
-                                      "Ошибка загрузки изображения"
+                                      t("post_details.image_download_error")
                                     );
                                   }
 
@@ -342,15 +347,15 @@ export const PostDetailsPage = () => {
                                   document.body.removeChild(link);
                                   window.URL.revokeObjectURL(url);
                                   message.success(
-                                    "Изображение скачано успешно!"
+                                    t("post_details.image_download_success")
                                   );
                                 } catch (error) {
                                   console.error(
-                                    "Ошибка при загрузке изображения:",
+                                    t("post_details.image_download_error"),
                                     error
                                   );
                                   message.error(
-                                    "Ошибка при загрузке изображения"
+                                    t("post_details.image_download_error")
                                   );
                                 }
                               }}
@@ -358,7 +363,6 @@ export const PostDetailsPage = () => {
                           </>
                         )}
                       </div>
-
                       {/* <Collapse className={styles.postDescription}>
                     <Panel header="Описание" key="1">
                       <Text>{post?.img_prompt}</Text>
@@ -368,7 +372,7 @@ export const PostDetailsPage = () => {
                     <div className={styles.postContent}>
                       <div className={styles.postContent__titleBlock}>
                         <Title level={3}>{post?.title}</Title>
-                        <Tooltip title="Скопировать">
+                        <Tooltip title={t("post_details.copy")}>
                           <Button
                             className={styles.postContent__icon}
                             icon={<CopyOutlined />}
@@ -393,13 +397,11 @@ export const PostDetailsPage = () => {
                                 navigator.clipboard.writeText(textToCopy).then(
                                   () => {
                                     message.success(
-                                      "Содержимое поста скопировано в буфер обмена!"
+                                      t("post_details.copy_success")
                                     );
                                   },
-                                  (err) => {
-                                    message.error(
-                                      "Ошибка при копировании содержимого поста."
-                                    );
+                                  () => {
+                                    message.error(t("post_details.copy_error"));
                                   }
                                 );
                               }
@@ -410,7 +412,6 @@ export const PostDetailsPage = () => {
                       <div className={styles.postContent__text}>
                         {post?.main_text ? formatText(post.main_text) : null}
                       </div>
-
                       <div className={styles.postHashtags}>
                         <Text>{post?.hashtags}</Text>
                       </div>
@@ -425,7 +426,7 @@ export const PostDetailsPage = () => {
                         )}
                         onClick={handleUpdateLike}
                       />
-                      <Text>В избранные для публикации</Text>
+                      <Text>{t("post_details.add_to_favorites")}</Text>
                     </div>
                     <div className={styles.postActions}>
                       <Button
@@ -436,26 +437,26 @@ export const PostDetailsPage = () => {
                           )
                         }
                       >
-                        Редактировать
+                        {t("post_details.edit")}
                       </Button>
                       <Button
                         type="primary"
                         onClick={handleShowContentPlanSocialMediaListModal}
                       >
-                        Опубликовать сейчас
+                        {t("post_details.publish_now")}
                       </Button>
                       <Button
                         type="primary"
                         onClick={handleShowContentPlanAddPostModal}
                       >
-                        В планировщик
+                        {t("post_details.add_to_scheduler")}
                       </Button>
                       <Button
                         htmlType="button"
                         type="default"
                         onClick={() => navigate(-1)}
                       >
-                        Отменить
+                        {t("post_details.cancel")}
                       </Button>
                     </div>
                   </div>
@@ -463,7 +464,9 @@ export const PostDetailsPage = () => {
                     <div className={styles.editBlock}>
                       <form onSubmit={handleSubmit(onSubmit)}>
                         <div className={styles.parameters}>
-                          <Title level={4}>Параметры рисунка:</Title>
+                          <Title level={4}>
+                            {t("post_details.image_parameters")}
+                          </Title>
                           <Controller
                             control={control}
                             name="imageOption"
@@ -479,7 +482,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  Оставить без изменения
+                                  {t("post_details.keep_image")}
                                 </Radio>
                                 <Radio
                                   value="newImage"
@@ -488,7 +491,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  Создать заново
+                                  {t("post_details.create_new_image")}
                                 </Radio>
                                 <Radio
                                   value="newDescriptionImage"
@@ -497,7 +500,9 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  Создать с новым описанием
+                                  {t(
+                                    "post_details.create_with_new_description"
+                                  )}
                                 </Radio>
                               </Radio.Group>
                             )}
@@ -516,7 +521,8 @@ export const PostDetailsPage = () => {
                                 }}
                               >
                                 <Title level={4}>
-                                  Стиль рисунка: {currentImgStyle?.name}
+                                  {t("post_details.image_style")}:{" "}
+                                  {currentImgStyle?.name}
                                 </Title>
                                 <img
                                   src={currentImgStyle?.picture}
@@ -530,7 +536,9 @@ export const PostDetailsPage = () => {
                                   <TextArea
                                     {...field}
                                     rows={6}
-                                    placeholder="Введите описание изображения..."
+                                    placeholder={t(
+                                      "post_details.enter_image_description"
+                                    )}
                                     className={styles.textArea}
                                     disabled={
                                       isRecreatePostImageLoading ||
@@ -541,7 +549,9 @@ export const PostDetailsPage = () => {
                               />
                             </div>
                           )}
-                          <Title level={4}>Параметры текста:</Title>
+                          <Title level={4}>
+                            {t("post_details.text_parameters")}
+                          </Title>
                           <Controller
                             control={control}
                             name="textOption"
@@ -557,7 +567,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  Оставить без изменения
+                                  {t("post_details.keep_text")}
                                 </Radio>
                                 <Radio
                                   value="newText"
@@ -566,7 +576,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  Создать заново
+                                  {t("post_details.create_new_text")}
                                 </Radio>
                                 <Radio
                                   value="newDescriptionText"
@@ -575,7 +585,9 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  Создать с новым описанием
+                                  {t(
+                                    "post_details.create_with_new_description"
+                                  )}
                                 </Radio>
                               </Radio.Group>
                             )}
@@ -588,7 +600,9 @@ export const PostDetailsPage = () => {
                                 <TextArea
                                   {...field}
                                   rows={6}
-                                  placeholder="Введите описание текста..."
+                                  placeholder={t(
+                                    "post_details.enter_text_description"
+                                  )}
                                   className={styles.textArea}
                                   disabled={
                                     isRecreatePostImageLoading ||
@@ -614,7 +628,7 @@ export const PostDetailsPage = () => {
                             isRecreatePostTextLoading
                           }
                         >
-                          Отправить запрос
+                          {t("post_details.submit_request")}
                         </Button>
                       </form>
                     </div>

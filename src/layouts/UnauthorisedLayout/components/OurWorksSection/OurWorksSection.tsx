@@ -18,14 +18,16 @@ import videoSrc from "assets/card.mp4";
 // @ts-ignore
 import videoSrc2 from "assets/card_1.mp4";
 import { useIsXlTablet, useIsTablet } from "hooks/media";
+import { useTranslation } from "react-i18next";
 
 export const OurWorksSection = () => {
   const isTablet = useIsTablet();
   const isXlTablet = useIsXlTablet();
+  const { t } = useTranslation();
 
   return (
     <section className={styles.section} id="OurWorksSection">
-      <h3 className={styles.title}>Работы, созданные нашим ИИ</h3>
+      <h3 className={styles.title}>{t("our_works.title")}</h3>
       <div className={styles.works}>
         <div className={styles.works__block}>
           <div className={styles.works__item}>

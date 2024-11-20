@@ -1,25 +1,40 @@
-import React, { useState } from 'react';
-import { Card, Typography, Button, Layout, Divider, Slider, message } from 'antd';
-import { Content } from 'antd/es/layout/layout';
-import { useTypedSelector } from 'hooks/useTypedSelector';
-import { useCreateTariffMutation, usePaymentInitiateMutation, usePaymentTokenMutation } from 'modules/tariff/redux/api';
+import React, { useState } from "react";
+import {
+  Card,
+  Typography,
+  Button,
+  Layout,
+  Divider,
+  Slider,
+  message,
+} from "antd";
+import { Content } from "antd/es/layout/layout";
+import { useTypedSelector } from "hooks/useTypedSelector";
+import {
+  useCreateTariffMutation,
+  usePaymentInitiateMutation,
+  usePaymentTokenMutation,
+} from "modules/tariff/redux/api";
 
-import infinity from 'assets/infinity.svg'
-import checked from 'assets/checked.svg'
-import { ReactComponent as IconPlus } from 'assets/plus-white.svg';
-import { ReactComponent as IconArrow } from 'assets/arrow.svg';
-import styles from './TariffListPage.module.scss';
+import infinity from "assets/infinity.svg";
+import checked from "assets/checked.svg";
+import { ReactComponent as IconPlus } from "assets/plus-white.svg";
+import { ReactComponent as IconArrow } from "assets/arrow.svg";
+import styles from "./TariffListPage.module.scss";
+import { useTranslation } from "react-i18next";
 
 const { Title } = Typography;
 
 export const TariffListPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
 
   const [companyCount, setCompanyCount] = useState<number>(1);
   const [monthDuration, setMonthDuration] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(29900);
-  const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] = useState<number>(29900);
+  const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] =
+    useState<number>(29900);
 
   const [createTariff] = useCreateTariffMutation();
   const [paymentToken] = usePaymentTokenMutation();
@@ -36,16 +51,23 @@ export const TariffListPage: React.FC = () => {
   };
 
   const handleBuyTariff = () => {
-    createTariff({ company_limit: companyCount, month: monthDuration }).unwrap().then(() => {
-      paymentToken().unwrap().then((res) => {
-        paymentInitiate({ token: res.access_token }).unwrap().then((resInitiate) => {
-          window.open(resInitiate.invoice_url, '_self');
-        })
+    createTariff({ company_limit: companyCount, month: monthDuration })
+      .unwrap()
+      .then(() => {
+        paymentToken()
+          .unwrap()
+          .then((res) => {
+            paymentInitiate({ token: res.access_token })
+              .unwrap()
+              .then((resInitiate) => {
+                window.open(resInitiate.invoice_url, "_self");
+              });
+          });
       })
-    }).catch((error) => {
-      message.error(error.data.error)
-    })
-  }
+      .catch((error) => {
+        message.error(error.data.error);
+      });
+  };
 
   const calculateCost = (companies: number, months: number) => {
     const baseCost = 29900;
@@ -79,88 +101,160 @@ export const TariffListPage: React.FC = () => {
 
   return (
     <Layout>
-      <Content className='page-layout'>
+      <Content className="page-layout">
         <Layout>
           <Content>
             <div className={styles.offerPage}>
               <Layout className={styles.accountInfo}>
                 <Content>
-                  <Title level={2}>Ваш тариф заканчивается через {user?.profile.user.tariff.days} дней.</Title>
+                  <Title level={2}>
+                    {t("tariff_page.title", {
+                      days: user?.profile?.user?.tariff?.days ?? 0, // Указываем значение или 0
+                    })}
+                  </Title>
                 </Content>
               </Layout>
 
               <section className={styles.section}>
-                <h3 className={styles.title}>Подбери свой тариф</h3>
-                <div className={styles.subtitle}>Акция: купи годовой тариф и получи 2 месяца в подарок</div>
+                <h3 className={styles.title}>{t("tariff_page.subtitle")}</h3>
+                <div className={styles.subtitle}>
+                  {t("tariff_page.promotion")}
+                </div>
                 <div className={styles.row}>
                   <div className={styles.col}>
                     <div className={styles.slidersBlock}>
                       <div className={styles.sliderBlock}>
-                        <h4 className={styles.sliderSubtitle}>Количество компаний</h4>
+                        <h4 className={styles.sliderSubtitle}>
+                          {t("tariff_page.sliders.company_count")}
+                        </h4>
                         <Slider
-                          className={'customSlider tariff-page-slider'}
+                          className={"customSlider tariff-page-slider"}
                           min={1}
                           max={12}
                           value={companyCount}
                           onChange={handleCompanyChange}
                           tooltip={{ visible: false }}
-                          marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                          marks={{
+                            1: "1",
+                            2: "2",
+                            3: "3",
+                            4: "4",
+                            5: "5",
+                            6: "6",
+                            7: "7",
+                            8: "8",
+                            9: "9",
+                            10: "10",
+                            11: "11",
+                            12: "12",
+                          }}
                         />
-                        {/* <div>{companyCount}</div> */}
                       </div>
                       <div className={styles.sliderBlock}>
-                        <h4 className={styles.sliderSubtitle}>Длительность, месяцев</h4>
+                        <h4 className={styles.sliderSubtitle}>
+                          {t("tariff_page.sliders.duration")}
+                        </h4>
                         <Slider
-                          className={'customSlider tariff-page-slider'}
+                          className={"customSlider tariff-page-slider"}
                           min={1}
                           max={12}
                           value={monthDuration}
                           onChange={handleDurationChange}
                           tooltip={{ visible: false }}
-                          marks={{ 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10', 11: '11', 12: '12' }}
+                          marks={{
+                            1: "1",
+                            2: "2",
+                            3: "3",
+                            4: "4",
+                            5: "5",
+                            6: "6",
+                            7: "7",
+                            8: "8",
+                            9: "9",
+                            10: "10",
+                            11: "11",
+                            12: "12",
+                          }}
                         />
-                        {/* <div>{monthDuration}</div> */}
                       </div>
                     </div>
                     <Divider />
                     <div className={styles.discountSection}>
-                      <div className={styles.discountSection__label}>Ваша скидка: </div>
-                      <div className={styles.discountSection__value}>{discount.toLocaleString()} ₸</div>
+                      <div className={styles.discountSection__label}>
+                        {t("tariff_page.discount_label")}
+                      </div>
+                      <div className={styles.discountSection__value}>
+                        {discount.toLocaleString()} ₸
+                      </div>
                     </div>
                   </div>
                   <div className={styles.col}>
                     <Card hoverable className={styles.card}>
                       <div className={styles.card__head}>
-                        <div className={styles.card__title}>Твой уникальный тариф</div>
+                        <div className={styles.card__title}>
+                          {t("tariff_page.card.title")}
+                        </div>
                         <div className={styles.card__body}>
                           <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Генерация маркетинговой стратегии</div>
-                            <div className={styles.card__item__value}><img src={checked} alt='checked' /></div>
+                            <div className={styles.card__item__label}>
+                              {t(
+                                "tariff_page.card.features.marketing_strategy"
+                              )}
+                            </div>
+                            <div className={styles.card__item__value}>
+                              <img src={checked} alt="checked" />
+                            </div>
                           </div>
                           <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Генерация воронки продаж</div>
-                            <div className={styles.card__item__value}><img src={checked} alt='checked' /></div>
+                            <div className={styles.card__item__label}>
+                              {t("tariff_page.card.features.sales_funnel")}
+                            </div>
+                            <div className={styles.card__item__value}>
+                              <img src={checked} alt="checked" />
+                            </div>
                           </div>
                           <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Генерации постов</div>
-                            <div className={styles.card__item__value}><img src={infinity} alt='infinity' /></div>
+                            <div className={styles.card__item__label}>
+                              {t("tariff_page.card.features.posts_generation")}
+                            </div>
+                            <div className={styles.card__item__value}>
+                              <img src={infinity} alt="infinity" />
+                            </div>
                           </div>
                           <div className={styles.card__item}>
-                            <div className={styles.card__item__label}>Количество продуктов</div>
-                            <div className={styles.card__item__value}><img src={infinity} alt='infinity' /></div>
+                            <div className={styles.card__item__label}>
+                              {t("tariff_page.card.features.products")}
+                            </div>
+                            <div className={styles.card__item__value}>
+                              <img src={infinity} alt="infinity" />
+                            </div>
                           </div>
                         </div>
                       </div>
                       <div className={styles.card__bottom}>
                         <div className={styles.card__price}>
-                          <div className={styles.card__price__label}>Стоимость:</div>
+                          <div className={styles.card__price__label}>
+                            {t("tariff_page.card.price_label")}
+                          </div>
                           <IconArrow />
                           <div className={styles.card__price__value}>
-                            {discount > 0 ? <span>{totalCostWithoutDiscount.toLocaleString()} ₸</span> : ''}
+                            {discount > 0 ? (
+                              <span>
+                                {totalCostWithoutDiscount.toLocaleString()} ₸
+                              </span>
+                            ) : (
+                              ""
+                            )}
                             {totalCost.toLocaleString()} ₸
                           </div>
                         </div>
-                        <Button className={styles.card__button} onClick={handleBuyTariff}>Подключить <IconPlus className={styles.iconPlus} /></Button>
+                        <Button
+                          className={styles.card__button}
+                          onClick={handleBuyTariff}
+                        >
+                          {t("tariff_page.card.button")}
+                          <IconPlus className={styles.iconPlus} />
+                        </Button>
                       </div>
                     </Card>
                   </div>

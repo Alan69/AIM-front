@@ -7,6 +7,7 @@ import {
 
 import { Layout, Typography, List, Button, message, Tooltip } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 import styles from "./IdeaQueriesDetailsPage.module.scss";
 import { useGetIdeasListQuery } from "modules/ideas/redux/api";
@@ -17,6 +18,7 @@ const { Content } = Layout;
 export const IdeaQueriesDetailsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { id } = useParams<{ id: string }>();
 
@@ -70,32 +72,41 @@ export const IdeaQueriesDetailsPage = () => {
     refetchIdeasList();
   }, [refetch, refetchIdeasList, location.pathname]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>{t("idea_queries_details.loading")}</div>;
 
   return (
     <Layout>
       <Content className="page-layout">
         <h1 className="main-title">
-          {(ideaQuery?.company?.name ? ideaQuery?.company?.name : "-") +
-            " - " +
-            (ideaQuery?.product?.name ? ideaQuery?.product?.name : "-")}
+          {`${ideaQuery?.company?.name || "-"} - ${
+            ideaQuery?.product?.name || "-"
+          }`}
         </h1>
         <Layout>
           <Content>
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  Тип контента: {ideaQuery?.content_type?.name}
+                  {t("idea_queries_details.content_type")}:{" "}
+                  {ideaQuery?.content_type?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Тематика: {ideaQuery?.theme?.name}</Title>
+                <Title level={4}>
+                  {t("idea_queries_details.theme")}: {ideaQuery?.theme?.name}
+                </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Язык: {ideaQuery?.language?.name}</Title>
+                <Title level={4}>
+                  {t("idea_queries_details.language")}:{" "}
+                  {ideaQuery?.language?.name}
+                </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Описание: {ideaQuery?.description}</Title>
+                <Title level={4}>
+                  {t("idea_queries_details.description")}:{" "}
+                  {ideaQuery?.description}
+                </Title>
               </div>
               <Button
                 type="primary"
@@ -103,18 +114,20 @@ export const IdeaQueriesDetailsPage = () => {
                 loading={isIdeaQueriesRecreating}
                 onClick={handleCreateIdeaQueriesReplay}
               >
-                Повторить запрос
+                {t("idea_queries_details.repeat_request")}
               </Button>
             </div>
           </Content>
         </Layout>
         <Layout>
-          <h2 className={styles.product__title}>Идеи:</h2>
+          <h2 className={styles.product__title}>
+            {t("idea_queries_details.ideas")}
+          </h2>
           <Content>
             <div className={styles.postQueryDescr}>
               {!ideas?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
-                  <Text>Идеи не найдены. Добавьте идеи.</Text>
+                  <Text>{t("idea_queries_details.no_ideas")}</Text>
                 </div>
               ) : (
                 <List
@@ -126,7 +139,7 @@ export const IdeaQueriesDetailsPage = () => {
                         title={
                           <div className={styles.titleBlock}>
                             <Title level={4}>{item.Idea}</Title>
-                            <Tooltip title="Скопировать">
+                            <Tooltip title={t("idea_queries_details.copy")}>
                               <Button
                                 className={styles.postContent__icon}
                                 icon={<CopyOutlined />}
@@ -136,31 +149,33 @@ export const IdeaQueriesDetailsPage = () => {
                                     navigator.clipboard
                                       .writeText(textToCopy)
                                       .then(
-                                        () => {
+                                        () =>
                                           message.success(
-                                            "Заголовок и описание скопированы в буфер обмена!"
-                                          );
-                                        },
-                                        (err) => {
+                                            t(
+                                              "idea_queries_details.copy_success"
+                                            )
+                                          ),
+                                        () =>
                                           message.error(
-                                            "Ошибка при копировании заголовка и описания."
-                                          );
-                                        }
+                                            t("idea_queries_details.copy_error")
+                                          )
                                       );
                                   } else if (item.Idea) {
                                     navigator.clipboard
                                       .writeText(item.Idea)
                                       .then(
-                                        () => {
+                                        () =>
                                           message.success(
-                                            "Заголовок скопирован в буфер обмена!"
-                                          );
-                                        },
-                                        (err) => {
+                                            t(
+                                              "idea_queries_details.copy_success_title"
+                                            )
+                                          ),
+                                        () =>
                                           message.error(
-                                            "Ошибка при копировании заголовка."
-                                          );
-                                        }
+                                            t(
+                                              "idea_queries_details.copy_error_title"
+                                            )
+                                          )
                                       );
                                   }
                                 }}

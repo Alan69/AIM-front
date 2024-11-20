@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout, Button, Typography, message } from "antd";
+import { useTranslation } from "react-i18next";
 import styles from "./SocialMediaAddPage.module.scss";
 import {
   TSocialMediaData,
@@ -22,6 +23,7 @@ const { Title } = Typography;
 
 export const SocialMediaAddPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { data: socialMediaList } = useGetSocialMediaListQuery();
   const [addFacebook] = useLazyAddFacebookQuery();
@@ -59,18 +61,21 @@ export const SocialMediaAddPage = () => {
         })
         .catch((err: string) => {
           message.error(
-            `Error adding ${item.name.charAt(0).toUpperCase() + item.name.slice(1)}: ${err}`
+            t("social_media_add.error", {
+              name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
+              error: err,
+            })
           );
         });
     } else {
-      message.error("Social media integration not available.");
+      message.error(t("social_media_add.not_available"));
     }
   };
 
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Добавление социальной сети</h1>
+        <h1 className="main-title">{t("social_media_add.title")}</h1>
         <Layout>
           <Content className={styles.wrapper}>
             <div className={styles.list}>
@@ -81,7 +86,7 @@ export const SocialMediaAddPage = () => {
                   onClick={() => handleAddSocialMedia(item)}
                 >
                   <Title level={4} className={styles.list__item__title}>
-                    {item.name}
+                    {t(`social_media_add.platforms.${item.name}`)}
                   </Title>
                   <img src={item.icon} alt={item.name} />
                 </div>
@@ -94,7 +99,7 @@ export const SocialMediaAddPage = () => {
               type="default"
               onClick={() => navigate(-1)}
             >
-              Назад
+              {t("social_media_add.back_button")}
             </Button>
           </Content>
         </Layout>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import cn from "classnames";
 import {
   Button,
@@ -49,11 +49,13 @@ import {
 import { postActions } from "modules/post/redux/slices/post.slice";
 import { SelectedPreviewBlockModal } from "modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal";
 import { useIsMobile, useIsSmallLaptop } from "hooks/media";
+import { useTranslation } from "react-i18next";
 
 const { Content } = Layout;
 const { Title } = Typography;
 
 export const ContentPlanPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const isSmallLaptop = useIsSmallLaptop();
   const isMobile = useIsMobile();
@@ -140,7 +142,7 @@ export const ContentPlanPage = () => {
       .then(() => {
         refetchPostList();
         setIsContentPlanAddPostModalOpen(false);
-        message.success("Пост успешно добавлен в планировщик.");
+        message.success(t("content_plan.post_added"));
       });
   };
 
@@ -201,7 +203,7 @@ export const ContentPlanPage = () => {
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: "Календарь",
+      label: t("content_plan.calendar"),
       children: (
         <ContentPlanCalendar
           postList={postList}
@@ -216,14 +218,14 @@ export const ContentPlanPage = () => {
     },
     {
       key: "2",
-      label: "Плитка",
+      label: t("content_plan.tile"),
       children: "Content of Tab Pane 2",
       icon: <AppstoreOutlined />,
       disabled: true,
     },
     {
       key: "3",
-      label: "Список",
+      label: t("content_plan.list"),
       children: "Content of Tab Pane 2",
       icon: <UnorderedListOutlined />,
       disabled: true,
@@ -247,7 +249,9 @@ export const ContentPlanPage = () => {
     <>
       <Layout>
         <Content className="page-layout">
-          <h1 className="main-title">Контент план - {current_company?.name}</h1>
+          <h1 className="main-title">
+            {t("content_plan.title")} - {current_company?.name}
+          </h1>
           <Layout>
             <Content className={styles.content}>
               <div
@@ -266,7 +270,7 @@ export const ContentPlanPage = () => {
                       icon={<PlusCircleOutlined />}
                       onClick={handleShowContentPlanAddPostModal}
                     >
-                      {isMobile ? "" : "Добавить контент"}
+                      {isMobile ? "" : t("content_plan.add_content")}
                     </Button>
                   }
                   centered={!isMobile}
@@ -320,7 +324,7 @@ export const ContentPlanPage = () => {
                           )}
                         />
                       ) : (
-                        <p>Нет активный публикаций</p>
+                        <p>{t("content_plan.no_active_posts")}</p>
                       )}
                     </div>
                   ) : (

@@ -10,6 +10,7 @@ import { useTypedSelector } from "hooks/useTypedSelector";
 import { TPostQueryCreateData } from "modules/post-query/redux/api";
 import { ContentPlanPostList } from "../ContentPlanPostList/ContentPlanPostList";
 import { useIsMobile } from "hooks/media";
+import { useTranslation } from "react-i18next"; // Для локализации
 
 type TProps = {
   isModalOpen: boolean;
@@ -39,7 +40,7 @@ export const ContentPlanPostsListModal = ({
   handleGetPostById,
 }: TProps) => {
   const isMobile = useIsMobile();
-
+  const { t } = useTranslation(); // Для перевода
   const [expandedKeys, setExpandedKeys] = useState<Record<number, boolean>>({});
   const [selectCurrentPost, setSelectCurrentPost] = useState<TPostData | null>(
     selectNewPost
@@ -63,7 +64,7 @@ export const ContentPlanPostsListModal = ({
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: "Создание поста",
+      label: t("content_plan.content_plan_posts_list_modal.create_post"),
       children: (
         <PostCreateForm
           post={post}
@@ -76,7 +77,7 @@ export const ContentPlanPostsListModal = ({
     },
     {
       key: "2",
-      label: "Генерация поста",
+      label: t("content_plan.content_plan_posts_list_modal.generate_post"),
       children: (
         <PostQueryGenerateForm
           post={post}
@@ -90,7 +91,7 @@ export const ContentPlanPostsListModal = ({
     },
     {
       key: "3",
-      label: "Список избранных постов",
+      label: t("content_plan.content_plan_posts_list_modal.favorite_posts"),
       children: (
         <ContentPlanPostList
           postListByCompanyId={postListByCompanyId}
@@ -109,7 +110,7 @@ export const ContentPlanPostsListModal = ({
 
   return (
     <Modal
-      title="Выбрать пост"
+      title={t("content_plan.content_plan_posts_list_modal.select_post")}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -145,8 +146,7 @@ export const ContentPlanPostsListModal = ({
             (activeTabKey === "3" && !selectCurrentPost)
           }
         >
-          Выбрать
-          {/* <b>{selectCurrentPost?.title}</b> */}
+          {t("content_plan.content_plan_posts_list_modal.select")}
         </Button>,
       ]}
     >

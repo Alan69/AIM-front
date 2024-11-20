@@ -11,6 +11,7 @@ import styles from "./PostQueryDetailsPage.module.scss";
 import cn from "classnames";
 import { TPostData, useGetPostListQuery } from "modules/post/redux/api";
 import { useIsMobile } from "hooks/media";
+import { useTranslation } from "react-i18next";
 
 interface DataType {
   key: string;
@@ -26,6 +27,7 @@ const { Content } = Layout;
 export const PostQueryDetailsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const isMobile = useIsMobile();
 
@@ -44,7 +46,7 @@ export const PostQueryDetailsPage = () => {
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "Заголовок",
+      title: t("post_query_details.table.title"),
       dataIndex: "post_name",
       key: "post_name",
       render: (text, record) => (
@@ -54,12 +56,12 @@ export const PostQueryDetailsPage = () => {
       width: isMobile ? 180 : "auto",
     },
     {
-      title: "В избранные для публикации",
+      title: t("post_query_details.table.favorite"),
       dataIndex: "post_like",
       key: "post_like",
     },
     {
-      title: "Дата cоздания",
+      title: t("post_query_details.table.created_date"),
       dataIndex: "time_create",
       key: "time_create",
       render: (text, record) => (
@@ -67,7 +69,7 @@ export const PostQueryDetailsPage = () => {
       ),
     },
     {
-      title: "Действия",
+      title: t("post_query_details.table.actions"),
       dataIndex: "post_actions",
       key: "post_actions",
     },
@@ -75,13 +77,13 @@ export const PostQueryDetailsPage = () => {
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) {
-      return "Invalid date";
+      return t("post_query_details.errors.invalid_date");
     }
 
     const date = new Date(dateString);
 
     if (isNaN(date.getTime())) {
-      return "Invalid date";
+      return t("post_query_details.errors.invalid_date");
     }
 
     return new Intl.DateTimeFormat("ru-RU", {
@@ -145,32 +147,38 @@ export const PostQueryDetailsPage = () => {
     refetchPostList();
   }, [refetch, refetchPostList, location.pathname]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>{t("common.loading")}</div>;
 
   return (
     <Layout>
       <Content className="page-layout">
         <h1 className="main-title">
-          {(postQuery?.company?.name ? postQuery?.company?.name : "-") +
-            " - " +
-            (postQuery?.product?.name ? postQuery?.product?.name : "-")}
+          {postQuery?.company?.name || "-"} - {postQuery?.product?.name || "-"}
         </h1>
         <Layout>
           <Content>
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Тип поста: {postQuery?.post_type?.name}</Title>
-              </div>
-              <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  Стилистика: {postQuery?.text_style?.name}
+                  {t("post_query_details.fields.post_type")}:
+                  {postQuery?.post_type?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Язык: {postQuery?.lang?.name}</Title>
+                <Title level={4}>
+                  {t("post_query_details.fields.text_style")}:
+                  {postQuery?.text_style?.name}
+                </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Описание: {postQuery?.content}</Title>
+                <Title level={4}>
+                  {t("post_query_details.fields.lang")}:{postQuery?.lang?.name}
+                </Title>
+              </div>
+              <div className={styles.postQueryDescr__title}>
+                <Title level={4}>
+                  {t("post_query_details.fields.content")}:{postQuery?.content}
+                </Title>
               </div>
               <Button
                 type="primary"
@@ -178,18 +186,20 @@ export const PostQueryDetailsPage = () => {
                 loading={isPostRecreating}
                 onClick={handleCreatePostQueryReplay}
               >
-                Повторить запрос
+                {t("post_query_details.buttons.recreate_request")}
               </Button>
             </div>
           </Content>
         </Layout>
         <Layout>
-          <h2 className={styles.product__title}>Посты:</h2>
+          <h2 className={styles.product__title}>
+            {t("post_query_details.posts_title")}
+          </h2>
           <Content>
             <div className={styles.postQueryDescr}>
               {!posts?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
-                  <Text>Посты не найдены. Добавьте пост.</Text>
+                  <Text>{t("post_query_details.errors.no_posts")}</Text>
                 </div>
               ) : (
                 <Table

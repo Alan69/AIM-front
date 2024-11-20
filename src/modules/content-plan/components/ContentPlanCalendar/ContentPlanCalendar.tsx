@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
-import moment from 'moment';
-import 'moment/locale/ru';
-import 'react-big-calendar/lib/css/react-big-calendar.css';
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import styles from './ContentPlanCalendar.module.scss';
-import { TSchedulesData } from 'modules/content-plan/redux/api';
-import { contentPlanActions } from 'modules/content-plan/redux/slices/contentPlan.slice';
-import { useIsLargeLaptop, useIsSmallLaptop, useIsTablet, useIsXlTablet } from 'hooks/media';
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Calendar, momentLocalizer } from "react-big-calendar";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import moment from "moment";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
+import styles from "./ContentPlanCalendar.module.scss";
+import { TSchedulesData } from "modules/content-plan/redux/api";
+import { contentPlanActions } from "modules/content-plan/redux/slices/contentPlan.slice";
+import {
+  useIsLargeLaptop,
+  useIsSmallLaptop,
+  useIsTablet,
+  useIsXlTablet,
+} from "hooks/media";
+import { useTranslation } from "react-i18next";
+import "moment/locale/ru";
+import "moment/locale/en-gb";
 
-moment.locale('ru');
+moment.locale("ru");
 
 type TProps = {
-  postList: TSchedulesData[] | undefined
-  handleSelectEvent: (event: any) => void
-  selectedDatePreview: Date | null
-  setSelectedDatePreview: React.Dispatch<React.SetStateAction<Date | null>>
-  setSelectedEvents: React.Dispatch<React.SetStateAction<any[] | null>>
-  setFormattedSelectedDate: React.Dispatch<React.SetStateAction<string | null>>
-}
+  postList: TSchedulesData[] | undefined;
+  handleSelectEvent: (event: any) => void;
+  selectedDatePreview: Date | null;
+  setSelectedDatePreview: React.Dispatch<React.SetStateAction<Date | null>>;
+  setSelectedEvents: React.Dispatch<React.SetStateAction<any[] | null>>;
+  setFormattedSelectedDate: React.Dispatch<React.SetStateAction<string | null>>;
+};
 
 export const ContentPlanCalendar = ({
   postList,
@@ -31,6 +38,7 @@ export const ContentPlanCalendar = ({
   setFormattedSelectedDate,
 }: TProps) => {
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation();
   const localizer = momentLocalizer(moment);
   const DnDCalendar = withDragAndDrop(Calendar);
   const isLargeLaptop = useIsLargeLaptop();
@@ -38,57 +46,72 @@ export const ContentPlanCalendar = ({
   const isXlTablet = useIsXlTablet();
   const isTablet = useIsTablet();
 
-  const calendarHeight = isTablet ? 400 : isXlTablet ? 500 : isSmallLaptop ? 600 : isLargeLaptop ? 700 : 800;
+  const calendarHeight = isTablet
+    ? 400
+    : isXlTablet
+      ? 500
+      : isSmallLaptop
+        ? 600
+        : isLargeLaptop
+          ? 700
+          : 800;
 
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const events = postList?.map((postItem) => {
-    const startDateTime = moment(`${postItem.scheduled_date}T${postItem.scheduled_time}`).toDate();
-    const endDateTime = moment(startDateTime).add(2, 'hours').toDate();
+  const events =
+    postList?.map((postItem) => {
+      const startDateTime = moment(
+        `${postItem.scheduled_date}T${postItem.scheduled_time}`
+      ).toDate();
+      const endDateTime = moment(startDateTime).add(2, "hours").toDate();
 
-    return {
-      id: postItem.id,
-      title: postItem.post.title,
-      start: startDateTime,
-      end: endDateTime,
-      resourceId: postItem.post.id,
-      main_text: postItem.post.main_text,
-      hashtags: postItem.post.hashtags,
-      time: moment(startDateTime).format('HH:mm'),
-      picture: postItem.post.picture,
-    };
-  }) || [];
+      return {
+        id: postItem.id,
+        title: postItem.post.title,
+        start: startDateTime,
+        end: endDateTime,
+        resourceId: postItem.post.id,
+        main_text: postItem.post.main_text,
+        hashtags: postItem.post.hashtags,
+        time: moment(startDateTime).format("HH:mm"),
+        picture: postItem.post.picture,
+      };
+    }) || [];
 
   const messages = {
-    allDay: 'Весь день',
-    previous: 'Предыдущий',
-    next: 'Следующий',
-    today: 'Сегодня',
-    month: 'Месяц',
-    week: 'Неделя',
-    day: 'День',
-    agenda: 'Повестка дня',
-    date: 'Дата',
-    time: 'Время',
-    event: 'Событие',
-    noEventsInRange: 'Событий нет',
-    showMore: (total: any) => `Еще (${total})`
+    allDay: t("content_plan.content_plan_calendar.all_day"),
+    previous: t("content_plan.content_plan_calendar.previous"),
+    next: t("content_plan.content_plan_calendar.next"),
+    today: t("content_plan.content_plan_calendar.today"),
+    month: t("content_plan.content_plan_calendar.month"),
+    week: t("content_plan.content_plan_calendar.week"),
+    day: t("content_plan.content_plan_calendar.day"),
+    agenda: t("content_plan.content_plan_calendar.agenda"),
+    date: t("content_plan.content_plan_calendar.date"),
+    time: t("content_plan.content_plan_calendar.time"),
+    event: t("content_plan.content_plan_calendar.event"),
+    noEventsInRange: t("content_plan.content_plan_calendar.no_events_in_range"),
+    showMore: (total: any) =>
+      t("content_plan.content_plan_calendar.show_more", { total }),
   };
 
   const handleSelectSlot = (slotInfo: any) => {
     dispatch(contentPlanActions.setSelectedPost(null));
 
-    if (selectedDatePreview && moment(slotInfo.start).isSame(selectedDatePreview, 'day')) {
+    if (
+      selectedDatePreview &&
+      moment(slotInfo.start).isSame(selectedDatePreview, "day")
+    ) {
       setSelectedDatePreview(null);
       setSelectedEvents(null);
       setFormattedSelectedDate(null);
     } else {
-      const selectedDateEvents = events.filter(
-        (event) => moment(event.start).isSame(slotInfo.start, 'day')
+      const selectedDateEvents = events.filter((event) =>
+        moment(event.start).isSame(slotInfo.start, "day")
       );
       setSelectedEvents(selectedDateEvents);
       setSelectedDatePreview(slotInfo.start);
-      setFormattedSelectedDate(moment(slotInfo.start).format('D MMMM, YYYY'));
+      setFormattedSelectedDate(moment(slotInfo.start).format("D MMMM, YYYY"));
     }
   };
 
@@ -105,19 +128,19 @@ export const ContentPlanCalendar = ({
       const prevDate = new Date(currentDate);
       prevDate.setMonth(prevDate.getMonth() - 1);
       setCurrentDate(prevDate);
-      toolbar.onNavigate('PREV');
+      toolbar.onNavigate("PREV");
     };
 
     const goToNext = () => {
       const nextDate = new Date(currentDate);
       nextDate.setMonth(nextDate.getMonth() + 1);
       setCurrentDate(nextDate);
-      toolbar.onNavigate('NEXT');
+      toolbar.onNavigate("NEXT");
     };
 
     const label = () => {
       const date = new Date(toolbar.date);
-      const month = date.toLocaleString('ru-RU', { month: 'long' });
+      const month = date.toLocaleString(i18n.language, { month: "long" });
       const year = date.getFullYear();
 
       return (
@@ -148,19 +171,27 @@ export const ContentPlanCalendar = ({
 
   const dayPropGetter = (date: Date) => {
     let style = {};
-    if (selectedDatePreview && moment(date).isSame(selectedDatePreview, 'day')) {
+    if (
+      selectedDatePreview &&
+      moment(date).isSame(selectedDatePreview, "day")
+    ) {
       style = {
-        backgroundColor: '#d4f0ff',
-        border: '1px solid #1890ff',
+        backgroundColor: "#d4f0ff",
+        border: "1px solid #1890ff",
       };
     }
     return {
       style: {
         ...style,
-        cursor: 'pointer',
+        cursor: "pointer",
       },
     };
   };
+
+  useEffect(() => {
+    const currentLang = i18n.language;
+    moment.locale(currentLang);
+  }, [i18n.language]);
 
   return (
     <div>
@@ -174,7 +205,7 @@ export const ContentPlanCalendar = ({
           draggableAccessor={(event) => false}
           style={{ height: calendarHeight }}
           popup
-          views={['month']}
+          views={["month"]}
           defaultView="month"
           toolbar
           components={{
@@ -189,15 +220,15 @@ export const ContentPlanCalendar = ({
           onShowMore={handleShowMore}
           eventPropGetter={() => ({
             style: {
-              border: 'none',
+              border: "none",
               padding: 0,
-              backgroundColor: 'transparent',
-              color: 'rgba(255, 119, 0, 1)',
+              backgroundColor: "transparent",
+              color: "rgba(255, 119, 0, 1)",
             },
           })}
           slotPropGetter={() => ({
             style: {
-              height: 'auto',
+              height: "auto",
             },
           })}
         />
@@ -205,3 +236,5 @@ export const ContentPlanCalendar = ({
     </div>
   );
 };
+
+export default ContentPlanCalendar;

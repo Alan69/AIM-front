@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import cn from "classnames";
 import { ArrowUpOutlined } from "@ant-design/icons";
 import { useTypedSelector } from "hooks/useTypedSelector";
+import { useTranslation } from "react-i18next";
 
 import { HeroSection } from "../components/HeroSection/HeroSection";
 import { VideoSection } from "../components/VideoSection/VideoSection";
@@ -25,6 +26,7 @@ export const LandingPage = () => {
   const { token } = useTypedSelector((state) => state.auth);
   const [isSticky, setSticky] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const { t } = useTranslation();
 
   const handleScroll = () => {
     const tariffSection = document.getElementById("tariff-section");
@@ -92,13 +94,13 @@ export const LandingPage = () => {
         )}
       >
         <Button className={styles.tariffBtn} onClick={scrollToTariff}>
-          Тарифы
+          {t("landing_page.tariffs")}
         </Button>
         <Button
           className={styles.startBtn}
           onClick={() => navigate(token ? "/tariffs" : "/login")}
         >
-          Начать сейчас <IconPlus className={styles.iconPlus} />
+          {t("landing_page.start_now")} <IconPlus className={styles.iconPlus} />
         </Button>
       </div>
 

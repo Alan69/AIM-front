@@ -2,14 +2,11 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { Layout, Button, Form, Input, Select, message } from "antd";
+import { useTranslation } from "react-i18next";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useGetLanguagesListQuery } from "../../../../redux/api/languages/languagesApi";
 import { useLazyGetProductListByCompanyIdQuery } from "modules/product/redux/api";
-
-import {
-  useGetCurrentTargetAudienceQuery,
-  useGetTargetAudienceListQuery,
-} from "modules/target-audience/redux/api";
+import { useGetCurrentTargetAudienceQuery } from "modules/target-audience/redux/api";
 import {
   TScenarioQueriesCreateData,
   useCreateScenarioQueriesMutation,
@@ -21,6 +18,7 @@ import styles from "./ScenarioQueriesCreatePage.module.scss";
 const { Content } = Layout;
 
 export const ScenarioQueriesCreatePage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
 
@@ -32,8 +30,6 @@ export const ScenarioQueriesCreatePage = () => {
   ] = useLazyGetProductListByCompanyIdQuery();
   const { data: scenarioTypesList, isLoading: isScenarioTypesListLoading } =
     useGetScenarioTypesListQuery();
-  // const { data: targetAudienceList, isLoading: isTargetAudienceListLoading } =
-  //   useGetTargetAudienceListQuery();
   const { data: targetAudience, isLoading: isTargetAudienceLoading } =
     useGetCurrentTargetAudienceQuery();
   const { data: scenarioThemesList, isLoading: isScenarioThemesListLoading } =
@@ -91,18 +87,19 @@ export const ScenarioQueriesCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Создать сценарий</h1>
+        <h1 className="main-title">{t("scenario_queries_create.title")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label="Компания"
+            label={t("scenario_queries_create.company")}
             validateStatus={errors.company ? "error" : ""}
-            help={errors.company && "Заполните это поле."}
+            help={
+              errors.company && t("scenario_queries_create.errors.required")
+            }
           >
             <Controller
               name="company"
               control={control}
               rules={{ required: true }}
-              disabled
               render={({ field }) => (
                 <Select
                   {...field}
@@ -118,17 +115,14 @@ export const ScenarioQueriesCreatePage = () => {
                 </Select>
               )}
             />
-            {!current_company?.id ? (
+            {!current_company?.id && (
               <div className={styles.noContent}>
-                (Если поле пустое, вы можете выбрать или добавить текущую
-                компанию в меню слева)
+                {t("scenario_queries_create.no_company")}
               </div>
-            ) : (
-              ""
             )}
           </Form.Item>
 
-          <Form.Item label="Продукт">
+          <Form.Item label={t("scenario_queries_create.product")}>
             <Controller
               name="product"
               control={control}
@@ -149,34 +143,13 @@ export const ScenarioQueriesCreatePage = () => {
             />
           </Form.Item>
 
-          {/* <Form.Item label="Целевая аудитория">
-            <Controller
-              name="target_audience"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  loading={isTargetAudienceListLoading}
-                  disabled={isScenarioCreating}
-                  allowClear
-                >
-                  {targetAudienceList?.map((target_audience) => (
-                    <Select.Option
-                      key={target_audience.id}
-                      value={target_audience.id}
-                    >
-                      {target_audience.prompt}
-                    </Select.Option>
-                  ))}
-                </Select>
-              )}
-            />
-          </Form.Item> */}
-
           <Form.Item
-            label="Вид контента"
+            label={t("scenario_queries_create.scenario_type")}
             validateStatus={errors.scenario_type ? "error" : ""}
-            help={errors.scenario_type && "Заполните это поле."}
+            help={
+              errors.scenario_type &&
+              t("scenario_queries_create.errors.required")
+            }
           >
             <Controller
               name="scenario_type"
@@ -185,9 +158,9 @@ export const ScenarioQueriesCreatePage = () => {
               disabled={isScenarioTypesListLoading}
               render={({ field }) => (
                 <Select {...field} disabled={isScenarioCreating}>
-                  {scenarioTypesList?.map((postType) => (
-                    <Select.Option key={postType.id} value={postType.id}>
-                      {postType.name}
+                  {scenarioTypesList?.map((type) => (
+                    <Select.Option key={type.id} value={type.id}>
+                      {type.name}
                     </Select.Option>
                   ))}
                 </Select>
@@ -196,9 +169,12 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Тематика"
+            label={t("scenario_queries_create.scenario_theme")}
             validateStatus={errors.scenario_theme ? "error" : ""}
-            help={errors.scenario_theme && "Заполните это поле."}
+            help={
+              errors.scenario_theme &&
+              t("scenario_queries_create.errors.required")
+            }
           >
             <Controller
               name="scenario_theme"
@@ -207,9 +183,9 @@ export const ScenarioQueriesCreatePage = () => {
               disabled={isScenarioThemesListLoading}
               render={({ field }) => (
                 <Select {...field} disabled={isScenarioCreating}>
-                  {scenarioThemesList?.map((textStyle) => (
-                    <Select.Option key={textStyle.id} value={textStyle.id}>
-                      {textStyle.name}
+                  {scenarioThemesList?.map((theme) => (
+                    <Select.Option key={theme.id} value={theme.id}>
+                      {theme.name}
                     </Select.Option>
                   ))}
                 </Select>
@@ -218,9 +194,11 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Язык"
+            label={t("scenario_queries_create.language")}
             validateStatus={errors.language ? "error" : ""}
-            help={errors.language && "Заполните это поле."}
+            help={
+              errors.language && t("scenario_queries_create.errors.required")
+            }
           >
             <Controller
               name="language"
@@ -249,9 +227,11 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Длительность"
+            label={t("scenario_queries_create.latency")}
             validateStatus={errors.latency ? "error" : ""}
-            help={errors.latency && "Заполните это поле."}
+            help={
+              errors.latency && t("scenario_queries_create.errors.required")
+            }
           >
             <Controller
               name="latency"
@@ -259,20 +239,32 @@ export const ScenarioQueriesCreatePage = () => {
               rules={{ required: true }}
               render={({ field }) => (
                 <Select {...field} disabled={isScenarioCreating}>
-                  <Select.Option value={15}>15 секунд</Select.Option>
-                  <Select.Option value={30}>30 секунд</Select.Option>
-                  <Select.Option value={45}>45 секунд</Select.Option>
-                  <Select.Option value={60}>60 секунд</Select.Option>
-                  <Select.Option value={90}>90 секунд</Select.Option>
+                  <Select.Option value={15}>
+                    15 {t("scenario_queries_create.seconds")}
+                  </Select.Option>
+                  <Select.Option value={30}>
+                    30 {t("scenario_queries_create.seconds")}
+                  </Select.Option>
+                  <Select.Option value={45}>
+                    45 {t("scenario_queries_create.seconds")}
+                  </Select.Option>
+                  <Select.Option value={60}>
+                    60 {t("scenario_queries_create.seconds")}
+                  </Select.Option>
+                  <Select.Option value={90}>
+                    90 {t("scenario_queries_create.seconds")}
+                  </Select.Option>
                 </Select>
               )}
             />
           </Form.Item>
 
           <Form.Item
-            label="Описание"
+            label={t("scenario_queries_create.description")}
             validateStatus={errors.description ? "error" : ""}
-            help={errors.description && "Заполните это поле."}
+            help={
+              errors.description && t("scenario_queries_create.errors.required")
+            }
           >
             <Controller
               name="description"
@@ -294,7 +286,7 @@ export const ScenarioQueriesCreatePage = () => {
               htmlType="submit"
               loading={isScenarioCreating}
             >
-              Отправить запрос
+              {t("scenario_queries_create.submit_button")}
             </Button>
           </Form.Item>
         </Form>

@@ -1,23 +1,34 @@
-import React from 'react'
-import { Button, List, Image, Typography } from 'antd';
-import cn from 'classnames'
+import React from "react";
+import { Button, List, Image, Typography } from "antd";
+import cn from "classnames";
+import { useTranslation } from "react-i18next";
 
-import styles from './ContentPlanPostList.module.scss'
-import { TPostData } from 'modules/post/redux/api';
+import styles from "./ContentPlanPostList.module.scss";
+import { TPostData } from "modules/post/redux/api";
 
 const { Title, Paragraph } = Typography;
 
 type TProps = {
-  postListByCompanyId: TPostData[] | undefined
-  selectCurrentPost: TPostData | null
-  handleSelectNewPost: (post: TPostData) => void
-  setSelectCurrentPost: React.Dispatch<React.SetStateAction<TPostData | null>>
-  expandedKeys: Record<number, boolean>
-  toggleExpand: (index: number) => void
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
+  postListByCompanyId: TPostData[] | undefined;
+  selectCurrentPost: TPostData | null;
+  handleSelectNewPost: (post: TPostData) => void;
+  setSelectCurrentPost: React.Dispatch<React.SetStateAction<TPostData | null>>;
+  expandedKeys: Record<number, boolean>;
+  toggleExpand: (index: number) => void;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, handleSelectNewPost, setSelectCurrentPost, expandedKeys, toggleExpand, setIsModalOpen }: TProps) => {
+export const ContentPlanPostList = ({
+  postListByCompanyId,
+  selectCurrentPost,
+  handleSelectNewPost,
+  setSelectCurrentPost,
+  expandedKeys,
+  toggleExpand,
+  setIsModalOpen,
+}: TProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className={styles.modalWithScroll}>
       <List
@@ -30,7 +41,10 @@ export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, ha
               handleSelectNewPost(item);
               setIsModalOpen(false);
             }}
-            className={cn(styles.item, selectCurrentPost?.id === item.id ? styles.item__isActive : '')}
+            className={cn(
+              styles.item,
+              selectCurrentPost?.id === item.id ? styles.item__isActive : ""
+            )}
           >
             <List.Item.Meta
               avatar={<Image width={160} height={160} src={item.picture} />}
@@ -39,13 +53,19 @@ export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, ha
                 <>
                   <Paragraph
                     className={styles.text}
-                    ellipsis={!expandedKeys[index] ? { rows: 4, expandable: false } : false}
+                    ellipsis={
+                      !expandedKeys[index]
+                        ? { rows: 4, expandable: false }
+                        : false
+                    }
                   >
                     {item.main_text}
                   </Paragraph>
                   <div className={styles.expandBtn}>
                     <Button type="link" onClick={() => toggleExpand(index)}>
-                      {expandedKeys[index] ? 'Скрыть' : 'Развернуть'}
+                      {expandedKeys[index]
+                        ? t("content_plan.expand_less")
+                        : t("content_plan.expand_more")}
                     </Button>
                   </div>
                 </>
@@ -55,5 +75,5 @@ export const ContentPlanPostList = ({ postListByCompanyId, selectCurrentPost, ha
         )}
       />
     </div>
-  )
-}
+  );
+};

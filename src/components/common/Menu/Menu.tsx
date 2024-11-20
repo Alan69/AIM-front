@@ -22,6 +22,7 @@ import CurrentCompanyInfo from "../CurrentCompanyInfo/CurrentCompanyInfo";
 import { ReactComponent as IconLogo } from "assets/logo.svg";
 import styles from "./Menu.module.scss";
 import { useIsSmallLaptop } from "hooks/media";
+import { useTranslation } from "react-i18next";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -34,6 +35,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isSmallLaptop = useIsSmallLaptop();
+  const { t } = useTranslation();
 
   const logOut = () => {
     dispatch(authActions.logOut());
@@ -58,7 +60,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       label: (
         <div className={styles.logOutBtn}>
           <Button type="primary" onClick={logOut}>
-            Выход
+            {t("menu.logout")}
           </Button>
         </div>
       ),
@@ -70,26 +72,25 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
     {
       key: "5",
       icon: <BorderOuterOutlined />,
-      label: <Link to="/idea-queries">Идеи</Link>,
+      label: <Link to="/idea-queries">{t("menu.items.ideas")}</Link>,
     },
     {
       key: "6",
       icon: <FormOutlined />,
-      label: <Link to="/post-query">Посты</Link>,
+      label: <Link to="/post-query">{t("menu.items.posts")}</Link>,
     },
     {
       key: "7",
       icon: <FileDoneOutlined />,
-      label: <Link to="/scenario-queries">Сценарии</Link>,
+      label: <Link to="/scenario-queries">{t("menu.items.scenarios")}</Link>,
     },
     {
       key: "8",
       icon: <CalendarOutlined />,
-      // label: <Link to="/content-plan">Контент план</Link>,
       label: (
         <div className={styles.soon}>
-          <Link to="/content-plan">Контент план</Link>
-          <Badge count={"скоро"} />
+          <Link to="/content-plan">{t("menu.items.content_plan")}</Link>
+          <Badge count={t("menu.soon")} />
         </div>
       ),
     },
@@ -98,7 +99,8 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       icon: <StockOutlined />,
       label: (
         <div className={styles.soon}>
-          Маркетинговая стратегия <Badge count={"скоро"} />
+          {t("menu.items.marketing_strategy")}
+          <Badge count={t("menu.soon")} />
         </div>
       ),
       disabled: true,
@@ -108,7 +110,8 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       icon: <FundOutlined />,
       label: (
         <div className={styles.soon}>
-          Воронка продаж <Badge count={"скоро"} />
+          {t("menu.items.sales_funnel")}
+          <Badge count={t("menu.soon")} />
         </div>
       ),
       disabled: true,
@@ -118,7 +121,8 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       icon: <WechatOutlined />,
       label: (
         <div className={styles.soon}>
-          Единый чат-хаб <Badge count={"скоро"} />
+          {t("menu.items.chat_hub")}
+          <Badge count={t("menu.soon")} />
         </div>
       ),
       disabled: true,
@@ -128,7 +132,8 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       icon: <RadarChartOutlined />,
       label: (
         <div className={styles.soon}>
-          Аналитика <Badge count={"скоро"} />
+          {t("menu.items.analytics")}
+          <Badge count={t("menu.soon")} />
         </div>
       ),
       disabled: true,

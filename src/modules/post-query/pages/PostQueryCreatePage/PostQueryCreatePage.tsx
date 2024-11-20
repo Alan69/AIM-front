@@ -11,6 +11,7 @@ import { useGetPostTypesListQuery } from "../../../../redux/api/postTypes/postTy
 import { useGetTextStylesListQuery } from "../../../../redux/api/textStyles/textStylesApi";
 import { useGetLanguagesListQuery } from "../../../../redux/api/languages/languagesApi";
 import { useLazyGetProductListByCompanyIdQuery } from "modules/product/redux/api";
+import { useTranslation } from "react-i18next";
 import styles from "./PostQueryCreatePage.module.scss";
 
 const { Content } = Layout;
@@ -18,6 +19,7 @@ const { Content } = Layout;
 export const PostQueryCreatePage = () => {
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const [createPostQuery, { isLoading: isPostCreating }] =
     useCreatePostQueryMutation();
@@ -79,12 +81,12 @@ export const PostQueryCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Создать пост</h1>
+        <h1 className="main-title">{t("post_query_create.title")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label="Компания"
+            label={t("post_query_create.fields.company")}
             validateStatus={errors.company ? "error" : ""}
-            help={errors.company && "Заполните это поле."}
+            help={errors.company && t("post_query_create.errors.required")}
           >
             <Controller
               name="company"
@@ -106,17 +108,14 @@ export const PostQueryCreatePage = () => {
                 </Select>
               )}
             />
-            {!current_company?.id ? (
+            {!current_company?.id && (
               <div className={styles.noContent}>
-                (Если поле пустое, вы можете выбрать или добавить текущую
-                компанию в меню слева)
+                {t("post_query_create.no_company")}
               </div>
-            ) : (
-              ""
             )}
           </Form.Item>
 
-          <Form.Item label="Продукт">
+          <Form.Item label={t("post_query_create.fields.product")}>
             <Controller
               name="product"
               control={control}
@@ -138,9 +137,9 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Тип поста"
+            label={t("post_query_create.fields.post_type")}
             validateStatus={errors.post_type ? "error" : ""}
-            help={errors.post_type && "Заполните это поле."}
+            help={errors.post_type && t("post_query_create.errors.required")}
           >
             <Controller
               name="post_type"
@@ -160,9 +159,9 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Стилистика"
+            label={t("post_query_create.fields.text_style")}
             validateStatus={errors.text_style ? "error" : ""}
-            help={errors.text_style && "Заполните это поле."}
+            help={errors.text_style && t("post_query_create.errors.required")}
           >
             <Controller
               name="text_style"
@@ -182,9 +181,9 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Язык"
+            label={t("post_query_create.fields.lang")}
             validateStatus={errors.lang ? "error" : ""}
-            help={errors.lang && "Заполните это поле."}
+            help={errors.lang && t("post_query_create.errors.required")}
           >
             <Controller
               name="lang"
@@ -213,9 +212,9 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label="Описание"
+            label={t("post_query_create.fields.content")}
             validateStatus={errors.content ? "error" : ""}
-            help={errors.content && "Заполните это поле."}
+            help={errors.content && t("post_query_create.errors.required")}
           >
             <Controller
               name="content"
@@ -229,7 +228,7 @@ export const PostQueryCreatePage = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isPostCreating}>
-              Отправить запрос
+              {t("post_query_create.submit_button")}
             </Button>
           </Form.Item>
         </Form>

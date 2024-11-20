@@ -17,12 +17,14 @@ import {
   Tooltip,
 } from "antd";
 import { useLazyGetAuthUserQuery } from "modules/auth/redux/api";
+import { useTranslation } from "react-i18next";
 
 const { Text } = Typography;
 
 const CurrentCompanyInfo = () => {
   const navigate = useNavigate();
   const { current_company, user } = useTypedSelector((state) => state.auth);
+  const { t } = useTranslation();
   const { data: companyList } = useGetCompanyListQuery(user?.profile.id);
   const [getAuthUser] = useLazyGetAuthUserQuery();
   const [updateCurrentCompany] = useUpdateCurrentCompanyMutation();
@@ -35,7 +37,6 @@ const CurrentCompanyInfo = () => {
           type="text"
           className={styles.companyBtn}
           onClick={(e) => {
-            // navigate(`/company/${company.id}`)
             updateCurrentCompany(company.id)
               .unwrap()
               .then(() => {
@@ -57,7 +58,9 @@ const CurrentCompanyInfo = () => {
   return (
     <>
       <div className={styles.upperDivider}>
-        <Text className={styles.dividerText}>Текущая компания</Text>
+        <Text className={styles.dividerText}>
+          {t("current_company_info.current_company")}
+        </Text>
         <Divider className={styles.divider} />
       </div>
       <div className={styles.infoBlock}>
@@ -73,12 +76,12 @@ const CurrentCompanyInfo = () => {
             {current_company?.name ? (
               current_company.name
             ) : (
-              <span>Добавить компанию</span>
+              <span>{t("current_company_info.add_company")}</span>
             )}
           </div>
           <div className={styles.actions}>
             {current_company ? (
-              <Tooltip title="Список компаний">
+              <Tooltip title={t("current_company_info.company_list")}>
                 <Dropdown
                   overlay={menu}
                   trigger={["click"]}
@@ -93,7 +96,7 @@ const CurrentCompanyInfo = () => {
             ) : (
               ""
             )}
-            <Tooltip title="Добавить компанию">
+            <Tooltip title={t("current_company_info.add_new_company")}>
               <Button
                 type="primary"
                 shape="circle"

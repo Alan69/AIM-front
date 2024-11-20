@@ -9,11 +9,14 @@ import {
   useGetScenarioQueriesByIdQuery,
 } from "modules/scenario-queries/redux/api";
 import { useGetScenariosListQuery } from "modules/scenarios/redux/api";
+import { useTranslation } from "react-i18next";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
 
 export const ScenarioQueriesDetailsPage = () => {
+  const { t } = useTranslation();
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -85,31 +88,48 @@ export const ScenarioQueriesDetailsPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className="main-title">
-          {(scenarioQuery?.company?.name ? scenarioQuery?.company?.name : "-") +
-            " - " +
-            (scenarioQuery?.product?.name ? scenarioQuery?.product?.name : "-")}
+          {t("scenario_queries_details.title", {
+            company: scenarioQuery?.company?.name || "-",
+            product: scenarioQuery?.product?.name || "-",
+          })}
         </h1>
         <Layout>
           <Content>
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  Вид контента: {scenarioQuery?.scenario_type?.name}
+                  {t("scenario_queries_details.fields.content_type", {
+                    content_type: scenarioQuery?.scenario_type?.name,
+                  })}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  Тематика сценария: {scenarioQuery?.scenario_theme?.name}
+                  {t("scenario_queries_details.fields.theme", {
+                    theme: scenarioQuery?.scenario_theme?.name,
+                  })}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Язык: {scenarioQuery?.language?.name}</Title>
+                <Title level={4}>
+                  {t("scenario_queries_details.fields.language", {
+                    language: scenarioQuery?.language?.name,
+                  })}
+                </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Описание: {scenarioQuery?.description}</Title>
+                <Title level={4}>
+                  {t("scenario_queries_details.fields.description", {
+                    description: scenarioQuery?.description,
+                  })}
+                </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
-                <Title level={4}>Длительность: {scenarioQuery?.latency}</Title>
+                <Title level={4}>
+                  {t("scenario_queries_details.fields.latency", {
+                    latency: scenarioQuery?.latency,
+                  })}
+                </Title>
               </div>
               <Button
                 type="primary"
@@ -117,18 +137,22 @@ export const ScenarioQueriesDetailsPage = () => {
                 loading={isScenarioQueriesRecreating}
                 onClick={handleCreateScenarioQueriesReplay}
               >
-                Повторить запрос
+                {t("scenario_queries_details.actions.replay_button")}
               </Button>
             </div>
           </Content>
         </Layout>
         <Layout>
-          <h2 className={styles.product__title}>Сценарии:</h2>
+          <h2 className={styles.product__title}>
+            {t("scenario_queries_details.scenarios_section.title")}
+          </h2>
           <Content>
             <div className={styles.postQueryDescr}>
               {!scenarios?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
-                  <Text>Сценарии не найдены. Добавьте сценарий.</Text>
+                  <Text>
+                    {t("scenario_queries_details.scenarios_section.not_found")}
+                  </Text>
                 </div>
               ) : (
                 <List
@@ -140,7 +164,9 @@ export const ScenarioQueriesDetailsPage = () => {
                         title={
                           <div className={styles.titleBlock}>
                             <Title level={3}>{item.topic}</Title>
-                            <Tooltip title="Скопировать">
+                            <Tooltip
+                              title={t("scenario_queries_details.copy_tooltip")}
+                            >
                               <Button
                                 className={styles.postContent__icon}
                                 icon={<CopyOutlined />}
@@ -165,12 +191,16 @@ export const ScenarioQueriesDetailsPage = () => {
                                       .then(
                                         () => {
                                           message.success(
-                                            "Содержимое скопировано в буфер обмена!"
+                                            t(
+                                              "scenario_queries_details.copy_success"
+                                            )
                                           );
                                         },
                                         (err) => {
                                           message.error(
-                                            "Ошибка при копировании содержимого."
+                                            t(
+                                              "scenario_queries_details.copy_error"
+                                            )
                                           );
                                         }
                                       );
@@ -183,11 +213,17 @@ export const ScenarioQueriesDetailsPage = () => {
                         description={
                           <div>
                             <div style={{ marginBottom: 8 }}>
-                              <Title level={5}>Краткое описание:</Title>
+                              <Title level={5}>
+                                {t(
+                                  "scenario_queries_details.short_description"
+                                )}
+                              </Title>
                               <Text>{" " + item.short_description}</Text>
                             </div>
                             <div style={{ marginBottom: 8 }}>
-                              <Title level={5}>Основной текст:</Title>
+                              <Title level={5}>
+                                {t("scenario_queries_details.main_text")}
+                              </Title>
                               <Text>
                                 <div>{formatMainText(item.main_text)}</div>
                               </Text>
