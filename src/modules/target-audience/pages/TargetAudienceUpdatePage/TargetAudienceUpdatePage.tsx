@@ -7,6 +7,7 @@ import {
   useUpdateTargetAudienceMutation,
 } from "modules/target-audience/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
+import { useTranslation } from "react-i18next";
 
 const { Content } = Layout;
 
@@ -15,6 +16,7 @@ export const TargetAudienceUpdatePage = () => {
   const navigate = useNavigate();
 
   const { current_company } = useTypedSelector((state) => state.auth);
+  const { t } = useTranslation();
 
   const [updateTargetAudience, { isLoading: isUpdating }] =
     useUpdateTargetAudienceMutation();
@@ -39,18 +41,18 @@ export const TargetAudienceUpdatePage = () => {
         .unwrap()
         .then(() => {
           navigate(`/company/${current_company?.id}`);
-          message.success("Целевая аудитория успешно обновлена");
+          message.success(t("target_audience_update.save_success"));
         });
       refetchTargetAudience();
     } catch (error) {
-      message.error("Ошибка при обновлении целевой аудитории");
+      message.error(t("target_audience_update.save_error"));
     }
   };
 
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">Редактирование Целевой аудитории</h1>
+        <h1 className="main-title">{t("target_audience_update.title")}</h1>
         <Layout>
           <Content>
             <TextArea
@@ -68,7 +70,7 @@ export const TargetAudienceUpdatePage = () => {
                 disabled={!formattedResponse || isLoading}
                 style={{ marginRight: "10px" }}
               >
-                Сохранить
+                {t("target_audience_update.save_button")}
               </Button>
             </div>
           </Content>

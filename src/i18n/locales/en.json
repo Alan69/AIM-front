@@ -418,6 +418,12 @@
     "error_create": "Error creating target audience",
     "no_data": "No data available"
   },
+  "target_audience_update": {
+    "title": "Edit Target Audience",
+    "save_success": "Target audience updated successfully",
+    "save_error": "Error updating target audience",
+    "save_button": "Save"
+  },
   "social_media_add": {
     "title": "Add Social Media",
     "error": "Error adding {{name}}: {{error}}",
