@@ -20,9 +20,9 @@ export const TariffSelectorSection: React.FC = () => {
   const [companyCount, setCompanyCount] = useState<number>(1);
   const [monthDuration, setMonthDuration] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
-  const [totalCost, setTotalCost] = useState<number>(29900);
+  const [totalCost, setTotalCost] = useState<number>(39900);
   const [totalCostWithoutDiscount, setTotalCostWithoutDiscount] =
-    useState<number>(29900);
+    useState<number>(39900);
 
   const handleCompanyChange = (value: number) => {
     setCompanyCount(value);
@@ -35,7 +35,7 @@ export const TariffSelectorSection: React.FC = () => {
   };
 
   const calculateCost = (companies: number, months: number) => {
-    const baseCost = 29900;
+    const baseCost = 39900;
     let discount = 0;
 
     if (months >= 4 && months <= 6) {
