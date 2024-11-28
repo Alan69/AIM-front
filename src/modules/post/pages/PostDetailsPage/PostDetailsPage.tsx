@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   useGetPostByIdQuery,
+  useGetPostMediasByIdQuery,
   usePostNowMutation,
   useRecreatePostImageMutation,
   useRecreatePostTextMutation,
@@ -24,6 +25,10 @@ import {
   HeartTwoTone,
   DownloadOutlined,
   CopyOutlined,
+  LeftOutlined,
+  RightOutlined,
+  CheckOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -61,6 +66,8 @@ export const PostDetailsPage = () => {
   const navigate = useNavigate();
 
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || "");
+  const { data: postMedias, isLoading: isMediasLoading } =
+    useGetPostMediasByIdQuery(id || "");
   const { data: imgStylesList } = useGetImgStylesListQuery();
   const { data: socialMediaList, refetch: refetchSocialMediaList } =
     useGetSocialMediaListByCurrentCompanyQuery();
@@ -75,6 +82,8 @@ export const PostDetailsPage = () => {
 
   const { user } = useTypedSelector((state) => state.auth);
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   const [currentImgStyle, setCurrentImgStyle] = useState(post?.img_style);
   const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<
     TSocialMediaByCurrentCompanyData[]
@@ -88,6 +97,7 @@ export const PostDetailsPage = () => {
     setIsContentPlanSocialMediaListModalOpen,
   ] = useState(false);
   const [isPostPageOpen, setIsPostPageOpen] = useState(true);
+  const [selectedMedias, setSelectedMedias] = useState<string[]>([]);
 
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
@@ -184,13 +194,29 @@ export const PostDetailsPage = () => {
     setSelectedNewSocialMedias([]);
   };
 
+  const handleMediaClick = (mediaPost: string) => {
+    setSelectedMedias((prev) =>
+      prev.includes(mediaPost)
+        ? prev.filter((item) => item !== mediaPost)
+        : [...prev, mediaPost]
+    );
+  };
+
   const handlePostNow = () => {
     if (post?.id) {
+      const previousPostImageIds =
+        selectedMedias.length > 0
+          ? selectedMedias
+          : postMedias && postMedias.length > 0
+            ? [postMedias[0].id]
+            : [];
+
       postNow({
         post_id: post.id,
         social_media_account_ids: selectedNewSocialMedias.map(
           (media) => media.id
         ),
+        previous_post_image_ids: previousPostImageIds,
       })
         .unwrap()
         .then((res) => {
@@ -279,6 +305,120 @@ export const PostDetailsPage = () => {
             <Content>
               <div className={styles.postDescr}>
                 <div className={styles.container}>
+                  <div className={styles.mediaSlider}>
+                    <button
+                      className={styles.scrollButton}
+                      onClick={() =>
+                        scrollContainerRef.current?.scrollBy({
+                          top: -200,
+                          behavior: "smooth",
+                        })
+                      }
+                    >
+                      <LeftOutlined />
+                    </button>
+
+                    <div
+                      className={styles.scrollContainer}
+                      ref={scrollContainerRef}
+                    >
+                      {postMedias
+                        ?.slice()
+                        .reverse()
+                        .map((media) => (
+                          <div key={media.id} className={styles.imageWrapper}>
+                            <Image
+                              src={media.media}
+                              alt={`Media ${media.id}`}
+                              className={styles.sliderImage}
+                            />
+                            <div
+                              className={`${styles.iconOverlay} ${
+                                selectedMedias.includes(media.id)
+                                  ? styles.selected
+                                  : ""
+                              }`}
+                              onClick={() => handleMediaClick(media.id)}
+                            >
+                              {selectedMedias.includes(media.id) ? (
+                                <CheckOutlined
+                                  className={styles.iconSelected}
+                                />
+                              ) : (
+                                <PlusOutlined
+                                  className={styles.iconUnselected}
+                                />
+                              )}
+                            </div>
+                            <Button
+                              className={cn(
+                                styles.iconOverlay,
+                                styles.iconOverlay__download
+                              )}
+                              icon={<DownloadOutlined />}
+                              shape="circle"
+                              onClick={async () => {
+                                try {
+                                  if (!media.media) {
+                                    message.error(
+                                      t("post_details.image_not_found")
+                                    );
+                                    return;
+                                  }
+
+                                  const response = await fetch(media.media, {
+                                    method: "GET",
+                                    mode: "cors",
+                                    credentials: "include",
+                                  });
+
+                                  if (!response.ok) {
+                                    throw new Error(
+                                      t("post_details.image_download_error")
+                                    );
+                                  }
+
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+
+                                  const link = document.createElement("a");
+                                  link.href = url;
+                                  link.setAttribute("download", "image.jpg");
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                  message.success(
+                                    t("post_details.image_download_success")
+                                  );
+                                } catch (error) {
+                                  console.error(
+                                    t("post_details.image_download_error"),
+                                    error
+                                  );
+                                  message.error(
+                                    t("post_details.image_download_error")
+                                  );
+                                }
+                              }}
+                            />
+                          </div>
+                        ))}
+                    </div>
+
+                    <button
+                      className={styles.scrollButton}
+                      onClick={() =>
+                        scrollContainerRef.current?.scrollBy({
+                          top: 200,
+                          behavior: "smooth",
+                        })
+                      }
+                    >
+                      <RightOutlined />
+                    </button>
+                  </div>
+
                   <div className={styles.mainBlock}>
                     <div className={styles.postHeader}>
                       <div className={styles.userInfo}>

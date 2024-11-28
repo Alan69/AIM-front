@@ -59,12 +59,19 @@ export type TRecreatePostText = {
 export type TPostNow = {
   post_id: string;
   social_media_account_ids: string[];
+  previous_post_image_ids: string[];
 }
 
 export type TPostNowResponse = {
   message: string;
   post_id: string;
   social_media_accounts: string[];
+}
+
+export type TPostMediaData = {
+  id: string;
+  post: string;
+  media: string;
 }
 
 export const postApi = baseApi.injectEndpoints({
@@ -191,16 +198,24 @@ export const postApi = baseApi.injectEndpoints({
       })
     }),
     postNow: build.mutation<TPostNowResponse, TPostNow>({
-      query: ({post_id, social_media_account_ids}) => ({
+      query: ({post_id, social_media_account_ids, previous_post_image_ids}) => ({
         url: '/post/now/',
         method: 'POST',
         body: {
           post_id,
-          social_media_account_ids
+          social_media_account_ids,
+          previous_post_image_ids
         }
       }),
       transformResponse: (response: TPostNowResponse) => response,
       extraOptions: { showErrors: false }
+    }),
+    getPostMediasById: build.query<TPostMediaData[], string>({
+      query: (post_id) => ({
+        url: `/post/${post_id}/medias/`,
+        method: 'GET'
+      }),
+      transformResponse: (response: TPostMediaData[]) => response,
     }),
   }),
   overrideExisting: false,
@@ -217,5 +232,6 @@ export const {
   useRecreatePostImageMutation,
   useRecreatePostTextMutation,
   useDeletePostMutation,
-  usePostNowMutation
+  usePostNowMutation,
+  useGetPostMediasByIdQuery
 } = postApi;

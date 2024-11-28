@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Divider, Typography } from "antd";
 import cn from "classnames";
 import { useTranslation } from "react-i18next";
@@ -82,6 +82,10 @@ export const ContentPlanSocialMediaListModal = ({
       setIsModalOpen(false);
     }
   };
+
+  useEffect(() => {
+    setSelectCurrentSocialMedias(selectedNewSocialMedias);
+  }, [selectedNewSocialMedias]);
 
   return (
     <Modal

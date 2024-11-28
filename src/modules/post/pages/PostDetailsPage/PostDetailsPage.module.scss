@@ -20,7 +20,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 32px;
 }
 
 .mainBlock {
@@ -28,7 +28,6 @@
   max-width: 450px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .editBlock {
@@ -132,7 +131,7 @@
 .imageStyleBlock {
   cursor: pointer;
   img {
-    width: 150px;
+    width: 160px;
     height: auto;
     border-radius: 16px;
   }
@@ -183,4 +182,123 @@
       fill: #eb2f96;
     }
   }
+}
+
+.mediaSlider {
+  display: flex;
+  align-items: center;
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.scrollContainer {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  gap: 12px;
+  width: 100%;
+  height: calc(100vh - 48px - 48px - 70px - 70px);
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.imageWrapper.selected {
+  border-color: #1890ff;
+}
+
+.sliderImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.sliderImage:hover {
+  transform: scale(1.05);
+}
+
+.scrollButton {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.scrollButton:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.scrollButton:first-of-type {
+  top: 4px;
+
+  svg {
+    transform: rotate(90deg);
+  }
+}
+
+.scrollButton:last-of-type {
+  bottom: 4px;
+
+  svg {
+    transform: rotate(90deg);
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  flex: 0 0 auto;
+  width: 160px;
+  height: 160px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.imageWrapper:hover {
+  border-color: rgba(0, 0, 0, 0.5);
+}
+
+.iconOverlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: cell;
+  transition: all 0.3s;
+
+  &__download {
+    min-width: auto !important;
+    width: 24px !important;
+    right: 36px;
+    cursor: pointer;
+  }
+}
+
+.iconOverlay:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.iconOverlay.selected {
+  background: #1890ff;
 }
