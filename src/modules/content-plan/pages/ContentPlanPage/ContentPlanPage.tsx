@@ -125,6 +125,7 @@ export const ContentPlanPage = () => {
         social_media_account_ids: selectedNewSocialMedias.map(
           (media) => media.id
         ),
+        previous_post_image_ids: [selectNewPost?.image_id?.id],
       })
         .unwrap()
         .then((res) => {

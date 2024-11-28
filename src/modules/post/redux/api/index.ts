@@ -18,6 +18,9 @@ export type TPostData = {
   img_style?: TImgStylesData;
   post_query: TPostQueryData;
   author: TUserData;
+  image_id: {
+    id: string
+  }
 }
 
 export type TCreatePost = {
