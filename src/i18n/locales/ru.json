@@ -613,7 +613,12 @@
     "keep_text": "Оставить текущий текст",
     "create_new_text": "Создать новый текст",
     "enter_text_description": "Введите описание текста...",
-    "submit_request": "Отправить запрос"
+    "submit_request": "Отправить запрос",
+    "upload_image": "Загрузить изображение",
+    "select_file": "Выбрать файл",
+    "invalid_file_type": "Недопустимый тип файла. Разрешены только JPEG и PNG.",
+    "image_upload_error": "Ошибка при добавлении изображения",
+    "update_success": "Обновление успешно завершено."
   },
   "post_update": {
     "invalid_file_type": "Пожалуйста, загрузите файл формата JPEG или PNG",

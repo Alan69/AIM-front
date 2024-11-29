@@ -77,6 +77,18 @@ export type TPostMediaData = {
   media: string;
 }
 
+export type TCreatePostImage = {
+  post: string | undefined;
+  media: File;
+}
+
+export type TCreatePostImageResponse = {
+  id: string;
+  post: string;
+  media: string;
+  created_at: string;
+}
+
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPostList: build.query<TPostData[], string>({
@@ -220,6 +232,24 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: TPostMediaData[]) => response,
     }),
+    createPostImage: build.mutation<TCreatePostImageResponse, TCreatePostImage>({
+      query: ({ post, media }) => {
+        const formData = new FormData();
+        if (post) formData.append('post', post);
+
+        if (media) {
+          formData.append('media', media);
+        }
+    
+        return {
+          url: `/post-image/create/`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      transformResponse: (response: TCreatePostImageResponse) => response,
+      extraOptions: { showErrors: false },
+    }),
   }),
   overrideExisting: false,
 });
@@ -236,5 +266,6 @@ export const {
   useRecreatePostTextMutation,
   useDeletePostMutation,
   usePostNowMutation,
-  useGetPostMediasByIdQuery
+  useGetPostMediasByIdQuery,
+  useCreatePostImageMutation
 } = postApi;

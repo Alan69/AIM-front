@@ -20,19 +20,19 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 32px;
+  gap: 45px;
 }
 
 .mainBlock {
-  width: 50%;
-  max-width: 450px;
+  width: calc(40% - 30px);
+  // max-width: 450px;
   display: flex;
   flex-direction: column;
 }
 
 .editBlock {
-  width: 50%;
-  max-width: 450px;
+  width: calc(40% - 30px);
+  // max-width: 450px;
 }
 
 .picture,
@@ -74,6 +74,7 @@
 .postActions {
   display: flex;
   gap: 16px;
+  margin-top: 40px;
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -185,11 +186,11 @@
 }
 
 .mediaSlider {
-  display: flex;
-  align-items: center;
+  width: calc(20% - 30px);
   position: relative;
-  max-width: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .scrollContainer {
@@ -198,8 +199,9 @@
   overflow-y: auto;
   scroll-behavior: smooth;
   gap: 12px;
-  width: 100%;
-  height: calc(100vh - 48px - 48px - 70px - 70px);
+  // margin-top: 48px;
+  // height: calc(100vh - 48px - 48px - 70px - 140px);
+  height: 70vh;
 }
 
 .scrollContainer::-webkit-scrollbar {
@@ -232,30 +234,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  transform: translateX(-50%);
+  // position: absolute;
+  // z-index: 1;
+  // left: 50%;
+  // transform: translateX(-50%);
+
+  width: 32px;
+  height: 32px;
+
+  &:first-child {
+    top: 4px;
+    margin-bottom: 12px;
+  }
+
+  &Down {
+    margin-top: 12px;
+  }
 }
 
 .scrollButton:hover {
   background: rgba(0, 0, 0, 0.8);
 }
 
-.scrollButton:first-of-type {
-  top: 4px;
-
-  svg {
-    transform: rotate(90deg);
-  }
+.upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 12px;
+  // position: absolute;
+  // z-index: 1;
+  // bottom: 0;
 }
 
-.scrollButton:last-of-type {
-  bottom: 4px;
-
-  svg {
-    transform: rotate(90deg);
-  }
+.uploadConfirm {
+  margin-top: 12px;
+  // position: absolute;
+  // z-index: 1;
+  // bottom: 0;
 }
 
 .imageWrapper {

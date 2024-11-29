@@ -613,7 +613,12 @@
     "keep_text": "Keep the current text",
     "create_new_text": "Create a new text",
     "enter_text_description": "Enter the text description...",
-    "submit_request": "Submit Request"
+    "submit_request": "Submit Request",
+    "upload_image": "Upload Image",
+    "select_file": "Select File",
+    "invalid_file_type": "Invalid file type. Only JPEG and PNG are allowed.",
+    "image_upload_error": "Error adding an image",
+    "update_success": "Update was successful."
   },
   "post_update": {
     "invalid_file_type": "Please upload a JPEG or PNG file",

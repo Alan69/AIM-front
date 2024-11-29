@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  useCreatePostImageMutation,
   useGetPostByIdQuery,
   useGetPostMediasByIdQuery,
   usePostNowMutation,
@@ -18,6 +19,7 @@ import {
   Input,
   message,
   Tooltip,
+  Upload,
 } from "antd";
 import {
   ReloadOutlined,
@@ -25,10 +27,10 @@ import {
   HeartTwoTone,
   DownloadOutlined,
   CopyOutlined,
-  LeftOutlined,
-  RightOutlined,
-  CheckOutlined,
+  UpOutlined,
+  DownOutlined,
   PlusOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -66,8 +68,11 @@ export const PostDetailsPage = () => {
   const navigate = useNavigate();
 
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || "");
-  const { data: postMedias, isLoading: isMediasLoading } =
-    useGetPostMediasByIdQuery(id || "");
+  const {
+    data: postMedias,
+    isLoading: isMediasLoading,
+    refetch: refetchPostMedias,
+  } = useGetPostMediasByIdQuery(id || "");
   const { data: imgStylesList } = useGetImgStylesListQuery();
   const { data: socialMediaList, refetch: refetchSocialMediaList } =
     useGetSocialMediaListByCurrentCompanyQuery();
@@ -79,6 +84,8 @@ export const PostDetailsPage = () => {
     useAddToSchedulersMutation();
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
   const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
+  const [createPostImage, { isLoading: isCreating }] =
+    useCreatePostImageMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
 
@@ -98,6 +105,7 @@ export const PostDetailsPage = () => {
   ] = useState(false);
   const [isPostPageOpen, setIsPostPageOpen] = useState(true);
   const [selectedMedias, setSelectedMedias] = useState<string[]>([]);
+  const [file, setFile] = useState<File | null>(null);
 
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
@@ -220,9 +228,13 @@ export const PostDetailsPage = () => {
       })
         .unwrap()
         .then((res) => {
-          setIsContentPlanSocialMediaListModalOpen(false);
-          setSelectedNewSocialMedias([]);
-          message.success(res.message);
+          refetchPostMedias()
+            .unwrap()
+            .then(() => {
+              setIsContentPlanSocialMediaListModalOpen(false);
+              setSelectedNewSocialMedias([]);
+              message.success(res.message);
+            });
         });
     }
   };
@@ -257,6 +269,43 @@ export const PostDetailsPage = () => {
               );
             });
         });
+    }
+  };
+
+  const handleFileChange = (info: any) => {
+    const fileList = info.fileList;
+    if (fileList.length > 0) {
+      const lastFile = fileList[fileList.length - 1];
+      if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
+        setFile(lastFile.originFileObj);
+      } else {
+        message.error(t("post_details.invalid_file_type"));
+        setFile(null);
+      }
+    } else {
+      setFile(null);
+    }
+  };
+
+  const handleUploadConfirm = async () => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("media", file);
+
+      try {
+        await createPostImage({
+          post: id,
+          media: file,
+        })
+          .unwrap()
+          .then(() => {
+            refetchPostMedias();
+            message.success(t("post_details.update_success"));
+            setFile(null);
+          });
+      } catch (error) {
+        message.error(t("post_details.image_upload_error"));
+      }
     }
   };
 
@@ -315,99 +364,97 @@ export const PostDetailsPage = () => {
                         })
                       }
                     >
-                      <LeftOutlined />
+                      <UpOutlined />
                     </button>
 
                     <div
                       className={styles.scrollContainer}
                       ref={scrollContainerRef}
                     >
-                      {postMedias
-                        ?.slice()
-                        .reverse()
-                        .map((media) => (
-                          <div key={media.id} className={styles.imageWrapper}>
-                            <Image
-                              src={media.media}
-                              alt={`Media ${media.id}`}
-                              className={styles.sliderImage}
-                            />
-                            <div
-                              className={`${styles.iconOverlay} ${
-                                selectedMedias.includes(media.id)
-                                  ? styles.selected
-                                  : ""
-                              }`}
-                              onClick={() => handleMediaClick(media.id)}
-                            >
-                              {selectedMedias.includes(media.id) ? (
-                                <CheckOutlined
-                                  className={styles.iconSelected}
-                                />
-                              ) : (
-                                <PlusOutlined
-                                  className={styles.iconUnselected}
-                                />
-                              )}
-                            </div>
-                            <Button
-                              className={cn(
-                                styles.iconOverlay,
-                                styles.iconOverlay__download
-                              )}
-                              icon={<DownloadOutlined />}
-                              shape="circle"
-                              onClick={async () => {
-                                try {
-                                  if (!media.media) {
-                                    message.error(
-                                      t("post_details.image_not_found")
-                                    );
-                                    return;
-                                  }
-
-                                  const response = await fetch(media.media, {
-                                    method: "GET",
-                                    mode: "cors",
-                                    credentials: "include",
-                                  });
-
-                                  if (!response.ok) {
-                                    throw new Error(
-                                      t("post_details.image_download_error")
-                                    );
-                                  }
-
-                                  const blob = await response.blob();
-                                  const url = window.URL.createObjectURL(blob);
-
-                                  const link = document.createElement("a");
-                                  link.href = url;
-                                  link.setAttribute("download", "image.jpg");
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  document.body.removeChild(link);
-                                  window.URL.revokeObjectURL(url);
-                                  message.success(
-                                    t("post_details.image_download_success")
-                                  );
-                                } catch (error) {
-                                  console.error(
-                                    t("post_details.image_download_error"),
-                                    error
-                                  );
+                      {postMedias?.map((media) => (
+                        <div key={media.id} className={styles.imageWrapper}>
+                          <Image
+                            src={media.media}
+                            alt={`Media ${media.id}`}
+                            className={styles.sliderImage}
+                          />
+                          <div
+                            className={`${styles.iconOverlay} ${
+                              selectedMedias.includes(media.id)
+                                ? styles.selected
+                                : ""
+                            }`}
+                            onClick={() => handleMediaClick(media.id)}
+                          >
+                            {selectedMedias.includes(media.id) ? (
+                              <div className={styles.iconSelected}>
+                                {selectedMedias.indexOf(media.id) + 1}
+                              </div>
+                            ) : (
+                              <PlusOutlined className={styles.iconUnselected} />
+                            )}
+                          </div>
+                          <Button
+                            className={cn(
+                              styles.iconOverlay,
+                              styles.iconOverlay__download
+                            )}
+                            icon={<DownloadOutlined />}
+                            shape="circle"
+                            onClick={async () => {
+                              try {
+                                if (!media.media) {
                                   message.error(
+                                    t("post_details.image_not_found")
+                                  );
+                                  return;
+                                }
+
+                                const response = await fetch(media.media, {
+                                  method: "GET",
+                                  mode: "cors",
+                                  credentials: "include",
+                                });
+
+                                if (!response.ok) {
+                                  throw new Error(
                                     t("post_details.image_download_error")
                                   );
                                 }
-                              }}
-                            />
-                          </div>
-                        ))}
+
+                                const blob = await response.blob();
+                                const url = window.URL.createObjectURL(blob);
+
+                                const link = document.createElement("a");
+                                link.href = url;
+                                link.setAttribute("download", "image.jpg");
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                                message.success(
+                                  t("post_details.image_download_success")
+                                );
+                              } catch (error) {
+                                console.error(
+                                  t("post_details.image_download_error"),
+                                  error
+                                );
+                                message.error(
+                                  t("post_details.image_download_error")
+                                );
+                              }
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
 
                     <button
-                      className={styles.scrollButton}
+                      className={cn(
+                        styles.scrollButton,
+                        styles.scrollButtonDown
+                      )}
                       onClick={() =>
                         scrollContainerRef.current?.scrollBy({
                           top: 200,
@@ -415,8 +462,31 @@ export const PostDetailsPage = () => {
                         })
                       }
                     >
-                      <RightOutlined />
+                      <DownOutlined />
                     </button>
+                    <Upload
+                      className={styles.upload}
+                      name="picture"
+                      listType="picture"
+                      accept="image/jpeg, image/png"
+                      maxCount={1}
+                      beforeUpload={() => false}
+                      onChange={handleFileChange}
+                    >
+                      <Button icon={<UploadOutlined />}>
+                        {t("post_details.select_file")}
+                      </Button>
+                    </Upload>
+                    {file && (
+                      <Button
+                        className={styles.uploadConfirm}
+                        type="primary"
+                        onClick={handleUploadConfirm}
+                        loading={isCreating}
+                      >
+                        {t("post_details.upload_image")}
+                      </Button>
+                    )}
                   </div>
 
                   <div className={styles.mainBlock}>
