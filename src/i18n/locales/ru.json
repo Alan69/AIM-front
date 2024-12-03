@@ -326,6 +326,7 @@
   "company_details": {
     "title": "Компания: {{name}}",
     "fields": {
+      "actions": "Действия",
       "scope": "Сфера деятельности",
       "description": "Описание",
       "target_audience": "Целевая аудитория",
@@ -345,6 +346,14 @@
     "buttons": {
       "show_more": "Показать больше",
       "hide": "Скрыть"
+    },
+    "modals": {
+      "confirm_deletion": "Подтвердите удаление",
+      "confirm_delete_message": "Вы уверены, что хотите удалить социальную сеть {{platform}} с именем пользователя {{username}}?"
+    },
+    "messages": {
+      "platform_removed": "Социальная сеть успешно удалена.",
+      "error_removing_platform": "Ошибка при удалении социальной сети. Пожалуйста, попробуйте снова."
     }
   },
   "company_update": {

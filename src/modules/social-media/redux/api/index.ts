@@ -129,6 +129,12 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: string) => response,
     }),
+    removePlatform: build.mutation<string, string>({
+      query: (account_id) => ({
+        url: `/platforms/accounts/remove/${account_id}/`,
+        method: 'DELETE'
+      })
+    }),
   }),
   overrideExisting: false,
 });
@@ -146,4 +152,5 @@ export const {
   useLazyAddTumblrQuery,
   useLazyAddTwitterQuery,
   useLazyAddVkQuery,
+  useRemovePlatformMutation
 } = postApi;

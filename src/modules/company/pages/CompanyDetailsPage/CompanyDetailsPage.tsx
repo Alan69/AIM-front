@@ -2,7 +2,16 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetCompanyByIdQuery } from "../../redux/api";
 
-import { Button, Layout, Table, TableProps, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Layout,
+  Table,
+  TableProps,
+  Tooltip,
+  Typography,
+  Modal,
+  message,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -16,6 +25,7 @@ import {
 import {
   TSocialMediaByCurrentCompanyData,
   useGetSocialMediaListByCurrentCompanyQuery,
+  useRemovePlatformMutation,
 } from "modules/social-media/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useGetCurrentTargetAudienceQuery } from "modules/target-audience/redux/api";
@@ -48,11 +58,41 @@ export const CompanyDetailsPage = () => {
     useGetSocialMediaListByCurrentCompanyQuery();
   const { data: targetAudience, refetch: refetchTargetAudience } =
     useGetCurrentTargetAudienceQuery();
+  const [removePlatform, { isLoading: isRemoving }] =
+    useRemovePlatformMutation();
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] =
+    useState<TSocialMediaByCurrentCompanyData | null>(null);
 
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const showRemovePlatformModal = (item: TSocialMediaByCurrentCompanyData) => {
+    setSelectedPlatform(item);
+    setIsModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setSelectedPlatform(null);
+  };
+
+  const handleRemovePlatform = async () => {
+    if (selectedPlatform) {
+      try {
+        // @ts-ignore
+        await removePlatform({ id: selectedPlatform.id }).unwrap();
+        message.success(t("company_details.messages.platform_removed"));
+        refetchSocialMediaList();
+      } catch (error) {
+        message.error(t("company_details.messages.error_removing_platform"));
+      }
+    }
+    setIsModalVisible(false);
+    setSelectedPlatform(null);
   };
 
   const columns: TableProps<DataType>["columns"] = [
@@ -97,6 +137,18 @@ export const CompanyDetailsPage = () => {
       key: item.username,
       platform: item.platform.name,
       username: item.username,
+      platform_action: (
+        <Button
+          type="link"
+          shape="circle"
+          icon={
+            <DeleteOutlined
+              onClick={() => showRemovePlatformModal(item)}
+              style={{ cursor: "pointer" }}
+            />
+          }
+        />
+      ),
     })) || [];
 
   const socialMediaListColumns: TableProps<TSocialMediaByCurrentCompanyData>["columns"] =
@@ -111,6 +163,11 @@ export const CompanyDetailsPage = () => {
         title: t("company_details.fields.description"),
         dataIndex: "username",
         key: "username",
+      },
+      {
+        title: t("company_details.fields.actions"),
+        dataIndex: "platform_action",
+        key: "platform_action",
       },
     ];
 
@@ -152,140 +209,156 @@ export const CompanyDetailsPage = () => {
   };
 
   return (
-    <Layout>
-      <Content className="page-layout">
-        <h1 className="main-title">
-          {t("company_details.title", { name: company?.name })}
-        </h1>
-        <Layout>
-          <Content>
-            <div className={styles.companyDescr}>
-              <div className={styles.companyDescr__title}>
-                <Title level={4}>
-                  {t("company_details.fields.scope")}:{" "}
-                  <span className={styles.companyDescr__title__value}>
-                    {company?.scope}
-                  </span>
+    <>
+      <Layout>
+        <Content className="page-layout">
+          <h1 className="main-title">
+            {t("company_details.title", { name: company?.name })}
+          </h1>
+          <Layout>
+            <Content>
+              <div className={styles.companyDescr}>
+                <div className={styles.companyDescr__title}>
+                  <Title level={4}>
+                    {t("company_details.fields.scope")}:{" "}
+                    <span className={styles.companyDescr__title__value}>
+                      {company?.scope}
+                    </span>
+                  </Title>
+                  <div className={styles.companyDescr__icons}>
+                    <Link to={`/company/${company?.id}/update`}>
+                      <EditOutlined />
+                    </Link>
+                    <Link to={`/company/${company?.id}/delete`}>
+                      <DeleteOutlined />
+                    </Link>
+                  </div>
+                </div>
+                <Title level={5}>
+                  {t("company_details.fields.description")}: {company?.comment}
                 </Title>
-                <div className={styles.companyDescr__icons}>
-                  <Link to={`/company/${company?.id}/update`}>
+              </div>
+            </Content>
+          </Layout>
+          <Layout>
+            <h2 className={styles.product__title}>
+              {t("company_details.fields.target_audience")}
+              <Tooltip title={t("company_details.actions.add_target_audience")}>
+                <Button
+                  type="primary"
+                  shape="circle"
+                  className={styles.addButton}
+                  icon={<PlusCircleOutlined className={styles.addIcon} />}
+                  onClick={() => navigate("/target-audience/create")}
+                />
+              </Tooltip>
+            </h2>
+            <Content>
+              <div
+                className={styles.companyDescr}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                {targetAudience?.text ? (
+                  renderTargetAudienceText()
+                ) : (
+                  <Text>
+                    {t("company_details.placeholders.no_target_audience")}
+                  </Text>
+                )}
+                {targetAudience?.text ? (
+                  <Link to={`/target-audience/${targetAudience?.id}/update`}>
                     <EditOutlined />
                   </Link>
-                  <Link to={`/company/${company?.id}/delete`}>
-                    <DeleteOutlined />
-                  </Link>
-                </div>
+                ) : (
+                  ""
+                )}
               </div>
-              <Title level={5}>
-                {t("company_details.fields.description")}: {company?.comment}
-              </Title>
-            </div>
-          </Content>
-        </Layout>
-        <Layout>
-          <h2 className={styles.product__title}>
-            {t("company_details.fields.target_audience")}
-            <Tooltip title={t("company_details.actions.add_target_audience")}>
-              <Button
-                type="primary"
-                shape="circle"
-                className={styles.addButton}
-                icon={<PlusCircleOutlined className={styles.addIcon} />}
-                onClick={() => navigate("/target-audience/create")}
-              />
-            </Tooltip>
-          </h2>
-          <Content>
-            <div
-              className={styles.companyDescr}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              {targetAudience?.text ? (
-                renderTargetAudienceText()
-              ) : (
-                <Text>
-                  {t("company_details.placeholders.no_target_audience")}
-                </Text>
-              )}
-              {targetAudience?.text ? (
-                <Link to={`/target-audience/${targetAudience?.id}/update`}>
-                  <EditOutlined />
-                </Link>
-              ) : (
-                ""
-              )}
-            </div>
-          </Content>
-        </Layout>
-        <Layout>
-          <h2 className={styles.product__title}>
-            {t("company_details.fields.products")}
-            <Tooltip title={t("company_details.actions.add_product")}>
-              <Button
-                type="primary"
-                shape="circle"
-                className={styles.addButton}
-                icon={<PlusCircleOutlined />}
-                onClick={() => navigate(`/product/${company?.id}/create`)}
-              />
-            </Tooltip>
-          </h2>
-          <Content>
-            <div className={styles.companyDescr}>
-              {!productListByCompanyId?.length ? (
-                <div style={{ paddingBottom: "12px" }}>
-                  <Text>{t("company_details.placeholders.no_products")}</Text>
-                </div>
-              ) : (
-                ""
-              )}
-              <Table
-                columns={columns}
-                dataSource={data}
-                pagination={false}
-                scroll={{ x: "max-content" }}
-              />
-            </div>
-          </Content>
-        </Layout>
-        <Layout>
-          <h2 className={styles.product__title}>
-            {t("company_details.fields.social_media")}
-            <Tooltip title={t("company_details.actions.add_social_media")}>
-              <Button
-                type="primary"
-                shape="circle"
-                className={styles.addButton}
-                icon={<PlusCircleOutlined />}
-                onClick={() => navigate(`/social-media/${company?.id}/add`)}
-              />
-            </Tooltip>
-          </h2>
-          <Content>
-            <div className={styles.companyDescr}>
-              {!productListByCompanyId?.length ? (
-                <div style={{ paddingBottom: "12px" }}>
-                  <Text>
-                    {t("company_details.placeholders.no_social_media")}
-                  </Text>
-                </div>
-              ) : (
-                ""
-              )}
-              <Table
-                // @ts-ignore
-                columns={socialMediaListColumns}
-                dataSource={newSocialMediaList}
-                pagination={false}
-                scroll={{ x: "max-content" }}
-              />
-            </div>
-          </Content>
-        </Layout>
-      </Content>
-    </Layout>
+            </Content>
+          </Layout>
+          <Layout>
+            <h2 className={styles.product__title}>
+              {t("company_details.fields.products")}
+              <Tooltip title={t("company_details.actions.add_product")}>
+                <Button
+                  type="primary"
+                  shape="circle"
+                  className={styles.addButton}
+                  icon={<PlusCircleOutlined />}
+                  onClick={() => navigate(`/product/${company?.id}/create`)}
+                />
+              </Tooltip>
+            </h2>
+            <Content>
+              <div className={styles.companyDescr}>
+                {!productListByCompanyId?.length ? (
+                  <div style={{ paddingBottom: "12px" }}>
+                    <Text>{t("company_details.placeholders.no_products")}</Text>
+                  </div>
+                ) : (
+                  ""
+                )}
+                <Table
+                  columns={columns}
+                  dataSource={data}
+                  pagination={false}
+                  scroll={{ x: "max-content" }}
+                />
+              </div>
+            </Content>
+          </Layout>
+          <Layout>
+            <h2 className={styles.product__title}>
+              {t("company_details.fields.social_media")}
+              <Tooltip title={t("company_details.actions.add_social_media")}>
+                <Button
+                  type="primary"
+                  shape="circle"
+                  className={styles.addButton}
+                  icon={<PlusCircleOutlined />}
+                  onClick={() => navigate(`/social-media/${company?.id}/add`)}
+                />
+              </Tooltip>
+            </h2>
+            <Content>
+              <div className={styles.companyDescr}>
+                {!productListByCompanyId?.length ? (
+                  <div style={{ paddingBottom: "12px" }}>
+                    <Text>
+                      {t("company_details.placeholders.no_social_media")}
+                    </Text>
+                  </div>
+                ) : (
+                  ""
+                )}
+                <Table
+                  // @ts-ignore
+                  columns={socialMediaListColumns}
+                  dataSource={newSocialMediaList}
+                  pagination={false}
+                  scroll={{ x: "max-content" }}
+                />
+              </div>
+            </Content>
+          </Layout>
+        </Content>
+      </Layout>
+      <Modal
+        title={t("company_details.modals.confirm_deletion")}
+        visible={isModalVisible}
+        onOk={handleRemovePlatform}
+        onCancel={handleModalCancel}
+        confirmLoading={isRemoving}
+      >
+        <Text>
+          {t("company_details.modals.confirm_delete_message", {
+            platform: selectedPlatform?.platform.name,
+            username: selectedPlatform?.username,
+          })}
+        </Text>
+      </Modal>
+    </>
   );
 };
