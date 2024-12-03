@@ -83,8 +83,7 @@ export const CompanyDetailsPage = () => {
   const handleRemovePlatform = async () => {
     if (selectedPlatform) {
       try {
-        // @ts-ignore
-        await removePlatform({ id: selectedPlatform.id }).unwrap();
+        await removePlatform(selectedPlatform.id).unwrap();
         message.success(t("company_details.messages.platform_removed"));
         refetchSocialMediaList();
       } catch (error) {

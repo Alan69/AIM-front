@@ -130,8 +130,8 @@ export const postApi = baseApi.injectEndpoints({
       transformResponse: (response: string) => response,
     }),
     removePlatform: build.mutation<string, string>({
-      query: (account_id) => ({
-        url: `/platforms/accounts/remove/${account_id}/`,
+      query: (id) => ({
+        url: `/platforms/accounts/remove/${id}/`,
         method: 'DELETE'
       })
     }),
