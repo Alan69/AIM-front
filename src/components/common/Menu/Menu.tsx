@@ -90,7 +90,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       label: (
         <div className={styles.soon}>
           <Link to="/content-plan">{t("menu.items.content_plan")}</Link>
-          <Badge count={t("menu.soon")} />
+          {/* <Badge count={t("menu.soon")} /> */}
         </div>
       ),
     },
