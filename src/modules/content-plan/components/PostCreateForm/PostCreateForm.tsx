@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Layout,
   Image,
   Button,
-  Checkbox,
   Form,
   Input,
   Upload,
   Typography,
   message,
 } from "antd";
-import { UploadOutlined, LoadingOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import styles from "./PostCreateForm.module.scss";
 import { useTypedSelector } from "hooks/useTypedSelector";
@@ -30,30 +29,38 @@ export const PostCreateForm = ({
   isCustomPostCreating,
   handleCreateCustomPost,
 }: TProps) => {
-  const { user } = useTypedSelector((state) => state.auth);
   const { isCustomPostCreated } = useTypedSelector((state) => state.post);
   const { t } = useTranslation();
 
-  const [file, setFile] = useState<File | null>(null);
+  const [fileList, setFileList] = useState<File[]>([]);
 
   const handleFileChange = (info: any) => {
-    const fileList = info.fileList;
-    if (fileList.length > 0) {
-      const lastFile = fileList[fileList.length - 1];
-      if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
-        setFile(lastFile.originFileObj);
-      } else {
-        message.error(t("content_plan.post_create_form.error_image_format"));
-      }
-    } else {
-      setFile(null);
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "video/mp4",
+      "video/quicktime",
+    ];
+    const files = info.fileList.map((file: any) => file.originFileObj);
+
+    const isValid = files.every((file: File) => validTypes.includes(file.type));
+    if (!isValid) {
+      message.error(t("content_plan.post_create_form.error_file_format"));
+      return;
     }
+
+    if (files.length > 10) {
+      message.error(t("content_plan.post_create_form.error_max_files"));
+      return;
+    }
+
+    setFileList(files);
   };
 
   const onFinish = (values: any) => {
     const updatedData = {
       ...values,
-      picture: file,
+      media_files: fileList,
     };
     handleCreateCustomPost(updatedData);
   };
@@ -67,8 +74,32 @@ export const PostCreateForm = ({
               <div className={styles.mainBlock}>
                 <div className={styles.postHeader}>
                   <div className={styles.pictureBlock}>
-                    {post?.picture?.includes("no_img") ? (
-                      <LoadingOutlined className={styles.loader} />
+                    {post && post?.previouspostimage?.length > 0 ? (
+                      post?.previouspostimage?.map((media) =>
+                        media.media.endsWith(".mp4") ||
+                        media.media.endsWith(".mov") ? (
+                          <video
+                            key={media.id}
+                            src={media.media}
+                            controls
+                            className={styles.mediaVideo}
+                          />
+                        ) : (
+                          <Image
+                            key={media.id}
+                            src={media.media}
+                            className={styles.picture}
+                            alt={t("content_plan.post_create_form.image_alt")}
+                          />
+                        )
+                      )
+                    ) : post?.picture?.endsWith(".mp4") ||
+                      post?.picture?.endsWith(".mov") ? (
+                      <video
+                        src={post.picture}
+                        controls
+                        className={styles.mediaVideo}
+                      />
                     ) : (
                       <Image
                         src={post?.picture}
@@ -94,19 +125,19 @@ export const PostCreateForm = ({
             <div className={styles.container}>
               <Form layout="vertical" onFinish={onFinish}>
                 <Form.Item
-                  name="picture"
-                  label={t("content_plan.post_create_form.upload_image")}
+                  name="media_files"
+                  label={t("content_plan.post_create_form.upload_file")}
                 >
                   <Upload
-                    name="picture"
+                    name="media_files"
                     listType="picture"
-                    accept="image/jpeg, image/png"
-                    maxCount={1}
+                    accept="image/jpeg, image/png, video/mp4, video/quicktime"
+                    multiple
                     beforeUpload={() => false}
                     onChange={handleFileChange}
                   >
                     <Button icon={<UploadOutlined />}>
-                      {t("content_plan.post_create_form.select_file")}
+                      {t("content_plan.post_create_form.select_files")}
                     </Button>
                   </Upload>
                 </Form.Item>

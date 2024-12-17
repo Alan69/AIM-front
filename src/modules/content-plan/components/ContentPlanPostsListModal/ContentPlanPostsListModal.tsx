@@ -10,14 +10,16 @@ import { useTypedSelector } from "hooks/useTypedSelector";
 import { TPostQueryCreateData } from "modules/post-query/redux/api";
 import { ContentPlanPostList } from "../ContentPlanPostList/ContentPlanPostList";
 import { useIsMobile } from "hooks/media";
-import { useTranslation } from "react-i18next"; // Для локализации
+import { useTranslation } from "react-i18next";
+import { TReelData } from "modules/reel/redux/api";
+import { TStoriesData } from "modules/stories/redux/api";
 
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   postListByCompanyId: TPostData[] | undefined;
   handleSelectNewPost: (post: TPostData) => void;
-  selectNewPost: TPostData | null;
+  selectNewPost: TPostData | TReelData | TStoriesData | null;
   isPostCreating: boolean;
   isCustomPostCreating: boolean;
   post: TPostData | undefined;
@@ -40,10 +42,10 @@ export const ContentPlanPostsListModal = ({
   handleGetPostById,
 }: TProps) => {
   const isMobile = useIsMobile();
-  const { t } = useTranslation(); // Для перевода
+  const { t } = useTranslation();
   const [expandedKeys, setExpandedKeys] = useState<Record<number, boolean>>({});
   const [selectCurrentPost, setSelectCurrentPost] = useState<TPostData | null>(
-    selectNewPost
+    selectNewPost && "img_prompt" in selectNewPost ? selectNewPost : null
   );
   const [activeTabKey, setActiveTabKey] = useState<string>("2");
   const { generatedPost, createdCustomPost } = useTypedSelector(

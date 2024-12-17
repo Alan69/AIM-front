@@ -94,50 +94,50 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
         </div>
       ),
     },
-    {
-      key: "9",
-      icon: <StockOutlined />,
-      label: (
-        <div className={styles.soon}>
-          {t("menu.items.marketing_strategy")}
-          <Badge count={t("menu.soon")} />
-        </div>
-      ),
-      disabled: true,
-    },
-    {
-      key: "10",
-      icon: <FundOutlined />,
-      label: (
-        <div className={styles.soon}>
-          {t("menu.items.sales_funnel")}
-          <Badge count={t("menu.soon")} />
-        </div>
-      ),
-      disabled: true,
-    },
-    {
-      key: "11",
-      icon: <WechatOutlined />,
-      label: (
-        <div className={styles.soon}>
-          {t("menu.items.chat_hub")}
-          <Badge count={t("menu.soon")} />
-        </div>
-      ),
-      disabled: true,
-    },
-    {
-      key: "12",
-      icon: <RadarChartOutlined />,
-      label: (
-        <div className={styles.soon}>
-          {t("menu.items.analytics")}
-          <Badge count={t("menu.soon")} />
-        </div>
-      ),
-      disabled: true,
-    },
+    // {
+    //   key: "9",
+    //   icon: <StockOutlined />,
+    //   label: (
+    //     <div className={styles.soon}>
+    //       {t("menu.items.marketing_strategy")}
+    //       <Badge count={t("menu.soon")} />
+    //     </div>
+    //   ),
+    //   disabled: true,
+    // },
+    // {
+    //   key: "10",
+    //   icon: <FundOutlined />,
+    //   label: (
+    //     <div className={styles.soon}>
+    //       {t("menu.items.sales_funnel")}
+    //       <Badge count={t("menu.soon")} />
+    //     </div>
+    //   ),
+    //   disabled: true,
+    // },
+    // {
+    //   key: "11",
+    //   icon: <WechatOutlined />,
+    //   label: (
+    //     <div className={styles.soon}>
+    //       {t("menu.items.chat_hub")}
+    //       <Badge count={t("menu.soon")} />
+    //     </div>
+    //   ),
+    //   disabled: true,
+    // },
+    // {
+    //   key: "12",
+    //   icon: <RadarChartOutlined />,
+    //   label: (
+    //     <div className={styles.soon}>
+    //       {t("menu.items.analytics")}
+    //       <Badge count={t("menu.soon")} />
+    //     </div>
+    //   ),
+    //   disabled: true,
+    // },
   ];
 
   return (

@@ -26,20 +26,28 @@ import { TAddToSchedulersData } from "modules/content-plan/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useIsMobile } from "hooks/media";
 import { useTranslation } from "react-i18next";
+import { TReelData } from "modules/reel/redux/api";
+import { ContentPlanPostingType } from "modules/content-plan/types";
+import { TStoriesData } from "modules/stories/redux/api";
 
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   handleShowContentPlanPostsListModal?: () => void;
-  handleShowContentPlanSocialMediaListModal: () => void;
-  selectNewPost: TPostData | null | undefined;
+  handleShowContentPlanSocialMediaListModal?: () => void;
+  handleShowContentPlanReelsModal?: () => void;
+  handleShowContentPlanStorieModal?: () => void;
+  selectNewPost: TPostData | TReelData | TStoriesData | null | undefined;
   selectedNewSocialMedias: TSocialMediaByCurrentCompanyData[];
   isAddingToSchedulers: boolean;
   handleAddToSchedulers: (item: TAddToSchedulersData) => void;
   handleClearAddModalParams: () => void;
   isPostNowLoading: boolean;
+  isPostReelNowLoading?: boolean;
+  isPostStorieNowLoading?: boolean;
   handlePostNow: () => void;
   isPostPage?: boolean;
+  selectedPostType?: ContentPlanPostingType;
 };
 
 const { Title, Paragraph } = Typography;
@@ -48,6 +56,8 @@ export const ContentPlanAddPostModal = ({
   isModalOpen,
   setIsModalOpen,
   handleShowContentPlanPostsListModal,
+  handleShowContentPlanReelsModal,
+  handleShowContentPlanStorieModal,
   handleShowContentPlanSocialMediaListModal,
   selectNewPost,
   selectedNewSocialMedias,
@@ -55,8 +65,11 @@ export const ContentPlanAddPostModal = ({
   handleAddToSchedulers,
   handleClearAddModalParams,
   isPostNowLoading,
+  isPostReelNowLoading,
+  isPostStorieNowLoading,
   handlePostNow,
   isPostPage = false,
+  selectedPostType,
 }: TProps) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
@@ -221,7 +234,11 @@ export const ContentPlanAddPostModal = ({
                 width: isMobile ? "100%" : "33.33%",
               }}
               disabled={!selectNewPost || selectedNewSocialMedias.length === 0}
-              loading={isPostNowLoading}
+              loading={
+                isPostNowLoading ||
+                isPostReelNowLoading ||
+                isPostStorieNowLoading
+              }
             >
               {t("content_plan.content_plan_add_post_modal.publish_now")}
             </Button>
@@ -278,15 +295,35 @@ export const ContentPlanAddPostModal = ({
               onClick={handleShowContentPlanPostsListModal}
               className={cn(
                 styles.addBtn,
-                selectNewPost?.id ? styles.addBtn__isActive : ""
+                selectedPostType === ContentPlanPostingType.POST
+                  ? styles.addBtn__isActive
+                  : ""
               )}
             >
               {t("content_plan.content_plan_add_post_modal.post")}
             </Button>
-            <Button icon={<VideoCameraOutlined />} disabled>
+            <Button
+              icon={<VideoCameraOutlined />}
+              onClick={handleShowContentPlanReelsModal}
+              className={cn(
+                styles.addBtn,
+                selectedPostType === ContentPlanPostingType.REELS
+                  ? styles.addBtn__isActive
+                  : ""
+              )}
+            >
               {t("content_plan.content_plan_add_post_modal.reels")}
             </Button>
-            <Button icon={<PlayCircleOutlined />} disabled>
+            <Button
+              icon={<PlayCircleOutlined />}
+              onClick={handleShowContentPlanStorieModal}
+              className={cn(
+                styles.addBtn,
+                selectedPostType === ContentPlanPostingType.STORIES
+                  ? styles.addBtn__isActive
+                  : ""
+              )}
+            >
               {t("content_plan.content_plan_add_post_modal.stories")}
             </Button>
           </div>
@@ -300,13 +337,21 @@ export const ContentPlanAddPostModal = ({
                   styles.selectNewPost__isActive
                 )}
                 avatar={
-                  <Image
-                    width={160}
-                    height={160}
-                    src={selectNewPost?.picture}
-                  />
+                  selectNewPost && "picture" in selectNewPost ? (
+                    <Image
+                      width={160}
+                      height={160}
+                      src={selectNewPost.picture}
+                    />
+                  ) : null
                 }
-                title={<Title level={5}>{selectNewPost?.title}</Title>}
+                title={
+                  <Title level={5}>
+                    {selectNewPost && "title" in selectNewPost
+                      ? selectNewPost?.title
+                      : ""}
+                  </Title>
+                }
                 description={
                   <>
                     <Paragraph
@@ -315,7 +360,9 @@ export const ContentPlanAddPostModal = ({
                         !expandedKeys ? { rows: 4, expandable: false } : false
                       }
                     >
-                      {selectNewPost?.main_text}
+                      {selectNewPost && "main_text" in selectNewPost
+                        ? selectNewPost?.main_text
+                        : ""}
                     </Paragraph>
                     <div className={styles.expandBtn}>
                       <Button

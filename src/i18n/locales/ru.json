@@ -709,15 +709,54 @@
       "favorite_posts": "Список избранных постов",
       "select": "Выбрать"
     },
+    "content_plan_reels_modal": {
+      "select_reel": "Выбрать рилс",
+      "create_reel": "Создание рилса",
+      "generate_reel": "Генерация рилса",
+      "select": "Выбрать"
+    },
+    "content_plan_stories_modal": {
+      "select_stories": "Выбрать сторисы",
+      "create_stories": "Создание сторисы",
+      "generate_stories": "Генерация сторисы",
+      "select": "Выбрать"
+    },
     "post_create_form": {
-      "error_image_format": "Пожалуйста, загрузите файл формата JPEG или PNG",
+      "error_file_format": "Пожалуйста, загрузите файлы форматов JPEG, PNG, MP4 или MOV",
+      "error_max_files": "Вы можете загрузить не более 10 файлов",
       "image_alt": "Изображение поста",
-      "upload_image": "Загрузить новое изображение",
-      "select_file": "Выберите файл",
+      "upload_file": "Загрузить новый файл",
+      "select_files": "Выберите файлы",
       "title": "Заголовок",
       "main_text": "Основной текст",
       "hashtags": "Хэштеги",
       "create_post": "Создать пост"
+    },
+    "reel_create_form": {
+      "validation_video_required": "Пожалуйста, загрузите видео",
+      "validation_title_required": "Пожалуйста, укажите заголовок",
+      "validation_title_length": "Заголовок должен содержать как минимум 3 символа",
+      "validation_main_text_required": "Пожалуйста, укажите основной текст",
+      "validation_hashtags_required": "Пожалуйста, укажите хэштеги",
+      "error_file_format": "Пожалуйста, загрузите файлы форматов MP4 или MOV",
+      "error_max_files": "Вы можете загрузить не более 10 файлов",
+      "error_file_size": "Размер файла должен быть меньше 100 МБ",
+      "select_files": "Выберите файлы",
+      "upload_image": "Загрузить новое видео",
+      "title": "Заголовок",
+      "main_text": "Основной текст",
+      "hashtags": "Хэштеги",
+      "create_reel": "Создать рил"
+    },
+    "stories_create_form": {
+      "error_image_size": "Размер изображения должен быть меньше 8 МБ",
+      "error_video_size": "Размер видео должен быть меньше 100 МБ",
+      "error_file_format": "Пожалуйста, загрузите допустимый файл (JPEG, PNG, MP4, MOV)",
+      "validation_video_required": "Пожалуйста, загрузите видео или изображение",
+      "image_alt": "Изображение поста",
+      "upload_image": "Загрузите изображение или видео",
+      "select_file": "Выберите файл",
+      "create_post": "Создать сторис"
     },
     "post_query_generate_form": {
       "company": "Компания",
