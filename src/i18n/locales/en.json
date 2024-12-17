@@ -709,15 +709,54 @@
       "favorite_posts": "Favorite Posts",
       "select": "Select"
     },
+    "content_plan_reels_modal": {
+      "select_reel": "Select Reel",
+      "create_reel": "Create Reel",
+      "generate_reel": "Generate Reel",
+      "select": "Select"
+    },
+    "content_plan_stories_modal": {
+      "select_stories": "Select Stories",
+      "create_stories": "Create Stories",
+      "generate_stories": "Generate Stories",
+      "select": "Select"
+    },
     "post_create_form": {
-      "error_image_format": "Please upload a file in JPEG or PNG format",
-      "image_alt": "Post Image",
-      "upload_image": "Upload New Image",
-      "select_file": "Select File",
+      "error_file_format": "Please upload files in JPEG, PNG, MP4, or MOV format",
+      "error_max_files": "You can upload up to 10 files",
+      "image_alt": "Media Preview",
+      "upload_file": "Upload Media Files",
+      "select_files": "Select Files",
       "title": "Title",
       "main_text": "Main Text",
       "hashtags": "Hashtags",
       "create_post": "Create Post"
+    },
+    "reel_create_form": {
+      "validation_video_required": "Please upload an video",
+      "validation_title_required": "Please provide a title",
+      "validation_title_length": "Title must be at least 3 characters long",
+      "validation_main_text_required": "Please provide the main text",
+      "validation_hashtags_required": "Please provide hashtags",
+      "error_file_format": "Please upload files in MP4 or MOV format",
+      "error_max_files": "You can upload up to 10 files",
+      "error_file_size": "File size must be less than 100 MB",
+      "select_files": "Select Files",
+      "upload_image": "Upload New Video",
+      "title": "Title",
+      "main_text": "Main Text",
+      "hashtags": "Hashtags",
+      "create_reel": "Create Reel"
+    },
+    "stories_create_form": {
+      "error_image_size": "Image size must be less than 8 MB",
+      "error_video_size": "Video size must be less than 100 MB",
+      "error_file_format": "Please upload a valid file (JPEG, PNG, MP4, MOV)",
+      "validation_video_required": "Please upload a video or image",
+      "image_alt": "Post Image",
+      "upload_image": "Upload Image or Video",
+      "select_file": "Select File",
+      "create_stories": "Create Stories"
     },
     "post_query_generate_form": {
       "company": "Company",

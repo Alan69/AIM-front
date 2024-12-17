@@ -3,6 +3,11 @@ import baseApi from '../../../../redux/api';
 import { TUserData } from 'modules/account/redux/api';
 import { TImgStylesData } from 'redux/api/imgStyles/imgStylesApi';
 
+export type TPreviousPostImage = {
+  id: string;
+  media: string;
+}
+
 export type TPostData = {
   id: string;
   title: string;
@@ -21,6 +26,7 @@ export type TPostData = {
   image_id: {
     id: string
   }
+  previouspostimage: TPreviousPostImage[]
 }
 
 export type TCreatePost = {
@@ -89,6 +95,14 @@ export type TCreatePostImageResponse = {
   created_at: string;
 }
 
+export type TCreateCustomPost = {
+  title: string;
+  main_text: string;
+  hashtags: string;
+  media_files?: File[];
+  like?: boolean;
+}
+
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPostList: build.query<TPostData[], string>({
@@ -100,7 +114,7 @@ export const postApi = baseApi.injectEndpoints({
     }),
     getPostById: build.query<TPostData, string>({
       query: (id) => ({
-        url: `/posts/${id}`,
+        url: `/posts/${id}/`,
         method: 'GET'
       }),
       transformResponse: (response: TPostData) => response,
@@ -134,16 +148,19 @@ export const postApi = baseApi.injectEndpoints({
       transformResponse: (response: TPostData) => response,
       extraOptions: { showErrors: false },
     }),
-    createCustomPost: build.mutation<TPostData, TCreatePost>({
-      query: ({ title, main_text, hashtags, picture, like, active }) => {
+    createCustomPost: build.mutation<TPostData, TCreateCustomPost>({
+      query: ({ title, main_text, hashtags, media_files, like }) => {
         const formData = new FormData();
+    
         formData.append('title', title);
         formData.append('main_text', main_text || '');
         formData.append('hashtags', hashtags || '');
         like && formData.append('like', like.toString());
-        
-        if (picture) {
-          formData.append('picture', picture);
+    
+        if (media_files && media_files.length > 0) {
+          media_files.forEach((file) => {
+            formData.append('media_files', file); 
+          });
         }
     
         return {

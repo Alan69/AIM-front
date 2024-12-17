@@ -50,6 +50,26 @@ import { postActions } from "modules/post/redux/slices/post.slice";
 import { SelectedPreviewBlockModal } from "modules/content-plan/components/SelectedPreviewBlockModal/SelectedPreviewBlockModal.modal";
 import { useIsMobile, useIsSmallLaptop } from "hooks/media";
 import { useTranslation } from "react-i18next";
+import { ContentPlanReelsModal } from "modules/content-plan/components/ContentPlanReelsModal/ContentPlanReelsModal";
+import {
+  TCreateReelRequest,
+  TReelData,
+  useCreateCustomReelMutation,
+  useLazyGetReelByIdQuery,
+  useLazyGetReelMediaListByIdQuery,
+  usePostReelNowMutation,
+} from "modules/reel/redux/api";
+import { reelActions } from "modules/reel/redux/slices/reel.slice";
+import { ContentPlanPostingType } from "modules/content-plan/types";
+import {
+  TCreateStoriesRequest,
+  TStoriesData,
+  useCreateCustomStoriesMutation,
+  useLazyGetStoriesByIdQuery,
+  usePostStoriesNowMutation,
+} from "modules/stories/redux/api";
+import { storiesActions } from "modules/stories/redux/slices/stories.slice";
+import { ContentPlanStoriesModal } from "modules/content-plan/components/ContentPlanStoriesModal/ContentPlanStoriesModal";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -64,12 +84,24 @@ export const ContentPlanPage = () => {
     useState(false);
   const [isContentPlanPostsListModalOpen, setIsContentPlanPostsListModalOpen] =
     useState(false);
+  const [isContentPlanReelsModalOpen, setIsContentPlanReelsModalOpen] =
+    useState(false);
+  const [isContentPlanStorieModalOpen, setIsContentPlanStorieModalOpen] =
+    useState(false);
+
   const [
     isContentPlanSocialMediaListModalOpen,
     setIsContentPlanSocialMediaListModalOpen,
   ] = useState(false);
 
-  const [selectNewPost, setSelectNewPost] = useState<TPostData | null>(null);
+  const [selectedPostType, setSelectedPostType] = useState(
+    ContentPlanPostingType.UNKNOWN
+  );
+
+  const [selectNewPost, setSelectNewPost] = useState<
+    TPostData | TReelData | TStoriesData | null
+  >(null);
+
   const [selectedNewSocialMedias, setSelectedNewSocialMedias] = useState<
     TSocialMediaByCurrentCompanyData[]
   >([]);
@@ -98,8 +130,27 @@ export const ContentPlanPage = () => {
     useCreatePostQueryMutation();
   const [createCustomPost, { isLoading: isCustomPostCreating }] =
     useCreateCustomPostMutation();
+  const [createCustomReel, { isLoading: isCustomReelCreating }] =
+    useCreateCustomReelMutation();
+  const [createCustomStories, { isLoading: isCustomStoriesCreating }] =
+    useCreateCustomStoriesMutation();
+
   const [getPostById, { data: post }] = useLazyGetPostByIdQuery();
+  const [getReelById, { data: reel }] = useLazyGetReelByIdQuery();
+  const [getReelMediaListById, { data: reelMediaList }] =
+    useLazyGetReelMediaListByIdQuery();
+  const [getStoriesById, { data: storie }] = useLazyGetStoriesByIdQuery();
+
   const [postNow, { isLoading: isPostNowLoading }] = usePostNowMutation();
+  const [postReelNow, { isLoading: isPostReelNowLoading }] =
+    usePostReelNowMutation();
+  const [postStoriesNow, { isLoading: isPostStorieNowLoading }] =
+    usePostStoriesNowMutation();
+
+  const updatedReel = {
+    reelMediaList,
+    ...reel,
+  };
 
   const handleShowContentPlanAddPostModal = () => {
     refetchPostListByCompanyId();
@@ -109,10 +160,33 @@ export const ContentPlanPage = () => {
   const handleShowContentPlanPostsListModal = () =>
     setIsContentPlanPostsListModalOpen(true);
 
+  const handleShowContentPlanReelsModal = () =>
+    setIsContentPlanReelsModalOpen(true);
+
+  const handleShowContentPlanStorieModal = () =>
+    setIsContentPlanStorieModalOpen(true);
+
   const handleShowContentPlanSocialMediaListModal = () =>
     setIsContentPlanSocialMediaListModalOpen(true);
 
-  const handleSelectNewPost = (post: TPostData) => setSelectNewPost(post);
+  const handleSelectNewPost = (
+    post?: TPostData,
+    reel?: TReelData,
+    storie?: TStoriesData
+  ) => {
+    if (post) {
+      setSelectNewPost(post);
+      setSelectedPostType(ContentPlanPostingType.POST);
+    }
+    if (reel) {
+      setSelectNewPost(reel);
+      setSelectedPostType(ContentPlanPostingType.REELS);
+    }
+    if (storie) {
+      setSelectNewPost(storie);
+      setSelectedPostType(ContentPlanPostingType.STORIES);
+    }
+  };
 
   const handleSelectNewSocialMedias = (
     socialMedias: TSocialMediaByCurrentCompanyData[]
@@ -120,20 +194,59 @@ export const ContentPlanPage = () => {
 
   const handlePostNow = () => {
     if (selectNewPost?.id) {
-      postNow({
-        post_id: selectNewPost?.id,
-        social_media_account_ids: selectedNewSocialMedias.map(
-          (media) => media.id
-        ),
-        previous_post_image_ids: [selectNewPost?.image_id?.id],
-      })
-        .unwrap()
-        .then((res) => {
-          setIsContentPlanSocialMediaListModalOpen(false);
-          setIsContentPlanAddPostModalOpen(false);
-          setSelectedNewSocialMedias([]);
-          message.success(res.message);
-        });
+      if (selectedPostType === ContentPlanPostingType.POST) {
+        postNow({
+          post_id: selectNewPost?.id,
+          social_media_account_ids: selectedNewSocialMedias.map(
+            (media) => media.id
+          ),
+          // @ts-ignore
+          previous_post_image_ids: selectNewPost?.previouspostimage?.map(
+            // @ts-ignore
+            (media) => media.id
+          ),
+        })
+          .unwrap()
+          .then((res) => {
+            setIsContentPlanSocialMediaListModalOpen(false);
+            setIsContentPlanAddPostModalOpen(false);
+            setSelectedNewSocialMedias([]);
+            message.success(res.message);
+          });
+      }
+
+      if (selectedPostType === ContentPlanPostingType.REELS) {
+        postReelNow({
+          reel: selectNewPost?.id,
+          social_media_accounts: selectedNewSocialMedias.map(
+            (media) => media.id
+          ),
+          reel_media: updatedReel?.reelMediaList?.map((media) => media.id),
+        })
+          .unwrap()
+          .then((res) => {
+            setIsContentPlanSocialMediaListModalOpen(false);
+            setIsContentPlanAddPostModalOpen(false);
+            setSelectedNewSocialMedias([]);
+            message.success(res.message);
+          });
+      }
+
+      if (selectedPostType === ContentPlanPostingType.STORIES) {
+        postStoriesNow({
+          story: selectNewPost?.id,
+          social_media_accounts: selectedNewSocialMedias.map(
+            (media) => media.id
+          ),
+        })
+          .unwrap()
+          .then((res) => {
+            setIsContentPlanSocialMediaListModalOpen(false);
+            setIsContentPlanAddPostModalOpen(false);
+            setSelectedNewSocialMedias([]);
+            message.success(res.message);
+          });
+      }
     }
   };
 
@@ -151,7 +264,7 @@ export const ContentPlanPage = () => {
     createPostQuery(updatedData)
       .unwrap()
       .then((response) => {
-        getPostById(response.id)
+        getPostById(response.post_id)
           .unwrap()
           .then((responsePost) => {
             dispatch(postActions.setIsPostGenerated(true));
@@ -173,6 +286,34 @@ export const ContentPlanPage = () => {
           .then((responsePost) => {
             dispatch(postActions.setIsCustomCreated(true));
             dispatch(postActions.setCreatedCustomPost(responsePost));
+          });
+      });
+  };
+
+  const handleCreateCustomReel = (updatedData: TCreateReelRequest) => {
+    createCustomReel(updatedData)
+      .unwrap()
+      .then((response) => {
+        getReelById(response.reel_id)
+          .unwrap()
+          .then((responseStorie) => {
+            getReelMediaListById(response.reel_id);
+            dispatch(reelActions.setIsCustomReelCreated(true));
+            dispatch(reelActions.setCreatedCustomReel(responseStorie));
+          });
+      });
+  };
+
+  const handleCreateCustomStories = (updatedData: TCreateStoriesRequest) => {
+    createCustomStories(updatedData)
+      .unwrap()
+      .then((response) => {
+        getStoriesById(response.storie_id)
+          .unwrap()
+          .then((responseStorie) => {
+            getReelMediaListById(response.storie_id);
+            dispatch(storiesActions.setIsCustomStoriesCreated(true));
+            dispatch(storiesActions.setCreatedCustomStories(responseStorie));
           });
       });
   };
@@ -350,6 +491,8 @@ export const ContentPlanPage = () => {
         handleShowContentPlanPostsListModal={
           handleShowContentPlanPostsListModal
         }
+        handleShowContentPlanReelsModal={handleShowContentPlanReelsModal}
+        handleShowContentPlanStorieModal={handleShowContentPlanStorieModal}
         handleShowContentPlanSocialMediaListModal={
           handleShowContentPlanSocialMediaListModal
         }
@@ -359,7 +502,10 @@ export const ContentPlanPage = () => {
         handleAddToSchedulers={handleAddToSchedulers}
         handleClearAddModalParams={handleClearAddModalParams}
         isPostNowLoading={isPostNowLoading}
+        isPostReelNowLoading={isPostReelNowLoading}
+        isPostStorieNowLoading={isPostStorieNowLoading}
         handlePostNow={handlePostNow}
+        selectedPostType={selectedPostType}
       />
       <ContentPlanPostsListModal
         isModalOpen={isContentPlanPostsListModalOpen}
@@ -373,6 +519,23 @@ export const ContentPlanPage = () => {
         handleGeneratePost={handleGeneratePost}
         handleCreateCustomPost={handleCreateCustomPost}
         handleGetPostById={handleGetPostById}
+      />
+      <ContentPlanReelsModal
+        isModalOpen={isContentPlanReelsModalOpen}
+        setIsModalOpen={setIsContentPlanReelsModalOpen}
+        handleSelectNewPost={handleSelectNewPost}
+        isCustomReelCreating={isCustomReelCreating}
+        // @ts-ignore
+        reel={updatedReel}
+        handleCreateCustomReel={handleCreateCustomReel}
+      />
+      <ContentPlanStoriesModal
+        isModalOpen={isContentPlanStorieModalOpen}
+        setIsModalOpen={setIsContentPlanStorieModalOpen}
+        handleSelectNewPost={handleSelectNewPost}
+        isCustomStoriesCreating={isCustomStoriesCreating}
+        storie={storie}
+        handleCreateCustomStories={handleCreateCustomStories}
       />
       <ContentPlanSocialMediaListModal
         isModalOpen={isContentPlanSocialMediaListModalOpen}
