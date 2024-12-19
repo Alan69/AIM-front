@@ -1,18 +1,15 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form";
-import { Layout, Button, Form, Input, Select, message } from "antd";
-import { useTypedSelector } from "hooks/useTypedSelector";
-import {
-  TPostQueryCreateData,
-  useCreatePostQueryMutation,
-} from "modules/post-query/redux/api";
-import { useGetPostTypesListQuery } from "../../../../redux/api/postTypes/postTypesApi";
-import { useGetTextStylesListQuery } from "../../../../redux/api/textStyles/textStylesApi";
-import { useGetLanguagesListQuery } from "../../../../redux/api/languages/languagesApi";
-import { useLazyGetProductListByCompanyIdQuery } from "modules/product/redux/api";
-import { useTranslation } from "react-i18next";
-import styles from "./PostQueryCreatePage.module.scss";
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { Layout, Button, Form, Input, Select, message } from 'antd';
+import { useTypedSelector } from 'hooks/useTypedSelector';
+import { TPostQueryCreateData, useCreatePostQueryMutation } from 'modules/post-query/redux/api';
+import { useGetPostTypesListQuery } from '../../../../redux/api/postTypes/postTypesApi';
+import { useGetTextStylesListQuery } from '../../../../redux/api/textStyles/textStylesApi';
+import { useGetLanguagesListQuery } from '../../../../redux/api/languages/languagesApi';
+import { useLazyGetProductListByCompanyIdQuery } from 'modules/product/redux/api';
+import { useTranslation } from 'react-i18next';
+import styles from './PostQueryCreatePage.module.scss';
 
 const { Content } = Layout;
 
@@ -21,18 +18,12 @@ export const PostQueryCreatePage = () => {
   const { current_company } = useTypedSelector((state) => state.auth);
   const { t } = useTranslation();
 
-  const [createPostQuery, { isLoading: isPostCreating }] =
-    useCreatePostQueryMutation();
-  const [
-    getProductListByCompanyId,
-    { data: productList, isLoading: isProductListLoading },
-  ] = useLazyGetProductListByCompanyIdQuery();
-  const { data: postTypesList, isLoading: isPostTypesListLoading } =
-    useGetPostTypesListQuery();
-  const { data: textStylesList, isLoading: isTextStylesListLoading } =
-    useGetTextStylesListQuery();
-  const { data: languagesList, isLoading: isLanguagesListLoading } =
-    useGetLanguagesListQuery();
+  const [createPostQuery, { isLoading: isPostCreating }] = useCreatePostQueryMutation();
+  const [getProductListByCompanyId, { data: productList, isLoading: isProductListLoading }] =
+    useLazyGetProductListByCompanyIdQuery();
+  const { data: postTypesList, isLoading: isPostTypesListLoading } = useGetPostTypesListQuery();
+  const { data: textStylesList, isLoading: isTextStylesListLoading } = useGetTextStylesListQuery();
+  const { data: languagesList, isLoading: isLanguagesListLoading } = useGetLanguagesListQuery();
 
   const {
     control,
@@ -41,25 +32,25 @@ export const PostQueryCreatePage = () => {
     formState: { errors },
   } = useForm<TPostQueryCreateData>({
     defaultValues: {
-      content: "",
-      company: "",
-      product: "",
-      post_type: "",
-      text_style: "",
-      lang: "",
+      content: '',
+      company: '',
+      product: '',
+      post_type: '',
+      text_style: '',
+      lang: '',
     },
   });
 
   useEffect(() => {
     if (current_company) {
-      setValue("company", current_company.id);
+      setValue('company', current_company.id);
     }
   }, [current_company, setValue]);
 
   useEffect(() => {
     if (current_company) {
       getProductListByCompanyId(current_company.id);
-      setValue("product", "");
+      setValue('product', '');
     }
   }, [current_company, getProductListByCompanyId]);
 
@@ -81,41 +72,31 @@ export const PostQueryCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("post_query_create.title")}</h1>
+        <h1 className="main-title">{t('post_query_create.title')}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label={t("post_query_create.fields.company")}
-            validateStatus={errors.company ? "error" : ""}
-            help={errors.company && t("post_query_create.errors.required")}
-          >
+            label={t('post_query_create.fields.company')}
+            validateStatus={errors.company ? 'error' : ''}
+            help={errors.company && t('post_query_create.errors.required')}>
             <Controller
               name="company"
               control={control}
               rules={{ required: true }}
               disabled
               render={({ field }) => (
-                <Select
-                  {...field}
-                  value={field.value || current_company?.id}
-                  disabled
-                >
-                  <Select.Option
-                    key={current_company?.id}
-                    value={current_company?.id}
-                  >
+                <Select {...field} value={field.value || current_company?.id} disabled>
+                  <Select.Option key={current_company?.id} value={current_company?.id}>
                     {current_company?.name}
                   </Select.Option>
                 </Select>
               )}
             />
             {!current_company?.id && (
-              <div className={styles.noContent}>
-                {t("post_query_create.no_company")}
-              </div>
+              <div className={styles.noContent}>{t('post_query_create.no_company')}</div>
             )}
           </Form.Item>
 
-          <Form.Item label={t("post_query_create.fields.product")}>
+          <Form.Item label={t('post_query_create.fields.product')}>
             <Controller
               name="product"
               control={control}
@@ -124,8 +105,7 @@ export const PostQueryCreatePage = () => {
                   {...field}
                   loading={isProductListLoading}
                   disabled={isPostCreating}
-                  allowClear
-                >
+                  allowClear>
                   {productList?.map((product) => (
                     <Select.Option key={product.id} value={product.id}>
                       {product.name}
@@ -137,10 +117,13 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("post_query_create.fields.post_type")}
-            validateStatus={errors.post_type ? "error" : ""}
-            help={errors.post_type && t("post_query_create.errors.required")}
-          >
+            label={
+              <span>
+                {t('post_query_create.fields.post_type')} <span>*</span>
+              </span>
+            }
+            validateStatus={errors.post_type ? 'error' : ''}
+            help={errors.post_type && t('post_query_create.errors.required')}>
             <Controller
               name="post_type"
               control={control}
@@ -159,10 +142,13 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("post_query_create.fields.text_style")}
-            validateStatus={errors.text_style ? "error" : ""}
-            help={errors.text_style && t("post_query_create.errors.required")}
-          >
+            label={
+              <span>
+                {t('post_query_create.fields.text_style')} <span>*</span>
+              </span>
+            }
+            validateStatus={errors.text_style ? 'error' : ''}
+            help={errors.text_style && t('post_query_create.errors.required')}>
             <Controller
               name="text_style"
               control={control}
@@ -179,12 +165,14 @@ export const PostQueryCreatePage = () => {
               )}
             />
           </Form.Item>
-
           <Form.Item
-            label={t("post_query_create.fields.lang")}
-            validateStatus={errors.lang ? "error" : ""}
-            help={errors.lang && t("post_query_create.errors.required")}
-          >
+            label={
+              <span>
+                {t('post_query_create.fields.lang')} <span>*</span>
+              </span>
+            }
+            validateStatus={errors.lang ? 'error' : ''}
+            help={errors.lang && t('post_query_create.errors.required')}>
             <Controller
               name="lang"
               control={control}
@@ -195,8 +183,8 @@ export const PostQueryCreatePage = () => {
                   {languagesList
                     ?.slice()
                     ?.sort((a, b) => {
-                      const aIsStarred = a.name.startsWith("*");
-                      const bIsStarred = b.name.startsWith("*");
+                      const aIsStarred = a.name.startsWith('*');
+                      const bIsStarred = b.name.startsWith('*');
                       if (aIsStarred && !bIsStarred) return -1;
                       if (!aIsStarred && bIsStarred) return 1;
                       return a.name.localeCompare(b.name);
@@ -212,10 +200,13 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("post_query_create.fields.content")}
-            validateStatus={errors.content ? "error" : ""}
-            help={errors.content && t("post_query_create.errors.required")}
-          >
+            label={
+              <span>
+                {t('post_query_create.fields.content')} <span>*</span>
+              </span>
+            }
+            validateStatus={errors.content ? 'error' : ''}
+            help={errors.content && t('post_query_create.errors.required')}>
             <Controller
               name="content"
               control={control}
@@ -228,7 +219,7 @@ export const PostQueryCreatePage = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isPostCreating}>
-              {t("post_query_create.submit_button")}
+              {t('post_query_create.submit_button')}
             </Button>
           </Form.Item>
         </Form>

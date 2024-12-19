@@ -1,65 +1,57 @@
-import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, Layout, Table } from "antd";
-import type { TableProps } from "antd";
-import cn from "classnames";
-import { TPostQueryData, useGetPostQueriesListQuery } from "../../redux/api";
-import { useTypedSelector } from "hooks/useTypedSelector";
-import { useTranslation } from "react-i18next";
-import styles from "./PostQueryListPage.module.scss";
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button, Layout, Table, Spin } from 'antd';
+import type { TableProps } from 'antd';
+import cn from 'classnames';
+import { TPostQueryData, useGetPostQueriesListQuery } from '../../redux/api';
+import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useTranslation } from 'react-i18next';
+import styles from './PostQueryListPage.module.scss';
 
 const { Content } = Layout;
 
 export const PostQueryListPage = () => {
   const navigate = useNavigate();
   const { current_company } = useTypedSelector((state) => state.auth);
-  const { data: postQueriesList, refetch } = useGetPostQueriesListQuery();
+  const { data: postQueriesList, refetch, isLoading } = useGetPostQueriesListQuery(); // isLoading показывает состояние запроса
   const { t } = useTranslation();
 
-  const columns: TableProps<TPostQueryData>["columns"] = [
+  const columns: TableProps<TPostQueryData>['columns'] = [
     {
-      title: t("post_queries_list.fields.product"),
-      dataIndex: "product",
-      key: "product",
-      fixed: "left",
-      render: (text, record) => (
-        <Link to={`/post-query/${record.id}`}>{text}</Link>
-      ),
+      title: t('post_queries_list.fields.product'),
+      dataIndex: 'product',
+      key: 'product',
+      fixed: 'left',
+      render: (text, record) => <Link to={`/post-query/${record.id}`}>{text}</Link>,
     },
     {
-      title: t("post_queries_list.fields.post_type"),
-      dataIndex: "post_type",
-      key: "post_type",
-      render: (text, record) => (
-        <Link to={`/post-query/${record.id}`}>{text}</Link>
-      ),
+      title: t('post_queries_list.fields.post_type'),
+      dataIndex: 'post_type',
+      key: 'post_type',
+      render: (text, record) => <Link to={`/post-query/${record.id}`}>{text}</Link>,
     },
     {
-      title: t("post_queries_list.fields.text_style"),
-      dataIndex: "text_style",
-      key: "text_style",
-      render: (text, record) => (
-        <Link to={`/post-query/${record.id}`}>{text}</Link>
-      ),
+      title: t('post_queries_list.fields.text_style'),
+      dataIndex: 'text_style',
+      key: 'text_style',
+      render: (text, record) => <Link to={`/post-query/${record.id}`}>{text}</Link>,
     },
     {
-      title: t("post_queries_list.fields.date"),
-      dataIndex: "date",
-      key: "date",
-      render: (text, record) => (
-        <Link to={`/post-query/${record.id}`}>{text}</Link>
-      ),
+      title: t('post_queries_list.fields.date'),
+      dataIndex: 'date',
+      key: 'date',
+      render: (text, record) => <Link to={`/post-query/${record.id}`}>{text}</Link>,
     },
   ];
 
   const formatDate = (dateString: string | undefined) => {
-    const date = new Date(dateString ? dateString : "");
-    return new Intl.DateTimeFormat("ru-RU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    const date = new Date(dateString ? dateString : '');
+    return new Intl.DateTimeFormat('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     }).format(date);
   };
 
@@ -78,23 +70,26 @@ export const PostQueryListPage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className={cn("main-title", styles.title)}>
-          {t("post_queries_list.title", { company: current_company?.name })}
+        <h1 className={cn('main-title', styles.title)}>
+          {t('post_queries_list.title', { company: current_company?.name })}
           <Button
             color="default"
             className={styles.addBtn}
-            onClick={() => navigate("/post-query/create")}
-          >
-            {t("post_queries_list.create_button")}
+            onClick={() => navigate('/post-query/create')}>
+            {t('post_queries_list.create_button')}
           </Button>
         </h1>
-        <Table
-          // @ts-ignore
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-          scroll={{ x: "max-content" }}
-        />
+        {/* Добавим лоадер Spin вокруг таблицы */}
+        <Spin spinning={isLoading} tip={t('loading')}>
+          <Table
+            // @ts-ignore
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+            loading={isLoading} // Передаём состояние загрузки
+          />
+        </Spin>
       </Content>
     </Layout>
   );

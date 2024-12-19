@@ -1,20 +1,20 @@
-import React, { memo, Suspense, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
-import { Spin, Typography } from "antd";
+import React, { memo, Suspense, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import { Spin, Typography } from 'antd';
 import {
   FacebookOutlined,
   InstagramOutlined,
   LinkedinOutlined,
   MenuFoldOutlined,
   CaretRightOutlined,
-} from "@ant-design/icons";
-import cn from "classnames";
-import { Footer } from "antd/es/layout/layout";
-import { Footer as FooterLanding } from "layouts/UnauthorisedLayout/components/Footer/Footer";
-import MenuNav from "../../components/common/Menu/Menu";
-import Header from "../UnauthorisedLayout/components/Header/Header";
-import styles from "./MainLayout.module.scss";
-import { useIsSmallLaptop } from "hooks/media";
+} from '@ant-design/icons';
+import cn from 'classnames';
+import { Footer } from 'antd/es/layout/layout';
+import { Footer as FooterLanding } from 'layouts/UnauthorisedLayout/components/Footer/Footer';
+import MenuNav from '../../components/common/Menu/Menu';
+import Header from '../UnauthorisedLayout/components/Header/Header';
+import styles from './MainLayout.module.scss';
+import { useIsSmallLaptop } from 'hooks/media';
 
 const { Text } = Typography;
 
@@ -24,54 +24,47 @@ export const MainLayout = memo(function MainLayout() {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSwitchMenu = (
-    e?: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
+  const handleSwitchMenu = () => {
     setIsOpen(!isOpen);
   };
 
   return (
     <div
       className={cn(
-        location.pathname === "/home" ||
-          location.pathname === "/agreement" ||
-          location.pathname === "/policy"
-          ? ""
-          : styles.layout
-      )}
-    >
-      {location.pathname === "/home" ||
-      location.pathname === "/agreement" ||
-      location.pathname === "/policy" ? (
+        location.pathname === '/home' ||
+          location.pathname === '/agreement' ||
+          location.pathname === '/policy'
+          ? ''
+          : styles.layout,
+      )}>
+      {location.pathname === '/home' ||
+      location.pathname === '/agreement' ||
+      location.pathname === '/policy' ? (
         <Header />
       ) : (
         <MenuNav isOpen={isOpen} handleSwitchMenu={handleSwitchMenu} />
       )}
       <div
         className={cn(
-          location.pathname === "/home" ||
-            location.pathname === "/agreement" ||
-            location.pathname === "/policy"
+          location.pathname === '/home' ||
+            location.pathname === '/agreement' ||
+            location.pathname === '/policy'
             ? styles.main
-            : styles.body
-        )}
-      >
+            : styles.body,
+        )}>
         {isSmallLaptop ? (
-          <div
-            className={styles.menuButton}
-            onClick={(e) => handleSwitchMenu()}
-          >
+          <div className={styles.menuButton} onClick={(e) => handleSwitchMenu()}>
             {<CaretRightOutlined />}
           </div>
         ) : (
-          ""
+          ''
         )}
         <Suspense fallback={<Spin size="small" />}>
           <Outlet />
         </Suspense>
-        {location.pathname === "/home" ||
-        location.pathname === "/agreement" ||
-        location.pathname === "/policy" ? (
+        {location.pathname === '/home' ||
+        location.pathname === '/agreement' ||
+        location.pathname === '/policy' ? (
           <FooterLanding />
         ) : (
           <Footer className={styles.footer}>
