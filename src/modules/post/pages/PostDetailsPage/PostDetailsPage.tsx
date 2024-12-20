@@ -330,6 +330,7 @@ export const PostDetailsPage = () => {
       if (!main_text || !title || !hashtags || picture?.includes("no_img")) {
         interval = setInterval(() => {
           refetch();
+          refetchPostMedias();
         }, 5000);
       }
     }
