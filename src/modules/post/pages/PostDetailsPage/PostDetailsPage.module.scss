@@ -21,6 +21,9 @@
   display: flex;
   justify-content: center;
   gap: 45px;
+  @media (max-width: 1024px) {
+    flex-direction: column;
+  }
 }
 
 .mainBlock {
@@ -28,6 +31,15 @@
   // max-width: 450px;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 1024px) {
+    width: 100%;
+  }
+}
+.mainContent {
+  @media (max-width: 1024px) {
+    order: 3;
+  }
 }
 
 .editBlock {
@@ -191,6 +203,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  @media (max-width: 1024px) {
+    width: 100%;
+    order: 2;
+  }
 }
 
 .scrollContainer {
@@ -202,6 +218,18 @@
   // margin-top: 48px;
   // height: calc(100vh - 48px - 48px - 70px - 140px);
   height: 70vh;
+  @media (max-width: 1024px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    height: auto;
+    flex-direction: row;
+    height: 35vh;
+  }
+}
+.postButtons {
+  @media (max-width: 1024px) {
+    order: 3;
+  }
 }
 
 .scrollContainer::-webkit-scrollbar {
@@ -261,9 +289,14 @@
   flex-direction: column;
   align-items: center;
   margin-top: 12px;
+
   // position: absolute;
   // z-index: 1;
   // bottom: 0;
+}
+.uploadPicture {
+  margin-top: 12px;
+  width: 145px;
 }
 
 .uploadConfirm {

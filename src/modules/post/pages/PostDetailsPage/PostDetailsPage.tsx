@@ -355,17 +355,21 @@ export const PostDetailsPage = () => {
               <div className={styles.postDescr}>
                 <div className={styles.container}>
                   <div className={styles.mediaSlider}>
-                    <button
-                      className={styles.scrollButton}
-                      onClick={() =>
-                        scrollContainerRef.current?.scrollBy({
-                          top: -200,
-                          behavior: "smooth",
-                        })
-                      }
-                    >
-                      <UpOutlined />
-                    </button>
+                    {postMedias && postMedias.length > 3 && (
+                      <>
+                        <button
+                          className={styles.scrollButton}
+                          onClick={() =>
+                            scrollContainerRef.current?.scrollBy({
+                              top: -200,
+                              behavior: "smooth",
+                            })
+                          }
+                        >
+                          <UpOutlined />
+                        </button>
+                      </>
+                    )}
 
                     <div
                       className={styles.scrollContainer}
@@ -449,23 +453,26 @@ export const PostDetailsPage = () => {
                         </div>
                       ))}
                     </div>
-
-                    <button
-                      className={cn(
-                        styles.scrollButton,
-                        styles.scrollButtonDown
-                      )}
-                      onClick={() =>
-                        scrollContainerRef.current?.scrollBy({
-                          top: 200,
-                          behavior: "smooth",
-                        })
-                      }
-                    >
-                      <DownOutlined />
-                    </button>
+                    {postMedias && postMedias.length > 3 && (
+                      <>
+                        <button
+                          className={cn(
+                            styles.scrollButton,
+                            styles.scrollButtonDown
+                          )}
+                          onClick={() =>
+                            scrollContainerRef.current?.scrollBy({
+                              top: 200,
+                              behavior: "smooth",
+                            })
+                          }
+                        >
+                          <DownOutlined />
+                        </button>
+                      </>
+                    )}
                     <Upload
-                      className={styles.upload}
+                      className={styles.uploadPicture}
                       name="picture"
                       listType="picture"
                       accept="image/jpeg, image/png"
@@ -490,184 +497,193 @@ export const PostDetailsPage = () => {
                   </div>
 
                   <div className={styles.mainBlock}>
-                    <div className={styles.postHeader}>
-                      <div className={styles.userInfo}>
-                        <img
-                          src={profileImage}
-                          alt={user ? user.profile.user.first_name : "-"}
-                          className={styles.avatar}
-                        />
-                        <div className={styles.details}>
-                          <div className={styles.name}>
-                            {user ? user.profile.user.first_name : "-"}
+                    <div className={styles.mainContent}>
+                      {" "}
+                      <div className={styles.postHeader}>
+                        <div className={styles.userInfo}>
+                          <img
+                            src={profileImage}
+                            alt={user ? user.profile.user.first_name : "-"}
+                            className={styles.avatar}
+                          />
+                          <div className={styles.details}>
+                            <div className={styles.name}>
+                              {user ? user.profile.user.first_name : "-"}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className={styles.pictureBlock}>
-                        {post?.picture?.includes("no_img") ? (
-                          <LoadingOutlined className={styles.loader} />
-                        ) : (
-                          <>
-                            <Image
-                              src={post?.picture}
-                              className={styles.picture}
-                              alt={t("post_details.image_alt")}
-                            />
-                            <Button
-                              className={styles.reloadButton}
-                              icon={<ReloadOutlined />}
-                              shape="circle"
-                              onClick={() =>
-                                setIsEditBlockShow(!isEditBlockShow)
-                              }
-                            />
-                            <Button
-                              className={styles.downloadButton}
-                              icon={<DownloadOutlined />}
-                              shape="circle"
-                              onClick={async () => {
-                                try {
-                                  if (!post?.picture) {
-                                    message.error(
-                                      t("post_details.image_not_found")
+                        <div className={styles.pictureBlock}>
+                          {post?.picture?.includes("no_img") ? (
+                            <LoadingOutlined className={styles.loader} />
+                          ) : (
+                            <>
+                              <Image
+                                src={post?.picture}
+                                className={styles.picture}
+                                alt={t("post_details.image_alt")}
+                              />
+
+                              <Button
+                                className={styles.reloadButton}
+                                icon={<ReloadOutlined />}
+                                shape="circle"
+                                onClick={() =>
+                                  setIsEditBlockShow(!isEditBlockShow)
+                                }
+                              />
+                              <Button
+                                className={styles.downloadButton}
+                                icon={<DownloadOutlined />}
+                                shape="circle"
+                                onClick={async () => {
+                                  try {
+                                    if (!post?.picture) {
+                                      message.error(
+                                        t("post_details.image_not_found")
+                                      );
+                                      return;
+                                    }
+
+                                    const response = await fetch(post.picture, {
+                                      method: "GET",
+                                      mode: "cors",
+                                      credentials: "include",
+                                    });
+
+                                    if (!response.ok) {
+                                      throw new Error(
+                                        t("post_details.image_download_error")
+                                      );
+                                    }
+
+                                    const blob = await response.blob();
+                                    const url =
+                                      window.URL.createObjectURL(blob);
+
+                                    const link = document.createElement("a");
+                                    link.href = url;
+                                    link.setAttribute("download", "image.jpg");
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                    message.success(
+                                      t("post_details.image_download_success")
                                     );
-                                    return;
-                                  }
-
-                                  const response = await fetch(post.picture, {
-                                    method: "GET",
-                                    mode: "cors",
-                                    credentials: "include",
-                                  });
-
-                                  if (!response.ok) {
-                                    throw new Error(
+                                  } catch (error) {
+                                    console.error(
+                                      t("post_details.image_download_error"),
+                                      error
+                                    );
+                                    message.error(
                                       t("post_details.image_download_error")
                                     );
                                   }
+                                }}
+                              />
+                            </>
+                          )}
+                        </div>
+                        {/* <Collapse className={styles.postDescription}>
+                        <Panel header="Описание" key="1">
+                          <Text>{post?.img_prompt}</Text>
+                        </Panel>
+                      </Collapse> */}
+                      </div>
+                      <div className={styles.postContent}>
+                        <div className={styles.postContent__titleBlock}>
+                          <Title level={3}>{post?.title}</Title>
+                          <Tooltip title={t("post_details.copy")}>
+                            <Button
+                              className={styles.postContent__icon}
+                              icon={<CopyOutlined />}
+                              onClick={() => {
+                                if (
+                                  post?.title ||
+                                  post?.main_text ||
+                                  post?.hashtags
+                                ) {
+                                  const mainTextCleaned =
+                                    post.main_text?.replace(/\n\n/g, " ");
+                                  const textToCopy = [
+                                    post.title,
+                                    mainTextCleaned,
+                                    post.hashtags,
+                                  ]
+                                    .filter(Boolean)
+                                    .join("\n\n");
 
-                                  const blob = await response.blob();
-                                  const url = window.URL.createObjectURL(blob);
-
-                                  const link = document.createElement("a");
-                                  link.href = url;
-                                  link.setAttribute("download", "image.jpg");
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  document.body.removeChild(link);
-                                  window.URL.revokeObjectURL(url);
-                                  message.success(
-                                    t("post_details.image_download_success")
-                                  );
-                                } catch (error) {
-                                  console.error(
-                                    t("post_details.image_download_error"),
-                                    error
-                                  );
-                                  message.error(
-                                    t("post_details.image_download_error")
-                                  );
+                                  navigator.clipboard
+                                    .writeText(textToCopy)
+                                    .then(
+                                      () => {
+                                        message.success(
+                                          t("post_details.copy_success")
+                                        );
+                                      },
+                                      () => {
+                                        message.error(
+                                          t("post_details.copy_error")
+                                        );
+                                      }
+                                    );
                                 }
                               }}
                             />
-                          </>
-                        )}
-                      </div>
-                      {/* <Collapse className={styles.postDescription}>
-                    <Panel header="Описание" key="1">
-                      <Text>{post?.img_prompt}</Text>
-                    </Panel>
-                  </Collapse> */}
-                    </div>
-                    <div className={styles.postContent}>
-                      <div className={styles.postContent__titleBlock}>
-                        <Title level={3}>{post?.title}</Title>
-                        <Tooltip title={t("post_details.copy")}>
-                          <Button
-                            className={styles.postContent__icon}
-                            icon={<CopyOutlined />}
-                            onClick={() => {
-                              if (
-                                post?.title ||
-                                post?.main_text ||
-                                post?.hashtags
-                              ) {
-                                const mainTextCleaned = post.main_text?.replace(
-                                  /\n\n/g,
-                                  " "
-                                );
-                                const textToCopy = [
-                                  post.title,
-                                  mainTextCleaned,
-                                  post.hashtags,
-                                ]
-                                  .filter(Boolean)
-                                  .join("\n\n");
-
-                                navigator.clipboard.writeText(textToCopy).then(
-                                  () => {
-                                    message.success(
-                                      t("post_details.copy_success")
-                                    );
-                                  },
-                                  () => {
-                                    message.error(t("post_details.copy_error"));
-                                  }
-                                );
-                              }
-                            }}
-                          />
-                        </Tooltip>
-                      </div>
-                      <div className={styles.postContent__text}>
-                        {post?.main_text ? formatText(post.main_text) : null}
-                      </div>
-                      <div className={styles.postHashtags}>
-                        <Text>{post?.hashtags}</Text>
+                          </Tooltip>
+                        </div>
+                        <div className={styles.postContent__text}>
+                          {post?.main_text ? formatText(post.main_text) : null}
+                        </div>
+                        <div className={styles.postHashtags}>
+                          <Text>{post?.hashtags}</Text>
+                        </div>
                       </div>
                     </div>
-                    <div className={styles.postLike}>
-                      <HeartTwoTone
-                        height={24}
-                        width={24}
-                        className={cn(
-                          styles.iconHeart,
-                          post?.like ? styles.iconHeart__active : ""
-                        )}
-                        onClick={handleUpdateLike}
-                      />
-                      <Text>{t("post_details.add_to_favorites")}</Text>
-                    </div>
-                    <div className={styles.postActions}>
-                      <Button
-                        type="primary"
-                        onClick={() =>
-                          navigate(
-                            `/post/${post?.post_query}/${post?.id}/update`
-                          )
-                        }
-                      >
-                        {t("post_details.edit")}
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleShowContentPlanSocialMediaListModal}
-                      >
-                        {t("post_details.publish_now")}
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleShowContentPlanAddPostModal}
-                      >
-                        {t("post_details.add_to_scheduler")}
-                      </Button>
-                      <Button
-                        htmlType="button"
-                        type="default"
-                        onClick={() => navigate(-1)}
-                      >
-                        {t("post_details.cancel")}
-                      </Button>
+                    <div className={styles.postButtons}>
+                      <div className={styles.postLike}>
+                        <HeartTwoTone
+                          height={24}
+                          width={24}
+                          className={cn(
+                            styles.iconHeart,
+                            post?.like ? styles.iconHeart__active : ""
+                          )}
+                          onClick={handleUpdateLike}
+                        />
+                        <Text>{t("post_details.add_to_favorites")}</Text>
+                      </div>
+                      <div className={styles.postActions}>
+                        <Button
+                          type="primary"
+                          onClick={() =>
+                            navigate(
+                              `/post/${post?.post_query}/${post?.id}/update`
+                            )
+                          }
+                        >
+                          {t("post_details.edit")}
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleShowContentPlanSocialMediaListModal}
+                        >
+                          {t("post_details.publish_now")}
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleShowContentPlanAddPostModal}
+                        >
+                          {t("post_details.add_to_scheduler")}
+                        </Button>
+                        <Button
+                          htmlType="button"
+                          type="default"
+                          onClick={() => navigate(-1)}
+                        >
+                          {t("post_details.cancel")}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   {isEditBlockShow && (

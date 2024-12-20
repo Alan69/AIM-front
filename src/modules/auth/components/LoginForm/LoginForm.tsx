@@ -14,8 +14,14 @@ export const LoginForm = () => {
   const [login, { isLoading }] = useLoginMutation();
 
   const onFinish = async (values: { email: string; password: string }) => {
+    // Преобразуем email в нижний регистр перед отправкой на сервер
+    const dataToSend = {
+      ...values,
+      email: values.email.toLowerCase(),
+    };
+    console.log("Данные перед отправкой:", dataToSend);
     try {
-      const response = await login(values);
+      const response = await login(dataToSend);
 
       // @ts-ignore
       const { access: token, refresh: refreshToken } = response.data;
