@@ -51,7 +51,7 @@ import {
 } from "modules/social-media/redux/api";
 import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
 import {
-  TAddToSchedulersData,
+  TAddToSchedulersRequest,
   useAddToSchedulersMutation,
 } from "modules/content-plan/redux/api";
 import { useTranslation } from "react-i18next";
@@ -188,7 +188,7 @@ export const PostDetailsPage = () => {
     }
   };
 
-  const handleAddToSchedulers = (item: TAddToSchedulersData) => {
+  const handleAddToSchedulers = (item: TAddToSchedulersRequest) => {
     addToSchedulers(item)
       .unwrap()
       .then(() => {

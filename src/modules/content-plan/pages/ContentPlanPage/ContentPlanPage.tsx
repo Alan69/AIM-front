@@ -22,8 +22,9 @@ import { useTypedSelector } from "hooks/useTypedSelector";
 import { contentPlanActions } from "modules/content-plan/redux/slices/contentPlan.slice";
 import { useDispatch } from "react-redux";
 import {
-  TAddToSchedulersData,
+  TAddToSchedulersRequest,
   useAddToSchedulersMutation,
+  useDeteleFromSchedulerMutation,
   useGetSchedulersQuery,
 } from "modules/content-plan/redux/api";
 import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
@@ -117,15 +118,16 @@ export const ContentPlanPage = () => {
   const { selectedPost } = useTypedSelector((state) => state.contentPlan);
   const { current_company } = useTypedSelector((state) => state.auth);
 
-  const { data: postList, refetch: refetchPostList } = useGetSchedulersQuery(
-    current_company?.id
-  );
+  const { data: contentPlanList, refetch: refetchPostList } =
+    useGetSchedulersQuery(current_company?.id);
   const { data: postListByCompanyId, refetch: refetchPostListByCompanyId } =
     useGetPostListByCompanyIdQuery(current_company?.id);
   const { data: socialMediaList, refetch: refetchSocialMediaList } =
     useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] =
     useAddToSchedulersMutation();
+  const [deteleFromScheduler, { isLoading: isDeletingFromScheduler }] =
+    useDeteleFromSchedulerMutation();
   const [createPostQuery, { isLoading: isPostCreating }] =
     useCreatePostQueryMutation();
   const [createCustomPost, { isLoading: isCustomPostCreating }] =
@@ -250,13 +252,28 @@ export const ContentPlanPage = () => {
     }
   };
 
-  const handleAddToSchedulers = (item: TAddToSchedulersData) => {
+  const handleAddToSchedulers = (item: TAddToSchedulersRequest) => {
     addToSchedulers(item)
       .unwrap()
       .then(() => {
         refetchPostList();
         setIsContentPlanAddPostModalOpen(false);
         message.success(t("content_plan.post_added"));
+      })
+      .catch((error) => {
+        message.error(error.data.error);
+      });
+  };
+
+  const handleDeleteFromScheduler = (scheduler_id: string) => {
+    deteleFromScheduler(scheduler_id)
+      .unwrap()
+      .then((res) => {
+        refetchPostList();
+        message.success(res.message);
+      })
+      .catch((error) => {
+        message.error(error.data.error);
       });
   };
 
@@ -348,7 +365,7 @@ export const ContentPlanPage = () => {
       label: t("content_plan.calendar"),
       children: (
         <ContentPlanCalendar
-          postList={postList}
+          contentPlanList={contentPlanList}
           handleSelectEvent={handleSelectEvent}
           selectedDatePreview={selectedDatePreview}
           setSelectedDatePreview={setSelectedDatePreview}

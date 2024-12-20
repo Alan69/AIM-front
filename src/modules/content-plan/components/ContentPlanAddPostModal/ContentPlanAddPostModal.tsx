@@ -22,7 +22,7 @@ import "moment/locale/en-gb";
 import styles from "./ContentPlanAddPostModal.module.scss";
 import { TPostData } from "modules/post/redux/api";
 import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
-import { TAddToSchedulersData } from "modules/content-plan/redux/api";
+import { TAddToSchedulersRequest } from "modules/content-plan/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useIsMobile } from "hooks/media";
 import { useTranslation } from "react-i18next";
@@ -40,7 +40,7 @@ type TProps = {
   selectNewPost: TPostData | TReelData | TStoriesData | null | undefined;
   selectedNewSocialMedias: TSocialMediaByCurrentCompanyData[];
   isAddingToSchedulers: boolean;
-  handleAddToSchedulers: (item: TAddToSchedulersData) => void;
+  handleAddToSchedulers: (item: TAddToSchedulersRequest) => void;
   handleClearAddModalParams: () => void;
   isPostNowLoading: boolean;
   isPostReelNowLoading?: boolean;
@@ -118,7 +118,18 @@ export const ContentPlanAddPostModal = ({
       const scheduledTime = selectedTime.format("HH:mm:ss");
 
       handleAddToSchedulers({
-        post_id: selectNewPost.id,
+        post_id:
+          selectedPostType === ContentPlanPostingType.POST
+            ? selectNewPost?.id
+            : undefined,
+        reel_id:
+          selectedPostType === ContentPlanPostingType.REELS
+            ? selectNewPost?.id
+            : undefined,
+        storie_id:
+          selectedPostType === ContentPlanPostingType.STORIES
+            ? selectNewPost?.id
+            : undefined,
         company_id: current_company.id,
         social_media_account_ids: selectedNewSocialMedias.map(
           (media) => media.id
@@ -127,7 +138,6 @@ export const ContentPlanAddPostModal = ({
         scheduled_time: scheduledTime,
         active: true,
       });
-
       handleClearAddModal();
     }
   };

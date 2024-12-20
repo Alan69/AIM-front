@@ -21,7 +21,7 @@ import "moment/locale/en-gb";
 moment.locale("ru");
 
 type TProps = {
-  postList: TSchedulesData[] | undefined;
+  contentPlanList: TSchedulesData[] | undefined;
   handleSelectEvent: (event: any) => void;
   selectedDatePreview: Date | null;
   setSelectedDatePreview: React.Dispatch<React.SetStateAction<Date | null>>;
@@ -30,7 +30,7 @@ type TProps = {
 };
 
 export const ContentPlanCalendar = ({
-  postList,
+  contentPlanList,
   handleSelectEvent,
   selectedDatePreview,
   setSelectedDatePreview,
@@ -59,22 +59,31 @@ export const ContentPlanCalendar = ({
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const events =
-    postList?.map((postItem) => {
+    contentPlanList?.map((item) => {
       const startDateTime = moment(
-        `${postItem.scheduled_date}T${postItem.scheduled_time}`
+        `${item.scheduled_date}T${item.scheduled_time}`
       ).toDate();
       const endDateTime = moment(startDateTime).add(2, "hours").toDate();
 
       return {
-        id: postItem.id,
-        title: postItem.post.title,
+        id: item.id,
+        title: item.post.title
+          ? item.post.title
+          : "" || item.reel.title
+            ? item.reel.title
+            : "" || item.storie.id
+              ? "Stories"
+              : "",
         start: startDateTime,
         end: endDateTime,
-        resourceId: postItem.post.id,
-        main_text: postItem.post.main_text,
-        hashtags: postItem.post.hashtags,
+        resourceId: item.post.id || item.reel.id || item.storie.id,
+        main_text:
+          item.post.main_text || item.reel.main_text || item.storie.id
+            ? ""
+            : "",
+        hashtags: item.post.hashtags || item.reel.hashtags,
         time: moment(startDateTime).format("HH:mm"),
-        picture: postItem.post.picture,
+        picture: item.post.picture,
       };
     }) || [];
 

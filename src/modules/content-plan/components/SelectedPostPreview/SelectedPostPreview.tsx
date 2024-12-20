@@ -77,7 +77,7 @@ export const SelectedPostPreview = ({ selectedPost }: TProps) => {
               />
               <Text>
                 {t("content_plan.selected_post_preview.add_to_favorites")}
-              </Text>{" "}
+              </Text>
             </div>
           </div>
         </div>

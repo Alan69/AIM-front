@@ -2,10 +2,14 @@ import { TPostData } from 'modules/post/redux/api';
 import baseApi from '../../../../redux/api';
 import { TCompanyData } from 'modules/company/redux/api';
 import { TProductData } from 'modules/product/redux/api';
+import { TReelData } from 'modules/reel/redux/api';
+import { TStoriesData } from 'modules/stories/redux/api';
 
 export type TSchedulesData = {
   id: string;
   post: TPostData;
+  reel: TReelData;
+  storie: TStoriesData;
   company: TCompanyData;
   product: TProductData;
   social_media: string;
@@ -24,6 +28,17 @@ export type TAddToSchedulersData = {
   active: boolean;
 }
 
+export type TAddToSchedulersRequest = {
+  post_id?: string | undefined;
+  reel_id?: string | undefined;
+  storie_id?: string | undefined;
+  company_id: string | undefined;
+  social_media_account_ids: string[] | undefined;
+  scheduled_date: string;
+  scheduled_time: string;
+  active: boolean;
+}
+
 export type TAddToSchedulersResponse = {
   id: string;
   post: string;
@@ -31,6 +46,10 @@ export type TAddToSchedulersResponse = {
   social_media: string;
   scheduled_time: string;
   active: boolean;
+}
+
+export type TDeleteFromSchedulerResponse = {
+  message: string
 }
 
 export const contentPlanApi = baseApi.injectEndpoints({
@@ -42,12 +61,14 @@ export const contentPlanApi = baseApi.injectEndpoints({
 			}),
 			transformResponse: (response: TSchedulesData[]) => response,
     }),
-    addToSchedulers: build.mutation<TAddToSchedulersResponse, TAddToSchedulersData>({
-			query: ({post_id, company_id, social_media_account_ids, scheduled_date, scheduled_time, active}) => ({
+    addToSchedulers: build.mutation<TAddToSchedulersResponse, TAddToSchedulersRequest>({
+			query: ({post_id, reel_id, storie_id, company_id, social_media_account_ids, scheduled_date, scheduled_time, active}) => ({
 				url: '/scheduler/post/',
 				method: 'POST',
         body: {
           post_id,
+          reel_id,
+          storie_id,
           company_id,
           social_media_account_ids,
           scheduled_date,
@@ -57,11 +78,19 @@ export const contentPlanApi = baseApi.injectEndpoints({
 			}),
 			transformResponse: (response: TAddToSchedulersResponse) => response,
     }),
+    deteleFromScheduler: build.mutation<TDeleteFromSchedulerResponse, string>({
+			query: (scheduler_id) => ({
+				url: `/scheduler/delete/${scheduler_id}/`,
+				method: 'DELETE',
+			}),
+			transformResponse: (response: TDeleteFromSchedulerResponse) => response,
+    }),
 	}),
 	overrideExisting: false,
 });
 
 export const {
   useGetSchedulersQuery,
-  useAddToSchedulersMutation
+  useAddToSchedulersMutation,
+  useDeteleFromSchedulerMutation
 } = contentPlanApi;
