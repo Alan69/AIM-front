@@ -36,6 +36,7 @@ export type TReelData = {
   main_text: string;
   hashtags: string;
   reelMediaList?: TReelMediaData[];
+  previous_media?: TReelMediaData[];
 }
 
 export const reelApi = baseApi.injectEndpoints({

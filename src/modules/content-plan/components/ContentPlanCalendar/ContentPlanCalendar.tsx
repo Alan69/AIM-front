@@ -65,6 +65,22 @@ export const ContentPlanCalendar = ({
       ).toDate();
       const endDateTime = moment(startDateTime).add(2, "hours").toDate();
 
+      const updatedMedia = () => {
+        if (item.post.id) {
+          if (item.post.picture?.includes("no_img")) {
+            return item.post.previouspostimage;
+          } else {
+            return [{ media: item.post.picture }];
+          }
+        }
+        if (item.reel.id) {
+          return item.reel.previous_media;
+        }
+        if (item.storie.id) {
+          return [{ media: item.storie.media }];
+        }
+      };
+
       return {
         id: item.id,
         title: item.post.title
@@ -83,11 +99,7 @@ export const ContentPlanCalendar = ({
             : "",
         hashtags: item.post.hashtags || item.reel.hashtags,
         time: moment(startDateTime).format("HH:mm"),
-        media: item.post.picture?.includes("no_img")
-          ? item.post.previouspostimage
-          : [{ media: item.post.picture }] ||
-            item.reel.reelMediaList ||
-            item.storie.media,
+        media: updatedMedia(),
       };
     }) || [];
 
