@@ -680,7 +680,8 @@
     },
     "selected_post_preview": {
       "image_alt": "Изображение поста",
-      "add_to_favorites": "В избранные для публикации"
+      "add_to_favorites": "В избранные для публикации",
+      "delete_post": "Удалить пост"
     },
     "content_plan_add_post_modal": {
       "add_content_title": "Добавить контент",
@@ -714,6 +715,12 @@
       "create_reel": "Создание рилса",
       "generate_reel": "Генерация рилса",
       "select": "Выбрать"
+    },
+    "content_plan_delete_post_modal": {
+      "delete": "Удалить",
+      "from": "из контент плана?",
+      "cancel": "Отмена",
+      "confirm": "Подтвердить"
     },
     "content_plan_stories_modal": {
       "select_stories": "Выбрать сторисы",

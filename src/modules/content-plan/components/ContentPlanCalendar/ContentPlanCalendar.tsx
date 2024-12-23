@@ -83,7 +83,11 @@ export const ContentPlanCalendar = ({
             : "",
         hashtags: item.post.hashtags || item.reel.hashtags,
         time: moment(startDateTime).format("HH:mm"),
-        picture: item.post.picture,
+        media: item.post.picture?.includes("no_img")
+          ? item.post.previouspostimage
+          : [{ media: item.post.picture }] ||
+            item.reel.reelMediaList ||
+            item.storie.media,
       };
     }) || [];
 

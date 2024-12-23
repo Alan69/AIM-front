@@ -680,7 +680,8 @@
     },
     "selected_post_preview": {
       "image_alt": "Post Image",
-      "add_to_favorites": "Add to favorites for publication"
+      "add_to_favorites": "Add to favorites for publication",
+      "delete_post": "Delete post"
     },
     "content_plan_add_post_modal": {
       "add_content_title": "Add content",
@@ -714,6 +715,12 @@
       "create_reel": "Create Reel",
       "generate_reel": "Generate Reel",
       "select": "Select"
+    },
+    "content_plan_delete_post_modal": {
+      "delete": "Delete",
+      "from": "content plan?",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
     },
     "content_plan_stories_modal": {
       "select_stories": "Select Stories",

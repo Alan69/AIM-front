@@ -71,6 +71,7 @@ import {
 } from "modules/stories/redux/api";
 import { storiesActions } from "modules/stories/redux/slices/stories.slice";
 import { ContentPlanStoriesModal } from "modules/content-plan/components/ContentPlanStoriesModal/ContentPlanStoriesModal";
+import { ContentPlanDeletePost } from "modules/content-plan/components/ContentPlanDeletePost/ContentPlanDeletePost";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -89,10 +90,13 @@ export const ContentPlanPage = () => {
     useState(false);
   const [isContentPlanStorieModalOpen, setIsContentPlanStorieModalOpen] =
     useState(false);
-
   const [
     isContentPlanSocialMediaListModalOpen,
     setIsContentPlanSocialMediaListModalOpen,
+  ] = useState(false);
+  const [
+    isContentPlanDeletePostModalOpen,
+    setIsContentPlanDeletePostModalOpen,
   ] = useState(false);
 
   const [selectedPostType, setSelectedPostType] = useState(
@@ -170,6 +174,10 @@ export const ContentPlanPage = () => {
 
   const handleShowContentPlanSocialMediaListModal = () =>
     setIsContentPlanSocialMediaListModalOpen(true);
+
+  const handleShowContentPlanDeletePostModal = () => {
+    setIsContentPlanDeletePostModalOpen(true);
+  };
 
   const handleSelectNewPost = (
     post?: TPostData,
@@ -269,8 +277,12 @@ export const ContentPlanPage = () => {
     deteleFromScheduler(scheduler_id)
       .unwrap()
       .then((res) => {
-        refetchPostList();
-        message.success(res.message);
+        refetchPostList()
+          .unwrap()
+          .then(() => {
+            dispatch(contentPlanActions.setSelectedPost(null));
+            message.success(res.message);
+          });
       })
       .catch((error) => {
         message.error(error.data.error);
@@ -465,7 +477,7 @@ export const ContentPlanPage = () => {
                                   <Image
                                     width={32}
                                     height={32}
-                                    src={item.picture}
+                                    src={item.media}
                                   />
                                 }
                                 title={
@@ -492,7 +504,12 @@ export const ContentPlanPage = () => {
                   {selectedPost === null ? (
                     ""
                   ) : (
-                    <SelectedPostPreview selectedPost={selectedPost} />
+                    <SelectedPostPreview
+                      selectedPost={selectedPost}
+                      handleShowContentPlanDeletePostModal={
+                        handleShowContentPlanDeletePostModal
+                      }
+                    />
                   )}
                 </div>
               ) : (
@@ -561,6 +578,12 @@ export const ContentPlanPage = () => {
         handleSelectNewSocialMedias={handleSelectNewSocialMedias}
         selectedNewSocialMedias={selectedNewSocialMedias}
       />
+      <ContentPlanDeletePost
+        isModalOpen={isContentPlanDeletePostModalOpen}
+        setIsModalOpen={setIsContentPlanDeletePostModalOpen}
+        handleDeleteFromScheduler={handleDeleteFromScheduler}
+        selectedPost={selectedPost}
+      />
       {isSmallLaptop ? (
         <SelectedPreviewBlockModal
           selectedDatePreview={selectedDatePreview}
@@ -570,6 +593,9 @@ export const ContentPlanPage = () => {
           handleSelectEvent={handleSelectEvent}
           isOpen={selectedDatePreview || selectedPost !== null ? true : false}
           handleCloseModal={handleClosePreviewBlockModal}
+          handleShowContentPlanDeletePostModal={
+            handleShowContentPlanDeletePostModal
+          }
         />
       ) : (
         ""

@@ -1,0 +1,63 @@
+.mediaSlider {
+  width: 100%;
+  height: auto;
+
+  .slick-arrow {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 2px solid rgb(22, 119, 255);
+    border-radius: 50%;
+    color: rgb(22, 119, 255);
+    font-size: 24px;
+    z-index: 10;
+    cursor: pointer;
+
+    &::after {
+      position: relative;
+      top: 0;
+    }
+
+    &:hover {
+      background-color: rgb(22, 119, 255);
+      color: white;
+    }
+  }
+
+  .slick-next {
+    &::after {
+      inset-inline-start: -2.3431457505076203px;
+    }
+  }
+
+  .slick-dots {
+    li button {
+      &::before {
+        color: rgb(22, 119, 255);
+        font-size: 12px;
+      }
+    }
+
+    .slick-active button::before {
+      color: rgb(22, 119, 255);
+    }
+  }
+
+  .mediaItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  video,
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+}
