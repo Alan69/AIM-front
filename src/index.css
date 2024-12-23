@@ -156,3 +156,7 @@ button:focus-visible {
 .ant-btn-default {
   border: 1px solid #1b1b1b;
 }
+
+:where(.css-dev-only-do-not-override-qk3teg).ant-tabs .ant-tabs-tab+.ant-tabs-tab {
+  margin: 0px 0px 0px 16px;
+}

@@ -450,6 +450,7 @@ export const ContentPlanPage = () => {
                     overflowX: isMobile ? "auto" : "unset",
                     whiteSpace: "nowrap",
                   }}
+                  size={isMobile ? "small" : "middle"}
                 />
               </div>
               {selectedDatePreview || selectedPost !== null ? (
