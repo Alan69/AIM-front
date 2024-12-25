@@ -681,7 +681,8 @@
     "selected_post_preview": {
       "image_alt": "Post Image",
       "add_to_favorites": "Add to favorites for publication",
-      "delete_post": "Delete post"
+      "delete_post": "Delete post",
+      "edit_post": "Edit post"
     },
     "content_plan_add_post_modal": {
       "add_content_title": "Add content",

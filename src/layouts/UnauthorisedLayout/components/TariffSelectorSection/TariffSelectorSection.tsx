@@ -156,9 +156,9 @@ export const TariffSelectorSection: React.FC = () => {
                     <div className={styles.card__item__label}>{item}</div>
                     <div className={styles.card__item__value}>
                       {index < 2 ? (
-                        <IconChecked className={styles.iconChecked} />
-                      ) : (
                         <IconInfinity className={styles.iconInfinity} />
+                      ) : (
+                        <IconChecked className={styles.iconChecked} />
                       )}
                     </div>
                   </div>

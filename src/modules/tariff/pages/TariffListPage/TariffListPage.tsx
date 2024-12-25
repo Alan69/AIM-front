@@ -202,7 +202,7 @@ export const TariffListPage: React.FC = () => {
                               )}
                             </div>
                             <div className={styles.card__item__value}>
-                              <img src={checked} alt="checked" />
+                              <img src={infinity} alt="infinity" />
                             </div>
                           </div>
                           <div className={styles.card__item}>
@@ -210,7 +210,7 @@ export const TariffListPage: React.FC = () => {
                               {t("tariff_page.card.features.sales_funnel")}
                             </div>
                             <div className={styles.card__item__value}>
-                              <img src={checked} alt="checked" />
+                              <img src={infinity} alt="infinity" />
                             </div>
                           </div>
                           <div className={styles.card__item}>
@@ -218,7 +218,7 @@ export const TariffListPage: React.FC = () => {
                               {t("tariff_page.card.features.posts_generation")}
                             </div>
                             <div className={styles.card__item__value}>
-                              <img src={infinity} alt="infinity" />
+                              <img src={checked} alt="checked" />
                             </div>
                           </div>
                           <div className={styles.card__item}>
@@ -226,7 +226,7 @@ export const TariffListPage: React.FC = () => {
                               {t("tariff_page.card.features.products")}
                             </div>
                             <div className={styles.card__item__value}>
-                              <img src={infinity} alt="infinity" />
+                              <img src={checked} alt="checked" />
                             </div>
                           </div>
                         </div>
