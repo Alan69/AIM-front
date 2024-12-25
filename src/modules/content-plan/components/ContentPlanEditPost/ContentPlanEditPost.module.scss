@@ -1,0 +1,27 @@
+.deleteBtn {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+}
+
+.dateTimeBlock,
+.selectedDateTime {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.datePicker,
+.timePicker {
+  width: 100%;
+}
+
+.currentDate,
+.currentTime {
+  width: 50%;
+}
+
+.socialMediaAddBtn {
+  margin-bottom: 8px;
+}

@@ -23,8 +23,10 @@ import { contentPlanActions } from "modules/content-plan/redux/slices/contentPla
 import { useDispatch } from "react-redux";
 import {
   TAddToSchedulersRequest,
+  TEditPostFromSchedulersRequest,
   useAddToSchedulersMutation,
   useDeteleFromSchedulerMutation,
+  useEditPostFromSchedulerMutation,
   useGetSchedulersQuery,
 } from "modules/content-plan/redux/api";
 import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
@@ -72,6 +74,7 @@ import {
 import { storiesActions } from "modules/stories/redux/slices/stories.slice";
 import { ContentPlanStoriesModal } from "modules/content-plan/components/ContentPlanStoriesModal/ContentPlanStoriesModal";
 import { ContentPlanDeletePost } from "modules/content-plan/components/ContentPlanDeletePost/ContentPlanDeletePost";
+import { ContentPlanEditPost } from "modules/content-plan/components/ContentPlanEditPost/ContentPlanEditPost";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -98,6 +101,8 @@ export const ContentPlanPage = () => {
     isContentPlanDeletePostModalOpen,
     setIsContentPlanDeletePostModalOpen,
   ] = useState(false);
+  const [isContentPlanEditPostModalOpen, setIsContentPlanEditPostModalOpen] =
+    useState(false);
 
   const [selectedPostType, setSelectedPostType] = useState(
     ContentPlanPostingType.UNKNOWN
@@ -132,6 +137,8 @@ export const ContentPlanPage = () => {
     useAddToSchedulersMutation();
   const [deteleFromScheduler, { isLoading: isDeletingFromScheduler }] =
     useDeteleFromSchedulerMutation();
+  const [editPostFromScheduler, { isLoading: isEdtitingPostFromScheduler }] =
+    useEditPostFromSchedulerMutation();
   const [createPostQuery, { isLoading: isPostCreating }] =
     useCreatePostQueryMutation();
   const [createCustomPost, { isLoading: isCustomPostCreating }] =
@@ -177,6 +184,10 @@ export const ContentPlanPage = () => {
 
   const handleShowContentPlanDeletePostModal = () => {
     setIsContentPlanDeletePostModalOpen(true);
+  };
+
+  const handleShowContentPlanEditPostModal = () => {
+    setIsContentPlanEditPostModalOpen(true);
   };
 
   const handleSelectNewPost = (
@@ -281,6 +292,26 @@ export const ContentPlanPage = () => {
           .unwrap()
           .then(() => {
             dispatch(contentPlanActions.setSelectedPost(null));
+            setSelectedEvents(null);
+            message.success(res.message);
+          });
+      })
+      .catch((error) => {
+        message.error(error.data.error);
+      });
+  };
+
+  const handleEditPostFromScheduler = (
+    payload: TEditPostFromSchedulersRequest
+  ) => {
+    editPostFromScheduler(payload)
+      .unwrap()
+      .then((res) => {
+        refetchPostList()
+          .unwrap()
+          .then(() => {
+            dispatch(contentPlanActions.setSelectedPost(null));
+            setSelectedEvents(null);
             message.success(res.message);
           });
       })
@@ -474,13 +505,6 @@ export const ContentPlanPage = () => {
                             >
                               <List.Item.Meta
                                 className={styles.selectedPost__content}
-                                avatar={
-                                  <Image
-                                    width={32}
-                                    height={32}
-                                    src={item.media}
-                                  />
-                                }
                                 title={
                                   <div className={styles.selectedPost__text}>
                                     <div className={styles.selectedPost__title}>
@@ -509,6 +533,9 @@ export const ContentPlanPage = () => {
                       selectedPost={selectedPost}
                       handleShowContentPlanDeletePostModal={
                         handleShowContentPlanDeletePostModal
+                      }
+                      handleShowContentPlanEditPostModal={
+                        handleShowContentPlanEditPostModal
                       }
                     />
                   )}
@@ -585,6 +612,12 @@ export const ContentPlanPage = () => {
         handleDeleteFromScheduler={handleDeleteFromScheduler}
         selectedPost={selectedPost}
       />
+      <ContentPlanEditPost
+        isModalOpen={isContentPlanEditPostModalOpen}
+        setIsModalOpen={setIsContentPlanEditPostModalOpen}
+        handleEditPostFromScheduler={handleEditPostFromScheduler}
+        selectedPost={selectedPost}
+      />
       {isSmallLaptop ? (
         <SelectedPreviewBlockModal
           selectedDatePreview={selectedDatePreview}
@@ -596,6 +629,9 @@ export const ContentPlanPage = () => {
           handleCloseModal={handleClosePreviewBlockModal}
           handleShowContentPlanDeletePostModal={
             handleShowContentPlanDeletePostModal
+          }
+          handleShowContentPlanEditPostModal={
+            handleShowContentPlanEditPostModal
           }
         />
       ) : (

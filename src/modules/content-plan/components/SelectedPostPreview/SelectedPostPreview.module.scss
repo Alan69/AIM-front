@@ -1,5 +1,7 @@
 .postDescr {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   padding: 24px;
   background: #fff;
@@ -88,9 +90,8 @@
   }
 }
 
-.deleteBtn {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  right: 24px;
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

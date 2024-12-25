@@ -84,9 +84,9 @@ export const ContentPlanCalendar = ({
       return {
         id: item.id,
         title: item.post.title
-          ? item.post.title
+          ? `Post: ${item.post.title}`
           : "" || item.reel.title
-            ? item.reel.title
+            ? `Reels: ${item.reel.title}`
             : "" || item.storie.id
               ? "Stories"
               : "",
@@ -99,6 +99,8 @@ export const ContentPlanCalendar = ({
             : "",
         hashtags: item.post.hashtags || item.reel.hashtags,
         time: moment(startDateTime).format("HH:mm"),
+        scheduled_date: item.scheduled_date,
+        scheduled_time: item.scheduled_time,
         media: updatedMedia(),
       };
     }) || [];

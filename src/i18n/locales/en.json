@@ -681,8 +681,8 @@
     "selected_post_preview": {
       "image_alt": "Post Image",
       "add_to_favorites": "Add to favorites for publication",
-      "delete_post": "Delete post",
-      "edit_post": "Edit post"
+      "delete_post": "Delete from content plan",
+      "edit_post": "Edit"
     },
     "content_plan_add_post_modal": {
       "add_content_title": "Add content",
@@ -703,6 +703,15 @@
       "select_date": "Select a date",
       "select_time": "Select a time",
       "no_post_selected": "No post selected"
+    },
+    "content_plan_edit_post_modal": {
+      "edit": "Editing",
+      "cancel": "Cancel",
+      "save": "Save",
+      "choose_date": "Choose a date",
+      "choose_time": "Choose a time",
+      "time_invalid": "Invalid time selected! Please choose a time in 15-minute intervals.",
+      "fill_all": "Please fill in all fields before saving."
     },
     "content_plan_posts_list_modal": {
       "select_post": "Select Post",

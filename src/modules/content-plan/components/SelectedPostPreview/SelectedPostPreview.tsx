@@ -14,6 +14,7 @@ import { TStoriesData } from "modules/stories/redux/api";
 type TProps = {
   selectedPost: TPostData | TReelData | TStoriesData | undefined;
   handleShowContentPlanDeletePostModal?: () => void;
+  handleShowContentPlanEditPostModal?: () => void;
 };
 
 const { Content } = Layout;
@@ -22,6 +23,7 @@ const { Title, Text } = Typography;
 export const SelectedPostPreview = ({
   selectedPost,
   handleShowContentPlanDeletePostModal,
+  handleShowContentPlanEditPostModal,
 }: TProps) => {
   const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
@@ -129,12 +131,13 @@ export const SelectedPostPreview = ({
                 {t("content_plan.selected_post_preview.add_to_favorites")}
               </Text>
             </div>
+          </div>
+          <div className={styles.buttons}>
+            <Button onClick={handleShowContentPlanEditPostModal} block>
+              {t("content_plan.selected_post_preview.edit_post")}
+            </Button>
 
-            <Button
-              className={styles.deleteBtn}
-              danger
-              onClick={handleShowContentPlanDeletePostModal}
-            >
+            <Button danger onClick={handleShowContentPlanDeletePostModal} block>
               {t("content_plan.selected_post_preview.delete_post")}
             </Button>
           </div>
