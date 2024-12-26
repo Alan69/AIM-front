@@ -196,11 +196,13 @@ export const ContentPlanPage = () => {
     storie?: TStoriesData
   ) => {
     if (post) {
-      setSelectNewPost(post);
+      // @ts-ignore
+      setSelectNewPost({ ...post, media: post.previouspostimage });
       setSelectedPostType(ContentPlanPostingType.POST);
     }
     if (reel) {
-      setSelectNewPost(reel);
+      // @ts-ignore
+      setSelectNewPost({ ...reel, media: reel.previous_media });
       setSelectedPostType(ContentPlanPostingType.REELS);
     }
     if (storie) {

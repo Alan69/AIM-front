@@ -56,7 +56,11 @@
     "choose_date": "Choose a date",
     "choose_time": "Choose a time",
     "time_invalid": "Invalid time selected! Please choose a time in 15-minute intervals.",
-    "fill_all": "Please fill in all fields before saving."
+    "fill_all": "Please fill in all fields before saving.",
+    "current_date_title": "Current publishing date:",
+    "current_time_title": "Current publishing time:",
+    "new_date_title": "Select a new publishing date:",
+    "new_time_title": "Select a new publishing time:"
   },
   "content_plan_posts_list_modal": {
     "select_post": "Select Post",

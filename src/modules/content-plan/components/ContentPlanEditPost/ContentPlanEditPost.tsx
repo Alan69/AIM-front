@@ -162,13 +162,17 @@ export const ContentPlanEditPost = ({
         <div className={styles.selectedDateTime}>
           <div className={styles.currentDate}>
             <Typography.Title level={5}>
-              Текущая дата для публикации:
+              {t(
+                "contentPlanPage.content_plan_edit_post_modal.current_date_title"
+              )}
             </Typography.Title>
             <Typography.Text>{currentDate}</Typography.Text>
           </div>
           <div className={styles.currentTime}>
             <Typography.Title level={5}>
-              Текущее время для публикации:
+              {t(
+                "contentPlanPage.content_plan_edit_post_modal.current_time_title"
+              )}
             </Typography.Title>
             <Typography.Text>{currentTime}</Typography.Text>
           </div>
@@ -179,7 +183,7 @@ export const ContentPlanEditPost = ({
         <div className={styles.dateTimeBlock}>
           <div className={styles.currentDate}>
             <Typography.Title level={5}>
-              Выберите новую дату для публикации:
+              {t("contentPlanPage.content_plan_edit_post_modal.new_date_title")}
             </Typography.Title>
             <DatePicker
               className={styles.datePicker}
@@ -195,7 +199,7 @@ export const ContentPlanEditPost = ({
           </div>
           <div className={styles.currentTime}>
             <Typography.Title level={5}>
-              Выберите новое время для публикации:
+              {t("contentPlanPage.content_plan_edit_post_modal.new_time_title")}
             </Typography.Title>
             <TimePicker
               className={styles.timePicker}

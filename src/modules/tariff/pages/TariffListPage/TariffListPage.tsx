@@ -128,7 +128,7 @@ export const TariffListPage: React.FC = () => {
                           {t("tariffPage.sliders.company_count")}
                         </h4>
                         <Slider
-                          className={"customSlider tariff-page-slider"}
+                          className={"tariffSlider tariff-page-slider"}
                           min={1}
                           max={12}
                           value={companyCount}
@@ -155,7 +155,7 @@ export const TariffListPage: React.FC = () => {
                           {t("tariffPage.sliders.duration")}
                         </h4>
                         <Slider
-                          className={"customSlider tariff-page-slider"}
+                          className={"tariffSlider tariff-page-slider"}
                           min={1}
                           max={12}
                           value={monthDuration}

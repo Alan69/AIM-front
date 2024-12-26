@@ -82,7 +82,7 @@ export const TariffSelectorSection: React.FC = () => {
                 {t("tariffSelectorSection.sliders.companies")}
               </h4>
               <Slider
-                className="customSlider"
+                className="tariffSlider"
                 min={1}
                 max={12}
                 value={companyCount}
@@ -109,7 +109,7 @@ export const TariffSelectorSection: React.FC = () => {
                 {t("tariffSelectorSection.sliders.duration")}
               </h4>
               <Slider
-                className="customSlider"
+                className="tariffSlider"
                 min={1}
                 max={12}
                 value={monthDuration}

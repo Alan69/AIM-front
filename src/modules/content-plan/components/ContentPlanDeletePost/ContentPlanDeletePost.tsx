@@ -5,7 +5,7 @@ import { TPostData } from "modules/post/redux/api";
 import { TReelData } from "modules/reel/redux/api";
 import { TStoriesData } from "modules/stories/redux/api";
 import styles from "./ContentPlanDeletePost.module.scss";
-import "./Custom-slider.scss";
+import "../../../../Custom-slider.scss";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import avatar from "assets/avatar.png";
 

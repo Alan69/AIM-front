@@ -8,6 +8,7 @@ import {
   Typography,
   Image,
   message,
+  Carousel,
 } from "antd";
 import {
   PictureOutlined,
@@ -20,6 +21,7 @@ import moment from "moment";
 import "moment/locale/ru";
 import "moment/locale/en-gb";
 import styles from "./ContentPlanAddPostModal.module.scss";
+import "../../../../Custom-slider.scss";
 import { TPostData } from "modules/post/redux/api";
 import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
 import { TAddToSchedulersRequest } from "modules/content-plan/redux/api";
@@ -170,6 +172,116 @@ export const ContentPlanAddPostModal = ({
 
   const disableDate = (current: moment.Moment) => {
     return current && current < moment().startOf("day");
+  };
+
+  const renderMediaSlider = () => {
+    if (selectNewPost && "media" in selectNewPost && selectNewPost.media) {
+      if (Array.isArray(selectNewPost.media)) {
+        return (
+          <Carousel
+            arrows={selectNewPost.media.length > 1}
+            dots={selectNewPost.media.length > 1}
+            className="mediaSlider"
+            style={{
+              width: "250px",
+              maxWidth: "250px",
+              height: "250px",
+              overflow: "hidden",
+            }}
+          >
+            {selectNewPost.media.map((mediaItem, index) => {
+              const isVideo =
+                mediaItem.media.endsWith(".mp4") ||
+                mediaItem.media.endsWith(".webm");
+
+              return (
+                <div
+                  key={index}
+                  className="mediaItem"
+                  style={{
+                    width: "250px",
+                    height: "250px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  {isVideo ? (
+                    <video
+                      className="media"
+                      controls
+                      src={mediaItem.media}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <Image
+                      src={mediaItem.media}
+                      className="media"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      alt={t(
+                        "contentPlanPage.content_plan_add_post_modal.image_alt"
+                      )}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </Carousel>
+        );
+      } else {
+        const mediaItem = selectNewPost;
+        const isVideo =
+          mediaItem.media.endsWith(".mp4") || mediaItem.media.endsWith(".webm");
+
+        return (
+          <div
+            className="mediaItem"
+            style={{
+              width: "250px",
+              height: "250px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
+            }}
+          >
+            {isVideo ? (
+              <video
+                className="media"
+                controls
+                src={mediaItem.media}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <Image
+                src={mediaItem.media}
+                className="media"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+                alt={t("contentPlanPage.content_plan_add_post_modal.image_alt")}
+              />
+            )}
+          </div>
+        );
+      }
+    }
+    return null;
   };
 
   useEffect(() => {
@@ -346,22 +458,7 @@ export const ContentPlanAddPostModal = ({
                   styles.selectNewPost,
                   styles.selectNewPost__isActive
                 )}
-                avatar={
-                  selectNewPost && "picture" in selectNewPost ? (
-                    <Image
-                      width={160}
-                      height={160}
-                      src={selectNewPost.picture}
-                    />
-                  ) : null
-                }
-                title={
-                  <Title level={5}>
-                    {selectNewPost && "title" in selectNewPost
-                      ? selectNewPost?.title
-                      : ""}
-                  </Title>
-                }
+                avatar={renderMediaSlider()}
                 description={
                   <>
                     <Paragraph
