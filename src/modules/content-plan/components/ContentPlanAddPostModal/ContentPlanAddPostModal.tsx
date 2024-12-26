@@ -8,6 +8,7 @@ import {
   Typography,
   Image,
   message,
+  Space,
 } from "antd";
 import {
   PictureOutlined,
@@ -24,7 +25,7 @@ import { TPostData } from "modules/post/redux/api";
 import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
 import { TAddToSchedulersRequest } from "modules/content-plan/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
-import { useIsMobile } from "hooks/media";
+import { useIsMobile, useIsXlTablet } from "hooks/media";
 import { useTranslation } from "react-i18next";
 import { TReelData } from "modules/reel/redux/api";
 import { ContentPlanPostingType } from "modules/content-plan/types";
@@ -73,6 +74,7 @@ export const ContentPlanAddPostModal = ({
 }: TProps) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
+  const isXlTablet = useIsXlTablet();
   const { current_company } = useTypedSelector((state) => state.auth);
 
   const [selectedDate, setSelectedDate] = useState<moment.Moment | null>(null);
@@ -424,47 +426,49 @@ export const ContentPlanAddPostModal = ({
           ))}
         </div>
       ) : null}
-
-      <div className={styles.dateTimeBlock}>
-        <DatePicker
-          className={styles.datePicker}
-          // @ts-ignore
-          disabledDate={disableDate}
-          onChange={handleDateChange}
-          value={selectedDate}
-          format="DD-MM-YYYY"
-          placeholder={t(
-            "content_plan.content_plan_add_post_modal.choose_date"
-          )}
-        />
-        <TimePicker
-          className={styles.timePicker}
-          // @ts-ignore
-          value={selectedTime}
-          // @ts-ignore
-          onChange={handleTimeChange}
-          format="HH:mm"
-          minuteStep={15}
-          disabled={!selectedDate}
-          disabledTime={(current) => {
-            const selectedHour = current ? current.hour() : 0;
-            return {
-              disabledHours: disableHours,
-              disabledMinutes: () => disableMinutes(selectedHour),
-            };
-          }}
-          placeholder={t(
-            "content_plan.content_plan_add_post_modal.choose_time"
-          )}
-          showNow={false}
-          onOpenChange={(open) => {
-            if (open) {
-              const selectedHour = selectedTime ? selectedTime.hour() : 0;
-              disableMinutes(selectedHour);
-            }
-          }}
-        />
-      </div>
+      <Space direction="vertical">
+        <div className={styles.dateTimeBlock}>
+          <DatePicker
+            className={styles.datePicker}
+            // @ts-ignore
+            disabledDate={disableDate}
+            onChange={handleDateChange}
+            value={selectedDate}
+            format="DD-MM-YYYY"
+            placeholder={t(
+              "content_plan.content_plan_add_post_modal.choose_date"
+            )}
+            variant="outlined"
+          />
+          <TimePicker
+            className={styles.timePicker}
+            // @ts-ignore
+            value={selectedTime}
+            // @ts-ignore
+            onChange={handleTimeChange}
+            format="HH:mm"
+            minuteStep={15}
+            disabled={!selectedDate}
+            disabledTime={(current) => {
+              const selectedHour = current ? current.hour() : 0;
+              return {
+                disabledHours: disableHours,
+                disabledMinutes: () => disableMinutes(selectedHour),
+              };
+            }}
+            placeholder={t(
+              "content_plan.content_plan_add_post_modal.choose_time"
+            )}
+            showNow={false}
+            onOpenChange={(open) => {
+              if (open) {
+                const selectedHour = selectedTime ? selectedTime.hour() : 0;
+                disableMinutes(selectedHour);
+              }
+            }}
+          />
+        </div>
+      </Space>
     </Modal>
   );
 };

@@ -459,7 +459,8 @@
       "product": "Product",
       "content_type": "Content Type",
       "theme": "Theme",
-      "date_created": "Date Created"
+      "date_created": "Date Created",
+      "actions": "Actions"
     }
   },
   "locale": "en-US",

@@ -459,7 +459,8 @@
       "product": "Продукт",
       "content_type": "Тип контента",
       "theme": "Тематика",
-      "date_created": "Дата создания"
+      "date_created": "Дата создания",
+      "actions": "Действия"
     }
   },
   "locale": "ru-RU",
