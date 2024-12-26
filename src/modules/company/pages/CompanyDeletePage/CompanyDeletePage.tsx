@@ -39,12 +39,12 @@ export const CompanyDeletePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("company_delete.title")}</h1>
+        <h1 className="main-title">{t("companyDeletePage.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
               <Title level={4}>
-                {t("company_delete.confirm", { name: company?.name })}
+                {t("companyDeletePage.confirm", { name: company?.name })}
               </Title>
               <div className={styles.buttons}>
                 <Button
@@ -53,7 +53,7 @@ export const CompanyDeletePage = () => {
                   loading={isUpdating}
                   onClick={handleDeleteCompany}
                 >
-                  {t("company_delete.buttons.delete")}
+                  {t("companyDeletePage.buttons.delete")}
                 </Button>
                 <Button
                   type="default"
@@ -62,7 +62,7 @@ export const CompanyDeletePage = () => {
                   }}
                   loading={isUpdating}
                 >
-                  {t("company_delete.buttons.cancel")}
+                  {t("companyDeletePage.buttons.cancel")}
                 </Button>
               </div>
             </div>

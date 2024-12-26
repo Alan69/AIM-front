@@ -15,9 +15,9 @@ const Menu = () => {
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
         location.pathname === "/policy" ? (
-          <Link to="/home">{t("menu-landing.examples")}</Link>
+          <Link to="/home">{t("menuLanding.examples")}</Link>
         ) : (
-          <a href="#OurWorksSection">{t("menu-landing.examples")}</a>
+          <a href="#OurWorksSection">{t("menuLanding.examples")}</a>
         )}
       </AntMenu.Item>
       <AntMenu.Item key="how-it-works" className={styles.item}>
@@ -25,9 +25,9 @@ const Menu = () => {
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
         location.pathname === "/policy" ? (
-          <Link to="/home">{t("menu-landing.how_it_works")}</Link>
+          <Link to="/home">{t("menuLanding.howItWorksSection")}</Link>
         ) : (
-          <a href="#HowItWorkSection">{t("menu-landing.how_it_works")}</a>
+          <a href="#HowItWorkSection">{t("menuLanding.howItWorksSection")}</a>
         )}
       </AntMenu.Item>
       <AntMenu.Item key="benefits" className={styles.item}>
@@ -35,9 +35,9 @@ const Menu = () => {
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
         location.pathname === "/policy" ? (
-          <Link to="/home">{t("menu-landing.benefits")}</Link>
+          <Link to="/home">{t("menuLanding.benefits")}</Link>
         ) : (
-          <a href="#AdvantagesSection">{t("menu-landing.benefits")}</a>
+          <a href="#AdvantagesSection">{t("menuLanding.benefits")}</a>
         )}
       </AntMenu.Item>
       <AntMenu.Item key="what-you-get" className={styles.item}>
@@ -45,9 +45,9 @@ const Menu = () => {
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
         location.pathname === "/policy" ? (
-          <Link to="/home">{t("menu-landing.what_you_get")}</Link>
+          <Link to="/home">{t("menuLanding.whatYouGetSection")}</Link>
         ) : (
-          <a href="#WhatYouGetSection">{t("menu-landing.what_you_get")}</a>
+          <a href="#WhatYouGetSection">{t("menuLanding.whatYouGetSection")}</a>
         )}
       </AntMenu.Item>
       <AntMenu.Item key="faq">
@@ -55,9 +55,9 @@ const Menu = () => {
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
         location.pathname === "/policy" ? (
-          <Link to="/home">{t("menu-landing.faq")}</Link>
+          <Link to="/home">{t("menuLanding.faqSection")}</Link>
         ) : (
-          <a href="#FAQSection">{t("menu-landing.faq")}</a>
+          <a href="#FAQSection">{t("menuLanding.faqSection")}</a>
         )}
       </AntMenu.Item>
     </AntMenu>

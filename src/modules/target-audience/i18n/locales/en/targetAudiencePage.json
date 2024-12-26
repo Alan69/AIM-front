@@ -1,0 +1,10 @@
+{
+  "title": "Target Audience",
+  "create": "Create",
+  "save": "Save",
+  "recreate": "Recreate",
+  "success_save": "Target audience successfully saved",
+  "error_save": "Error saving target audience",
+  "error_create": "Error creating target audience",
+  "no_data": "No data available"
+}

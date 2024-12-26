@@ -27,7 +27,7 @@ export const OurWorksSection = () => {
 
   return (
     <section className={styles.section} id="OurWorksSection">
-      <h3 className={styles.title}>{t("our_works.title")}</h3>
+      <h3 className={styles.title}>{t("ourWorksSection.title")}</h3>
       <div className={styles.works}>
         <div className={styles.works__block}>
           <div className={styles.works__item}>

@@ -61,7 +61,7 @@ export const SelectedPostPreview = ({
                   <Image
                     src={mediaItem.media}
                     className="media"
-                    alt={t("content_plan.selected_post_preview.image_alt")}
+                    alt={t("contentPlanPage.selected_post_preview.image_alt")}
                   />
                 )}
               </div>
@@ -128,17 +128,17 @@ export const SelectedPostPreview = ({
                 )}
               />
               <Text>
-                {t("content_plan.selected_post_preview.add_to_favorites")}
+                {t("contentPlanPage.selected_post_preview.add_to_favorites")}
               </Text>
             </div>
           </div>
           <div className={styles.buttons}>
             <Button onClick={handleShowContentPlanEditPostModal} block>
-              {t("content_plan.selected_post_preview.edit_post")}
+              {t("contentPlanPage.selected_post_preview.edit_post")}
             </Button>
 
             <Button danger onClick={handleShowContentPlanDeletePostModal} block>
-              {t("content_plan.selected_post_preview.delete_post")}
+              {t("contentPlanPage.selected_post_preview.delete_post")}
             </Button>
           </div>
         </div>

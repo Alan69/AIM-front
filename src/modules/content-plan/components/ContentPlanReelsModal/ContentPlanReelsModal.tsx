@@ -31,7 +31,7 @@ export const ContentPlanReelsModal = ({
 
   return (
     <Modal
-      title={t("content_plan.content_plan_reels_modal.select_reel")}
+      title={t("contentPlanPage.content_plan_reels_modal.select_reel")}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -56,7 +56,7 @@ export const ContentPlanReelsModal = ({
           }}
           disabled={createdCustomReel === null}
         >
-          {t("content_plan.content_plan_reels_modal.select")}
+          {t("contentPlanPage.content_plan_reels_modal.select")}
         </Button>,
       ]}
     >

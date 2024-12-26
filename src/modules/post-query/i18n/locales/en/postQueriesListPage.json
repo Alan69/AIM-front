@@ -1,0 +1,10 @@
+{
+  "title": "Post Creation History - {{company}}",
+  "create_button": "Create",
+  "fields": {
+    "product": "Product",
+    "post_type": "Post Type",
+    "text_style": "Text Style",
+    "date": "Creation Date"
+  }
+}

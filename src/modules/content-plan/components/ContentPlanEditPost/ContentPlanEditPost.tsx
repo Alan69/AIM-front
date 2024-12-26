@@ -58,7 +58,7 @@ export const ContentPlanEditPost = ({
       if (minutes % 15 !== 0) {
         setSelectedTime(null);
         message.warning(
-          t("content_plan.content_plan_edit_post_modal.time_invalid")
+          t("contentPlanPage.content_plan_edit_post_modal.time_invalid")
         );
         return;
       }
@@ -106,7 +106,9 @@ export const ContentPlanEditPost = ({
       handleEditPostFromScheduler(updatedPayload);
       setIsModalOpen(false);
     } else {
-      message.warning(t("content_plan.content_plan_edit_post_modal.fill_all"));
+      message.warning(
+        t("contentPlanPage.content_plan_edit_post_modal.fill_all")
+      );
     }
   };
 
@@ -122,7 +124,7 @@ export const ContentPlanEditPost = ({
   return (
     <Modal
       title={
-        t("content_plan.content_plan_edit_post_modal.edit") +
+        t("contentPlanPage.content_plan_edit_post_modal.edit") +
         ` "${
           selectedPost && "title" in selectedPost
             ? selectedPost.title
@@ -137,7 +139,7 @@ export const ContentPlanEditPost = ({
           onClick={() => setIsModalOpen(false)}
           style={{ borderRadius: "16px" }}
         >
-          {t("content_plan.content_plan_edit_post_modal.cancel")}
+          {t("contentPlanPage.content_plan_edit_post_modal.cancel")}
         </Button>,
         <Button
           key="save"
@@ -145,7 +147,7 @@ export const ContentPlanEditPost = ({
           onClick={handleSubmit}
           style={{ borderRadius: "16px" }}
         >
-          {t("content_plan.content_plan_edit_post_modal.save")}
+          {t("contentPlanPage.content_plan_edit_post_modal.save")}
         </Button>,
       ]}
       width={600}
@@ -187,7 +189,7 @@ export const ContentPlanEditPost = ({
               onChange={handleDateChange}
               format="DD-MM-YYYY"
               placeholder={t(
-                "content_plan.content_plan_edit_post_modal.choose_date"
+                "contentPlanPage.content_plan_edit_post_modal.choose_date"
               )}
             />
           </div>
@@ -212,7 +214,7 @@ export const ContentPlanEditPost = ({
                 };
               }}
               placeholder={t(
-                "content_plan.content_plan_edit_post_modal.choose_time"
+                "contentPlanPage.content_plan_edit_post_modal.choose_time"
               )}
               showNow={false}
             />

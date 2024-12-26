@@ -94,13 +94,13 @@ export const LandingPage = () => {
         )}
       >
         <Button className={styles.tariffBtn} onClick={scrollToTariff}>
-          {t("landing_page.tariffs")}
+          {t("landingPage.tariffs")}
         </Button>
         <Button
           className={styles.startBtn}
           onClick={() => navigate(token ? "/tariffs" : "/login")}
         >
-          {t("landing_page.start_now")} <IconPlus className={styles.iconPlus} />
+          {t("landingPage.start_now")} <IconPlus className={styles.iconPlus} />
         </Button>
       </div>
 

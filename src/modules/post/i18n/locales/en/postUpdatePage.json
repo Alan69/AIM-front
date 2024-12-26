@@ -1,0 +1,15 @@
+{
+  "invalid_file_type": "Please upload a JPEG or PNG file",
+  "update_success": "Post updated successfully!",
+  "image_alt": "Post Image",
+  "upload_image": "Upload New Image",
+  "select_file": "Select File",
+  "title": "Title",
+  "main_text": "Main Text",
+  "hashtags": "Hashtags",
+  "add_to_favorites": "Add to Favorites",
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

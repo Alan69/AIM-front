@@ -51,18 +51,18 @@ export const CompanyCreatePage = () => {
             navigate(`/company/${response.id}`);
             refetchCompanyList();
             getAuthUser();
-            message.success(t("company_create.success_message"));
+            message.success(t("companyCreatePage.success_message"));
           });
       })
       .catch((error) => {
-        message.error(error.data.error || t("company_create.error_message"));
+        message.error(error.data.error || t("companyCreatePage.error_message"));
       });
   };
 
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("company_create.title")}</h1>
+        <h1 className="main-title">{t("companyCreatePage.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -72,9 +72,9 @@ export const CompanyCreatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label={t("company_create.form.name.label")}
+                  label={t("companyCreatePage.form.name.label")}
                   validateStatus={errors.name ? "error" : ""}
-                  help={errors.name && t("company_create.form.name.error")}
+                  help={errors.name && t("companyCreatePage.form.name.error")}
                 >
                   <Controller
                     name="name"
@@ -85,9 +85,9 @@ export const CompanyCreatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={t("company_create.form.scope.label")}
+                  label={t("companyCreatePage.form.scope.label")}
                   validateStatus={errors.scope ? "error" : ""}
-                  help={errors.scope && t("company_create.form.scope.error")}
+                  help={errors.scope && t("companyCreatePage.form.scope.error")}
                 >
                   <Controller
                     name="scope"
@@ -97,7 +97,7 @@ export const CompanyCreatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label={t("company_create.form.comment.label")}>
+                <Form.Item label={t("companyCreatePage.form.comment.label")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -107,7 +107,7 @@ export const CompanyCreatePage = () => {
 
                 <Form.Item>
                   <Button type="primary" htmlType="submit" loading={isCreating}>
-                    {t("company_create.form.submit")}
+                    {t("companyCreatePage.form.submit")}
                   </Button>
                 </Form.Item>
               </Form>

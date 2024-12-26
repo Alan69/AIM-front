@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 export const WhatYouGetSection = () => {
   const { t } = useTranslation();
-  const benefits = t("what_you_get.benefits", { returnObjects: true }) as {
+  const benefits = t("whatYouGetSection.benefits", { returnObjects: true }) as {
     title: string;
     description: string;
     icon: string;
@@ -21,8 +21,8 @@ export const WhatYouGetSection = () => {
   return (
     <section className={styles.section} id="WhatYouGetSection">
       <div className={styles.head}>
-        <div className={styles.label}>{t("what_you_get.label")}</div>
-        <h2 className={styles.title}>{t("what_you_get.title")}</h2>
+        <div className={styles.label}>{t("whatYouGetSection.label")}</div>
+        <h2 className={styles.title}>{t("whatYouGetSection.title")}</h2>
       </div>
       <div className={styles.benefit}>
         {benefits.map((benefit, index) => (

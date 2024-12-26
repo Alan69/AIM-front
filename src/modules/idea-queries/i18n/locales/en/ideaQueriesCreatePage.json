@@ -1,0 +1,20 @@
+{
+  "title": "Create Idea Query",
+  "fields": {
+    "company": "Company",
+    "product": "Product",
+    "content_type": "Content Type",
+    "theme": "Theme",
+    "language": "Language",
+    "description": "Description"
+  },
+  "validation": {
+    "required": "This field is required."
+  },
+  "hints": {
+    "no_company": "(If empty, select or add a current company from the left menu.)"
+  },
+  "buttons": {
+    "submit": "Submit"
+  }
+}

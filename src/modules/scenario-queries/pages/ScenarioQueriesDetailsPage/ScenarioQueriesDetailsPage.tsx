@@ -88,7 +88,7 @@ export const ScenarioQueriesDetailsPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className="main-title">
-          {t("scenario_queries_details.title", {
+          {t("scenarioQueriesDetailsPage.title", {
             company: scenarioQuery?.company?.name || "-",
             product: scenarioQuery?.product?.name || "-",
           })}
@@ -98,35 +98,35 @@ export const ScenarioQueriesDetailsPage = () => {
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("scenario_queries_details.fields.content_type", {
+                  {t("scenarioQueriesDetailsPage.fields.content_type", {
                     content_type: scenarioQuery?.scenario_type?.name,
                   })}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("scenario_queries_details.fields.theme", {
+                  {t("scenarioQueriesDetailsPage.fields.theme", {
                     theme: scenarioQuery?.scenario_theme?.name,
                   })}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("scenario_queries_details.fields.language", {
+                  {t("scenarioQueriesDetailsPage.fields.language", {
                     language: scenarioQuery?.language?.name,
                   })}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("scenario_queries_details.fields.description", {
+                  {t("scenarioQueriesDetailsPage.fields.description", {
                     description: scenarioQuery?.description,
                   })}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("scenario_queries_details.fields.latency", {
+                  {t("scenarioQueriesDetailsPage.fields.latency", {
                     latency: scenarioQuery?.latency,
                   })}
                 </Title>
@@ -137,21 +137,23 @@ export const ScenarioQueriesDetailsPage = () => {
                 loading={isScenarioQueriesRecreating}
                 onClick={handleCreateScenarioQueriesReplay}
               >
-                {t("scenario_queries_details.actions.replay_button")}
+                {t("scenarioQueriesDetailsPage.actions.replay_button")}
               </Button>
             </div>
           </Content>
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            {t("scenario_queries_details.scenarios_section.title")}
+            {t("scenarioQueriesDetailsPage.scenarios_section.title")}
           </h2>
           <Content>
             <div className={styles.postQueryDescr}>
               {!scenarios?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
                   <Text>
-                    {t("scenario_queries_details.scenarios_section.not_found")}
+                    {t(
+                      "scenarioQueriesDetailsPage.scenarios_section.not_found"
+                    )}
                   </Text>
                 </div>
               ) : (
@@ -165,7 +167,9 @@ export const ScenarioQueriesDetailsPage = () => {
                           <div className={styles.titleBlock}>
                             <Title level={3}>{item.topic}</Title>
                             <Tooltip
-                              title={t("scenario_queries_details.copy_tooltip")}
+                              title={t(
+                                "scenarioQueriesDetailsPage.copy_tooltip"
+                              )}
                             >
                               <Button
                                 className={styles.postContent__icon}
@@ -192,14 +196,14 @@ export const ScenarioQueriesDetailsPage = () => {
                                         () => {
                                           message.success(
                                             t(
-                                              "scenario_queries_details.copy_success"
+                                              "scenarioQueriesDetailsPage.copy_success"
                                             )
                                           );
                                         },
                                         (err) => {
                                           message.error(
                                             t(
-                                              "scenario_queries_details.copy_error"
+                                              "scenarioQueriesDetailsPage.copy_error"
                                             )
                                           );
                                         }
@@ -215,14 +219,14 @@ export const ScenarioQueriesDetailsPage = () => {
                             <div style={{ marginBottom: 8 }}>
                               <Title level={5}>
                                 {t(
-                                  "scenario_queries_details.short_description"
+                                  "scenarioQueriesDetailsPage.short_description"
                                 )}
                               </Title>
                               <Text>{" " + item.short_description}</Text>
                             </div>
                             <div style={{ marginBottom: 8 }}>
                               <Title level={5}>
-                                {t("scenario_queries_details.main_text")}
+                                {t("scenarioQueriesDetailsPage.main_text")}
                               </Title>
                               <Text>
                                 <div>{formatMainText(item.main_text)}</div>

@@ -1,0 +1,21 @@
+{
+  "title": "Your tariff expires in {{days}} days.",
+  "subtitle": "Pick your plan",
+  "promotion": "Promotion: Buy an annual plan and get 2 months free",
+  "sliders": {
+    "company_count": "Number of companies",
+    "duration": "Duration, months"
+  },
+  "discount_label": "Your discount:",
+  "card": {
+    "title": "Your unique plan",
+    "features": {
+      "marketing_strategy": "Marketing strategy generation",
+      "sales_funnel": "Sales funnel generation",
+      "posts_generation": "Unlimited post generation",
+      "products": "Unlimited products"
+    },
+    "price_label": "Cost:",
+    "button": "Subscribe"
+  }
+}

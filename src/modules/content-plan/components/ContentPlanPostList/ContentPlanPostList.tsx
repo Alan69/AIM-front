@@ -64,8 +64,8 @@ export const ContentPlanPostList = ({
                   <div className={styles.expandBtn}>
                     <Button type="link" onClick={() => toggleExpand(index)}>
                       {expandedKeys[index]
-                        ? t("content_plan.expand_less")
-                        : t("content_plan.expand_more")}
+                        ? t("contentPlanPage.expand_less")
+                        : t("contentPlanPage.expand_more")}
                     </Button>
                   </div>
                 </>

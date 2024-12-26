@@ -1,0 +1,36 @@
+{
+  "profile": "Profile",
+  "photo": {
+    "upload_button": "Choose file",
+    "alt_text": "Avatar"
+  },
+  "form": {
+    "email_label": "Email",
+    "first_name_label": "First name",
+    "last_name_label": "Last name",
+    "birth_year_label": "Year of birth",
+    "phone_number_label": "Phone number",
+    "job_label": "Job",
+    "country_label": "Country",
+    "email_error": "This field is required.",
+    "birth_year_error": {
+      "required": "Year of birth is required.",
+      "min": "Year of birth cannot be less than 1964.",
+      "max": "Year of birth cannot exceed the current year.",
+      "pattern": "Year of birth must be a four-digit number."
+    },
+    "phone_number_error": {
+      "required": "Phone number is required.",
+      "pattern": "Phone number must be in the format +7XXXXXXXXXX."
+    }
+  },
+  "buttons": {
+    "save": "Save",
+    "change_password": "Change password"
+  },
+  "messages": {
+    "success": "Your profile has been successfully updated!",
+    "error": "An error occurred! Your profile has not been updated.",
+    "invalid_file": "Please upload a JPEG or PNG file."
+  }
+}

@@ -72,7 +72,7 @@ export const IdeaQueriesDetailsPage = () => {
     refetchIdeasList();
   }, [refetch, refetchIdeasList, location.pathname]);
 
-  if (isLoading) return <div>{t("idea_queries_details.loading")}</div>;
+  if (isLoading) return <div>{t("ideaQueriesDetailsPage.loading")}</div>;
 
   return (
     <Layout>
@@ -87,24 +87,24 @@ export const IdeaQueriesDetailsPage = () => {
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("idea_queries_details.content_type")}:{" "}
+                  {t("ideaQueriesDetailsPage.content_type")}:{" "}
                   {ideaQuery?.content_type?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("idea_queries_details.theme")}: {ideaQuery?.theme?.name}
+                  {t("ideaQueriesDetailsPage.theme")}: {ideaQuery?.theme?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("idea_queries_details.language")}:{" "}
+                  {t("ideaQueriesDetailsPage.language")}:{" "}
                   {ideaQuery?.language?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("idea_queries_details.description")}:{" "}
+                  {t("ideaQueriesDetailsPage.description")}:{" "}
                   {ideaQuery?.description}
                 </Title>
               </div>
@@ -114,20 +114,20 @@ export const IdeaQueriesDetailsPage = () => {
                 loading={isIdeaQueriesRecreating}
                 onClick={handleCreateIdeaQueriesReplay}
               >
-                {t("idea_queries_details.repeat_request")}
+                {t("ideaQueriesDetailsPage.repeat_request")}
               </Button>
             </div>
           </Content>
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            {t("idea_queries_details.ideas")}
+            {t("ideaQueriesDetailsPage.ideas")}
           </h2>
           <Content>
             <div className={styles.postQueryDescr}>
               {!ideas?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
-                  <Text>{t("idea_queries_details.no_ideas")}</Text>
+                  <Text>{t("ideaQueriesDetailsPage.no_ideas")}</Text>
                 </div>
               ) : (
                 <List
@@ -139,7 +139,7 @@ export const IdeaQueriesDetailsPage = () => {
                         title={
                           <div className={styles.titleBlock}>
                             <Title level={4}>{item.Idea}</Title>
-                            <Tooltip title={t("idea_queries_details.copy")}>
+                            <Tooltip title={t("ideaQueriesDetailsPage.copy")}>
                               <Button
                                 className={styles.postContent__icon}
                                 icon={<CopyOutlined />}
@@ -152,12 +152,14 @@ export const IdeaQueriesDetailsPage = () => {
                                         () =>
                                           message.success(
                                             t(
-                                              "idea_queries_details.copy_success"
+                                              "ideaQueriesDetailsPage.copy_success"
                                             )
                                           ),
                                         () =>
                                           message.error(
-                                            t("idea_queries_details.copy_error")
+                                            t(
+                                              "ideaQueriesDetailsPage.copy_error"
+                                            )
                                           )
                                       );
                                   } else if (item.Idea) {
@@ -167,13 +169,13 @@ export const IdeaQueriesDetailsPage = () => {
                                         () =>
                                           message.success(
                                             t(
-                                              "idea_queries_details.copy_success_title"
+                                              "ideaQueriesDetailsPage.copy_success_title"
                                             )
                                           ),
                                         () =>
                                           message.error(
                                             t(
-                                              "idea_queries_details.copy_error_title"
+                                              "ideaQueriesDetailsPage.copy_error_title"
                                             )
                                           )
                                       );

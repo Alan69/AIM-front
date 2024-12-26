@@ -1,0 +1,15 @@
+{
+  "title": "Edit Company Information",
+  "fields": {
+    "name": "Name",
+    "scope": "Scope",
+    "description": "Description"
+  },
+  "errors": {
+    "required": "This field is required"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

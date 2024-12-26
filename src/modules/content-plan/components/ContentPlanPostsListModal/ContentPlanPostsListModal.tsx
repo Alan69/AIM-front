@@ -66,7 +66,7 @@ export const ContentPlanPostsListModal = ({
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: t("content_plan.content_plan_posts_list_modal.create_post"),
+      label: t("contentPlanPage.content_plan_posts_list_modal.create_post"),
       children: (
         <PostCreateForm
           post={post}
@@ -79,7 +79,7 @@ export const ContentPlanPostsListModal = ({
     },
     {
       key: "2",
-      label: t("content_plan.content_plan_posts_list_modal.generate_post"),
+      label: t("contentPlanPage.content_plan_posts_list_modal.generate_post"),
       children: (
         <PostQueryGenerateForm
           post={post}
@@ -93,7 +93,7 @@ export const ContentPlanPostsListModal = ({
     },
     {
       key: "3",
-      label: t("content_plan.content_plan_posts_list_modal.favorite_posts"),
+      label: t("contentPlanPage.content_plan_posts_list_modal.favorite_posts"),
       children: (
         <ContentPlanPostList
           postListByCompanyId={postListByCompanyId}
@@ -112,7 +112,7 @@ export const ContentPlanPostsListModal = ({
 
   return (
     <Modal
-      title={t("content_plan.content_plan_posts_list_modal.select_post")}
+      title={t("contentPlanPage.content_plan_posts_list_modal.select_post")}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -148,7 +148,7 @@ export const ContentPlanPostsListModal = ({
             (activeTabKey === "3" && !selectCurrentPost)
           }
         >
-          {t("content_plan.content_plan_posts_list_modal.select")}
+          {t("contentPlanPage.content_plan_posts_list_modal.select")}
         </Button>,
       ]}
     >

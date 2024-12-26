@@ -85,13 +85,13 @@ export const IdeaQueriesCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("idea_queries_create.title")}</h1>
+        <h1 className="main-title">{t("ideaQueriesCreatePage.title")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label={t("idea_queries_create.fields.company")}
+            label={t("ideaQueriesCreatePage.fields.company")}
             validateStatus={errors.company ? "error" : ""}
             help={
-              errors.company && t("idea_queries_create.validation.required")
+              errors.company && t("ideaQueriesCreatePage.validation.required")
             }
           >
             <Controller
@@ -116,12 +116,12 @@ export const IdeaQueriesCreatePage = () => {
             />
             {!current_company?.id ? (
               <div className={styles.noContent}>
-                {t("idea_queries_create.hints.no_company")}
+                {t("ideaQueriesCreatePage.hints.no_company")}
               </div>
             ) : null}
           </Form.Item>
 
-          <Form.Item label={t("idea_queries_create.fields.product")}>
+          <Form.Item label={t("ideaQueriesCreatePage.fields.product")}>
             <Controller
               name="product"
               control={control}
@@ -143,11 +143,11 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("idea_queries_create.fields.content_type")}
+            label={t("ideaQueriesCreatePage.fields.content_type")}
             validateStatus={errors.content_type ? "error" : ""}
             help={
               errors.content_type &&
-              t("idea_queries_create.validation.required")
+              t("ideaQueriesCreatePage.validation.required")
             }
           >
             <Controller
@@ -168,9 +168,11 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("idea_queries_create.fields.theme")}
+            label={t("ideaQueriesCreatePage.fields.theme")}
             validateStatus={errors.theme ? "error" : ""}
-            help={errors.theme && t("idea_queries_create.validation.required")}
+            help={
+              errors.theme && t("ideaQueriesCreatePage.validation.required")
+            }
           >
             <Controller
               name="theme"
@@ -190,10 +192,10 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("idea_queries_create.fields.language")}
+            label={t("ideaQueriesCreatePage.fields.language")}
             validateStatus={errors.language ? "error" : ""}
             help={
-              errors.language && t("idea_queries_create.validation.required")
+              errors.language && t("ideaQueriesCreatePage.validation.required")
             }
           >
             <Controller
@@ -223,10 +225,11 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("idea_queries_create.fields.description")}
+            label={t("ideaQueriesCreatePage.fields.description")}
             validateStatus={errors.description ? "error" : ""}
             help={
-              errors.description && t("idea_queries_create.validation.required")
+              errors.description &&
+              t("ideaQueriesCreatePage.validation.required")
             }
           >
             <Controller
@@ -241,7 +244,7 @@ export const IdeaQueriesCreatePage = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isIdeaCreating}>
-              {t("idea_queries_create.buttons.submit")}
+              {t("ideaQueriesCreatePage.buttons.submit")}
             </Button>
           </Form.Item>
         </Form>

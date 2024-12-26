@@ -1,0 +1,20 @@
+{
+  "title": "Select your tariff",
+  "subtitle": "Promotion: buy an annual tariff and get 2 months free",
+  "sliders": {
+    "companies": "Number of companies",
+    "duration": "Duration, months"
+  },
+  "discount_label": "Your discount:",
+  "card": {
+    "title": "Your unique tariff",
+    "items": [
+      "Marketing strategy generation",
+      "Sales funnel generation",
+      "Post generation",
+      "Number of products"
+    ],
+    "price_label": "Price:",
+    "button_text": "Subscribe"
+  }
+}

@@ -92,7 +92,7 @@ export const ContentPlanAddPostModal = ({
       if (minutes % 15 !== 0) {
         setSelectedTime(null);
         message.warning(
-          t("content_plan.content_plan_add_post_modal.time_invalid")
+          t("contentPlanPage.content_plan_add_post_modal.time_invalid")
         );
         return;
       }
@@ -187,7 +187,7 @@ export const ContentPlanAddPostModal = ({
 
         if (now.isAfter(selectedDateTime)) {
           message.warning(
-            t("content_plan.content_plan_add_post_modal.time_passed")
+            t("contentPlanPage.content_plan_add_post_modal.time_passed")
           );
           setSelectedTime(null);
         }
@@ -209,8 +209,8 @@ export const ContentPlanAddPostModal = ({
     <Modal
       title={
         isPostPage
-          ? t("content_plan.content_plan_add_post_modal.scheduler_title")
-          : t("content_plan.content_plan_add_post_modal.add_content_title")
+          ? t("contentPlanPage.content_plan_add_post_modal.scheduler_title")
+          : t("contentPlanPage.content_plan_add_post_modal.add_content_title")
       }
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
@@ -250,7 +250,7 @@ export const ContentPlanAddPostModal = ({
                 isPostStorieNowLoading
               }
             >
-              {t("content_plan.content_plan_add_post_modal.publish_now")}
+              {t("contentPlanPage.content_plan_add_post_modal.publish_now")}
             </Button>
           )}
           <Button
@@ -274,7 +274,7 @@ export const ContentPlanAddPostModal = ({
             }
             loading={isAddingToSchedulers}
           >
-            {t("content_plan.content_plan_add_post_modal.add_to_scheduler")}
+            {t("contentPlanPage.content_plan_add_post_modal.add_to_scheduler")}
           </Button>
           {isPostPage ? (
             ""
@@ -288,7 +288,7 @@ export const ContentPlanAddPostModal = ({
                 width: isMobile ? "100%" : "33.33%",
               }}
             >
-              {t("content_plan.content_plan_add_post_modal.draft")}
+              {t("contentPlanPage.content_plan_add_post_modal.draft")}
             </Button>
           )}
         </Button.Group>,
@@ -310,7 +310,7 @@ export const ContentPlanAddPostModal = ({
                   : ""
               )}
             >
-              {t("content_plan.content_plan_add_post_modal.post")}
+              {t("contentPlanPage.content_plan_add_post_modal.post")}
             </Button>
             <Button
               icon={<VideoCameraOutlined />}
@@ -322,7 +322,7 @@ export const ContentPlanAddPostModal = ({
                   : ""
               )}
             >
-              {t("content_plan.content_plan_add_post_modal.reels")}
+              {t("contentPlanPage.content_plan_add_post_modal.reels")}
             </Button>
             <Button
               icon={<PlayCircleOutlined />}
@@ -334,7 +334,7 @@ export const ContentPlanAddPostModal = ({
                   : ""
               )}
             >
-              {t("content_plan.content_plan_add_post_modal.stories")}
+              {t("contentPlanPage.content_plan_add_post_modal.stories")}
             </Button>
           </div>
           <Divider />
@@ -380,9 +380,11 @@ export const ContentPlanAddPostModal = ({
                         onClick={() => setExpandedKeys(!expandedKeys)}
                       >
                         {expandedKeys
-                          ? t("content_plan.content_plan_add_post_modal.hide")
+                          ? t(
+                              "contentPlanPage.content_plan_add_post_modal.hide"
+                            )
                           : t(
-                              "content_plan.content_plan_add_post_modal.expand"
+                              "contentPlanPage.content_plan_add_post_modal.expand"
                             )}
                       </Button>
                     </div>
@@ -398,7 +400,7 @@ export const ContentPlanAddPostModal = ({
         onClick={handleShowContentPlanSocialMediaListModal}
         className={styles.socialMediaAddBtn}
       >
-        {t("content_plan.content_plan_add_post_modal.add_social_media")}
+        {t("contentPlanPage.content_plan_add_post_modal.add_social_media")}
       </Button>
 
       {selectedNewSocialMedias.length > 0 ? (
@@ -434,7 +436,7 @@ export const ContentPlanAddPostModal = ({
           value={selectedDate}
           format="DD-MM-YYYY"
           placeholder={t(
-            "content_plan.content_plan_add_post_modal.choose_date"
+            "contentPlanPage.content_plan_add_post_modal.choose_date"
           )}
         />
         <TimePicker
@@ -454,7 +456,7 @@ export const ContentPlanAddPostModal = ({
             };
           }}
           placeholder={t(
-            "content_plan.content_plan_add_post_modal.choose_time"
+            "contentPlanPage.content_plan_add_post_modal.choose_time"
           )}
           showNow={false}
           onOpenChange={(open) => {

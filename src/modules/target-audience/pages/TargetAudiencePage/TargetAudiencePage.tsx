@@ -36,7 +36,7 @@ export const TargetAudiencePage = () => {
       const formattedText = formatResponse(result);
       setFormattedResponse(formattedText);
     } catch (error) {
-      setFormattedResponse(t("target_audience.error_create"));
+      setFormattedResponse(t("targetAudiencePage.error_create"));
     }
   };
 
@@ -46,15 +46,15 @@ export const TargetAudiencePage = () => {
         .unwrap()
         .then(() => {
           navigate(`/company/${current_company?.id}`);
-          message.success(t("target_audience.success_save"));
+          message.success(t("targetAudiencePage.success_save"));
         });
     } catch (error) {
-      message.error(t("target_audience.error_save"));
+      message.error(t("targetAudiencePage.error_save"));
     }
   };
 
   const formatResponse = (data: any) => {
-    if (!data?.result) return t("target_audience.no_data");
+    if (!data?.result) return t("targetAudiencePage.no_data");
 
     return Object.entries(data.result)
       .map(([section, details]) => {
@@ -71,7 +71,7 @@ export const TargetAudiencePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("target_audience.title")}</h1>
+        <h1 className="main-title">{t("targetAudiencePage.title")}</h1>
         <Layout>
           <Content>
             <div style={{ position: "relative" }}>
@@ -103,7 +103,7 @@ export const TargetAudiencePage = () => {
                     onClick={handleCreate}
                     loading={isCreating || isSaving}
                   >
-                    {t("target_audience.create")}
+                    {t("targetAudiencePage.create")}
                   </Button>
                 </div>
               )}
@@ -117,7 +117,7 @@ export const TargetAudiencePage = () => {
                 disabled={!formattedResponse}
                 style={{ marginRight: "10px" }}
               >
-                {t("target_audience.save")}
+                {t("targetAudiencePage.save")}
               </Button>
               {formattedResponse && (
                 <Button
@@ -126,7 +126,7 @@ export const TargetAudiencePage = () => {
                   onClick={handleCreate}
                   loading={isCreating || isSaving}
                 >
-                  {t("target_audience.recreate")}
+                  {t("targetAudiencePage.recreate")}
                 </Button>
               )}
             </div>

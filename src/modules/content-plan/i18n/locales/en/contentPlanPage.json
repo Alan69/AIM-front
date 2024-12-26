@@ -1,0 +1,141 @@
+{
+  "calendar": "Calendar",
+  "tile": "Tile",
+  "list": "List",
+  "add_content": "Add Content",
+  "post_added": "Post successfully added to the scheduler.",
+  "no_active_posts": "No active posts",
+  "title": "Content Plan",
+  "publish_now": "Publish Now",
+  "add_to_scheduler": "Add to Scheduler",
+  "content_plan_calendar": {
+    "all_day": "All day",
+    "previous": "Previous",
+    "next": "Next",
+    "today": "Today",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "agenda": "Agenda",
+    "date": "Date",
+    "time": "Time",
+    "event": "Event",
+    "no_events_in_range": "No events in range",
+    "show_more": "Show more ({{total}})"
+  },
+  "selected_post_preview": {
+    "image_alt": "Post Image",
+    "add_to_favorites": "Add to favorites for publication",
+    "delete_post": "Delete from content plan",
+    "edit_post": "Edit"
+  },
+  "content_plan_add_post_modal": {
+    "add_content_title": "Add content",
+    "scheduler_title": "Add to scheduler",
+    "publish_now": "Publish now",
+    "add_to_scheduler": "Add to scheduler",
+    "draft": "Draft",
+    "post": "Post",
+    "reels": "Reels",
+    "stories": "Stories",
+    "expand": "Expand",
+    "hide": "Hide",
+    "add_social_media": "Add social media",
+    "choose_date": "Choose a date",
+    "choose_time": "Choose a time",
+    "time_invalid": "Minutes must be a multiple of 15. Please select a different time.",
+    "time_passed": "The selected time has passed, resetting the time selection.",
+    "select_date": "Select a date",
+    "select_time": "Select a time",
+    "no_post_selected": "No post selected"
+  },
+  "content_plan_edit_post_modal": {
+    "edit": "Editing",
+    "cancel": "Cancel",
+    "save": "Save",
+    "choose_date": "Choose a date",
+    "choose_time": "Choose a time",
+    "time_invalid": "Invalid time selected! Please choose a time in 15-minute intervals.",
+    "fill_all": "Please fill in all fields before saving."
+  },
+  "content_plan_posts_list_modal": {
+    "select_post": "Select Post",
+    "create_post": "Create Post",
+    "generate_post": "Generate Post",
+    "favorite_posts": "Favorite Posts",
+    "select": "Select"
+  },
+  "content_plan_reels_modal": {
+    "select_reel": "Select Reel",
+    "create_reel": "Create Reel",
+    "generate_reel": "Generate Reel",
+    "select": "Select"
+  },
+  "content_plan_delete_post_modal": {
+    "delete": "Delete",
+    "from": "content plan?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "content_plan_stories_modal": {
+    "select_stories": "Select Stories",
+    "create_stories": "Create Stories",
+    "generate_stories": "Generate Stories",
+    "select": "Select"
+  },
+  "post_create_form": {
+    "error_file_format": "Please upload files in JPEG, PNG, MP4, or MOV format",
+    "error_max_files": "You can upload up to 10 files",
+    "image_alt": "Media Preview",
+    "upload_file": "Upload Media Files",
+    "select_files": "Select Files",
+    "title": "Title",
+    "main_text": "Main Text",
+    "hashtags": "Hashtags",
+    "create_post": "Create Post"
+  },
+  "reel_create_form": {
+    "validation_video_required": "Please upload an video",
+    "validation_title_required": "Please provide a title",
+    "validation_title_length": "Title must be at least 3 characters long",
+    "validation_main_text_required": "Please provide the main text",
+    "validation_hashtags_required": "Please provide hashtags",
+    "error_file_format": "Please upload files in MP4 or MOV format",
+    "error_max_files": "You can upload up to 10 files",
+    "error_file_size": "File size must be less than 100 MB",
+    "select_files": "Select Files",
+    "upload_image": "Upload New Video",
+    "title": "Title",
+    "main_text": "Main Text",
+    "hashtags": "Hashtags",
+    "create_reel": "Create Reel"
+  },
+  "stories_create_form": {
+    "error_image_size": "Image size must be less than 8 MB",
+    "error_video_size": "Video size must be less than 100 MB",
+    "error_file_format": "Please upload a valid file (JPEG, PNG, MP4, MOV)",
+    "validation_video_required": "Please upload a video or image",
+    "image_alt": "Post Image",
+    "upload_image": "Upload Image or Video",
+    "select_file": "Select File",
+    "create_stories": "Create Stories"
+  },
+  "post_query_generate_form": {
+    "company": "Company",
+    "product": "Product",
+    "post_type": "Post Type",
+    "text_style": "Text Style",
+    "lang": "Language",
+    "content": "Content",
+    "field_required": "This field is required",
+    "post_image_alt": "Post Image",
+    "submit_request": "Submit Request"
+  },
+  "expand_more": "Expand",
+  "expand_less": "Collapse",
+  "select_social_networks": "Select Social Networks",
+  "select": "Select",
+  "no_social_networks": "You have no connected social networks.",
+  "connect_social_network": "Connect a social network",
+  "select_all": "Select All"
+}

@@ -15,16 +15,16 @@ export const SignUpForm = () => {
 
   const passwordValidator = (rule: any, value: any) => {
     if (!value) {
-      return Promise.reject(t("sign_up_form.password_required"));
+      return Promise.reject(t("signUpForm.password_required"));
     }
     if (value.length < 8) {
-      return Promise.reject(t("sign_up_form.password_invalid"));
+      return Promise.reject(t("signUpForm.password_invalid"));
     }
     if (!/\d.*\d/.test(value)) {
-      return Promise.reject(t("sign_up_form.password_invalid"));
+      return Promise.reject(t("signUpForm.password_invalid"));
     }
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-      return Promise.reject(t("sign_up_form.password_invalid"));
+      return Promise.reject(t("signUpForm.password_invalid"));
     }
     return Promise.resolve();
   };
@@ -34,7 +34,7 @@ export const SignUpForm = () => {
       if (!value || getFieldValue("password") === value) {
         return Promise.resolve();
       }
-      return Promise.reject(t("sign_up_form.password_mismatch"));
+      return Promise.reject(t("signUpForm.password_mismatch"));
     },
   });
 
@@ -50,17 +50,17 @@ export const SignUpForm = () => {
         const { access: token, refresh: refreshToken } = response;
 
         dispatch(authActions.setToken({ token, refreshToken }));
-        message.success(t("sign_up_form.success_message"));
+        message.success(t("signUpForm.success_message"));
       })
       .catch((error) => {
-        const errorMsg = error?.data?.error || t("sign_up_form.error_message");
+        const errorMsg = error?.data?.error || t("signUpForm.error_message");
         message.error(errorMsg);
       });
   };
 
   return (
     <div className={styles.signUpBox}>
-      <h2>{t("sign_up_form.title")}</h2>
+      <h2>{t("signUpForm.title")}</h2>
       <Form
         name="signup_form"
         className={styles.signUpForm}
@@ -69,32 +69,32 @@ export const SignUpForm = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: t("sign_up_form.email_required") },
+            { required: true, message: t("signUpForm.email_required") },
             {
               type: "email",
-              message: t("sign_up_form.email_invalid"),
+              message: t("signUpForm.email_invalid"),
             },
           ]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder={t("sign_up_form.email_placeholder")}
+            placeholder={t("signUpForm.email_placeholder")}
           />
         </Form.Item>
 
         <Form.Item
           name="phone_number"
           rules={[
-            { required: true, message: t("sign_up_form.phone_required") },
+            { required: true, message: t("signUpForm.phone_required") },
             {
               pattern: /^\+7\d{10}$/,
-              message: t("sign_up_form.phone_invalid"),
+              message: t("signUpForm.phone_invalid"),
             },
           ]}
         >
           <Input
             prefix={<PhoneOutlined className="site-form-item-icon" />}
-            placeholder={t("sign_up_form.phone_placeholder")}
+            placeholder={t("signUpForm.phone_placeholder")}
           />
         </Form.Item>
 
@@ -105,7 +105,7 @@ export const SignUpForm = () => {
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             type="password"
-            placeholder={t("sign_up_form.password_placeholder")}
+            placeholder={t("signUpForm.password_placeholder")}
           />
         </Form.Item>
 
@@ -115,7 +115,7 @@ export const SignUpForm = () => {
           rules={[
             {
               required: true,
-              message: t("sign_up_form.confirm_password_placeholder"),
+              message: t("signUpForm.confirm_password_placeholder"),
             },
             confirmPasswordValidator,
           ]}
@@ -123,7 +123,7 @@ export const SignUpForm = () => {
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             type="password"
-            placeholder={t("sign_up_form.confirm_password_placeholder")}
+            placeholder={t("signUpForm.confirm_password_placeholder")}
           />
         </Form.Item>
 
@@ -134,12 +134,12 @@ export const SignUpForm = () => {
             className={styles.signUpFormButton}
             loading={isLoading}
           >
-            {t("sign_up_form.submit_button")}
+            {t("signUpForm.submit_button")}
           </Button>
         </Form.Item>
 
         <Form.Item>
-          <Link to="/login">{t("sign_up_form.login_link")}</Link>
+          <Link to="/login">{t("signUpForm.login_link")}</Link>
         </Form.Item>
       </Form>
     </div>

@@ -29,10 +29,10 @@ const Header = () => {
   const languageMenu = (
     <Menu>
       <Menu.Item key="en" onClick={() => handleLanguageChange("en")}>
-        {t("header-landing.language_menu.english")}
+        {t("headerLanding.language_menu.english")}
       </Menu.Item>
       <Menu.Item key="ru" onClick={() => handleLanguageChange("ru")}>
-        {t("header-landing.language_menu.russian")}
+        {t("headerLanding.language_menu.russian")}
       </Menu.Item>
     </Menu>
   );
@@ -47,8 +47,8 @@ const Header = () => {
         <Dropdown overlay={languageMenu} trigger={["click"]}>
           <Button className={styles.languageButton} icon={<DownOutlined />}>
             {language === "ru"
-              ? t("header-landing.language_ru")
-              : t("header-landing.language_en")}
+              ? t("headerLanding.language_ru")
+              : t("headerLanding.language_en")}
           </Button>
         </Dropdown>
         <Button
@@ -56,7 +56,7 @@ const Header = () => {
           type="primary"
           onClick={() => navigate("/login")}
         >
-          {t("header-landing.start_button")}
+          {t("headerLanding.start_button")}
         </Button>
       </div>
     </AntHeader>

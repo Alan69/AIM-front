@@ -1,0 +1,9 @@
+{
+  "title": "Delete Post",
+  "confirmation_text": "Are you sure you want to delete the post \"{{postTitle}}\"?",
+  "success": "Post deleted successfully!",
+  "buttons": {
+    "delete": "Delete",
+    "cancel": "Cancel"
+  }
+}

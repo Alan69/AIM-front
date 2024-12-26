@@ -36,7 +36,7 @@ export const ContentPlanStoriesModal = ({
 
   return (
     <Modal
-      title={t("content_plan.content_plan_stories_modal.select_stories")}
+      title={t("contentPlanPage.content_plan_stories_modal.select_stories")}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -61,7 +61,7 @@ export const ContentPlanStoriesModal = ({
           }}
           disabled={createdCustomStories === null}
         >
-          {t("content_plan.content_plan_stories_modal.select")}
+          {t("contentPlanPage.content_plan_stories_modal.select")}
         </Button>,
       ]}
     >

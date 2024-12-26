@@ -1,0 +1,36 @@
+{
+  "profile": "Профиль",
+  "photo": {
+    "upload_button": "Выберите файл",
+    "alt_text": "Аватар"
+  },
+  "form": {
+    "email_label": "Email",
+    "first_name_label": "Имя",
+    "last_name_label": "Фамилия",
+    "birth_year_label": "Год рождения",
+    "phone_number_label": "Номер телефона",
+    "job_label": "Работа",
+    "country_label": "Страна",
+    "email_error": "Заполните это поле.",
+    "birth_year_error": {
+      "required": "Год рождения обязателен.",
+      "min": "Год рождения не может быть меньше 1964.",
+      "max": "Год рождения не может быть больше текущего года.",
+      "pattern": "Год рождения должен содержать ровно четыре цифры."
+    },
+    "phone_number_error": {
+      "required": "Номер телефона обязателен.",
+      "pattern": "Номер телефона должен быть в формате +7XXXXXXXXXX."
+    }
+  },
+  "buttons": {
+    "save": "Сохранить",
+    "change_password": "Изменить пароль"
+  },
+  "messages": {
+    "success": "Ваш профиль был успешно изменен!",
+    "error": "Произошла ошибка! Ваш профиль не был изменен!",
+    "invalid_file": "Пожалуйста, загрузите файл формата JPEG или PNG."
+  }
+}

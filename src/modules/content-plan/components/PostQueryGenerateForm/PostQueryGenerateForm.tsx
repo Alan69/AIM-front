@@ -114,7 +114,7 @@ export const PostQueryGenerateForm = ({
                       src={post?.picture}
                       className={styles.picture}
                       alt={t(
-                        "content_plan.post_query_generate_form.post_image_alt"
+                        "contentPlanPage.post_query_generate_form.post_image_alt"
                       )}
                     />
                   )}
@@ -134,11 +134,11 @@ export const PostQueryGenerateForm = ({
       ) : (
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label={t("content_plan.post_query_generate_form.company")}
+            label={t("contentPlanPage.post_query_generate_form.company")}
             validateStatus={errors.company ? "error" : ""}
             help={
               errors.company &&
-              t("content_plan.post_query_generate_form.field_required")
+              t("contentPlanPage.post_query_generate_form.field_required")
             }
           >
             <Controller
@@ -164,11 +164,11 @@ export const PostQueryGenerateForm = ({
           </Form.Item>
 
           <Form.Item
-            label={t("content_plan.post_query_generate_form.product")}
+            label={t("contentPlanPage.post_query_generate_form.product")}
             validateStatus={errors.product ? "error" : ""}
             help={
               errors.product &&
-              t("content_plan.post_query_generate_form.field_required")
+              t("contentPlanPage.post_query_generate_form.field_required")
             }
           >
             <Controller
@@ -193,11 +193,11 @@ export const PostQueryGenerateForm = ({
           </Form.Item>
 
           <Form.Item
-            label={t("content_plan.post_query_generate_form.post_type")}
+            label={t("contentPlanPage.post_query_generate_form.post_type")}
             validateStatus={errors.post_type ? "error" : ""}
             help={
               errors.post_type &&
-              t("content_plan.post_query_generate_form.field_required")
+              t("contentPlanPage.post_query_generate_form.field_required")
             }
           >
             <Controller
@@ -218,11 +218,11 @@ export const PostQueryGenerateForm = ({
           </Form.Item>
 
           <Form.Item
-            label={t("content_plan.post_query_generate_form.text_style")}
+            label={t("contentPlanPage.post_query_generate_form.text_style")}
             validateStatus={errors.text_style ? "error" : ""}
             help={
               errors.text_style &&
-              t("content_plan.post_query_generate_form.field_required")
+              t("contentPlanPage.post_query_generate_form.field_required")
             }
           >
             <Controller
@@ -243,11 +243,11 @@ export const PostQueryGenerateForm = ({
           </Form.Item>
 
           <Form.Item
-            label={t("content_plan.post_query_generate_form.lang")}
+            label={t("contentPlanPage.post_query_generate_form.lang")}
             validateStatus={errors.lang ? "error" : ""}
             help={
               errors.lang &&
-              t("content_plan.post_query_generate_form.field_required")
+              t("contentPlanPage.post_query_generate_form.field_required")
             }
           >
             <Controller
@@ -277,11 +277,11 @@ export const PostQueryGenerateForm = ({
           </Form.Item>
 
           <Form.Item
-            label={t("content_plan.post_query_generate_form.content")}
+            label={t("contentPlanPage.post_query_generate_form.content")}
             validateStatus={errors.content ? "error" : ""}
             help={
               errors.content &&
-              t("content_plan.post_query_generate_form.field_required")
+              t("contentPlanPage.post_query_generate_form.field_required")
             }
           >
             <Controller
@@ -301,7 +301,7 @@ export const PostQueryGenerateForm = ({
               loading={isPostCreating}
               block
             >
-              {t("content_plan.post_query_generate_form.submit_request")}{" "}
+              {t("contentPlanPage.post_query_generate_form.submit_request")}{" "}
             </Button>
           </Form.Item>
         </Form>

@@ -41,18 +41,18 @@ export const TargetAudienceUpdatePage = () => {
         .unwrap()
         .then(() => {
           navigate(`/company/${current_company?.id}`);
-          message.success(t("target_audience_update.save_success"));
+          message.success(t("targetAudienceUpdatePage.save_success"));
         });
       refetchTargetAudience();
     } catch (error) {
-      message.error(t("target_audience_update.save_error"));
+      message.error(t("targetAudienceUpdatePage.save_error"));
     }
   };
 
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("target_audience_update.title")}</h1>
+        <h1 className="main-title">{t("targetAudienceUpdatePage.title")}</h1>
         <Layout>
           <Content>
             <TextArea
@@ -70,7 +70,7 @@ export const TargetAudienceUpdatePage = () => {
                 disabled={!formattedResponse || isLoading}
                 style={{ marginRight: "10px" }}
               >
-                {t("target_audience_update.save_button")}
+                {t("targetAudienceUpdatePage.save_button")}
               </Button>
             </div>
           </Content>

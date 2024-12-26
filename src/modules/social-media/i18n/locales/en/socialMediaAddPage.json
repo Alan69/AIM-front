@@ -1,0 +1,18 @@
+{
+  "title": "Add Social Media",
+  "error": "Error adding {{name}}: {{error}}",
+  "not_available": "Social media integration not available.",
+  "back_button": "Back",
+  "platforms": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "reddit": "Reddit",
+    "snapchat": "Snapchat",
+    "telegram": "Telegram",
+    "tiktok": "TikTok",
+    "tumblr": "Tumblr",
+    "twitter": "Twitter",
+    "vk": "VK"
+  }
+}

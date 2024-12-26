@@ -60,7 +60,7 @@ export const ContentPlanDeletePost = ({
                   <Image
                     src={mediaItem.media}
                     className=""
-                    alt={t("content_plan.selected_post_preview.image_alt")}
+                    alt={t("contentPlanPage.selected_post_preview.image_alt")}
                   />
                 )}
               </div>
@@ -75,13 +75,13 @@ export const ContentPlanDeletePost = ({
   return (
     <Modal
       title={
-        t("content_plan.content_plan_delete_post_modal.delete") +
+        t("contentPlanPage.content_plan_delete_post_modal.delete") +
         ` "${
           selectedPost && "title" in selectedPost
             ? selectedPost.title
             : undefined
         }" ` +
-        t("content_plan.content_plan_delete_post_modal.from")
+        t("contentPlanPage.content_plan_delete_post_modal.from")
       }
       open={isModalOpen}
       onCancel={() => setIsModalOpen(false)}
@@ -91,7 +91,7 @@ export const ContentPlanDeletePost = ({
           onClick={() => setIsModalOpen(false)}
           style={{ borderRadius: "16px" }}
         >
-          {t("content_plan.content_plan_delete_post_modal.cancel")}
+          {t("contentPlanPage.content_plan_delete_post_modal.cancel")}
         </Button>,
         <Button
           key="delete"
@@ -103,7 +103,7 @@ export const ContentPlanDeletePost = ({
           }}
           style={{ borderRadius: "16px" }}
         >
-          {t("content_plan.content_plan_delete_post_modal.confirm")}
+          {t("contentPlanPage.content_plan_delete_post_modal.confirm")}
         </Button>,
       ]}
       width={600}

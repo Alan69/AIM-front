@@ -277,7 +277,7 @@ export const ContentPlanPage = () => {
       .then(() => {
         refetchPostList();
         setIsContentPlanAddPostModalOpen(false);
-        message.success(t("content_plan.post_added"));
+        message.success(t("contentPlanPage.post_added"));
       })
       .catch((error) => {
         message.error(error.data.error);
@@ -405,7 +405,7 @@ export const ContentPlanPage = () => {
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: t("content_plan.calendar"),
+      label: t("contentPlanPage.calendar"),
       children: (
         <ContentPlanCalendar
           contentPlanList={contentPlanList}
@@ -420,14 +420,14 @@ export const ContentPlanPage = () => {
     },
     {
       key: "2",
-      label: t("content_plan.tile"),
+      label: t("contentPlanPage.tile"),
       children: "Content of Tab Pane 2",
       icon: <AppstoreOutlined />,
       disabled: true,
     },
     {
       key: "3",
-      label: t("content_plan.list"),
+      label: t("contentPlanPage.list"),
       children: "Content of Tab Pane 2",
       icon: <UnorderedListOutlined />,
       disabled: true,
@@ -452,7 +452,7 @@ export const ContentPlanPage = () => {
       <Layout>
         <Content className="page-layout">
           <h1 className="main-title">
-            {t("content_plan.title")} - {current_company?.name}
+            {t("contentPlanPage.title")} - {current_company?.name}
           </h1>
           <Layout>
             <Content className={styles.content}>
@@ -472,7 +472,7 @@ export const ContentPlanPage = () => {
                       icon={<PlusCircleOutlined />}
                       onClick={handleShowContentPlanAddPostModal}
                     >
-                      {isMobile ? "" : t("content_plan.add_content")}
+                      {isMobile ? "" : t("contentPlanPage.add_content")}
                     </Button>
                   }
                   centered={!isMobile}
@@ -520,7 +520,7 @@ export const ContentPlanPage = () => {
                           )}
                         />
                       ) : (
-                        <p>{t("content_plan.no_active_posts")}</p>
+                        <p>{t("contentPlanPage.no_active_posts")}</p>
                       )}
                     </div>
                   ) : (

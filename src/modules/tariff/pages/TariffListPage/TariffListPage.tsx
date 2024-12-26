@@ -108,24 +108,24 @@ export const TariffListPage: React.FC = () => {
               <Layout className={styles.accountInfo}>
                 <Content>
                   <Title level={2}>
-                    {t("tariff_page.title", {
-                      days: user?.profile?.user?.tariff?.days ?? 0, // Указываем значение или 0
+                    {t("tariffPage.title", {
+                      days: user?.profile?.user?.tariff?.days ?? 0,
                     })}
                   </Title>
                 </Content>
               </Layout>
 
               <section className={styles.section}>
-                <h3 className={styles.title}>{t("tariff_page.subtitle")}</h3>
+                <h3 className={styles.title}>{t("tariffPage.subtitle")}</h3>
                 <div className={styles.subtitle}>
-                  {t("tariff_page.promotion")}
+                  {t("tariffPage.promotion")}
                 </div>
                 <div className={styles.row}>
                   <div className={styles.col}>
                     <div className={styles.slidersBlock}>
                       <div className={styles.sliderBlock}>
                         <h4 className={styles.sliderSubtitle}>
-                          {t("tariff_page.sliders.company_count")}
+                          {t("tariffPage.sliders.company_count")}
                         </h4>
                         <Slider
                           className={"customSlider tariff-page-slider"}
@@ -152,7 +152,7 @@ export const TariffListPage: React.FC = () => {
                       </div>
                       <div className={styles.sliderBlock}>
                         <h4 className={styles.sliderSubtitle}>
-                          {t("tariff_page.sliders.duration")}
+                          {t("tariffPage.sliders.duration")}
                         </h4>
                         <Slider
                           className={"customSlider tariff-page-slider"}
@@ -181,7 +181,7 @@ export const TariffListPage: React.FC = () => {
                     <Divider />
                     <div className={styles.discountSection}>
                       <div className={styles.discountSection__label}>
-                        {t("tariff_page.discount_label")}
+                        {t("tariffPage.discount_label")}
                       </div>
                       <div className={styles.discountSection__value}>
                         {discount.toLocaleString()} ₸
@@ -192,14 +192,12 @@ export const TariffListPage: React.FC = () => {
                     <Card hoverable className={styles.card}>
                       <div className={styles.card__head}>
                         <div className={styles.card__title}>
-                          {t("tariff_page.card.title")}
+                          {t("tariffPage.card.title")}
                         </div>
                         <div className={styles.card__body}>
                           <div className={styles.card__item}>
                             <div className={styles.card__item__label}>
-                              {t(
-                                "tariff_page.card.features.marketing_strategy"
-                              )}
+                              {t("tariffPage.card.features.marketing_strategy")}
                             </div>
                             <div className={styles.card__item__value}>
                               <img src={infinity} alt="infinity" />
@@ -207,7 +205,7 @@ export const TariffListPage: React.FC = () => {
                           </div>
                           <div className={styles.card__item}>
                             <div className={styles.card__item__label}>
-                              {t("tariff_page.card.features.sales_funnel")}
+                              {t("tariffPage.card.features.sales_funnel")}
                             </div>
                             <div className={styles.card__item__value}>
                               <img src={infinity} alt="infinity" />
@@ -215,7 +213,7 @@ export const TariffListPage: React.FC = () => {
                           </div>
                           <div className={styles.card__item}>
                             <div className={styles.card__item__label}>
-                              {t("tariff_page.card.features.posts_generation")}
+                              {t("tariffPage.card.features.posts_generation")}
                             </div>
                             <div className={styles.card__item__value}>
                               <img src={checked} alt="checked" />
@@ -223,7 +221,7 @@ export const TariffListPage: React.FC = () => {
                           </div>
                           <div className={styles.card__item}>
                             <div className={styles.card__item__label}>
-                              {t("tariff_page.card.features.products")}
+                              {t("tariffPage.card.features.products")}
                             </div>
                             <div className={styles.card__item__value}>
                               <img src={checked} alt="checked" />
@@ -234,7 +232,7 @@ export const TariffListPage: React.FC = () => {
                       <div className={styles.card__bottom}>
                         <div className={styles.card__price}>
                           <div className={styles.card__price__label}>
-                            {t("tariff_page.card.price_label")}
+                            {t("tariffPage.card.price_label")}
                           </div>
                           <IconArrow />
                           <div className={styles.card__price__value}>
@@ -252,7 +250,7 @@ export const TariffListPage: React.FC = () => {
                           className={styles.card__button}
                           onClick={handleBuyTariff}
                         >
-                          {t("tariff_page.card.button")}
+                          {t("tariffPage.card.button")}
                           <IconPlus className={styles.iconPlus} />
                         </Button>
                       </div>

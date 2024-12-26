@@ -1,0 +1,29 @@
+{
+  "title": "FAQ",
+  "items": [
+    {
+      "question": "What is AI?",
+      "answer": "AI is artificial intelligence that helps automate processes and improve marketing results."
+    },
+    {
+      "question": "What is your AI platform?",
+      "answer": "It helps automate routine tasks such as audience segmentation, content personalization, campaign management, and data analysis."
+    },
+    {
+      "question": "How does AI optimize marketing?",
+      "answer": "AI analyzes data and helps create more precise and effective marketing campaigns."
+    },
+    {
+      "question": "Is your platform suitable for small businesses?",
+      "answer": "Yes, our platform is suitable for businesses of any size, including small businesses."
+    },
+    {
+      "question": "How can we integrate the platform with our current marketing tools?",
+      "answer": "Our platform supports integration with most popular marketing tools."
+    },
+    {
+      "question": "What support do you offer?",
+      "answer": "We provide 24/7 support and detailed documentation for all our users."
+    }
+  ]
+}

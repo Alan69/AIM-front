@@ -1,0 +1,30 @@
+{
+  "label": "Best solutions",
+  "title": "What you get",
+  "benefits": [
+    {
+      "title": "Brand recognition",
+      "description": "Helps stand out among competitors and increase memorability"
+    },
+    {
+      "title": "Increased sales",
+      "description": "Attract more customers and boost conversions with effective marketing"
+    },
+    {
+      "title": "Customer loyalty",
+      "description": "Build long-term relationships with customers, ensuring high satisfaction"
+    },
+    {
+      "title": "Detailed brand analysis",
+      "description": "Deep analysis of all brand aspects, including its values and positioning"
+    },
+    {
+      "title": "Efficiency improvement",
+      "description": "Implement innovative AI solutions for data analysis and routine task automation"
+    },
+    {
+      "title": "Forecasting and personalization",
+      "description": "Use AI to predict customer behavior and provide personalized offers"
+    }
+  ]
+}

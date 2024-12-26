@@ -1,0 +1,15 @@
+{
+  "loading": "Loading...",
+  "content_type": "Content Type",
+  "theme": "Theme",
+  "language": "Language",
+  "description": "Description",
+  "repeat_request": "Repeat Request",
+  "ideas": "Ideas",
+  "no_ideas": "No ideas found. Add ideas.",
+  "copy": "Copy",
+  "copy_success": "Title and description copied to clipboard!",
+  "copy_error": "Error copying title and description.",
+  "copy_success_title": "Title copied to clipboard!",
+  "copy_error_title": "Error copying title."
+}

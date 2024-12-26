@@ -12,7 +12,7 @@ export const WorkWithSection = () => {
 
   return (
     <section className={styles.section}>
-      <h3 className={styles.title}>{t("work_with.title")}</h3>
+      <h3 className={styles.title}>{t("workWithSection.title")}</h3>
       <div className={styles.socialMedia}>
         <div className={styles.socialMedia__item}>
           <img src={inst} alt="inst" />

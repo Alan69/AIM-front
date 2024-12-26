@@ -1,0 +1,14 @@
+{
+  "logout": "Logout",
+  "soon": "soon",
+  "items": {
+    "ideas": "Ideas",
+    "posts": "Posts",
+    "scenarios": "Scenarios",
+    "contentPlanPage": "Content Plan",
+    "marketing_strategy": "Marketing Strategy",
+    "sales_funnel": "Sales Funnel",
+    "chat_hub": "Unified Chat Hub",
+    "analytics": "Analytics"
+  }
+}

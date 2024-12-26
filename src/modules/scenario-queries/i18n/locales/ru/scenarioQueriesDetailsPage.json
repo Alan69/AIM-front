@@ -1,0 +1,22 @@
+{
+  "title": "{{company}} - {{product}}",
+  "fields": {
+    "content_type": "Вид контента: {{content_type}}",
+    "theme": "Тематика сценария: {{theme}}",
+    "language": "Язык: {{language}}",
+    "description": "Описание: {{description}}",
+    "latency": "Длительность: {{latency}}"
+  },
+  "actions": {
+    "replay_button": "Повторить запрос"
+  },
+  "scenarios_section": {
+    "title": "Сценарии:",
+    "not_found": "Сценарии не найдены. Добавьте сценарий."
+  },
+  "copy_tooltip": "Скопировать",
+  "copy_success": "Содержимое скопировано в буфер обмена!",
+  "copy_error": "Ошибка при копировании содержимого в буфер обмена.",
+  "short_description": "Краткое описание:",
+  "main_text": "Основной текст:"
+}

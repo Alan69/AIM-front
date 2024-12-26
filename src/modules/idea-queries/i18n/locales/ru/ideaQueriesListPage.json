@@ -1,0 +1,12 @@
+{
+  "title": "История создания идеи - {{company}}",
+  "default_company": "Компания",
+  "create_button": "Создать",
+  "fields": {
+    "product": "Продукт",
+    "content_type": "Тип контента",
+    "theme": "Тематика",
+    "date_created": "Дата создания"
+  },
+  "locale": "ru-RU"
+}

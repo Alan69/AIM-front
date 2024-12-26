@@ -1,0 +1,8 @@
+{
+  "title": "Delete Company",
+  "confirm": "Are you sure you want to delete the company {{name}}?",
+  "buttons": {
+    "delete": "Delete",
+    "cancel": "Cancel"
+  }
+}
