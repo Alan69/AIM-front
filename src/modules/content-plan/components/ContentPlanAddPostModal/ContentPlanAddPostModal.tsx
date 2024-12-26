@@ -21,7 +21,6 @@ import moment from "moment";
 import "moment/locale/ru";
 import "moment/locale/en-gb";
 import styles from "./ContentPlanAddPostModal.module.scss";
-import "./Custom-slider.scss";
 import { TPostData } from "modules/post/redux/api";
 import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
 import { TAddToSchedulersRequest } from "modules/content-plan/redux/api";

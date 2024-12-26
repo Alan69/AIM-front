@@ -3,7 +3,6 @@ import { Layout, Typography, Image, Carousel, Button } from "antd";
 import { HeartTwoTone } from "@ant-design/icons";
 import cn from "classnames";
 import styles from "./SelectedPostPreview.module.scss";
-import "../../../../Custom-slider.scss";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import avatar from "assets/avatar.png";
 import { useTranslation } from "react-i18next";
