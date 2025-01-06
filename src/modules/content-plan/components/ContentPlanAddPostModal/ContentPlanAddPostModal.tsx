@@ -70,7 +70,7 @@ export const ContentPlanAddPostModal = ({
   isPostStorieNowLoading,
   handlePostNow,
   isPostPage = false,
-  selectedPostType,
+  selectedPostType = ContentPlanPostingType.POST,
 }: TProps) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
