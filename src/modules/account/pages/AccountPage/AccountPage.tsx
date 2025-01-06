@@ -19,6 +19,8 @@ import { useLazyGetAuthUserQuery } from "modules/auth/redux/api";
 import avatar from "assets/avatar.png";
 import styles from "./AccountPage.module.scss";
 import { useTranslation } from "react-i18next";
+import { ConfirmationChangesModal } from "modules/account/components/ConfirmationChangesModal/ConfirmationChangesModal";
+import _ from "lodash";
 
 type TUpdateProfilesForm = {
   user: string;
@@ -61,6 +63,7 @@ export const AccountPage = () => {
     handleSubmit,
     reset,
     formState: { errors },
+    getValues,
   } = useForm<TUpdateProfilesForm>({
     defaultValues: {
       first_name: "",
@@ -79,7 +82,8 @@ export const AccountPage = () => {
       picture: "",
     },
   });
-
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [oldValues, setOldValues] = useState<any>({});
   useEffect(() => {
     if (user) {
       reset({
@@ -125,6 +129,9 @@ export const AccountPage = () => {
         .catch(() => {
           message.error(t("accountPage.messages.error"));
         });
+      const isShouldShowConfirmModal = _.isEqual(getValues(), oldValues);
+      setShowConfirmModal(!isShouldShowConfirmModal);
+      console.log(isShouldShowConfirmModal);
     }
   };
 
@@ -144,6 +151,27 @@ export const AccountPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      setOldValues({
+        first_name: user.profile.user.first_name || "",
+        last_name: user.profile.user.last_name || "",
+        email: user.profile.user.email || "",
+        bd_year: user.profile.bd_year,
+        phone_number: user.profile.phone_number || "",
+        job: {
+          id: user.profile.job?.id || "",
+          name: user.profile.job?.name || "",
+        },
+        location: {
+          id: user.profile.location?.id || "",
+          name: user.profile.location?.name || "",
+        },
+        picture: user.profile.picture || "",
+      });
+    }
+  }, [user]);
+  // console.log(getValues());
   return (
     <Layout>
       <Content className="page-layout">
@@ -299,6 +327,12 @@ export const AccountPage = () => {
               {t("accountPage.buttons.change_password")}
             </Button>
           </Form.Item>
+          {
+            <ConfirmationChangesModal
+              visible={showConfirmModal}
+              onCancel={() => setShowConfirmModal(false)}
+            />
+          }
         </Form>
       </Content>
     </Layout>

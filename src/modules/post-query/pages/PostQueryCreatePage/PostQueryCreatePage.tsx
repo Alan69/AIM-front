@@ -139,7 +139,8 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                {t("postQueryCreatePage.fields.post_type")} <span>*</span>
+                {t("postQueryCreatePage.fields.post_type")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.post_type ? "error" : ""}
@@ -165,7 +166,8 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                {t("postQueryCreatePage.fields.text_style")} <span>*</span>
+                {t("postQueryCreatePage.fields.text_style")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.text_style ? "error" : ""}
@@ -190,7 +192,8 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                {t("postQueryCreatePage.fields.lang")} <span>*</span>
+                {t("postQueryCreatePage.fields.lang")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.lang ? "error" : ""}
@@ -225,7 +228,8 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                {t("postQueryCreatePage.fields.content")} <span>*</span>
+                {t("postQueryCreatePage.fields.content")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.content ? "error" : ""}
