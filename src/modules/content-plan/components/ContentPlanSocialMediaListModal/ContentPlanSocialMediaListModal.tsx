@@ -89,7 +89,7 @@ export const ContentPlanSocialMediaListModal = ({
 
   return (
     <Modal
-      title={t("content_plan.select_social_networks")}
+      title={t("contentPlanPage.select_social_networks")}
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
       onCancel={() => setIsModalOpen(false)}
@@ -110,7 +110,9 @@ export const ContentPlanSocialMediaListModal = ({
           }
           loading={isPostNowLoading}
         >
-          {isPostNow ? t("content_plan.publish_now") : t("content_plan.select")}
+          {isPostNow
+            ? t("contentPlanPage.publish_now")
+            : t("contentPlanPage.select")}
         </Button>,
       ]}
     >
@@ -144,13 +146,13 @@ export const ContentPlanSocialMediaListModal = ({
         ) : (
           <div className={styles.noContent}>
             <div className={styles.noContent__text}>
-              {t("content_plan.no_social_networks")}
+              {t("contentPlanPage.no_social_networks")}
             </div>
             <Link
               to={`/social-media/${current_company?.id}/add`}
               className={styles.noContent__link}
             >
-              {t("content_plan.connect_social_network")}
+              {t("contentPlanPage.connect_social_network")}
             </Link>
           </div>
         )}
@@ -167,7 +169,7 @@ export const ContentPlanSocialMediaListModal = ({
         disabled={socialMediaList?.length === 0}
         loading={isPostNowLoading}
       >
-        {t("content_plan.select_all")}
+        {t("contentPlanPage.select_all")}
       </Button>
     </Modal>
   );

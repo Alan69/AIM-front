@@ -1,0 +1,11 @@
+{
+  "title": "Scenario creation history",
+  "columns": {
+    "product": "Product",
+    "scenario_type": "Scenario Type",
+    "scenario_theme": "Scenario Theme",
+    "date": "Creation Date"
+  },
+  "create_button": "Create",
+  "locale": "en-US"
+}

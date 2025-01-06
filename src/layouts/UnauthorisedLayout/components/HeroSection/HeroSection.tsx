@@ -16,7 +16,9 @@ export const HeroSection = ({ isSticky }: TProps) => {
   const { token } = useTypedSelector((state) => state.auth);
   const { t } = useTranslation();
 
-  const features = t("hero.features", { returnObjects: true }) as string[];
+  const features = t("heroSection.features", {
+    returnObjects: true,
+  }) as string[];
 
   const handleScrollToTariff = () => {
     const tariffSection = document.getElementById("tariff-section");
@@ -49,19 +51,20 @@ export const HeroSection = ({ isSticky }: TProps) => {
 
   return (
     <section className={styles.section} id="hero-section">
-      <h1 className={styles.title}>{t("hero.title")}</h1>
-      <h3 className={styles.subtitle}>{t("hero.subtitle")}</h3>
+      <h1 className={styles.title}>{t("heroSection.title")}</h1>
+      <h3 className={styles.subtitle}>{t("heroSection.subtitle")}</h3>
       <div
         className={cn(styles.actions, isSticky ? styles.actions__hidden : "")}
       >
         <Button className={styles.tariffBtn} onClick={handleScrollToTariff}>
-          {t("hero.tariffs_button")}
+          {t("heroSection.tariffs_button")}
         </Button>
         <Button
           className={styles.startBtn}
           onClick={() => navigate(token ? "/tariffs" : "/login")}
         >
-          {t("hero.start_button")} <IconPlus className={styles.iconPlus} />
+          {t("heroSection.start_button")}{" "}
+          <IconPlus className={styles.iconPlus} />
         </Button>
       </div>
       <div className={styles.feature}>

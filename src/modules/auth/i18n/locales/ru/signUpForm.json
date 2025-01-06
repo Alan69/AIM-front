@@ -1,0 +1,18 @@
+{
+  "title": "Регистрация",
+  "email_placeholder": "Email",
+  "phone_placeholder": "Номер телефона",
+  "password_placeholder": "Пароль",
+  "confirm_password_placeholder": "Подтверждение пароля",
+  "submit_button": "Создать аккаунт",
+  "email_required": "Пожалуйста, введите email!",
+  "email_invalid": "Некорректный формат email!",
+  "phone_required": "Пожалуйста, введите номер телефона!",
+  "phone_invalid": "Номер телефона должен быть в формате +7XXXXXXXXXX.",
+  "password_required": "Пожалуйста, введите пароль!",
+  "password_invalid": "Пароль должен содержать минимум 8 символов, два числа и один спецсимвол.",
+  "password_mismatch": "Пароли не совпадают!",
+  "success_message": "Регистрация успешна! Пожалуйста, войдите в систему.",
+  "error_message": "Ошибка регистрации. Пожалуйста, проверьте введенные данные.",
+  "login_link": "Есть аккаунт?"
+}

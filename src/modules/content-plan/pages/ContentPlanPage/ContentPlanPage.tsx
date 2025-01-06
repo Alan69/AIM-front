@@ -23,8 +23,10 @@ import { contentPlanActions } from "modules/content-plan/redux/slices/contentPla
 import { useDispatch } from "react-redux";
 import {
   TAddToSchedulersRequest,
+  TEditPostFromSchedulersRequest,
   useAddToSchedulersMutation,
   useDeteleFromSchedulerMutation,
+  useEditPostFromSchedulerMutation,
   useGetSchedulersQuery,
 } from "modules/content-plan/redux/api";
 import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
@@ -72,6 +74,7 @@ import {
 import { storiesActions } from "modules/stories/redux/slices/stories.slice";
 import { ContentPlanStoriesModal } from "modules/content-plan/components/ContentPlanStoriesModal/ContentPlanStoriesModal";
 import { ContentPlanDeletePost } from "modules/content-plan/components/ContentPlanDeletePost/ContentPlanDeletePost";
+import { ContentPlanEditPost } from "modules/content-plan/components/ContentPlanEditPost/ContentPlanEditPost";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -98,6 +101,8 @@ export const ContentPlanPage = () => {
     isContentPlanDeletePostModalOpen,
     setIsContentPlanDeletePostModalOpen,
   ] = useState(false);
+  const [isContentPlanEditPostModalOpen, setIsContentPlanEditPostModalOpen] =
+    useState(false);
 
   const [selectedPostType, setSelectedPostType] = useState(
     ContentPlanPostingType.UNKNOWN
@@ -132,6 +137,8 @@ export const ContentPlanPage = () => {
     useAddToSchedulersMutation();
   const [deteleFromScheduler, { isLoading: isDeletingFromScheduler }] =
     useDeteleFromSchedulerMutation();
+  const [editPostFromScheduler, { isLoading: isEdtitingPostFromScheduler }] =
+    useEditPostFromSchedulerMutation();
   const [createPostQuery, { isLoading: isPostCreating }] =
     useCreatePostQueryMutation();
   const [createCustomPost, { isLoading: isCustomPostCreating }] =
@@ -179,17 +186,23 @@ export const ContentPlanPage = () => {
     setIsContentPlanDeletePostModalOpen(true);
   };
 
+  const handleShowContentPlanEditPostModal = () => {
+    setIsContentPlanEditPostModalOpen(true);
+  };
+
   const handleSelectNewPost = (
     post?: TPostData,
     reel?: TReelData,
     storie?: TStoriesData
   ) => {
     if (post) {
-      setSelectNewPost(post);
+      // @ts-ignore
+      setSelectNewPost({ ...post, media: post.previouspostimage });
       setSelectedPostType(ContentPlanPostingType.POST);
     }
     if (reel) {
-      setSelectNewPost(reel);
+      // @ts-ignore
+      setSelectNewPost({ ...reel, media: reel.previous_media });
       setSelectedPostType(ContentPlanPostingType.REELS);
     }
     if (storie) {
@@ -266,7 +279,7 @@ export const ContentPlanPage = () => {
       .then(() => {
         refetchPostList();
         setIsContentPlanAddPostModalOpen(false);
-        message.success(t("content_plan.post_added"));
+        message.success(t("contentPlanPage.post_added"));
       })
       .catch((error) => {
         message.error(error.data.error);
@@ -281,6 +294,26 @@ export const ContentPlanPage = () => {
           .unwrap()
           .then(() => {
             dispatch(contentPlanActions.setSelectedPost(null));
+            setSelectedEvents(null);
+            message.success(res.message);
+          });
+      })
+      .catch((error) => {
+        message.error(error.data.error);
+      });
+  };
+
+  const handleEditPostFromScheduler = (
+    payload: TEditPostFromSchedulersRequest
+  ) => {
+    editPostFromScheduler(payload)
+      .unwrap()
+      .then((res) => {
+        refetchPostList()
+          .unwrap()
+          .then(() => {
+            dispatch(contentPlanActions.setSelectedPost(null));
+            setSelectedEvents(null);
             message.success(res.message);
           });
       })
@@ -374,7 +407,7 @@ export const ContentPlanPage = () => {
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: t("content_plan.calendar"),
+      label: t("contentPlanPage.calendar"),
       children: (
         <ContentPlanCalendar
           contentPlanList={contentPlanList}
@@ -389,14 +422,14 @@ export const ContentPlanPage = () => {
     },
     {
       key: "2",
-      label: t("content_plan.tile"),
+      label: t("contentPlanPage.tile"),
       children: "Content of Tab Pane 2",
       icon: <AppstoreOutlined />,
       disabled: true,
     },
     {
       key: "3",
-      label: t("content_plan.list"),
+      label: t("contentPlanPage.list"),
       children: "Content of Tab Pane 2",
       icon: <UnorderedListOutlined />,
       disabled: true,
@@ -421,7 +454,7 @@ export const ContentPlanPage = () => {
       <Layout>
         <Content className="page-layout">
           <h1 className="main-title">
-            {t("content_plan.title")} - {current_company?.name}
+            {t("contentPlanPage.title")} - {current_company?.name}
           </h1>
           <Layout>
             <Content className={styles.content}>
@@ -441,7 +474,7 @@ export const ContentPlanPage = () => {
                       icon={<PlusCircleOutlined />}
                       onClick={handleShowContentPlanAddPostModal}
                     >
-                      {isMobile ? "" : t("content_plan.add_content")}
+                      {isMobile ? "" : t("contentPlanPage.add_content")}
                     </Button>
                   }
                   centered={!isMobile}
@@ -474,13 +507,6 @@ export const ContentPlanPage = () => {
                             >
                               <List.Item.Meta
                                 className={styles.selectedPost__content}
-                                avatar={
-                                  <Image
-                                    width={32}
-                                    height={32}
-                                    src={item.media}
-                                  />
-                                }
                                 title={
                                   <div className={styles.selectedPost__text}>
                                     <div className={styles.selectedPost__title}>
@@ -496,7 +522,7 @@ export const ContentPlanPage = () => {
                           )}
                         />
                       ) : (
-                        <p>{t("content_plan.no_active_posts")}</p>
+                        <p>{t("contentPlanPage.no_active_posts")}</p>
                       )}
                     </div>
                   ) : (
@@ -509,6 +535,9 @@ export const ContentPlanPage = () => {
                       selectedPost={selectedPost}
                       handleShowContentPlanDeletePostModal={
                         handleShowContentPlanDeletePostModal
+                      }
+                      handleShowContentPlanEditPostModal={
+                        handleShowContentPlanEditPostModal
                       }
                     />
                   )}
@@ -585,6 +614,12 @@ export const ContentPlanPage = () => {
         handleDeleteFromScheduler={handleDeleteFromScheduler}
         selectedPost={selectedPost}
       />
+      <ContentPlanEditPost
+        isModalOpen={isContentPlanEditPostModalOpen}
+        setIsModalOpen={setIsContentPlanEditPostModalOpen}
+        handleEditPostFromScheduler={handleEditPostFromScheduler}
+        selectedPost={selectedPost}
+      />
       {isSmallLaptop ? (
         <SelectedPreviewBlockModal
           selectedDatePreview={selectedDatePreview}
@@ -596,6 +631,9 @@ export const ContentPlanPage = () => {
           handleCloseModal={handleClosePreviewBlockModal}
           handleShowContentPlanDeletePostModal={
             handleShowContentPlanDeletePostModal
+          }
+          handleShowContentPlanEditPostModal={
+            handleShowContentPlanEditPostModal
           }
         />
       ) : (

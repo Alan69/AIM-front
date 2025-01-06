@@ -105,7 +105,7 @@ export const PostDetailsPage = () => {
   ] = useState(false);
   const [isPostPageOpen, setIsPostPageOpen] = useState(true);
   const [selectedMedias, setSelectedMedias] = useState<string[]>([]);
-  const [file, setFile] = useState<File | null>(null);
+  const [fileList, setFileList] = useState<File[]>([]);
 
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
@@ -273,39 +273,37 @@ export const PostDetailsPage = () => {
   };
 
   const handleFileChange = (info: any) => {
-    const fileList = info.fileList;
-    if (fileList.length > 0) {
-      const lastFile = fileList[fileList.length - 1];
-      if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
-        setFile(lastFile.originFileObj);
-      } else {
-        message.error(t("post_details.invalid_file_type"));
-        setFile(null);
-      }
-    } else {
-      setFile(null);
+    const validTypes = ["image/jpeg", "image/png"];
+    const files = info.fileList.map((file: any) => file.originFileObj);
+
+    const isValid = files.every((file: File) => validTypes.includes(file.type));
+    if (!isValid) {
+      message.error(t("postDetailsPage.invalid_file_type"));
+      return;
     }
+
+    if (files.length > 10) {
+      message.error(t("postDetailsPage.error_max_files"));
+      return;
+    }
+
+    setFileList(files);
   };
 
   const handleUploadConfirm = async () => {
-    if (file) {
-      const formData = new FormData();
-      formData.append("media", file);
-
-      try {
-        await createPostImage({
-          post: id,
-          media: file,
-        })
-          .unwrap()
-          .then(() => {
-            refetchPostMedias();
-            message.success(t("post_details.update_success"));
-            setFile(null);
-          });
-      } catch (error) {
-        message.error(t("post_details.image_upload_error"));
-      }
+    try {
+      await createPostImage({
+        post: id,
+        media: fileList,
+      })
+        .unwrap()
+        .then(() => {
+          refetchPostMedias();
+          message.success(t("postDetailsPage.update_success"));
+          setFileList([]);
+        });
+    } catch (error) {
+      message.error(t("postDetailsPage.image_upload_error"));
     }
   };
 
@@ -410,7 +408,7 @@ export const PostDetailsPage = () => {
                               try {
                                 if (!media.media) {
                                   message.error(
-                                    t("post_details.image_not_found")
+                                    t("postDetailsPage.image_not_found")
                                   );
                                   return;
                                 }
@@ -423,7 +421,7 @@ export const PostDetailsPage = () => {
 
                                 if (!response.ok) {
                                   throw new Error(
-                                    t("post_details.image_download_error")
+                                    t("postDetailsPage.image_download_error")
                                   );
                                 }
 
@@ -438,15 +436,15 @@ export const PostDetailsPage = () => {
                                 document.body.removeChild(link);
                                 window.URL.revokeObjectURL(url);
                                 message.success(
-                                  t("post_details.image_download_success")
+                                  t("postDetailsPage.image_download_success")
                                 );
                               } catch (error) {
                                 console.error(
-                                  t("post_details.image_download_error"),
+                                  t("postDetailsPage.image_download_error"),
                                   error
                                 );
                                 message.error(
-                                  t("post_details.image_download_error")
+                                  t("postDetailsPage.image_download_error")
                                 );
                               }
                             }}
@@ -477,23 +475,33 @@ export const PostDetailsPage = () => {
                       name="picture"
                       listType="picture"
                       accept="image/jpeg, image/png"
-                      maxCount={1}
+                      multiple
+                      fileList={fileList.map((file) => ({
+                        // @ts-ignore
+                        uid: file.uid || file.name,
+                        name: file.name,
+                        status: "done",
+                        url: URL.createObjectURL(file),
+                      }))}
                       beforeUpload={() => false}
                       onChange={handleFileChange}
                     >
                       <Button icon={<UploadOutlined />}>
-                        {t("post_details.select_file")}
+                        {t("postDetailsPage.select_file")}
                       </Button>
                     </Upload>
-                    {file && (
+
+                    {fileList.length ? (
                       <Button
                         className={styles.uploadConfirm}
                         type="primary"
                         onClick={handleUploadConfirm}
                         loading={isCreating}
                       >
-                        {t("post_details.upload_image")}
+                        {t("postDetailsPage.upload_image")}
                       </Button>
+                    ) : (
+                      ""
                     )}
                   </div>
 
@@ -521,7 +529,7 @@ export const PostDetailsPage = () => {
                               <Image
                                 src={post?.picture}
                                 className={styles.picture}
-                                alt={t("post_details.image_alt")}
+                                alt={t("postDetailsPage.image_alt")}
                               />
 
                               <Button
@@ -540,7 +548,7 @@ export const PostDetailsPage = () => {
                                   try {
                                     if (!post?.picture) {
                                       message.error(
-                                        t("post_details.image_not_found")
+                                        t("postDetailsPage.image_not_found")
                                       );
                                       return;
                                     }
@@ -553,7 +561,9 @@ export const PostDetailsPage = () => {
 
                                     if (!response.ok) {
                                       throw new Error(
-                                        t("post_details.image_download_error")
+                                        t(
+                                          "postDetailsPage.image_download_error"
+                                        )
                                       );
                                     }
 
@@ -569,15 +579,17 @@ export const PostDetailsPage = () => {
                                     document.body.removeChild(link);
                                     window.URL.revokeObjectURL(url);
                                     message.success(
-                                      t("post_details.image_download_success")
+                                      t(
+                                        "postDetailsPage.image_download_success"
+                                      )
                                     );
                                   } catch (error) {
                                     console.error(
-                                      t("post_details.image_download_error"),
+                                      t("postDetailsPage.image_download_error"),
                                       error
                                     );
                                     message.error(
-                                      t("post_details.image_download_error")
+                                      t("postDetailsPage.image_download_error")
                                     );
                                   }
                                 }}
@@ -594,7 +606,7 @@ export const PostDetailsPage = () => {
                       <div className={styles.postContent}>
                         <div className={styles.postContent__titleBlock}>
                           <Title level={3}>{post?.title}</Title>
-                          <Tooltip title={t("post_details.copy")}>
+                          <Tooltip title={t("postDetailsPage.copy")}>
                             <Button
                               className={styles.postContent__icon}
                               icon={<CopyOutlined />}
@@ -619,12 +631,12 @@ export const PostDetailsPage = () => {
                                     .then(
                                       () => {
                                         message.success(
-                                          t("post_details.copy_success")
+                                          t("postDetailsPage.copy_success")
                                         );
                                       },
                                       () => {
                                         message.error(
-                                          t("post_details.copy_error")
+                                          t("postDetailsPage.copy_error")
                                         );
                                       }
                                     );
@@ -652,7 +664,7 @@ export const PostDetailsPage = () => {
                           )}
                           onClick={handleUpdateLike}
                         />
-                        <Text>{t("post_details.add_to_favorites")}</Text>
+                        <Text>{t("postDetailsPage.add_to_favorites")}</Text>
                       </div>
                       <div className={styles.postActions}>
                         <Button
@@ -663,26 +675,26 @@ export const PostDetailsPage = () => {
                             )
                           }
                         >
-                          {t("post_details.edit")}
+                          {t("postDetailsPage.edit")}
                         </Button>
                         <Button
                           type="primary"
                           onClick={handleShowContentPlanSocialMediaListModal}
                         >
-                          {t("post_details.publish_now")}
+                          {t("postDetailsPage.publish_now")}
                         </Button>
                         <Button
                           type="primary"
                           onClick={handleShowContentPlanAddPostModal}
                         >
-                          {t("post_details.add_to_scheduler")}
+                          {t("postDetailsPage.add_to_scheduler")}
                         </Button>
                         <Button
                           htmlType="button"
                           type="default"
                           onClick={() => navigate(-1)}
                         >
-                          {t("post_details.cancel")}
+                          {t("postDetailsPage.cancel")}
                         </Button>
                       </div>
                     </div>
@@ -692,7 +704,7 @@ export const PostDetailsPage = () => {
                       <form onSubmit={handleSubmit(onSubmit)}>
                         <div className={styles.parameters}>
                           <Title level={4}>
-                            {t("post_details.image_parameters")}
+                            {t("postDetailsPage.image_parameters")}
                           </Title>
                           <Controller
                             control={control}
@@ -709,7 +721,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  {t("post_details.keep_image")}
+                                  {t("postDetailsPage.keep_image")}
                                 </Radio>
                                 <Radio
                                   value="newImage"
@@ -718,7 +730,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  {t("post_details.create_new_image")}
+                                  {t("postDetailsPage.create_new_image")}
                                 </Radio>
                                 <Radio
                                   value="newDescriptionImage"
@@ -728,7 +740,7 @@ export const PostDetailsPage = () => {
                                   }
                                 >
                                   {t(
-                                    "post_details.create_with_new_description"
+                                    "postDetailsPage.create_with_new_description"
                                   )}
                                 </Radio>
                               </Radio.Group>
@@ -748,7 +760,7 @@ export const PostDetailsPage = () => {
                                 }}
                               >
                                 <Title level={4}>
-                                  {t("post_details.image_style")}:{" "}
+                                  {t("postDetailsPage.image_style")}:{" "}
                                   {currentImgStyle?.name}
                                 </Title>
                                 <img
@@ -764,7 +776,7 @@ export const PostDetailsPage = () => {
                                     {...field}
                                     rows={6}
                                     placeholder={t(
-                                      "post_details.enter_image_description"
+                                      "postDetailsPage.enter_image_description"
                                     )}
                                     className={styles.textArea}
                                     disabled={
@@ -777,7 +789,7 @@ export const PostDetailsPage = () => {
                             </div>
                           )}
                           <Title level={4}>
-                            {t("post_details.text_parameters")}
+                            {t("postDetailsPage.text_parameters")}
                           </Title>
                           <Controller
                             control={control}
@@ -794,7 +806,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  {t("post_details.keep_text")}
+                                  {t("postDetailsPage.keep_text")}
                                 </Radio>
                                 <Radio
                                   value="newText"
@@ -803,7 +815,7 @@ export const PostDetailsPage = () => {
                                     isRecreatePostTextLoading
                                   }
                                 >
-                                  {t("post_details.create_new_text")}
+                                  {t("postDetailsPage.create_new_text")}
                                 </Radio>
                                 <Radio
                                   value="newDescriptionText"
@@ -813,7 +825,7 @@ export const PostDetailsPage = () => {
                                   }
                                 >
                                   {t(
-                                    "post_details.create_with_new_description"
+                                    "postDetailsPage.create_with_new_description"
                                   )}
                                 </Radio>
                               </Radio.Group>
@@ -828,7 +840,7 @@ export const PostDetailsPage = () => {
                                   {...field}
                                   rows={6}
                                   placeholder={t(
-                                    "post_details.enter_text_description"
+                                    "postDetailsPage.enter_text_description"
                                   )}
                                   className={styles.textArea}
                                   disabled={
@@ -855,7 +867,7 @@ export const PostDetailsPage = () => {
                             isRecreatePostTextLoading
                           }
                         >
-                          {t("post_details.submit_request")}
+                          {t("postDetailsPage.submit_request")}
                         </Button>
                       </form>
                     </div>

@@ -1,0 +1,22 @@
+{
+  "table": {
+    "title": "Заголовок",
+    "favorite": "В избранные",
+    "created_date": "Дата создания",
+    "actions": "Действия"
+  },
+  "fields": {
+    "post_type": "Тип поста",
+    "text_style": "Стилистика",
+    "lang": "Язык",
+    "content": "Описание"
+  },
+  "buttons": {
+    "recreate_request": "Повторить запрос"
+  },
+  "posts_title": "Посты:",
+  "errors": {
+    "invalid_date": "Неверная дата",
+    "no_posts": "Посты не найдены. Добавьте пост."
+  }
+}

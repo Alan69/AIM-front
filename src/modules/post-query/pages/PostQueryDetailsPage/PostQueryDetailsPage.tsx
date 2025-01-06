@@ -46,7 +46,7 @@ export const PostQueryDetailsPage = () => {
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: t("post_query_details.table.title"),
+      title: t("postQueryDetailsPage.table.title"),
       dataIndex: "post_name",
       key: "post_name",
       render: (text, record) => (
@@ -56,12 +56,12 @@ export const PostQueryDetailsPage = () => {
       width: isMobile ? 180 : "auto",
     },
     {
-      title: t("post_query_details.table.favorite"),
+      title: t("postQueryDetailsPage.table.favorite"),
       dataIndex: "post_like",
       key: "post_like",
     },
     {
-      title: t("post_query_details.table.created_date"),
+      title: t("postQueryDetailsPage.table.created_date"),
       dataIndex: "time_create",
       key: "time_create",
       render: (text, record) => (
@@ -69,7 +69,7 @@ export const PostQueryDetailsPage = () => {
       ),
     },
     {
-      title: t("post_query_details.table.actions"),
+      title: t("postQueryDetailsPage.table.actions"),
       dataIndex: "post_actions",
       key: "post_actions",
     },
@@ -77,13 +77,13 @@ export const PostQueryDetailsPage = () => {
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) {
-      return t("post_query_details.errors.invalid_date");
+      return t("postQueryDetailsPage.errors.invalid_date");
     }
 
     const date = new Date(dateString);
 
     if (isNaN(date.getTime())) {
-      return t("post_query_details.errors.invalid_date");
+      return t("postQueryDetailsPage.errors.invalid_date");
     }
 
     return new Intl.DateTimeFormat("ru-RU", {
@@ -160,24 +160,26 @@ export const PostQueryDetailsPage = () => {
             <div className={styles.postQueryDescr}>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("post_query_details.fields.post_type")}:
+                  {t("postQueryDetailsPage.fields.post_type")}:
                   {postQuery?.post_type?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("post_query_details.fields.text_style")}:
+                  {t("postQueryDetailsPage.fields.text_style")}:
                   {postQuery?.text_style?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("post_query_details.fields.lang")}:{postQuery?.lang?.name}
+                  {t("postQueryDetailsPage.fields.lang")}:
+                  {postQuery?.lang?.name}
                 </Title>
               </div>
               <div className={styles.postQueryDescr__title}>
                 <Title level={4}>
-                  {t("post_query_details.fields.content")}:{postQuery?.content}
+                  {t("postQueryDetailsPage.fields.content")}:
+                  {postQuery?.content}
                 </Title>
               </div>
               <Button
@@ -186,20 +188,20 @@ export const PostQueryDetailsPage = () => {
                 loading={isPostRecreating}
                 onClick={handleCreatePostQueryReplay}
               >
-                {t("post_query_details.buttons.recreate_request")}
+                {t("postQueryDetailsPage.buttons.recreate_request")}
               </Button>
             </div>
           </Content>
         </Layout>
         <Layout>
           <h2 className={styles.product__title}>
-            {t("post_query_details.posts_title")}
+            {t("postQueryDetailsPage.posts_title")}
           </h2>
           <Content>
             <div className={styles.postQueryDescr}>
               {!posts?.length ? (
                 <div style={{ paddingBottom: "12px" }}>
-                  <Text>{t("post_query_details.errors.no_posts")}</Text>
+                  <Text>{t("postQueryDetailsPage.errors.no_posts")}</Text>
                 </div>
               ) : (
                 <Table

@@ -9,6 +9,7 @@ import {
   Image,
   message,
   Space,
+  Carousel,
 } from "antd";
 import {
   PictureOutlined,
@@ -70,7 +71,7 @@ export const ContentPlanAddPostModal = ({
   isPostStorieNowLoading,
   handlePostNow,
   isPostPage = false,
-  selectedPostType,
+  selectedPostType = ContentPlanPostingType.POST,
 }: TProps) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
@@ -94,7 +95,7 @@ export const ContentPlanAddPostModal = ({
       if (minutes % 15 !== 0) {
         setSelectedTime(null);
         message.warning(
-          t("content_plan.content_plan_add_post_modal.time_invalid")
+          t("contentPlanPage.content_plan_add_post_modal.time_invalid")
         );
         return;
       }
@@ -174,6 +175,116 @@ export const ContentPlanAddPostModal = ({
     return current && current < moment().startOf("day");
   };
 
+  const renderMediaSlider = () => {
+    if (selectNewPost && "media" in selectNewPost && selectNewPost.media) {
+      if (Array.isArray(selectNewPost.media)) {
+        return (
+          <Carousel
+            arrows={selectNewPost.media.length > 1}
+            dots={selectNewPost.media.length > 1}
+            className="mediaSlider"
+            style={{
+              width: "250px",
+              maxWidth: "250px",
+              height: "250px",
+              overflow: "hidden",
+            }}
+          >
+            {selectNewPost.media.map((mediaItem, index) => {
+              const isVideo =
+                mediaItem.media.endsWith(".mp4") ||
+                mediaItem.media.endsWith(".webm");
+
+              return (
+                <div
+                  key={index}
+                  className="mediaItem"
+                  style={{
+                    width: "250px",
+                    height: "250px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  {isVideo ? (
+                    <video
+                      className="media"
+                      controls
+                      src={mediaItem.media}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    <Image
+                      src={mediaItem.media}
+                      className="media"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      alt={t(
+                        "contentPlanPage.content_plan_add_post_modal.image_alt"
+                      )}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </Carousel>
+        );
+      } else {
+        const mediaItem = selectNewPost;
+        const isVideo =
+          mediaItem.media.endsWith(".mp4") || mediaItem.media.endsWith(".webm");
+
+        return (
+          <div
+            className="mediaItem"
+            style={{
+              width: "250px",
+              height: "250px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden",
+            }}
+          >
+            {isVideo ? (
+              <video
+                className="media"
+                controls
+                src={mediaItem.media}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <Image
+                src={mediaItem.media}
+                className="media"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+                alt={t("contentPlanPage.content_plan_add_post_modal.image_alt")}
+              />
+            )}
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (
@@ -189,7 +300,7 @@ export const ContentPlanAddPostModal = ({
 
         if (now.isAfter(selectedDateTime)) {
           message.warning(
-            t("content_plan.content_plan_add_post_modal.time_passed")
+            t("contentPlanPage.content_plan_add_post_modal.time_passed")
           );
           setSelectedTime(null);
         }
@@ -211,8 +322,8 @@ export const ContentPlanAddPostModal = ({
     <Modal
       title={
         isPostPage
-          ? t("content_plan.content_plan_add_post_modal.scheduler_title")
-          : t("content_plan.content_plan_add_post_modal.add_content_title")
+          ? t("contentPlanPage.content_plan_add_post_modal.scheduler_title")
+          : t("contentPlanPage.content_plan_add_post_modal.add_content_title")
       }
       open={isModalOpen}
       onOk={() => setIsModalOpen(false)}
@@ -252,7 +363,7 @@ export const ContentPlanAddPostModal = ({
                 isPostStorieNowLoading
               }
             >
-              {t("content_plan.content_plan_add_post_modal.publish_now")}
+              {t("contentPlanPage.content_plan_add_post_modal.publish_now")}
             </Button>
           )}
           <Button
@@ -276,7 +387,7 @@ export const ContentPlanAddPostModal = ({
             }
             loading={isAddingToSchedulers}
           >
-            {t("content_plan.content_plan_add_post_modal.add_to_scheduler")}
+            {t("contentPlanPage.content_plan_add_post_modal.add_to_scheduler")}
           </Button>
           {isPostPage ? (
             ""
@@ -290,7 +401,7 @@ export const ContentPlanAddPostModal = ({
                 width: isMobile ? "100%" : "33.33%",
               }}
             >
-              {t("content_plan.content_plan_add_post_modal.draft")}
+              {t("contentPlanPage.content_plan_add_post_modal.draft")}
             </Button>
           )}
         </Button.Group>,
@@ -312,7 +423,7 @@ export const ContentPlanAddPostModal = ({
                   : ""
               )}
             >
-              {t("content_plan.content_plan_add_post_modal.post")}
+              {t("contentPlanPage.content_plan_add_post_modal.post")}
             </Button>
             <Button
               icon={<VideoCameraOutlined />}
@@ -324,7 +435,7 @@ export const ContentPlanAddPostModal = ({
                   : ""
               )}
             >
-              {t("content_plan.content_plan_add_post_modal.reels")}
+              {t("contentPlanPage.content_plan_add_post_modal.reels")}
             </Button>
             <Button
               icon={<PlayCircleOutlined />}
@@ -336,7 +447,7 @@ export const ContentPlanAddPostModal = ({
                   : ""
               )}
             >
-              {t("content_plan.content_plan_add_post_modal.stories")}
+              {t("contentPlanPage.content_plan_add_post_modal.stories")}
             </Button>
           </div>
           <Divider />
@@ -348,22 +459,7 @@ export const ContentPlanAddPostModal = ({
                   styles.selectNewPost,
                   styles.selectNewPost__isActive
                 )}
-                avatar={
-                  selectNewPost && "picture" in selectNewPost ? (
-                    <Image
-                      width={160}
-                      height={160}
-                      src={selectNewPost.picture}
-                    />
-                  ) : null
-                }
-                title={
-                  <Title level={5}>
-                    {selectNewPost && "title" in selectNewPost
-                      ? selectNewPost?.title
-                      : ""}
-                  </Title>
-                }
+                avatar={renderMediaSlider()}
                 description={
                   <>
                     <Paragraph
@@ -382,9 +478,11 @@ export const ContentPlanAddPostModal = ({
                         onClick={() => setExpandedKeys(!expandedKeys)}
                       >
                         {expandedKeys
-                          ? t("content_plan.content_plan_add_post_modal.hide")
+                          ? t(
+                              "contentPlanPage.content_plan_add_post_modal.hide"
+                            )
                           : t(
-                              "content_plan.content_plan_add_post_modal.expand"
+                              "contentPlanPage.content_plan_add_post_modal.expand"
                             )}
                       </Button>
                     </div>
@@ -400,7 +498,7 @@ export const ContentPlanAddPostModal = ({
         onClick={handleShowContentPlanSocialMediaListModal}
         className={styles.socialMediaAddBtn}
       >
-        {t("content_plan.content_plan_add_post_modal.add_social_media")}
+        {t("contentPlanPage.content_plan_add_post_modal.add_social_media")}
       </Button>
 
       {selectedNewSocialMedias.length > 0 ? (
@@ -426,7 +524,7 @@ export const ContentPlanAddPostModal = ({
           ))}
         </div>
       ) : null}
-      <Space direction="vertical">
+      <Space>
         <div className={styles.dateTimeBlock}>
           <DatePicker
             className={styles.datePicker}
@@ -436,9 +534,8 @@ export const ContentPlanAddPostModal = ({
             value={selectedDate}
             format="DD-MM-YYYY"
             placeholder={t(
-              "content_plan.content_plan_add_post_modal.choose_date"
+              "contentPlanPage.content_plan_add_post_modal.choose_date"
             )}
-            variant="outlined"
           />
           <TimePicker
             className={styles.timePicker}
@@ -457,7 +554,7 @@ export const ContentPlanAddPostModal = ({
               };
             }}
             placeholder={t(
-              "content_plan.content_plan_add_post_modal.choose_time"
+              "contentPlanPage.content_plan_add_post_modal.choose_time"
             )}
             showNow={false}
             onOpenChange={(open) => {

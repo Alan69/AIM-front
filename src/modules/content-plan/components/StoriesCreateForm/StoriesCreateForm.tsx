@@ -30,7 +30,9 @@ export const StoriesCreateForm = ({
 
     if (isImage) {
       if (file.size / 1024 / 1024 > 8) {
-        message.error(t("content_plan.stories_create_form.error_image_size"));
+        message.error(
+          t("contentPlanPage.stories_create_form.error_image_size")
+        );
         return false;
       }
       return true;
@@ -38,13 +40,15 @@ export const StoriesCreateForm = ({
 
     if (isVideo) {
       if (file.size / 1024 / 1024 > 100) {
-        message.error(t("content_plan.stories_create_form.error_video_size"));
+        message.error(
+          t("contentPlanPage.stories_create_form.error_video_size")
+        );
         return false;
       }
       return true;
     }
 
-    message.error(t("content_plan.stories_create_form.error_file_format"));
+    message.error(t("contentPlanPage.stories_create_form.error_file_format"));
     return false;
   };
 
@@ -88,7 +92,7 @@ export const StoriesCreateForm = ({
                   ) : (
                     <Image
                       src={storie?.media}
-                      alt={t("content_plan.stories_create_form.image_alt")}
+                      alt={t("contentPlanPage.stories_create_form.image_alt")}
                       className={styles.mediaImage}
                     />
                   )}
@@ -102,12 +106,12 @@ export const StoriesCreateForm = ({
               <Form layout="vertical" onFinish={onFinish}>
                 <Form.Item
                   name="media"
-                  label={t("content_plan.stories_create_form.upload_image")}
+                  label={t("contentPlanPage.stories_create_form.upload_image")}
                   rules={[
                     {
                       required: true,
                       message: t(
-                        "content_plan.stories_create_form.validation_video_required"
+                        "contentPlanPage.stories_create_form.validation_video_required"
                       ),
                     },
                   ]}
@@ -121,7 +125,7 @@ export const StoriesCreateForm = ({
                     onChange={handleFileChange}
                   >
                     <Button icon={<UploadOutlined />}>
-                      {t("content_plan.stories_create_form.select_file")}
+                      {t("contentPlanPage.stories_create_form.select_file")}
                     </Button>
                   </Upload>
                 </Form.Item>
@@ -133,7 +137,7 @@ export const StoriesCreateForm = ({
                     loading={isCustomStoriesCreating}
                     block
                   >
-                    {t("content_plan.stories_create_form.create_stories")}
+                    {t("contentPlanPage.stories_create_form.create_stories")}
                   </Button>
                 </Form.Item>
               </Form>

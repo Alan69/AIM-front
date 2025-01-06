@@ -38,7 +38,7 @@ const ChatButtonWithForm: React.FC = () => {
       setPhoneNumber("+7");
       setIsModalVisible(false);
     } catch (error) {
-      message.error(t("chat_button.form.error_message"));
+      message.error(t("chatButton.form.error_message"));
     }
   };
 
@@ -76,7 +76,7 @@ const ChatButtonWithForm: React.FC = () => {
       <Modal
         title={
           <Title level={2} style={{ textAlign: "center" }}>
-            {t("chat_button.modal_title")}
+            {t("chatButton.modal_title")}
           </Title>
         }
         open={isModalVisible}
@@ -85,7 +85,7 @@ const ChatButtonWithForm: React.FC = () => {
         className={styles.chatModal}
       >
         <div className={styles.chatForm}>
-          <h3>{t("chat_button.form_title")}</h3>
+          <h3>{t("chatButton.form_title")}</h3>
 
           <Form
             form={form}
@@ -95,33 +95,33 @@ const ChatButtonWithForm: React.FC = () => {
             initialValues={{ phone_number: phoneNumber }}
           >
             <Form.Item
-              label={t("chat_button.form.name_label")}
+              label={t("chatButton.form.name_label")}
               name="name"
               rules={[
-                { required: true, message: t("chat_button.form.name_error") },
+                { required: true, message: t("chatButton.form.name_error") },
               ]}
             >
-              <Input placeholder={t("chat_button.form.name_placeholder")} />
+              <Input placeholder={t("chatButton.form.name_placeholder")} />
             </Form.Item>
 
             <Form.Item
-              label={t("chat_button.form.phone_label")}
+              label={t("chatButton.form.phone_label")}
               name="phone_number"
               rules={[
                 {
                   required: true,
-                  message: t("chat_button.form.phone_error"),
+                  message: t("chatButton.form.phone_error"),
                 },
                 {
                   pattern: /^\+7\d{10}$/,
-                  message: t("chat_button.form.phone_format_error"),
+                  message: t("chatButton.form.phone_format_error"),
                 },
               ]}
             >
               <Input
                 value={phoneNumber}
                 onChange={handlePhoneNumberChange}
-                placeholder={t("chat_button.form.phone_placeholder")}
+                placeholder={t("chatButton.form.phone_placeholder")}
                 maxLength={12}
               />
             </Form.Item>
@@ -133,7 +133,7 @@ const ChatButtonWithForm: React.FC = () => {
                 block
                 loading={isLoading}
               >
-                {t("chat_button.form.submit_button")}
+                {t("chatButton.form.submit_button")}
               </Button>
             </Form.Item>
           </Form>

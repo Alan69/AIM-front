@@ -1,0 +1,11 @@
+{
+  "title": "История создания сценарии",
+  "columns": {
+    "product": "Продукт",
+    "scenario_type": "Вид контента",
+    "scenario_theme": "Тематика сценария",
+    "date": "Дата создания"
+  },
+  "create_button": "Создать",
+  "locale": "ru-RU"
+}

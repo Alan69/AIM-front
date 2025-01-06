@@ -85,7 +85,7 @@ export type TPostMediaData = {
 
 export type TCreatePostImage = {
   post: string | undefined;
-  media: File;
+  media: File[];
 }
 
 export type TCreatePostImageResponse = {
@@ -254,8 +254,10 @@ export const postApi = baseApi.injectEndpoints({
         const formData = new FormData();
         if (post) formData.append('post', post);
 
-        if (media) {
-          formData.append('media', media);
+        if (media && media.length > 0) {
+          media.forEach((file) => {
+            formData.append('media', file); 
+          });
         }
     
         return {

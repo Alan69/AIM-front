@@ -1,0 +1,18 @@
+{
+  "title": "Sign Up",
+  "email_placeholder": "Email",
+  "phone_placeholder": "Phone number",
+  "password_placeholder": "Password",
+  "confirm_password_placeholder": "Confirm password",
+  "submit_button": "Create account",
+  "email_required": "Please enter your email!",
+  "email_invalid": "Invalid email format!",
+  "phone_required": "Please enter your phone number!",
+  "phone_invalid": "Phone number must be in the format +7XXXXXXXXXX.",
+  "password_required": "Please enter a password!",
+  "password_invalid": "Password must contain at least 8 characters, two numbers, and one special character.",
+  "password_mismatch": "Passwords do not match!",
+  "success_message": "Registration successful! Please log in.",
+  "error_message": "Registration failed. Please check your input data.",
+  "login_link": "Already have an account?"
+}

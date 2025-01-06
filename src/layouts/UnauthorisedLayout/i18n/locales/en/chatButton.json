@@ -1,0 +1,16 @@
+{
+  "modal_title": "Need consultation?",
+  "form_title": "Leave a request and we will contact you",
+  "form": {
+    "name_label": "Name",
+    "name_placeholder": "Enter your name",
+    "phone_label": "Phone number",
+    "phone_placeholder": "Enter your phone number",
+    "phone_error": "Please enter your phone number",
+    "phone_format_error": "Enter a valid phone number in the format +7XXXXXXXXXX",
+    "submit_button": "Get consultation",
+    "name_error": "Please enter your name",
+    "error_message": "Failed to send the message. Please try again.",
+    "success_message": "Your message has been sent successfully!"
+  }
+}

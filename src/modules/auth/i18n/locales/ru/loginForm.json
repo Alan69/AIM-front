@@ -1,0 +1,10 @@
+{
+  "title": "Авторизация",
+  "email_placeholder": "Логин",
+  "password_placeholder": "Пароль",
+  "submit_button": "Войти",
+  "login_error": "Вход не удался. Пожалуйста, проверьте свои учетные данные.",
+  "registration_link": "Регистрация аккаунта",
+  "forgot_password_link": "Забыли пароль?",
+  "login_success": "Авторизация прошла успешно!"
+}

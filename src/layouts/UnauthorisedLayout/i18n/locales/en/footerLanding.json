@@ -1,0 +1,20 @@
+{
+  "columns": {
+    "blog": "Blog",
+    "latest_generations": "Latest generations",
+    "terms_of_use": "Terms of use",
+    "reviews": "Reviews",
+    "follow_us": "Follow our news and updates",
+    "contact_us": {
+      "title": "For any questions, write to us",
+      "email": "info@aimmagic.com"
+    }
+  },
+  "bottom": {
+    "text": "© 2024 AIM - helping businesses thrive. All rights reserved.",
+    "links": {
+      "agreement": "Terms of agreement",
+      "privacy_policy": "Privacy policy"
+    }
+  }
+}

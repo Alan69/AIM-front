@@ -87,13 +87,13 @@ export const ScenarioQueriesCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("scenario_queries_create.title")}</h1>
+        <h1 className="main-title">{t("scenarioQueriesCreatePage.title")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label={t("scenario_queries_create.company")}
+            label={t("scenarioQueriesCreatePage.company")}
             validateStatus={errors.company ? "error" : ""}
             help={
-              errors.company && t("scenario_queries_create.errors.required")
+              errors.company && t("scenarioQueriesCreatePage.errors.required")
             }
           >
             <Controller
@@ -117,12 +117,12 @@ export const ScenarioQueriesCreatePage = () => {
             />
             {!current_company?.id && (
               <div className={styles.noContent}>
-                {t("scenario_queries_create.no_company")}
+                {t("scenarioQueriesCreatePage.no_company")}
               </div>
             )}
           </Form.Item>
 
-          <Form.Item label={t("scenario_queries_create.product")}>
+          <Form.Item label={t("scenarioQueriesCreatePage.product")}>
             <Controller
               name="product"
               control={control}
@@ -144,11 +144,11 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenario_queries_create.scenario_type")}
+            label={t("scenarioQueriesCreatePage.scenario_type")}
             validateStatus={errors.scenario_type ? "error" : ""}
             help={
               errors.scenario_type &&
-              t("scenario_queries_create.errors.required")
+              t("scenarioQueriesCreatePage.errors.required")
             }
           >
             <Controller
@@ -169,11 +169,11 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenario_queries_create.scenario_theme")}
+            label={t("scenarioQueriesCreatePage.scenario_theme")}
             validateStatus={errors.scenario_theme ? "error" : ""}
             help={
               errors.scenario_theme &&
-              t("scenario_queries_create.errors.required")
+              t("scenarioQueriesCreatePage.errors.required")
             }
           >
             <Controller
@@ -194,10 +194,10 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenario_queries_create.language")}
+            label={t("scenarioQueriesCreatePage.language")}
             validateStatus={errors.language ? "error" : ""}
             help={
-              errors.language && t("scenario_queries_create.errors.required")
+              errors.language && t("scenarioQueriesCreatePage.errors.required")
             }
           >
             <Controller
@@ -227,10 +227,10 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenario_queries_create.latency")}
+            label={t("scenarioQueriesCreatePage.latency")}
             validateStatus={errors.latency ? "error" : ""}
             help={
-              errors.latency && t("scenario_queries_create.errors.required")
+              errors.latency && t("scenarioQueriesCreatePage.errors.required")
             }
           >
             <Controller
@@ -240,19 +240,19 @@ export const ScenarioQueriesCreatePage = () => {
               render={({ field }) => (
                 <Select {...field} disabled={isScenarioCreating}>
                   <Select.Option value={15}>
-                    15 {t("scenario_queries_create.seconds")}
+                    15 {t("scenarioQueriesCreatePage.seconds")}
                   </Select.Option>
                   <Select.Option value={30}>
-                    30 {t("scenario_queries_create.seconds")}
+                    30 {t("scenarioQueriesCreatePage.seconds")}
                   </Select.Option>
                   <Select.Option value={45}>
-                    45 {t("scenario_queries_create.seconds")}
+                    45 {t("scenarioQueriesCreatePage.seconds")}
                   </Select.Option>
                   <Select.Option value={60}>
-                    60 {t("scenario_queries_create.seconds")}
+                    60 {t("scenarioQueriesCreatePage.seconds")}
                   </Select.Option>
                   <Select.Option value={90}>
-                    90 {t("scenario_queries_create.seconds")}
+                    90 {t("scenarioQueriesCreatePage.seconds")}
                   </Select.Option>
                 </Select>
               )}
@@ -260,10 +260,11 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenario_queries_create.description")}
+            label={t("scenarioQueriesCreatePage.description")}
             validateStatus={errors.description ? "error" : ""}
             help={
-              errors.description && t("scenario_queries_create.errors.required")
+              errors.description &&
+              t("scenarioQueriesCreatePage.errors.required")
             }
           >
             <Controller
@@ -286,7 +287,7 @@ export const ScenarioQueriesCreatePage = () => {
               htmlType="submit"
               loading={isScenarioCreating}
             >
-              {t("scenario_queries_create.submit_button")}
+              {t("scenarioQueriesCreatePage.submit_button")}
             </Button>
           </Form.Item>
         </Form>

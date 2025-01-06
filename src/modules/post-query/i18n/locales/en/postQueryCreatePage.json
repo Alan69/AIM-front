@@ -1,0 +1,16 @@
+{
+  "title": "Create Post",
+  "fields": {
+    "company": "Company",
+    "product": "Product",
+    "post_type": "Post Type",
+    "text_style": "Text Style",
+    "lang": "Language",
+    "content": "Description"
+  },
+  "errors": {
+    "required": "This field is required"
+  },
+  "no_company": "If the field is empty, you can select or add a current company in the left menu.",
+  "submit_button": "Submit Request"
+}

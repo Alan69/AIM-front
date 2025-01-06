@@ -40,7 +40,7 @@ export const PostUpdatePage = () => {
       if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
         setFile(lastFile.originFileObj);
       } else {
-        message.error(t("post_update.invalid_file_type"));
+        message.error(t("postUpdatePage.invalid_file_type"));
       }
     } else {
       setFile(null);
@@ -68,7 +68,7 @@ export const PostUpdatePage = () => {
           refetch()
             .unwrap()
             .then(() => {
-              message.success(t("post_update.update_success"));
+              message.success(t("postUpdatePage.update_success"));
             });
         });
     }
@@ -88,7 +88,7 @@ export const PostUpdatePage = () => {
                     <Image
                       src={post?.picture}
                       className={styles.picture}
-                      alt={t("post_update.image_alt")}
+                      alt={t("postUpdatePage.image_alt")}
                     />
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export const PostUpdatePage = () => {
                 >
                   <Form.Item
                     name="picture"
-                    label={t("post_update.upload_image")}
+                    label={t("postUpdatePage.upload_image")}
                   >
                     <Upload
                       name="picture"
@@ -116,28 +116,31 @@ export const PostUpdatePage = () => {
                       onChange={handleFileChange}
                     >
                       <Button icon={<UploadOutlined />}>
-                        {t("post_update.select_file")}
+                        {t("postUpdatePage.select_file")}
                       </Button>
                     </Upload>
                   </Form.Item>
 
-                  <Form.Item name="title" label={t("post_update.title")}>
+                  <Form.Item name="title" label={t("postUpdatePage.title")}>
                     <Input />
                   </Form.Item>
 
                   <Form.Item
                     name="main_text"
-                    label={t("post_update.main_text")}
+                    label={t("postUpdatePage.main_text")}
                   >
                     <Input.TextArea rows={8} />
                   </Form.Item>
 
-                  <Form.Item name="hashtags" label={t("post_update.hashtags")}>
+                  <Form.Item
+                    name="hashtags"
+                    label={t("postUpdatePage.hashtags")}
+                  >
                     <Input.TextArea rows={4} />
                   </Form.Item>
 
                   <Form.Item name="like" valuePropName="checked">
-                    <Checkbox>{t("post_update.add_to_favorites")}</Checkbox>
+                    <Checkbox>{t("postUpdatePage.add_to_favorites")}</Checkbox>
                   </Form.Item>
 
                   <Form.Item>
@@ -147,7 +150,7 @@ export const PostUpdatePage = () => {
                         htmlType="submit"
                         loading={isUpdating}
                       >
-                        {t("post_update.buttons.save")}
+                        {t("postUpdatePage.buttons.save")}
                       </Button>
                       <Button
                         htmlType="button"
@@ -155,7 +158,7 @@ export const PostUpdatePage = () => {
                         onClick={() => navigate(-1)}
                         loading={isUpdating}
                       >
-                        {t("post_update.buttons.cancel")}
+                        {t("postUpdatePage.buttons.cancel")}
                       </Button>
                     </div>
                   </Form.Item>

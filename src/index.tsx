@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./custom-slider.scss";
+import "./сustom-slider.scss";
+import "./tariff-slider.scss";
 import "./index.css";
 import "./page-layout.scss";
 import { BrowserRouter } from "react-router-dom";

@@ -42,12 +42,12 @@ export const ReelsCreateForm = ({
       const isSizeValid = file.size / 1024 / 1024 < 100;
 
       if (!isTypeValid) {
-        message.error(t("content_plan.reel_create_form.error_file_format"));
+        message.error(t("contentPlanPage.reel_create_form.error_file_format"));
         return false;
       }
 
       if (!isSizeValid) {
-        message.error(t("content_plan.reel_create_form.error_file_size"));
+        message.error(t("contentPlanPage.reel_create_form.error_file_size"));
         return false;
       }
       return true;
@@ -56,7 +56,7 @@ export const ReelsCreateForm = ({
     if (!isValid) return;
 
     if (files.length > 10) {
-      message.error(t("content_plan.reel_create_form.error_max_files"));
+      message.error(t("contentPlanPage.reel_create_form.error_max_files"));
       return;
     }
 
@@ -99,7 +99,7 @@ export const ReelsCreateForm = ({
                         <Image
                           key={mediaItem.id}
                           src={mediaItem.media}
-                          alt={t("content_plan.reel_create_form.image_alt")}
+                          alt={t("contentPlanPage.reel_create_form.image_alt")}
                           className={styles.mediaImage}
                         />
                       );
@@ -124,12 +124,12 @@ export const ReelsCreateForm = ({
               <Form layout="vertical" onFinish={onFinish}>
                 <Form.Item
                   name="media"
-                  label={t("content_plan.reel_create_form.upload_image")}
+                  label={t("contentPlanPage.reel_create_form.upload_image")}
                   rules={[
                     {
                       required: true,
                       message: t(
-                        "content_plan.reel_create_form.validation_video_required"
+                        "contentPlanPage.reel_create_form.validation_video_required"
                       ),
                     },
                   ]}
@@ -143,25 +143,25 @@ export const ReelsCreateForm = ({
                     onChange={handleFileChange}
                   >
                     <Button icon={<UploadOutlined />}>
-                      {t("content_plan.reel_create_form.select_files")}
+                      {t("contentPlanPage.reel_create_form.select_files")}
                     </Button>
                   </Upload>
                 </Form.Item>
 
                 <Form.Item
                   name="title"
-                  label={t("content_plan.reel_create_form.title")}
+                  label={t("contentPlanPage.reel_create_form.title")}
                   rules={[
                     {
                       required: true,
                       message: t(
-                        "content_plan.reel_create_form.validation_title_required"
+                        "contentPlanPage.reel_create_form.validation_title_required"
                       ),
                     },
                     {
                       min: 3,
                       message: t(
-                        "content_plan.reel_create_form.validation_title_length"
+                        "contentPlanPage.reel_create_form.validation_title_length"
                       ),
                     },
                   ]}
@@ -171,12 +171,12 @@ export const ReelsCreateForm = ({
 
                 <Form.Item
                   name="main_text"
-                  label={t("content_plan.reel_create_form.main_text")}
+                  label={t("contentPlanPage.reel_create_form.main_text")}
                   rules={[
                     {
                       required: true,
                       message: t(
-                        "content_plan.reel_create_form.validation_main_text_required"
+                        "contentPlanPage.reel_create_form.validation_main_text_required"
                       ),
                     },
                   ]}
@@ -186,12 +186,12 @@ export const ReelsCreateForm = ({
 
                 <Form.Item
                   name="hashtags"
-                  label={t("content_plan.reel_create_form.hashtags")}
+                  label={t("contentPlanPage.reel_create_form.hashtags")}
                   rules={[
                     {
                       required: true,
                       message: t(
-                        "content_plan.reel_create_form.validation_hashtags_required"
+                        "contentPlanPage.reel_create_form.validation_hashtags_required"
                       ),
                     },
                   ]}
@@ -206,7 +206,7 @@ export const ReelsCreateForm = ({
                     loading={isCustomReelCreating}
                     block
                   >
-                    {t("content_plan.reel_create_form.create_reel")}
+                    {t("contentPlanPage.reel_create_form.create_reel")}
                   </Button>
                 </Form.Item>
               </Form>

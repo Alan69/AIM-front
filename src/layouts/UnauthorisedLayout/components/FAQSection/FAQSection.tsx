@@ -15,14 +15,14 @@ export const FAQSection: React.FC = () => {
     setActiveKey(key);
   };
 
-  const faqData = t("faq.items", { returnObjects: true }) as {
+  const faqData = t("faqSection.items", { returnObjects: true }) as {
     question: string;
     answer: string;
   }[];
 
   return (
     <section className={styles.section} id="FAQSection">
-      <h2 className={styles.title}>{t("faq.title")}</h2>
+      <h2 className={styles.title}>{t("faqSection.title")}</h2>
       <Collapse
         accordion
         className={styles.accordion}

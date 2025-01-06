@@ -1,0 +1,15 @@
+{
+  "title": "Add Product",
+  "fields": {
+    "name": "Name",
+    "scope": "Scope",
+    "comment": "Description"
+  },
+  "errors": {
+    "required": "This field is required"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

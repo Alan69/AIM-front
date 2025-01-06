@@ -61,21 +61,21 @@ export const SocialMediaAddPage = () => {
         })
         .catch((err: string) => {
           message.error(
-            t("social_media_add.error", {
+            t("socialMediaAddPage.error", {
               name: item.name.charAt(0).toUpperCase() + item.name.slice(1),
               error: err,
             })
           );
         });
     } else {
-      message.error(t("social_media_add.not_available"));
+      message.error(t("socialMediaAddPage.not_available"));
     }
   };
 
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("social_media_add.title")}</h1>
+        <h1 className="main-title">{t("socialMediaAddPage.title")}</h1>
         <Layout>
           <Content className={styles.wrapper}>
             <div className={styles.list}>
@@ -86,7 +86,7 @@ export const SocialMediaAddPage = () => {
                   onClick={() => handleAddSocialMedia(item)}
                 >
                   <Title level={4} className={styles.list__item__title}>
-                    {t(`social_media_add.platforms.${item.name}`)}
+                    {t(`socialMediaAddPage.platforms.${item.name}`)}
                   </Title>
                   <img src={item.icon} alt={item.name} />
                 </div>
@@ -99,7 +99,7 @@ export const SocialMediaAddPage = () => {
               type="default"
               onClick={() => navigate(-1)}
             >
-              {t("social_media_add.back_button")}
+              {t("socialMediaAddPage.back_button")}
             </Button>
           </Content>
         </Layout>

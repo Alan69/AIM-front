@@ -1,0 +1,22 @@
+{
+  "table": {
+    "title": "Title",
+    "favorite": "Add to favorites",
+    "created_date": "Creation date",
+    "actions": "Actions"
+  },
+  "fields": {
+    "post_type": "Post type",
+    "text_style": "Text style",
+    "lang": "Language",
+    "content": "Description"
+  },
+  "buttons": {
+    "recreate_request": "Recreate request"
+  },
+  "posts_title": "Posts:",
+  "errors": {
+    "invalid_date": "Invalid date",
+    "no_posts": "No posts found. Add a post."
+  }
+}

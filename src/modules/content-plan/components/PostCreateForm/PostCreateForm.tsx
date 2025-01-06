@@ -45,12 +45,12 @@ export const PostCreateForm = ({
 
     const isValid = files.every((file: File) => validTypes.includes(file.type));
     if (!isValid) {
-      message.error(t("content_plan.post_create_form.error_file_format"));
+      message.error(t("contentPlanPage.post_create_form.error_file_format"));
       return;
     }
 
     if (files.length > 10) {
-      message.error(t("content_plan.post_create_form.error_max_files"));
+      message.error(t("contentPlanPage.post_create_form.error_max_files"));
       return;
     }
 
@@ -89,7 +89,9 @@ export const PostCreateForm = ({
                             key={media.id}
                             src={media.media}
                             className={styles.picture}
-                            alt={t("content_plan.post_create_form.image_alt")}
+                            alt={t(
+                              "contentPlanPage.post_create_form.image_alt"
+                            )}
                           />
                         )
                       )
@@ -104,7 +106,7 @@ export const PostCreateForm = ({
                       <Image
                         src={post?.picture}
                         className={styles.picture}
-                        alt={t("content_plan.post_create_form.image_alt")}
+                        alt={t("contentPlanPage.post_create_form.image_alt")}
                       />
                     )}
                   </div>
@@ -126,7 +128,7 @@ export const PostCreateForm = ({
               <Form layout="vertical" onFinish={onFinish}>
                 <Form.Item
                   name="media_files"
-                  label={t("content_plan.post_create_form.upload_file")}
+                  label={t("contentPlanPage.post_create_form.upload_file")}
                 >
                   <Upload
                     name="media_files"
@@ -137,28 +139,28 @@ export const PostCreateForm = ({
                     onChange={handleFileChange}
                   >
                     <Button icon={<UploadOutlined />}>
-                      {t("content_plan.post_create_form.select_files")}
+                      {t("contentPlanPage.post_create_form.select_files")}
                     </Button>
                   </Upload>
                 </Form.Item>
 
                 <Form.Item
                   name="title"
-                  label={t("content_plan.post_create_form.title")}
+                  label={t("contentPlanPage.post_create_form.title")}
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
                   name="main_text"
-                  label={t("content_plan.post_create_form.main_text")}
+                  label={t("contentPlanPage.post_create_form.main_text")}
                 >
                   <Input.TextArea rows={8} />
                 </Form.Item>
 
                 <Form.Item
                   name="hashtags"
-                  label={t("content_plan.post_create_form.hashtags")}
+                  label={t("contentPlanPage.post_create_form.hashtags")}
                 >
                   <Input.TextArea rows={4} />
                 </Form.Item>
@@ -170,7 +172,7 @@ export const PostCreateForm = ({
                     loading={isCustomPostCreating}
                     block
                   >
-                    {t("content_plan.post_create_form.create_post")}
+                    {t("contentPlanPage.post_create_form.create_post")}
                   </Button>
                 </Form.Item>
               </Form>

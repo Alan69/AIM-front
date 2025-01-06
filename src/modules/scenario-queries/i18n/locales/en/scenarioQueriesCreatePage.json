@@ -1,0 +1,16 @@
+{
+  "title": "Create Scenario",
+  "company": "Company",
+  "no_company": "(If this field is empty, you can select or add the current company in the menu on the left)",
+  "product": "Product",
+  "scenario_type": "Scenario Type",
+  "scenario_theme": "Scenario Theme",
+  "language": "Language",
+  "latency": "Duration",
+  "seconds": "seconds",
+  "description": "Description",
+  "errors": {
+    "required": "This field is required"
+  },
+  "submit_button": "Submit Query"
+}

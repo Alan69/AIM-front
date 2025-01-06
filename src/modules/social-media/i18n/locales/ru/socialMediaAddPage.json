@@ -1,0 +1,18 @@
+{
+  "title": "Добавление социальной сети",
+  "error": "Ошибка добавления {{name}}: {{error}}",
+  "not_available": "Интеграция с социальной сетью недоступна.",
+  "back_button": "Назад",
+  "platforms": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "linkedin": "LinkedIn",
+    "reddit": "Reddit",
+    "snapchat": "Snapchat",
+    "telegram": "Telegram",
+    "tiktok": "TikTok",
+    "tumblr": "Tumblr",
+    "twitter": "Twitter",
+    "vk": "VK"
+  }
+}

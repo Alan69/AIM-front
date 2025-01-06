@@ -74,7 +74,7 @@ export const CompanyUpdatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("company_update.title")}</h1>
+        <h1 className="main-title">{t("companyUpdatePage.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -84,9 +84,9 @@ export const CompanyUpdatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label={t("company_update.fields.name")}
+                  label={t("companyUpdatePage.fields.name")}
                   validateStatus={errors.name ? "error" : ""}
-                  help={errors.name && t("company_update.errors.required")}
+                  help={errors.name && t("companyUpdatePage.errors.required")}
                 >
                   <Controller
                     name="name"
@@ -97,9 +97,9 @@ export const CompanyUpdatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={t("company_update.fields.scope")}
+                  label={t("companyUpdatePage.fields.scope")}
                   validateStatus={errors.scope ? "error" : ""}
-                  help={errors.scope && t("company_update.errors.required")}
+                  help={errors.scope && t("companyUpdatePage.errors.required")}
                 >
                   <Controller
                     name="scope"
@@ -109,7 +109,7 @@ export const CompanyUpdatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label={t("company_update.fields.description")}>
+                <Form.Item label={t("companyUpdatePage.fields.description")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -123,7 +123,7 @@ export const CompanyUpdatePage = () => {
                       htmlType="submit"
                       loading={isUpdating}
                     >
-                      {t("company_update.buttons.save")}
+                      {t("companyUpdatePage.buttons.save")}
                     </Button>
                     <Button
                       type="default"
@@ -132,7 +132,7 @@ export const CompanyUpdatePage = () => {
                       }}
                       loading={isUpdating}
                     >
-                      {t("company_update.buttons.cancel")}
+                      {t("companyUpdatePage.buttons.cancel")}
                     </Button>
                   </div>
                 </Form.Item>

@@ -1,0 +1,10 @@
+{
+  "title": "Login",
+  "email_placeholder": "Username",
+  "password_placeholder": "Password",
+  "submit_button": "Login",
+  "login_error": "Login failed. Please check your credentials.",
+  "registration_link": "Sign up",
+  "forgot_password_link": "Forgot password?",
+  "login_success": "Login successful!"
+}

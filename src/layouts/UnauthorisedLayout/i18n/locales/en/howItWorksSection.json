@@ -1,0 +1,20 @@
+{
+  "title": "How it works",
+  "steps": [
+    {
+      "number": "01",
+      "title": "Subscribe",
+      "description": "Get up-to-date data and analytical reports tailored to your marketing goals."
+    },
+    {
+      "number": "02",
+      "title": "Create",
+      "description": "Generate creative content and campaigns using the platform's intelligent tools."
+    },
+    {
+      "number": "03",
+      "title": "Plan and Publish",
+      "description": "Manage content and launch campaigns on a pre-set schedule for maximum efficiency."
+    }
+  ]
+}

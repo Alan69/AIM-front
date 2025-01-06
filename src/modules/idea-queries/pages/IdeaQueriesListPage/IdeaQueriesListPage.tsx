@@ -21,7 +21,7 @@ export const IdeaQueriesListPage = () => {
 
   const columns: TableProps<TIdeaQueriesData>["columns"] = [
     {
-      title: t("idea_queries_list.fields.product"),
+      title: t("ideaQueriesListPage.fields.product"),
       dataIndex: "product",
       key: "product",
       fixed: "left",
@@ -30,7 +30,7 @@ export const IdeaQueriesListPage = () => {
       ),
     },
     {
-      title: t("idea_queries_list.fields.content_type"),
+      title: t("ideaQueriesListPage.fields.content_type"),
       dataIndex: "content_type",
       key: "content_type",
       render: (text, record) => (
@@ -38,7 +38,7 @@ export const IdeaQueriesListPage = () => {
       ),
     },
     {
-      title: t("idea_queries_list.fields.theme"),
+      title: t("ideaQueriesListPage.fields.theme"),
       dataIndex: "theme",
       key: "theme",
       render: (text, record) => (
@@ -46,7 +46,7 @@ export const IdeaQueriesListPage = () => {
       ),
     },
     {
-      title: t("idea_queries_list.fields.date_created"),
+      title: t("ideaQueriesListPage.fields.date_created"),
       dataIndex: "date",
       key: "date",
       render: (text, record) => (
@@ -57,7 +57,7 @@ export const IdeaQueriesListPage = () => {
 
   const formatDate = (dateString: string | undefined) => {
     const date = new Date(dateString || "");
-    return new Intl.DateTimeFormat(t("locale"), {
+    return new Intl.DateTimeFormat(t("ideaQueriesListPage.locale"), {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -82,16 +82,16 @@ export const IdeaQueriesListPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className={cn("main-title", styles.title)}>
-          {t("idea_queries_list.title", {
+          {t("ideaQueriesListPage.title", {
             company:
-              current_company?.name || t("idea_queries_list.default_company"),
+              current_company?.name || t("ideaQueriesListPage.default_company"),
           })}
           <Button
             color="default"
             className={styles.addBtn}
             onClick={() => navigate("/idea-queries/create")}
           >
-            {t("idea_queries_list.create_button")}
+            {t("ideaQueriesListPage.create_button")}
           </Button>
         </h1>
         <Table

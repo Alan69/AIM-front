@@ -1,0 +1,33 @@
+{
+  "title": "Company: {{name}}",
+  "fields": {
+    "products": "Products",
+    "description": "Description",
+    "actions": "Actions",
+    "scope": "Scope",
+    "social_media": "Social Media",
+    "target_audience": "Target Audience"
+  },
+  "placeholders": {
+    "no_target_audience": "Currently, there are no target audiences. You can add a new target audience.",
+    "no_products": "Currently, there are no products or brands. You can add a new product or brand.",
+    "no_social_media": "Currently, there are no social media accounts. You can add a new one."
+  },
+  "actions": {
+    "add_target_audience": "Add Target Audience",
+    "add_social_media": "Add Social Media",
+    "add_product": "Add Product"
+  },
+  "buttons": {
+    "show_more": "Show More",
+    "hide": "Hide"
+  },
+  "modals": {
+    "confirm_deletion": "Confirm Deletion",
+    "confirm_delete_message": "Are you sure you want to delete the social media account {{platform}} with username {{username}}?"
+  },
+  "messages": {
+    "platform_removed": "Social media account successfully removed.",
+    "error_removing_platform": "Error removing the social media account. Please try again."
+  }
+}

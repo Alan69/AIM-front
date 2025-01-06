@@ -49,7 +49,18 @@ export type TAddToSchedulersResponse = {
 }
 
 export type TDeleteFromSchedulerResponse = {
-  message: string
+  message: string;
+}
+
+export type TEditPostFromSchedulersRequest = {
+  scheduler_id: string;
+  scheduled_date: string;
+  scheduled_time: string;
+}
+
+export type TEditPostFromSchedulerResponse = {
+  message: string;
+  post_data: string;
 }
 
 export const contentPlanApi = baseApi.injectEndpoints({
@@ -85,6 +96,17 @@ export const contentPlanApi = baseApi.injectEndpoints({
 			}),
 			transformResponse: (response: TDeleteFromSchedulerResponse) => response,
     }),
+    editPostFromScheduler: build.mutation<TDeleteFromSchedulerResponse, TEditPostFromSchedulersRequest>({
+			query: ({scheduler_id, scheduled_date,scheduled_time}) => ({
+				url: `/scheduler/edit/${scheduler_id}/`,
+				method: 'PUT',
+        body: {
+          scheduled_date,
+          scheduled_time
+        }
+			}),
+			transformResponse: (response: TDeleteFromSchedulerResponse) => response,
+    }),
 	}),
 	overrideExisting: false,
 });
@@ -92,5 +114,6 @@ export const contentPlanApi = baseApi.injectEndpoints({
 export const {
   useGetSchedulersQuery,
   useAddToSchedulersMutation,
-  useDeteleFromSchedulerMutation
+  useDeteleFromSchedulerMutation,
+  useEditPostFromSchedulerMutation
 } = contentPlanApi;

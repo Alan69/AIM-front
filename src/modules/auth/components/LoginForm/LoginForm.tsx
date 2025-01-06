@@ -14,12 +14,11 @@ export const LoginForm = () => {
   const [login, { isLoading }] = useLoginMutation();
 
   const onFinish = async (values: { email: string; password: string }) => {
-    // Преобразуем email в нижний регистр перед отправкой на сервер
     const dataToSend = {
       ...values,
       email: values.email.toLowerCase(),
     };
-    console.log("Данные перед отправкой:", dataToSend);
+
     try {
       const response = await login(dataToSend);
 
@@ -27,17 +26,17 @@ export const LoginForm = () => {
       const { access: token, refresh: refreshToken } = response.data;
 
       dispatch(authActions.setToken({ token, refreshToken }));
-      message.success(t("login_form.login_success"));
+      message.success(t("loginForm.login_success"));
     } catch (error) {
-      message.error(t("login_form.login_error"));
+      message.error(t("loginForm.login_error"));
     }
   };
 
   return (
     <div className={styles.loginBox}>
-      <h2>{t("login_form.title")}</h2>
+      <h2>{t("loginForm.title")}</h2>
       <Form
-        name="login_form"
+        name="loginForm"
         className={styles.loginForm}
         initialValues={{ remember: true }}
         onFinish={onFinish}
@@ -45,24 +44,24 @@ export const LoginForm = () => {
         <Form.Item
           name="email"
           rules={[
-            { required: true, message: t("login_form.email_placeholder") },
+            { required: true, message: t("loginForm.email_placeholder") },
           ]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder={t("login_form.email_placeholder")}
+            placeholder={t("loginForm.email_placeholder")}
           />
         </Form.Item>
         <Form.Item
           name="password"
           rules={[
-            { required: true, message: t("login_form.password_placeholder") },
+            { required: true, message: t("loginForm.password_placeholder") },
           ]}
         >
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             type="password"
-            placeholder={t("login_form.password_placeholder")}
+            placeholder={t("loginForm.password_placeholder")}
           />
         </Form.Item>
 
@@ -73,14 +72,14 @@ export const LoginForm = () => {
             className={styles.loginFormButton}
             loading={isLoading}
           >
-            {t("login_form.submit_button")}
+            {t("loginForm.submit_button")}
           </Button>
         </Form.Item>
 
         <div className={styles.linksBlock}>
-          <Link to="/signup">{t("login_form.registration_link")}</Link>
+          <Link to="/signup">{t("loginForm.registration_link")}</Link>
           <Link className={styles.loginFormForgot} to="/login">
-            {t("login_form.forgot_password_link")}
+            {t("loginForm.forgot_password_link")}
           </Link>
         </div>
       </Form>

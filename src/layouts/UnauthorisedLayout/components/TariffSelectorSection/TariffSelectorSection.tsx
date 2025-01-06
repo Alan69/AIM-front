@@ -64,23 +64,25 @@ export const TariffSelectorSection: React.FC = () => {
     setDiscount(calculatedDiscount);
   };
 
-  const cardItems = t("tariff_selector.card.items", {
+  const cardItems = t("tariffSelectorSection.card.items", {
     returnObjects: true,
   }) as string[];
 
   return (
     <section className={styles.section} id="tariff-section">
-      <h3 className={styles.title}>{t("tariff_selector.title")}</h3>
-      <div className={styles.subtitle}>{t("tariff_selector.subtitle")}</div>
+      <h3 className={styles.title}>{t("tariffSelectorSection.title")}</h3>
+      <div className={styles.subtitle}>
+        {t("tariffSelectorSection.subtitle")}
+      </div>
       <div className={styles.row}>
         <div className={styles.col}>
           <div className={styles.slidersBlock}>
             <div className={styles.sliderBlock}>
               <h4 className={styles.sliderSubtitle}>
-                {t("tariff_selector.sliders.companies")}
+                {t("tariffSelectorSection.sliders.companies")}
               </h4>
               <Slider
-                className="customSlider"
+                className="tariffSlider"
                 min={1}
                 max={12}
                 value={companyCount}
@@ -104,10 +106,10 @@ export const TariffSelectorSection: React.FC = () => {
             </div>
             <div className={styles.sliderBlock}>
               <h4 className={styles.sliderSubtitle}>
-                {t("tariff_selector.sliders.duration")}
+                {t("tariffSelectorSection.sliders.duration")}
               </h4>
               <Slider
-                className="customSlider"
+                className="tariffSlider"
                 min={1}
                 max={12}
                 value={monthDuration}
@@ -136,7 +138,7 @@ export const TariffSelectorSection: React.FC = () => {
           ) : (
             <div className={styles.discountSection}>
               <div className={styles.discountSection__label}>
-                {t("tariff_selector.discount_label")}
+                {t("tariffSelectorSection.discount_label")}
               </div>
               <div className={styles.discountSection__value}>
                 {discount.toLocaleString()} ₸
@@ -148,7 +150,7 @@ export const TariffSelectorSection: React.FC = () => {
           <Card hoverable className={styles.card}>
             <div className={styles.card__head}>
               <div className={styles.card__title}>
-                {t("tariff_selector.card.title")}
+                {t("tariffSelectorSection.card.title")}
               </div>
               <div className={styles.card__body}>
                 {cardItems.map((item, index) => (
@@ -156,9 +158,9 @@ export const TariffSelectorSection: React.FC = () => {
                     <div className={styles.card__item__label}>{item}</div>
                     <div className={styles.card__item__value}>
                       {index < 2 ? (
-                        <IconChecked className={styles.iconChecked} />
-                      ) : (
                         <IconInfinity className={styles.iconInfinity} />
+                      ) : (
+                        <IconChecked className={styles.iconChecked} />
                       )}
                     </div>
                   </div>
@@ -168,7 +170,7 @@ export const TariffSelectorSection: React.FC = () => {
             <div className={styles.card__bottom}>
               <div className={styles.card__price}>
                 <div className={styles.card__price__label}>
-                  {t("tariff_selector.card.price_label")}
+                  {t("tariffSelectorSection.card.price_label")}
                 </div>
                 <IconArrow />
                 <div className={styles.card__price__value}>
@@ -184,7 +186,7 @@ export const TariffSelectorSection: React.FC = () => {
                 className={styles.card__button}
                 onClick={() => navigate(token ? "/tariffs" : "/login")}
               >
-                {t("tariff_selector.card.button_text")}{" "}
+                {t("tariffSelectorSection.card.button_text")}{" "}
                 <IconPlus className={styles.iconPlus} />
               </Button>
             </div>
@@ -194,7 +196,7 @@ export const TariffSelectorSection: React.FC = () => {
           ) : (
             <div className={styles.discountSection}>
               <div className={styles.discountSection__label}>
-                {t("tariff_selector.discount_label")}
+                {t("tariffSelectorSection.discount_label")}
               </div>
               <div className={styles.discountSection__value}>
                 {discount.toLocaleString()} ₸

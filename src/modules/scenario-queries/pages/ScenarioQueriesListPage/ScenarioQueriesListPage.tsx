@@ -22,7 +22,7 @@ export const ScenarioQueriesListPage = () => {
 
   const columns: TableProps<TScenarioQueriesData>["columns"] = [
     {
-      title: t("scenario_queries_list.columns.product"),
+      title: t("scenarioQueriesListPage.columns.product"),
       dataIndex: "product",
       key: "product",
       fixed: "left",
@@ -31,7 +31,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: t("scenario_queries_list.columns.scenario_type"),
+      title: t("scenarioQueriesListPage.columns.scenario_type"),
       dataIndex: "scenario_type",
       key: "scenario_type",
       render: (text, record) => (
@@ -39,7 +39,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: t("scenario_queries_list.columns.scenario_theme"),
+      title: t("scenarioQueriesListPage.columns.scenario_theme"),
       dataIndex: "scenario_theme",
       key: "scenario_theme",
       render: (text, record) => (
@@ -47,7 +47,7 @@ export const ScenarioQueriesListPage = () => {
       ),
     },
     {
-      title: t("scenario_queries_list.columns.date"),
+      title: t("scenarioQueriesListPage.columns.date"),
       dataIndex: "date",
       key: "date",
       render: (text, record) => (
@@ -58,7 +58,7 @@ export const ScenarioQueriesListPage = () => {
 
   const formatDate = (dateString: string | undefined) => {
     const date = new Date(dateString ? dateString : "");
-    return new Intl.DateTimeFormat(t("date.locale"), {
+    return new Intl.DateTimeFormat(t("scenarioQueriesListPage.locale"), {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -83,13 +83,13 @@ export const ScenarioQueriesListPage = () => {
     <Layout>
       <Content className="page-layout">
         <h1 className={cn("main-title", styles.title)}>
-          {t("scenario_queries_list.title")} - {current_company?.name}
+          {t("scenarioQueriesListPage.title")} - {current_company?.name}
           <Button
             color="default"
             className={styles.addBtn}
             onClick={() => navigate("/scenario-queries/create")}
           >
-            {t("scenario_queries_list.create_button")}
+            {t("scenarioQueriesListPage.create_button")}
           </Button>
         </h1>
         <Table

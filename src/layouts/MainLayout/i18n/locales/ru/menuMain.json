@@ -1,0 +1,14 @@
+{
+  "logout": "Выход",
+  "soon": "скоро",
+  "items": {
+    "ideas": "Идеи",
+    "posts": "Посты",
+    "scenarios": "Сценарии",
+    "contentPlanPage": "Контент план",
+    "marketing_strategy": "Маркетинговая стратегия",
+    "sales_funnel": "Воронка продаж",
+    "chat_hub": "Единый чат-хаб",
+    "analytics": "Аналитика"
+  }
+}

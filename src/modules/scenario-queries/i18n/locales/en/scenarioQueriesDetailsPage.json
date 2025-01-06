@@ -1,0 +1,22 @@
+{
+  "title": "{{company}} - {{product}}",
+  "fields": {
+    "content_type": "Content type: {{content_type}}",
+    "theme": "Scenario theme: {{theme}}",
+    "language": "Language: {{language}}",
+    "description": "Description: {{description}}",
+    "latency": "Duration: {{latency}}"
+  },
+  "actions": {
+    "replay_button": "Repeat query"
+  },
+  "scenarios_section": {
+    "title": "Scenarios:",
+    "not_found": "No scenarios found. Please add a scenario."
+  },
+  "copy_tooltip": "Copy",
+  "copy_success": "Content copied to clipboard!",
+  "copy_error": "Error copying content to clipboard.",
+  "short_description": "Short description:",
+  "main_text": "Main text:"
+}

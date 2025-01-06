@@ -14,14 +14,14 @@ export const StartAISection = () => {
   return (
     <section className={styles.section}>
       <div className={styles.container}>
-        <div className={styles.label}>{t("start_ai.label")}</div>
-        <h2 className={styles.title}>{t("start_ai.title")}</h2>
-        <div className={styles.subtitle}>{t("start_ai.subtitle")}</div>
+        <div className={styles.label}>{t("startAiSection.label")}</div>
+        <h2 className={styles.title}>{t("startAiSection.title")}</h2>
+        <div className={styles.subtitle}>{t("startAiSection.subtitle")}</div>
         <Button
           className={styles.button}
           onClick={() => navigate(token ? "/tariffs" : "/login")}
         >
-          {t("start_ai.button")}
+          {t("startAiSection.button")}
           <IconPlus className={styles.icon} />
         </Button>
       </div>

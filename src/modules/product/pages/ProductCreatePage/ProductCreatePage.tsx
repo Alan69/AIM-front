@@ -57,7 +57,7 @@ export const ProductCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("product_create.title")}</h1>
+        <h1 className="main-title">{t("productCreatePage.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -67,9 +67,9 @@ export const ProductCreatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label={t("product_create.fields.name")}
+                  label={t("productCreatePage.fields.name")}
                   validateStatus={errors.name ? "error" : ""}
-                  help={errors.name && t("product_create.errors.required")}
+                  help={errors.name && t("productCreatePage.errors.required")}
                 >
                   <Controller
                     name="name"
@@ -80,9 +80,9 @@ export const ProductCreatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={t("product_create.fields.scope")}
+                  label={t("productCreatePage.fields.scope")}
                   validateStatus={errors.scope ? "error" : ""}
-                  help={errors.scope && t("product_create.errors.required")}
+                  help={errors.scope && t("productCreatePage.errors.required")}
                 >
                   <Controller
                     name="scope"
@@ -92,7 +92,7 @@ export const ProductCreatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label={t("product_create.fields.comment")}>
+                <Form.Item label={t("productCreatePage.fields.comment")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -107,14 +107,14 @@ export const ProductCreatePage = () => {
                       htmlType="submit"
                       loading={isCreating}
                     >
-                      {t("product_create.buttons.save")}
+                      {t("productCreatePage.buttons.save")}
                     </Button>
                     <Button
                       htmlType="button"
                       type="default"
                       onClick={() => navigate(-1)}
                     >
-                      {t("product_create.buttons.cancel")}
+                      {t("productCreatePage.buttons.cancel")}
                     </Button>
                   </div>
                 </Form.Item>

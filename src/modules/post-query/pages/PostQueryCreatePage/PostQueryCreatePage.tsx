@@ -81,12 +81,12 @@ export const PostQueryCreatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("post_query_create.title")}</h1>
+        <h1 className="main-title">{t("postQueryCreatePage.title")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
-            label={t("post_query_create.fields.company")}
+            label={t("postQueryCreatePage.fields.company")}
             validateStatus={errors.company ? "error" : ""}
-            help={errors.company && t("post_query_create.errors.required")}
+            help={errors.company && t("postQueryCreatePage.errors.required")}
           >
             <Controller
               name="company"
@@ -110,12 +110,12 @@ export const PostQueryCreatePage = () => {
             />
             {!current_company?.id && (
               <div className={styles.noContent}>
-                {t("post_query_create.no_company")}
+                {t("postQueryCreatePage.no_company")}
               </div>
             )}
           </Form.Item>
 
-          <Form.Item label={t("post_query_create.fields.product")}>
+          <Form.Item label={t("postQueryCreatePage.fields.product")}>
             <Controller
               name="product"
               control={control}
@@ -139,12 +139,12 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                <span className={styles.redStar}>*</span>{" "}
-                {t("post_query_create.fields.post_type")}
+                {t("postQueryCreatePage.fields.post_type")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.post_type ? "error" : ""}
-            help={errors.post_type && t("post_query_create.errors.required")}
+            help={errors.post_type && t("postQueryCreatePage.errors.required")}
           >
             <Controller
               name="post_type"
@@ -166,12 +166,12 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                <span className={styles.redStar}>*</span>{" "}
-                {t("post_query_create.fields.text_style")}
+                {t("postQueryCreatePage.fields.text_style")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.text_style ? "error" : ""}
-            help={errors.text_style && t("post_query_create.errors.required")}
+            help={errors.text_style && t("postQueryCreatePage.errors.required")}
           >
             <Controller
               name="text_style"
@@ -192,12 +192,12 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                <span className={styles.redStar}>*</span>{" "}
-                {t("post_query_create.fields.lang")}
+                {t("postQueryCreatePage.fields.lang")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.lang ? "error" : ""}
-            help={errors.lang && t("post_query_create.errors.required")}
+            help={errors.lang && t("postQueryCreatePage.errors.required")}
           >
             <Controller
               name="lang"
@@ -228,12 +228,12 @@ export const PostQueryCreatePage = () => {
           <Form.Item
             label={
               <span>
-                <span className={styles.redStar}>*</span>{" "}
-                {t("post_query_create.fields.content")}
+                {t("postQueryCreatePage.fields.content")}{" "}
+                <span className={styles.redStar}>*</span>
               </span>
             }
             validateStatus={errors.content ? "error" : ""}
-            help={errors.content && t("post_query_create.errors.required")}
+            help={errors.content && t("postQueryCreatePage.errors.required")}
           >
             <Controller
               name="content"
@@ -247,7 +247,7 @@ export const PostQueryCreatePage = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isPostCreating}>
-              {t("post_query_create.submit_button")}
+              {t("postQueryCreatePage.submit_button")}
             </Button>
           </Form.Item>
         </Form>

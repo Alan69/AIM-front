@@ -13,13 +13,15 @@ import { useTranslation } from "react-i18next";
 
 export const AdvantagesSection = () => {
   const { t } = useTranslation();
-  const advantages = t("advantages.items", { returnObjects: true }) as string[];
+  const advantages = t("advantagesSection.items", {
+    returnObjects: true,
+  }) as string[];
 
   return (
     <section className={styles.section} id="AdvantagesSection">
       <h2 className={styles.title}>
-        {t("advantages.title").split(" ")[0]} <br />{" "}
-        {t("advantages.title").split(" ").slice(1).join(" ")}
+        {t("advantagesSection.title").split(" ")[0]} <br />{" "}
+        {t("advantagesSection.title").split(" ").slice(1).join(" ")}
       </h2>
       <div className={styles.advantagesBlock}>
         <div className={cn(styles.advantagesRow, styles.advantagesRow__end)}>

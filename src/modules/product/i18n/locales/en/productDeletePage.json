@@ -1,0 +1,8 @@
+{
+  "title": "Delete Product",
+  "confirmation": "Are you sure you want to delete the product \"{{name}}\"?",
+  "buttons": {
+    "delete": "Delete",
+    "cancel": "Cancel"
+  }
+}

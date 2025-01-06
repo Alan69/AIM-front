@@ -31,7 +31,7 @@ export const PostDeletePage = () => {
           refetchCompanyList()
             .unwrap()
             .then(() => {
-              message.success(t("post_delete.success"));
+              message.success(t("postDeletePage.success"));
             });
         });
     }
@@ -40,12 +40,14 @@ export const PostDeletePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("post_delete.title")}</h1>
+        <h1 className="main-title">{t("postDeletePage.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
               <Title level={4}>
-                {t("post_delete.confirmation_text", { postTitle: post?.title })}
+                {t("postDeletePage.confirmation_text", {
+                  postTitle: post?.title,
+                })}
               </Title>
               <div className={styles.buttons}>
                 <Button
@@ -54,7 +56,7 @@ export const PostDeletePage = () => {
                   loading={isUpdating}
                   onClick={handleDeletePost}
                 >
-                  {t("post_delete.buttons.delete")}
+                  {t("postDeletePage.buttons.delete")}
                 </Button>
                 <Button
                   type="default"
@@ -63,7 +65,7 @@ export const PostDeletePage = () => {
                   }}
                   loading={isUpdating}
                 >
-                  {t("post_delete.buttons.cancel")}
+                  {t("postDeletePage.buttons.cancel")}
                 </Button>
               </div>
             </div>

@@ -90,7 +90,7 @@ export const ProductUpdatePage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("product_update.title")}</h1>
+        <h1 className="main-title">{t("productUpdatePage.title")}</h1>
         <Layout>
           <Content>
             <div className={styles.companyDescr}>
@@ -100,9 +100,9 @@ export const ProductUpdatePage = () => {
                 className={styles.form}
               >
                 <Form.Item
-                  label={t("product_update.fields.name")}
+                  label={t("productUpdatePage.fields.name")}
                   validateStatus={errors.name ? "error" : ""}
-                  help={errors.name && t("product_update.errors.required")}
+                  help={errors.name && t("productUpdatePage.errors.required")}
                 >
                   <Controller
                     name="name"
@@ -114,9 +114,9 @@ export const ProductUpdatePage = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label={t("product_update.fields.scope")}
+                  label={t("productUpdatePage.fields.scope")}
                   validateStatus={errors.scope ? "error" : ""}
-                  help={errors.scope && t("product_update.errors.required")}
+                  help={errors.scope && t("productUpdatePage.errors.required")}
                 >
                   <Controller
                     name="scope"
@@ -127,7 +127,7 @@ export const ProductUpdatePage = () => {
                   />
                 </Form.Item>
 
-                <Form.Item label={t("product_update.fields.comment")}>
+                <Form.Item label={t("productUpdatePage.fields.comment")}>
                   <Controller
                     name="comment"
                     control={control}
@@ -143,7 +143,7 @@ export const ProductUpdatePage = () => {
                       disabled={isLoading || isFetching}
                       loading={isUpdating}
                     >
-                      {t("product_update.buttons.save")}
+                      {t("productUpdatePage.buttons.save")}
                     </Button>
                     <Button
                       type="default"
@@ -153,7 +153,7 @@ export const ProductUpdatePage = () => {
                         navigate(`/company/${company?.id}`);
                       }}
                     >
-                      {t("product_update.buttons.cancel")}
+                      {t("productUpdatePage.buttons.cancel")}
                     </Button>
                   </div>
                 </Form.Item>

@@ -1,0 +1,19 @@
+{
+  "title": "Add a company",
+  "form": {
+    "name": {
+      "label": "Name",
+      "error": "Please fill out this field."
+    },
+    "scope": {
+      "label": "Scope",
+      "error": "Please fill out this field."
+    },
+    "comment": {
+      "label": "Description"
+    },
+    "submit": "Save"
+  },
+  "success_message": "Company successfully created!",
+  "error_message": "Failed to create company. Please try again."
+}

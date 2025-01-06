@@ -21,6 +21,7 @@ type TProps = {
   isOpen: boolean;
   handleCloseModal: () => void;
   handleShowContentPlanDeletePostModal: () => void;
+  handleShowContentPlanEditPostModal: () => void;
 };
 
 export const SelectedPreviewBlockModal = ({
@@ -32,6 +33,7 @@ export const SelectedPreviewBlockModal = ({
   isOpen,
   handleCloseModal,
   handleShowContentPlanDeletePostModal,
+  handleShowContentPlanEditPostModal,
 }: TProps) => {
   const isSmallLaptop = useIsSmallLaptop();
 
@@ -107,6 +109,9 @@ export const SelectedPreviewBlockModal = ({
               selectedPost={selectedPost}
               handleShowContentPlanDeletePostModal={
                 handleShowContentPlanDeletePostModal
+              }
+              handleShowContentPlanEditPostModal={
+                handleShowContentPlanEditPostModal
               }
             />
           )}

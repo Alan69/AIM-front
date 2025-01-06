@@ -3,7 +3,6 @@ import { Layout, Typography, Image, Carousel, Button } from "antd";
 import { HeartTwoTone } from "@ant-design/icons";
 import cn from "classnames";
 import styles from "./SelectedPostPreview.module.scss";
-import "./Custom-slider.scss";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import avatar from "assets/avatar.png";
 import { useTranslation } from "react-i18next";
@@ -14,6 +13,7 @@ import { TStoriesData } from "modules/stories/redux/api";
 type TProps = {
   selectedPost: TPostData | TReelData | TStoriesData | undefined;
   handleShowContentPlanDeletePostModal?: () => void;
+  handleShowContentPlanEditPostModal?: () => void;
 };
 
 const { Content } = Layout;
@@ -22,6 +22,7 @@ const { Title, Text } = Typography;
 export const SelectedPostPreview = ({
   selectedPost,
   handleShowContentPlanDeletePostModal,
+  handleShowContentPlanEditPostModal,
 }: TProps) => {
   const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
@@ -59,7 +60,7 @@ export const SelectedPostPreview = ({
                   <Image
                     src={mediaItem.media}
                     className="media"
-                    alt={t("content_plan.selected_post_preview.image_alt")}
+                    alt={t("contentPlanPage.selected_post_preview.image_alt")}
                   />
                 )}
               </div>
@@ -126,16 +127,17 @@ export const SelectedPostPreview = ({
                 )}
               />
               <Text>
-                {t("content_plan.selected_post_preview.add_to_favorites")}
+                {t("contentPlanPage.selected_post_preview.add_to_favorites")}
               </Text>
             </div>
+          </div>
+          <div className={styles.buttons}>
+            <Button onClick={handleShowContentPlanEditPostModal} block>
+              {t("contentPlanPage.selected_post_preview.edit_post")}
+            </Button>
 
-            <Button
-              className={styles.deleteBtn}
-              danger
-              onClick={handleShowContentPlanDeletePostModal}
-            >
-              {t("content_plan.selected_post_preview.delete_post")}
+            <Button danger onClick={handleShowContentPlanDeletePostModal} block>
+              {t("contentPlanPage.selected_post_preview.delete_post")}
             </Button>
           </div>
         </div>

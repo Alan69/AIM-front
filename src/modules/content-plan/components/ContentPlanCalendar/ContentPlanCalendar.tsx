@@ -84,9 +84,9 @@ export const ContentPlanCalendar = ({
       return {
         id: item.id,
         title: item.post.title
-          ? item.post.title
+          ? `Post: ${item.post.title}`
           : "" || item.reel.title
-            ? item.reel.title
+            ? `Reels: ${item.reel.title}`
             : "" || item.storie.id
               ? "Stories"
               : "",
@@ -99,25 +99,29 @@ export const ContentPlanCalendar = ({
             : "",
         hashtags: item.post.hashtags || item.reel.hashtags,
         time: moment(startDateTime).format("HH:mm"),
+        scheduled_date: item.scheduled_date,
+        scheduled_time: item.scheduled_time,
         media: updatedMedia(),
       };
     }) || [];
 
   const messages = {
-    allDay: t("content_plan.content_plan_calendar.all_day"),
-    previous: t("content_plan.content_plan_calendar.previous"),
-    next: t("content_plan.content_plan_calendar.next"),
-    today: t("content_plan.content_plan_calendar.today"),
-    month: t("content_plan.content_plan_calendar.month"),
-    week: t("content_plan.content_plan_calendar.week"),
-    day: t("content_plan.content_plan_calendar.day"),
-    agenda: t("content_plan.content_plan_calendar.agenda"),
-    date: t("content_plan.content_plan_calendar.date"),
-    time: t("content_plan.content_plan_calendar.time"),
-    event: t("content_plan.content_plan_calendar.event"),
-    noEventsInRange: t("content_plan.content_plan_calendar.no_events_in_range"),
+    allDay: t("contentPlanPage.content_plan_calendar.all_day"),
+    previous: t("contentPlanPage.content_plan_calendar.previous"),
+    next: t("contentPlanPage.content_plan_calendar.next"),
+    today: t("contentPlanPage.content_plan_calendar.today"),
+    month: t("contentPlanPage.content_plan_calendar.month"),
+    week: t("contentPlanPage.content_plan_calendar.week"),
+    day: t("contentPlanPage.content_plan_calendar.day"),
+    agenda: t("contentPlanPage.content_plan_calendar.agenda"),
+    date: t("contentPlanPage.content_plan_calendar.date"),
+    time: t("contentPlanPage.content_plan_calendar.time"),
+    event: t("contentPlanPage.content_plan_calendar.event"),
+    noEventsInRange: t(
+      "contentPlanPage.content_plan_calendar.no_events_in_range"
+    ),
     showMore: (total: any) =>
-      t("content_plan.content_plan_calendar.show_more", { total }),
+      t("contentPlanPage.content_plan_calendar.show_more", { total }),
   };
 
   const handleSelectSlot = (slotInfo: any) => {

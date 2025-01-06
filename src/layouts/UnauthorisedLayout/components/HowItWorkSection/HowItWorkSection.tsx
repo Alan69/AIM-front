@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 export const HowItWorkSection = () => {
   const { t } = useTranslation();
-  const steps = t("how_it_works.steps", { returnObjects: true }) as {
+  const steps = t("howItWorksSection.steps", { returnObjects: true }) as {
     number: string;
     title: string;
     description: string;
@@ -15,7 +15,7 @@ export const HowItWorkSection = () => {
 
   return (
     <section className={styles.section} id="HowItWorkSection">
-      <h2 className={styles.title}>{t("how_it_works.title")}</h2>
+      <h2 className={styles.title}>{t("howItWorksSection.title")}</h2>
       <div className={styles.card}>
         {steps.map((step, index) => (
           <div

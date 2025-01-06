@@ -124,10 +124,10 @@ export const AccountPage = () => {
         .unwrap()
         .then(() => {
           getAuthUser().refetch();
-          message.success(t("account_page.messages.success"));
+          message.success(t("accountPage.messages.success"));
         })
         .catch(() => {
-          message.error(t("account_page.messages.error"));
+          message.error(t("accountPage.messages.error"));
         });
       const isShouldShowConfirmModal = _.isEqual(getValues(), oldValues);
       setShowConfirmModal(!isShouldShowConfirmModal);
@@ -144,7 +144,7 @@ export const AccountPage = () => {
       if (lastFile.type === "image/jpeg" || lastFile.type === "image/png") {
         setFile(lastFile.originFileObj);
       } else {
-        message.error(t("account_page.messages.invalid_file"));
+        message.error(t("accountPage.messages.invalid_file"));
       }
     } else {
       setFile(null);
@@ -175,7 +175,7 @@ export const AccountPage = () => {
   return (
     <Layout>
       <Content className="page-layout">
-        <h1 className="main-title">{t("account_page.profile")}</h1>
+        <h1 className="main-title">{t("accountPage.profile")}</h1>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item>
             <div className={styles.photo}>
@@ -199,7 +199,7 @@ export const AccountPage = () => {
                     onChange={handleFileChange}
                   >
                     <Button icon={<UploadOutlined />}>
-                      {t("account_page.photo.upload_button")}
+                      {t("accountPage.photo.upload_button")}
                     </Button>
                   </Upload>
                 )}
@@ -208,9 +208,9 @@ export const AccountPage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("account_page.form.email_label")}
+            label={t("accountPage.form.email_label")}
             validateStatus={errors.email ? "error" : ""}
-            help={errors.email && t("account_page.form.email_error")}
+            help={errors.email && t("accountPage.form.email_error")}
           >
             <Controller
               name="email"
@@ -220,7 +220,7 @@ export const AccountPage = () => {
             />
           </Form.Item>
 
-          <Form.Item label={t("account_page.form.first_name_label")}>
+          <Form.Item label={t("accountPage.form.first_name_label")}>
             <Controller
               name="first_name"
               control={control}
@@ -228,7 +228,7 @@ export const AccountPage = () => {
             />
           </Form.Item>
 
-          <Form.Item label={t("account_page.form.last_name_label")}>
+          <Form.Item label={t("accountPage.form.last_name_label")}>
             <Controller
               name="last_name"
               control={control}
@@ -237,7 +237,7 @@ export const AccountPage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("account_page.form.birth_year_label")}
+            label={t("accountPage.form.birth_year_label")}
             validateStatus={errors.bd_year ? "error" : undefined}
             help={errors.bd_year?.message}
           >
@@ -245,18 +245,18 @@ export const AccountPage = () => {
               name="bd_year"
               control={control}
               rules={{
-                required: t("account_page.form.birth_year_error.required"),
+                required: t("accountPage.form.birth_year_error.required"),
                 min: {
                   value: 1964,
-                  message: t("account_page.form.birth_year_error.min"),
+                  message: t("accountPage.form.birth_year_error.min"),
                 },
                 max: {
                   value: currentYear,
-                  message: t("account_page.form.birth_year_error.max"),
+                  message: t("accountPage.form.birth_year_error.max"),
                 },
                 pattern: {
                   value: /^\d{4}$/,
-                  message: t("account_page.form.birth_year_error.pattern"),
+                  message: t("accountPage.form.birth_year_error.pattern"),
                 },
               }}
               render={({ field }) => <Input {...field} type="number" />}
@@ -264,7 +264,7 @@ export const AccountPage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("account_page.form.phone_number_label")}
+            label={t("accountPage.form.phone_number_label")}
             validateStatus={errors.phone_number ? "error" : ""}
             help={
               errors.phone_number &&
@@ -275,17 +275,17 @@ export const AccountPage = () => {
               name="phone_number"
               control={control}
               rules={{
-                required: t("account_page.form.phone_number_error.required"),
+                required: t("accountPage.form.phone_number_error.required"),
                 pattern: {
                   value: /^\+7\d{10}$/,
-                  message: t("account_page.form.phone_number_error.pattern"),
+                  message: t("accountPage.form.phone_number_error.pattern"),
                 },
               }}
               render={({ field }) => <Input {...field} />}
             />
           </Form.Item>
 
-          <Form.Item label={t("account_page.form.job_label")}>
+          <Form.Item label={t("accountPage.form.job_label")}>
             <Controller
               name="job.id"
               control={control}
@@ -302,7 +302,7 @@ export const AccountPage = () => {
             />
           </Form.Item>
 
-          <Form.Item label={t("account_page.form.country_label")}>
+          <Form.Item label={t("accountPage.form.country_label")}>
             <Controller
               name="location.id"
               control={control}
@@ -321,10 +321,10 @@ export const AccountPage = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isUpdating}>
-              {t("account_page.buttons.save")}
+              {t("accountPage.buttons.save")}
             </Button>
             <Button htmlType="button" style={{ margin: "0 8px" }}>
-              {t("account_page.buttons.change_password")}
+              {t("accountPage.buttons.change_password")}
             </Button>
           </Form.Item>
           {

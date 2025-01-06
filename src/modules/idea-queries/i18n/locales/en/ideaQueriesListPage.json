@@ -1,0 +1,12 @@
+{
+  "title": "Idea creation history - {{company}}",
+  "default_company": "Company",
+  "create_button": "Create",
+  "fields": {
+    "product": "Product",
+    "content_type": "Content Type",
+    "theme": "Theme",
+    "date_created": "Date Created"
+  },
+  "locale": "en-US"
+}

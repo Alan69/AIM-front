@@ -16,21 +16,21 @@ export const Footer = () => {
       <div className={styles.footerContent}>
         <div className={styles.column}>
           <a href="#" className={styles.item}>
-            {t("footer-landing.columns.blog")}
+            {t("footerLanding.columns.blog")}
           </a>
           <a href="#" className={styles.item}>
-            {t("footer-landing.columns.latest_generations")}
+            {t("footerLanding.columns.latest_generations")}
           </a>
           <a href="#" className={styles.item}>
-            {t("footer-landing.columns.terms_of_use")}
+            {t("footerLanding.columns.terms_of_use")}
           </a>
           <a href="#" className={styles.item}>
-            {t("footer-landing.columns.reviews")}
+            {t("footerLanding.columns.reviews")}
           </a>
         </div>
         <div className={styles.column}>
           <div className={styles.item}>
-            {t("footer-landing.columns.follow_us")}
+            {t("footerLanding.columns.follow_us")}
           </div>
           <div className={styles.socialIcons}>
             <a href="https://www.facebook.com/people/AimMagic/61560400936181/">
@@ -46,7 +46,7 @@ export const Footer = () => {
         </div>
         <div className={cn(styles.column, styles.blockEmail)}>
           <div className={styles.blockEmail__head}>
-            <div>{t("footer-landing.columns.contact_us.title")}</div>
+            <div>{t("footerLanding.columns.contact_us.title")}</div>
             <svg
               className={styles.iconEmail}
               xmlns="http://www.w3.org/2000/svg"
@@ -77,26 +77,26 @@ export const Footer = () => {
             className={styles.blockEmail__link}
             href="mailto:info@aimmagic.com"
           >
-            {t("footer-landing.columns.contact_us.email")}
+            {t("footerLanding.columns.contact_us.email")}
           </a>
         </div>
       </div>
       <div className={styles.footerBottom}>
         <div className={styles.footerBottom__text}>
-          {t("footer-landing.bottom.text")}
+          {t("footerLanding.bottom.text")}
         </div>
         <div className={styles.links}>
           <Link
             to="/agreement"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            {t("footer-landing.bottom.links.agreement")}
+            {t("footerLanding.bottom.links.agreement")}
           </Link>
           <Link
             to="/policy"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            {t("footer-landing.bottom.links.privacy_policy")}
+            {t("footerLanding.bottom.links.privacy_policy")}
           </Link>
         </div>
       </div>
