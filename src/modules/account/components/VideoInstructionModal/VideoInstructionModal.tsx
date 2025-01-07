@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactPlayer from "react-player";
-import questionMark from "assets/questionMark.svg";
 import { Button, Modal } from "antd";
-import styles from "./VideoInstructionModal.module.scss";
-import { useTranslation } from "react-i18next";
 import { InfoOutlined } from "@ant-design/icons";
+import styles from "./VideoInstructionModal.module.scss";
 
-const VideoInstructionModal = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+interface VideoInstructionModalProps {
+  isModalVisible: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  playerRef: React.RefObject<ReactPlayer>;
+  src: string;
+}
 
-  const handleModalOpen = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-  };
-
-  const { t } = useTranslation();
-
+const VideoInstructionModal: React.FC<VideoInstructionModalProps> = ({
+  isModalVisible,
+  onOpen,
+  onClose,
+  playerRef,
+  src,
+}) => {
   return (
     <div>
       <Button
@@ -27,21 +27,22 @@ const VideoInstructionModal = () => {
         shape="circle"
         size="large"
         icon={<InfoOutlined className={styles.iconMessage} />}
-        onClick={handleModalOpen}
+        onClick={onOpen}
       ></Button>
       <Modal
-        title={t("accountPage.modal.title")}
+        title="Video Instruction"
         visible={isModalVisible}
-        onCancel={handleModalClose}
+        onCancel={onClose}
         footer={null}
         width={1300}
       >
         <ReactPlayer
-          url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          ref={playerRef}
+          url={src}
           controls
           width="100%"
           height="100%"
-          playing={true}
+          playing={isModalVisible}
         />
       </Modal>
     </div>

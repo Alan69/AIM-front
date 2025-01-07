@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Layout, Table, Modal } from "antd";
+import { Button, Layout, Table } from "antd";
 import type { TableProps } from "antd";
 import cn from "classnames";
 import { useTypedSelector } from "hooks/useTypedSelector";
@@ -12,6 +12,7 @@ import {
 } from "modules/idea-queries/redux/api";
 
 import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
+import ReactPlayer from "react-player";
 
 const { Content } = Layout;
 
@@ -20,6 +21,17 @@ export const IdeaQueriesListPage = () => {
   const { current_company } = useTypedSelector((state) => state.auth);
   const { data: ideaQueriesList, refetch } = useGetIdeaQueriesListQuery();
   const { t } = useTranslation();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const playerRef = useRef<ReactPlayer | null>(null);
+
+  const openModal = () => setIsModalVisible(true);
+  const closeModal = () => {
+    setIsModalVisible(false);
+    if (playerRef.current) {
+      playerRef.current.getInternalPlayer().pause();
+    }
+  };
 
   const columns: TableProps<TIdeaQueriesData>["columns"] = [
     {
@@ -104,7 +116,13 @@ export const IdeaQueriesListPage = () => {
           scroll={{ x: "max-content" }}
         />
       </Content>
-      <VideoInstructionModal />
+      <VideoInstructionModal
+        isModalVisible={isModalVisible}
+        onOpen={openModal}
+        onClose={closeModal}
+        playerRef={playerRef}
+        src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      />
     </Layout>
   );
 };

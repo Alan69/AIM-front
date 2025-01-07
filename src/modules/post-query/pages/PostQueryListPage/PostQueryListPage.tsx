@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Layout, Table, Spin, Modal } from "antd";
 import type { TableProps } from "antd";
@@ -8,6 +8,7 @@ import { useTypedSelector } from "hooks/useTypedSelector";
 import { useTranslation } from "react-i18next";
 import styles from "./PostQueryListPage.module.scss";
 import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
+import ReactPlayer from "react-player";
 
 const { Content } = Layout;
 
@@ -20,6 +21,17 @@ export const PostQueryListPage = () => {
     isLoading,
   } = useGetPostQueriesListQuery(); // isLoading показывает состояние запроса
   const { t } = useTranslation();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const playerRef = useRef<ReactPlayer | null>(null);
+
+  const openModal = () => setIsModalVisible(true);
+  const closeModal = () => {
+    setIsModalVisible(false);
+    if (playerRef.current) {
+      playerRef.current.getInternalPlayer().pause();
+    }
+  };
 
   const columns: TableProps<TPostQueryData>["columns"] = [
     {
@@ -105,7 +117,13 @@ export const PostQueryListPage = () => {
           />
         </Spin>
       </Content>
-      <VideoInstructionModal />
+      <VideoInstructionModal
+        isModalVisible={isModalVisible}
+        onOpen={openModal}
+        onClose={closeModal}
+        playerRef={playerRef}
+        src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      />
     </Layout>
   );
 };

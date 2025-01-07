@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import cn from "classnames";
 import {
   Button,
@@ -77,6 +77,7 @@ import { ContentPlanStoriesModal } from "modules/content-plan/components/Content
 import { ContentPlanDeletePost } from "modules/content-plan/components/ContentPlanDeletePost/ContentPlanDeletePost";
 import { ContentPlanEditPost } from "modules/content-plan/components/ContentPlanEditPost/ContentPlanEditPost";
 import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
+import ReactPlayer from "react-player";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -86,6 +87,17 @@ export const ContentPlanPage = () => {
   const dispatch = useDispatch();
   const isSmallLaptop = useIsSmallLaptop();
   const isMobile = useIsMobile();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const playerRef = useRef<ReactPlayer | null>(null);
+
+  const openModal = () => setIsModalVisible(true);
+  const closeModal = () => {
+    setIsModalVisible(false);
+    if (playerRef.current) {
+      playerRef.current.getInternalPlayer().pause();
+    }
+  };
 
   const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] =
     useState(false);
@@ -550,7 +562,13 @@ export const ContentPlanPage = () => {
             </Content>
           </Layout>
         </Content>
-        <VideoInstructionModal />
+        <VideoInstructionModal
+          isModalVisible={isModalVisible}
+          onOpen={openModal}
+          onClose={closeModal}
+          playerRef={playerRef}
+          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        />
       </Layout>
       <ContentPlanAddPostModal
         isModalOpen={isContentPlanAddPostModalOpen}
