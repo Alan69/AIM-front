@@ -113,7 +113,7 @@ export const IdeaQueriesListPage = () => {
           scroll={{ x: "max-content" }}
         />
       </Content>
-      <button
+      {/* <button
         type="button"
         className="ant-btn css-dev-only-do-not-override-qk3teg ant-btn-circle ant-btn-default ant-btn-lg ant-btn-icon-only ChatButtonWithForm_messageButton__i7-0i"
         onClick={handleModalOpen}
@@ -146,7 +146,7 @@ export const IdeaQueriesListPage = () => {
           height="100%"
           playing={true}
         />
-      </Modal>
+      </Modal> */}
     </Layout>
   );
 };
