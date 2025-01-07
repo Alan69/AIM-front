@@ -135,6 +135,9 @@
     "post_image_alt": "Post Image",
     "submit_request": "Submit Request"
   },
+  "modal": {
+    "title": "Instructions for using the functionality"
+  },
   "expand_more": "Expand",
   "expand_less": "Collapse",
   "select_social_networks": "Select Social Networks",

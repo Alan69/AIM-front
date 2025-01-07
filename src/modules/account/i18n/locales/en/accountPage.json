@@ -32,5 +32,8 @@
     "success": "Your profile has been successfully updated!",
     "error": "An error occurred! Your profile has not been updated.",
     "invalid_file": "Please upload a JPEG or PNG file."
+  },
+  "modal": {
+    "title": "Instructions for using the functionality"
   }
 }

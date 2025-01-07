@@ -10,6 +10,7 @@ import {
   Select,
   Image,
   message,
+  Modal,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useGetJobTypesListQuery } from "../../../../redux/api/jobTypes/jobTypesApi";
@@ -21,6 +22,8 @@ import styles from "./AccountPage.module.scss";
 import { useTranslation } from "react-i18next";
 import { ConfirmationChangesModal } from "modules/account/components/ConfirmationChangesModal/ConfirmationChangesModal";
 import _ from "lodash";
+import ReactPlayer from "react-player";
+import questionMark from "assets/questionMark.svg";
 
 type TUpdateProfilesForm = {
   user: string;
@@ -46,6 +49,7 @@ export const AccountPage = () => {
   const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
   const [file, setFile] = useState<File | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
@@ -108,6 +112,13 @@ export const AccountPage = () => {
   useEffect(() => {
     getAuthUser();
   }, []);
+  const handleModalOpen = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+  };
 
   const onSubmit = (data: TUpdateProfilesForm) => {
     if (user) {
@@ -206,7 +217,6 @@ export const AccountPage = () => {
               />
             </div>
           </Form.Item>
-
           <Form.Item
             label={t("accountPage.form.email_label")}
             validateStatus={errors.email ? "error" : ""}
@@ -219,7 +229,6 @@ export const AccountPage = () => {
               render={({ field }) => <Input {...field} />}
             />
           </Form.Item>
-
           <Form.Item label={t("accountPage.form.first_name_label")}>
             <Controller
               name="first_name"
@@ -227,7 +236,6 @@ export const AccountPage = () => {
               render={({ field }) => <Input {...field} />}
             />
           </Form.Item>
-
           <Form.Item label={t("accountPage.form.last_name_label")}>
             <Controller
               name="last_name"
@@ -235,7 +243,6 @@ export const AccountPage = () => {
               render={({ field }) => <Input {...field} />}
             />
           </Form.Item>
-
           <Form.Item
             label={t("accountPage.form.birth_year_label")}
             validateStatus={errors.bd_year ? "error" : undefined}
@@ -262,7 +269,6 @@ export const AccountPage = () => {
               render={({ field }) => <Input {...field} type="number" />}
             />
           </Form.Item>
-
           <Form.Item
             label={t("accountPage.form.phone_number_label")}
             validateStatus={errors.phone_number ? "error" : ""}
@@ -284,7 +290,6 @@ export const AccountPage = () => {
               render={({ field }) => <Input {...field} />}
             />
           </Form.Item>
-
           <Form.Item label={t("accountPage.form.job_label")}>
             <Controller
               name="job.id"
@@ -301,7 +306,6 @@ export const AccountPage = () => {
               )}
             />
           </Form.Item>
-
           <Form.Item label={t("accountPage.form.country_label")}>
             <Controller
               name="location.id"
@@ -318,7 +322,6 @@ export const AccountPage = () => {
               )}
             />
           </Form.Item>
-
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={isUpdating}>
               {t("accountPage.buttons.save")}
@@ -327,6 +330,7 @@ export const AccountPage = () => {
               {t("accountPage.buttons.change_password")}
             </Button>
           </Form.Item>
+
           {
             <ConfirmationChangesModal
               visible={showConfirmModal}
@@ -335,6 +339,40 @@ export const AccountPage = () => {
           }
         </Form>
       </Content>
+      <button
+        type="button"
+        className="ant-btn css-dev-only-do-not-override-qk3teg ant-btn-circle ant-btn-default ant-btn-lg ant-btn-icon-only ChatButtonWithForm_messageButton__i7-0i"
+        onClick={handleModalOpen}
+      >
+        <span className="ant-btn-icon">
+          <span
+            role="img"
+            aria-label="message"
+            className="anticon anticon-message ChatButtonWithForm_iconMessage__xIciZ"
+          >
+            <img
+              className={styles.icon}
+              src={questionMark}
+              alt="questionMark"
+            />
+          </span>
+        </span>
+      </button>
+      <Modal
+        title={t("accountPage.modal.title")}
+        visible={isModalVisible}
+        onCancel={handleModalClose}
+        footer={null}
+        width={1300}
+      >
+        <ReactPlayer
+          url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          controls
+          width="100%"
+          height="100%"
+          playing={true}
+        />
+      </Modal>
     </Layout>
   );
 };
