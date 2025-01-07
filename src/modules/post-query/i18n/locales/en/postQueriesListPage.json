@@ -6,5 +6,8 @@
     "post_type": "Post Type",
     "text_style": "Text Style",
     "date": "Creation Date"
+  },
+  "modal": {
+    "title": "Instructions for using the functionality"
   }
 }

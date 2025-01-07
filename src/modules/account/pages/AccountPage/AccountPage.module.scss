@@ -1,5 +1,10 @@
 .photo {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
 }

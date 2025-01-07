@@ -33,6 +33,9 @@
     "error": "An error occurred! Your profile has not been updated.",
     "invalid_file": "Please upload a JPEG or PNG file."
   },
+  "modal": {
+    "title": "Instructions for using the functionality"
+  },
   "confirmation": {
     "title": "Unsaved Changes",
     "message": "You have unsaved changes. Are you sure you want to leave the page?",
