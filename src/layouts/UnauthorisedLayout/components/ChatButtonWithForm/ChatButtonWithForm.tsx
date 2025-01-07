@@ -72,7 +72,6 @@ const ChatButtonWithForm: React.FC = () => {
         icon={<MessageOutlined className={styles.iconMessage} />}
         onClick={showModal}
       />
-
       <Modal
         title={
           <Title level={2} style={{ textAlign: "center" }}>

@@ -10,7 +10,6 @@ import {
   Select,
   Image,
   message,
-  Modal,
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useGetJobTypesListQuery } from "../../../../redux/api/jobTypes/jobTypesApi";
@@ -22,9 +21,9 @@ import styles from "./AccountPage.module.scss";
 import { useTranslation } from "react-i18next";
 import { ConfirmationChangesModal } from "modules/account/components/ConfirmationChangesModal/ConfirmationChangesModal";
 import _ from "lodash";
-import ReactPlayer from "react-player";
-import questionMark from "assets/questionMark.svg";
+
 import { useNavigate } from "react-router-dom";
+import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
 
 type TUpdateProfilesForm = {
   user: string;
@@ -51,7 +50,7 @@ export const AccountPage = () => {
   const { t } = useTranslation();
   const { user } = useTypedSelector((state) => state.auth);
   const [file, setFile] = useState<File | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const [hasChanges, setHasChanges] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [nextLocation, setNextLocation] = useState<string | null>(null);
@@ -95,13 +94,7 @@ export const AccountPage = () => {
   useEffect(() => {
     getAuthUser();
   }, []);
-  const handleModalOpen = () => {
-    setIsModalVisible(true);
-  };
 
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-  };
   const formValues = watch();
 
   const onSubmit = (data: TUpdateProfilesForm) => {
@@ -368,40 +361,7 @@ export const AccountPage = () => {
           </Form>
         </Content>
       </Layout>
-      <button
-        type="button"
-        className="ant-btn css-dev-only-do-not-override-qk3teg ant-btn-circle ant-btn-default ant-btn-lg ant-btn-icon-only ChatButtonWithForm_messageButton__i7-0i"
-        onClick={handleModalOpen}
-      >
-        <span className="ant-btn-icon">
-          <span
-            role="img"
-            aria-label="message"
-            className="anticon anticon-message ChatButtonWithForm_iconMessage__xIciZ"
-          >
-            <img
-              className={styles.icon}
-              src={questionMark}
-              alt="questionMark"
-            />
-          </span>
-        </span>
-      </button>
-      <Modal
-        title={t("accountPage.modal.title")}
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={null}
-        width={1300}
-      >
-        <ReactPlayer
-          url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          controls
-          width="100%"
-          height="100%"
-          playing={true}
-        />
-      </Modal>
+      <VideoInstructionModal />
       <ConfirmationChangesModal
         visible={showConfirmModal}
         onConfirm={handleConfirmNavigation}

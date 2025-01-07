@@ -7,8 +7,7 @@ import { TPostQueryData, useGetPostQueriesListQuery } from "../../redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useTranslation } from "react-i18next";
 import styles from "./PostQueryListPage.module.scss";
-import ReactPlayer from "react-player";
-import questionMark from "assets/questionMark.svg";
+import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
 
 const { Content } = Layout;
 
@@ -21,7 +20,6 @@ export const PostQueryListPage = () => {
     isLoading,
   } = useGetPostQueriesListQuery(); // isLoading показывает состояние запроса
   const { t } = useTranslation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const columns: TableProps<TPostQueryData>["columns"] = [
     {
@@ -77,13 +75,6 @@ export const PostQueryListPage = () => {
     text_style: item?.text_style?.name,
     date: formatDate(item?.time_create),
   }));
-  const handleModalOpen = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-  };
 
   useEffect(() => {
     refetch();
@@ -114,40 +105,7 @@ export const PostQueryListPage = () => {
           />
         </Spin>
       </Content>
-      <button
-        type="button"
-        className="ant-btn css-dev-only-do-not-override-qk3teg ant-btn-circle ant-btn-default ant-btn-lg ant-btn-icon-only ChatButtonWithForm_messageButton__i7-0i"
-        onClick={handleModalOpen}
-      >
-        <span className="ant-btn-icon">
-          <span
-            role="img"
-            aria-label="message"
-            className="anticon anticon-message ChatButtonWithForm_iconMessage__xIciZ"
-          >
-            <img
-              className={styles.icon}
-              src={questionMark}
-              alt="questionMark"
-            />
-          </span>
-        </span>
-      </button>
-      <Modal
-        title={t("postQueriesListPage.modal.title")}
-        visible={isModalVisible}
-        onCancel={handleModalClose}
-        footer={null}
-        width={1300}
-      >
-        <ReactPlayer
-          url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          controls
-          width="100%"
-          height="100%"
-          playing={true}
-        />
-      </Modal>
+      <VideoInstructionModal />
     </Layout>
   );
 };

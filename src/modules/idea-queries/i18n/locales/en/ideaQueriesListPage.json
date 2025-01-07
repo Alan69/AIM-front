@@ -8,8 +8,5 @@
     "theme": "Theme",
     "date_created": "Date Created"
   },
-  "modal": {
-    "title": "Instructions for using the functionality"
-  },
   "locale": "en-US"
 }
