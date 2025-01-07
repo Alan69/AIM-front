@@ -35,5 +35,11 @@
   },
   "modal": {
     "title": "Instructions for using the functionality"
+  },
+  "confirmation": {
+    "title": "Unsaved Changes",
+    "message": "You have unsaved changes. Are you sure you want to leave the page?",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }
