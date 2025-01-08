@@ -126,7 +126,7 @@ export const PostDetailsPage = () => {
 
   const formatText = (text: string) => {
     return text
-      .split("\n\n")
+      .split("\n")
       .map((paragraph, index) => (
         <Typography.Paragraph key={index}>{paragraph}</Typography.Paragraph>
       ));
