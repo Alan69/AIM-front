@@ -6,9 +6,6 @@
     "scenario_theme": "Scenario Theme",
     "date": "Creation Date"
   },
-  "modal": {
-    "title": "Instructions for using the functionality"
-  },
   "create_button": "Create",
   "locale": "en-US"
 }

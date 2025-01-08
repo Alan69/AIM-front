@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import cn from "classnames";
 import {
   Button,
@@ -76,8 +76,8 @@ import { storiesActions } from "modules/stories/redux/slices/stories.slice";
 import { ContentPlanStoriesModal } from "modules/content-plan/components/ContentPlanStoriesModal/ContentPlanStoriesModal";
 import { ContentPlanDeletePost } from "modules/content-plan/components/ContentPlanDeletePost/ContentPlanDeletePost";
 import { ContentPlanEditPost } from "modules/content-plan/components/ContentPlanEditPost/ContentPlanEditPost";
+import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
 import ReactPlayer from "react-player";
-import questionMark from "assets/questionMark.svg";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -87,7 +87,17 @@ export const ContentPlanPage = () => {
   const dispatch = useDispatch();
   const isSmallLaptop = useIsSmallLaptop();
   const isMobile = useIsMobile();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const playerRef = useRef<ReactPlayer | null>(null);
+
+  const openModal = () => setIsModalVisible(true);
+  const closeModal = () => {
+    setIsModalVisible(false);
+    if (playerRef.current) {
+      playerRef.current.getInternalPlayer().pause();
+    }
+  };
 
   const [isContentPlanAddPostModalOpen, setIsContentPlanAddPostModalOpen] =
     useState(false);
@@ -440,14 +450,6 @@ export const ContentPlanPage = () => {
     },
   ];
 
-  const handleModalOpen = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-  };
-
   useEffect(() => {
     return () => {
       dispatch(contentPlanActions.setSelectedPost(null));
@@ -560,40 +562,13 @@ export const ContentPlanPage = () => {
             </Content>
           </Layout>
         </Content>
-        {/* <button
-          type="button"
-          className="ant-btn css-dev-only-do-not-override-qk3teg ant-btn-circle ant-btn-default ant-btn-lg ant-btn-icon-only ChatButtonWithForm_messageButton__i7-0i"
-          onClick={handleModalOpen}
-        >
-          <span className="ant-btn-icon">
-            <span
-              role="img"
-              aria-label="message"
-              className="anticon anticon-message ChatButtonWithForm_iconMessage__xIciZ"
-            >
-              <img
-                className={styles.icon}
-                src={questionMark}
-                alt="questionMark"
-              />
-            </span>
-          </span>
-        </button>
-        <Modal
-          title={t("contentPlanPage.modal.title")}
-          visible={isModalVisible}
-          onCancel={handleModalClose}
-          footer={null}
-          width={1300}
-        >
-          <ReactPlayer
-            url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            controls
-            width="100%"
-            height="100%"
-            playing={true}
-          />
-        </Modal> */}
+        <VideoInstructionModal
+          isModalVisible={isModalVisible}
+          onOpen={openModal}
+          onClose={closeModal}
+          playerRef={playerRef}
+          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        />
       </Layout>
       <ContentPlanAddPostModal
         isModalOpen={isContentPlanAddPostModalOpen}

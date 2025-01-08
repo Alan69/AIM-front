@@ -135,9 +135,6 @@
     "post_image_alt": "Изображение поста",
     "submit_request": "Отправить запрос"
   },
-  "modal": {
-    "title": "Инструкция использования функционала"
-  },
   "expand_more": "Развернуть",
   "expand_less": "Скрыть",
   "select_social_networks": "Выбрать социальные сети",
