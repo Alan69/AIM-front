@@ -14,12 +14,12 @@ const OfferInfo: React.FC = () => {
         <div className={styles.details}>
           <div className={styles.name}>
             {t("offerInfo.your_tariff")}{" "}
-            {user?.profile.user.tariff.is_active
+            {user?.profile?.user.tariff?.is_active
               ? t("offerInfo.is_active")
               : ""}
             <div style={{ margin: "12px 0", fontSize: 24 }}>
-              {user?.profile.user.tariff.is_active
-                ? `${user?.profile.user.tariff.days} ${t("offerInfo.days_left")}`
+              {user?.profile?.user.tariff?.is_active
+                ? `${user?.profile?.user.tariff?.days} ${t("offerInfo.days_left")}`
                 : t("offerInfo.free")}
             </div>
           </div>
