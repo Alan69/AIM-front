@@ -3,6 +3,7 @@ import ReactPlayer from "react-player";
 import { Button, Modal } from "antd";
 import { InfoOutlined } from "@ant-design/icons";
 import styles from "./VideoInstructionModal.module.scss";
+import { useTranslation } from "react-i18next";
 
 interface VideoInstructionModalProps {
   isModalVisible: boolean;
@@ -19,6 +20,7 @@ const VideoInstructionModal: React.FC<VideoInstructionModalProps> = ({
   playerRef,
   src,
 }) => {
+  const { t } = useTranslation();
   return (
     <div>
       <Button
@@ -30,7 +32,7 @@ const VideoInstructionModal: React.FC<VideoInstructionModalProps> = ({
         onClick={onOpen}
       ></Button>
       <Modal
-        title="Video Instruction"
+        title={t("accountPage.modal.title")}
         visible={isModalVisible}
         onCancel={onClose}
         footer={null}
