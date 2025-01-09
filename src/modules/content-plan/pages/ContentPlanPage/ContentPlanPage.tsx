@@ -567,7 +567,7 @@ export const ContentPlanPage = () => {
           onOpen={openModal}
           onClose={closeModal}
           playerRef={playerRef}
-          src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          src="https://res.cloudinary.com/dwbv1fvgp/video/upload/v1736418349/content_plan_jwhudp.mov"
         />
       </Layout>
       <ContentPlanAddPostModal

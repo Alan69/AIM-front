@@ -118,7 +118,7 @@ export const ScenarioQueriesListPage = () => {
         onOpen={openModal}
         onClose={closeModal}
         playerRef={playerRef}
-        src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        src="https://res.cloudinary.com/dwbv1fvgp/video/upload/v1736418376/ideas_and_scenarios_mnaqfi.mov"
       />
     </Layout>
   );

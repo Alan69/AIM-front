@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useUpdateProfilesMutation } from "../../redux/api";
 import {
@@ -21,9 +21,8 @@ import styles from "./AccountPage.module.scss";
 import { useTranslation } from "react-i18next";
 import { ConfirmationChangesModal } from "modules/account/components/ConfirmationChangesModal/ConfirmationChangesModal";
 import _ from "lodash";
-import ReactPlayer from "react-player";
+
 import { useNavigate } from "react-router-dom";
-import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
 
 type TUpdateProfilesForm = {
   user: string;
@@ -58,17 +57,6 @@ export const AccountPage = () => {
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
     : avatar;
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const playerRef = useRef<ReactPlayer | null>(null);
-
-  const openModal = () => setIsModalVisible(true);
-  const closeModal = () => {
-    setIsModalVisible(false);
-    if (playerRef.current) {
-      playerRef.current.getInternalPlayer().pause();
-    }
-  };
 
   const [getAuthUser] = useLazyGetAuthUserQuery();
   const [updateProfiles, { isLoading: isUpdating }] =
@@ -372,13 +360,6 @@ export const AccountPage = () => {
           </Form>
         </Content>
       </Layout>
-      <VideoInstructionModal
-        isModalVisible={isModalVisible}
-        onOpen={openModal}
-        onClose={closeModal}
-        playerRef={playerRef}
-        src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-      />
       <ConfirmationChangesModal
         visible={showConfirmModal}
         onConfirm={handleConfirmNavigation}
