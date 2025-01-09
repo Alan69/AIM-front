@@ -35,12 +35,7 @@ export const PostCreateForm = ({
   const [fileList, setFileList] = useState<File[]>([]);
 
   const handleFileChange = (info: any) => {
-    const validTypes = [
-      "image/jpeg",
-      "image/png",
-      "video/mp4",
-      "video/quicktime",
-    ];
+    const validTypes = ["image/jpeg", "image/png"];
     const files = info.fileList.map((file: any) => file.originFileObj);
 
     const isValid = files.every((file: File) => validTypes.includes(file.type));
