@@ -122,7 +122,7 @@ export const PostQueryListPage = () => {
         onOpen={openModal}
         onClose={closeModal}
         playerRef={playerRef}
-        src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        src="https://api.aimmagic.com/media/posts.mov"
       />
     </Layout>
   );

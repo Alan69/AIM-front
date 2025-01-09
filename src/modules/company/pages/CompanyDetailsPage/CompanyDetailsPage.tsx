@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetCompanyByIdQuery } from "../../redux/api";
 
@@ -30,7 +30,9 @@ import {
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { useGetCurrentTargetAudienceQuery } from "modules/target-audience/redux/api";
 import { useTranslation } from "react-i18next";
+import VideoInstructionModal from "modules/account/components/VideoInstructionModal/VideoInstructionModal";
 
+import ReactPlayer from "react-player";
 interface DataType {
   key: string;
   product_name: string;
@@ -45,6 +47,17 @@ export const CompanyDetailsPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { current_company } = useTypedSelector((state) => state.auth);
+
+  const [isVideoModalVisible, setIsVideoModalVisible] = useState(false);
+  const playerRef = useRef<ReactPlayer | null>(null);
+
+  const openVideoModal = () => setIsVideoModalVisible(true);
+  const closeVideoModal = () => {
+    setIsVideoModalVisible(false);
+    if (playerRef.current) {
+      playerRef.current.getInternalPlayer().pause();
+    }
+  };
 
   const {
     data: company,
@@ -348,6 +361,13 @@ export const CompanyDetailsPage = () => {
             </Content>
           </Layout>
         </Content>
+        <VideoInstructionModal
+          isModalVisible={isVideoModalVisible}
+          onOpen={openVideoModal}
+          onClose={closeVideoModal}
+          playerRef={playerRef}
+          src="https://res.cloudinary.com/dwbv1fvgp/video/upload/v1736418262/company_mkwfm8.mov"
+        />
       </Layout>
       <Modal
         title={t("companyDetailsPage.modals.confirm_deletion")}
