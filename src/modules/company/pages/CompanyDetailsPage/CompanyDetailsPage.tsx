@@ -205,9 +205,20 @@ export const CompanyDetailsPage = () => {
     if (textLines.length > 5) {
       return (
         <div>
-          <Text>
-            {isExpanded ? targetText : textLines.slice(0, 5).join("\n")}
-          </Text>
+          {isExpanded
+            ? targetText.split("\n").map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  <br />
+                </React.Fragment>
+              ))
+            : textLines.slice(0, 9).map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  <br />
+                </React.Fragment>
+              ))}
+
           <Button type="link" onClick={handleToggleExpand}>
             {isExpanded
               ? t("companyDetailsPage.buttons.hide")
