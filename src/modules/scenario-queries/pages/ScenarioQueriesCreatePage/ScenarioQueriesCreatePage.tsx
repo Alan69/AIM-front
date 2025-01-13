@@ -144,7 +144,12 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenarioQueriesCreatePage.scenario_type")}
+            label={
+              <span>
+                {t("scenarioQueriesCreatePage.scenario_type")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.scenario_type ? "error" : ""}
             help={
               errors.scenario_type &&
@@ -169,7 +174,12 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenarioQueriesCreatePage.scenario_theme")}
+            label={
+              <span>
+                {t("scenarioQueriesCreatePage.scenario_theme")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.scenario_theme ? "error" : ""}
             help={
               errors.scenario_theme &&
@@ -194,7 +204,12 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenarioQueriesCreatePage.language")}
+            label={
+              <span>
+                {t("scenarioQueriesCreatePage.language")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.language ? "error" : ""}
             help={
               errors.language && t("scenarioQueriesCreatePage.errors.required")
@@ -227,7 +242,12 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenarioQueriesCreatePage.latency")}
+            label={
+              <span>
+                {t("scenarioQueriesCreatePage.latency")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.latency ? "error" : ""}
             help={
               errors.latency && t("scenarioQueriesCreatePage.errors.required")
@@ -260,7 +280,12 @@ export const ScenarioQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("scenarioQueriesCreatePage.description")}
+            label={
+              <span>
+                {t("scenarioQueriesCreatePage.description")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.description ? "error" : ""}
             help={
               errors.description &&
