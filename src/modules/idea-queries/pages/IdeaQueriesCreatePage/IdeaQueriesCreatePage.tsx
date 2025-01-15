@@ -143,7 +143,12 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("ideaQueriesCreatePage.fields.content_type")}
+            label={
+              <span>
+                {t("ideaQueriesCreatePage.fields.content_type")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.content_type ? "error" : ""}
             help={
               errors.content_type &&
@@ -168,7 +173,12 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("ideaQueriesCreatePage.fields.theme")}
+            label={
+              <span>
+                {t("ideaQueriesCreatePage.fields.theme")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.theme ? "error" : ""}
             help={
               errors.theme && t("ideaQueriesCreatePage.validation.required")
@@ -192,7 +202,12 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("ideaQueriesCreatePage.fields.language")}
+            label={
+              <span>
+                {t("ideaQueriesCreatePage.fields.language")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.language ? "error" : ""}
             help={
               errors.language && t("ideaQueriesCreatePage.validation.required")
@@ -225,7 +240,12 @@ export const IdeaQueriesCreatePage = () => {
           </Form.Item>
 
           <Form.Item
-            label={t("ideaQueriesCreatePage.fields.description")}
+            label={
+              <span>
+                {t("ideaQueriesCreatePage.fields.description")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.description ? "error" : ""}
             help={
               errors.description &&

@@ -65,6 +65,10 @@
 
 .logOutBtn {
   padding: 8px 0;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+
   button {
     width: 100%;
   }

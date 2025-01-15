@@ -162,9 +162,13 @@ export const PostQueryGenerateForm = ({
               )}
             />
           </Form.Item>
-
           <Form.Item
-            label={t("contentPlanPage.post_query_generate_form.product")}
+            label={
+              <span>
+                {t("contentPlanPage.post_query_generate_form.product")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.product ? "error" : ""}
             help={
               errors.product &&
@@ -191,9 +195,13 @@ export const PostQueryGenerateForm = ({
               )}
             />
           </Form.Item>
-
           <Form.Item
-            label={t("contentPlanPage.post_query_generate_form.post_type")}
+            label={
+              <span>
+                {t("contentPlanPage.post_query_generate_form.post_type")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.post_type ? "error" : ""}
             help={
               errors.post_type &&
@@ -216,9 +224,13 @@ export const PostQueryGenerateForm = ({
               )}
             />
           </Form.Item>
-
           <Form.Item
-            label={t("contentPlanPage.post_query_generate_form.text_style")}
+            label={
+              <span>
+                {t("contentPlanPage.post_query_generate_form.text_style")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.text_style ? "error" : ""}
             help={
               errors.text_style &&
@@ -241,9 +253,13 @@ export const PostQueryGenerateForm = ({
               )}
             />
           </Form.Item>
-
           <Form.Item
-            label={t("contentPlanPage.post_query_generate_form.lang")}
+            label={
+              <span>
+                {t("contentPlanPage.post_query_generate_form.lang")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.lang ? "error" : ""}
             help={
               errors.lang &&
@@ -275,9 +291,13 @@ export const PostQueryGenerateForm = ({
               )}
             />
           </Form.Item>
-
           <Form.Item
-            label={t("contentPlanPage.post_query_generate_form.content")}
+            label={
+              <span>
+                {t("contentPlanPage.post_query_generate_form.content")}{" "}
+                <span className={styles.redStar}>*</span>
+              </span>
+            }
             validateStatus={errors.content ? "error" : ""}
             help={
               errors.content &&
@@ -293,7 +313,6 @@ export const PostQueryGenerateForm = ({
               )}
             />
           </Form.Item>
-
           <Form.Item>
             <Button
               type="primary"

@@ -36,6 +36,7 @@ import { TargetAudiencePage } from "modules/target-audience/pages/TargetAudience
 import { LandingPage } from "layouts/UnauthorisedLayout/Pages/LandingPage";
 import { PolicyPage } from "layouts/UnauthorisedLayout/Pages/PolicyPage";
 import { AgreementPage } from "layouts/UnauthorisedLayout/Pages/AgreementPage";
+import { TermsAndConditionsPage } from "layouts/UnauthorisedLayout/Pages/TermsAndConditionsPage";
 import { useLazyGetAuthUserQuery } from "modules/auth/redux/api";
 import { TargetAudienceUpdatePage } from "modules/target-audience/pages/TargetAudienceUpdatePage/TargetAudienceUpdatePage";
 import { IdeaQueriesListPage } from "modules/idea-queries/pages/IdeaQueriesListPage/IdeaQueriesListPage";
@@ -66,6 +67,7 @@ const AppRoutes: FC = () => {
           <Route path="/home" element={<LandingPage />} />
           <Route path="/agreement" element={<AgreementPage />} />
           <Route path="/policy" element={<PolicyPage />} />
+          <Route path="/terms" element={<TermsAndConditionsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/recovery" element={<RecoveryPage />} />
@@ -89,6 +91,7 @@ const AppRoutes: FC = () => {
         <Route path="/home" element={<LandingPage />} />
         <Route path="/agreement" element={<AgreementPage />} />
         <Route path="/policy" element={<PolicyPage />} />
+        <Route path="/terms" element={<TermsAndConditionsPage />} />
         <Route path="/account/profile/edit" element={<AccountPage />} />
         <Route path="/account/tariffs" element={<TariffListPage />} />
         <Route path="/tariffs" element={<TariffListPage />} />
