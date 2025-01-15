@@ -59,16 +59,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
         </div>
       ),
     },
-    {
-      key: "3",
-      label: (
-        <div className={styles.logOutBtn}>
-          <Button type="primary" onClick={logOut}>
-            {t("menuMain.logout")}
-          </Button>
-        </div>
-      ),
-    },
+
     {
       key: "4",
       label: (
@@ -115,6 +106,16 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
         </div>
       ),
     },
+    {
+      key: "3",
+      label: (
+        <div className={styles.logOutBtn}>
+          <Button type="primary" onClick={logOut}>
+            {t("menuMain.logout")}
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -137,6 +138,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
           <IconLogo />
         </Link>
         <Menu
+          className={styles.customMenu} // Добавляем свой класс
           defaultSelectedKeys={["1"]}
           defaultOpenKeys={["sub1"]}
           mode="inline"
