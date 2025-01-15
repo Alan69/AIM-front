@@ -133,7 +133,6 @@ export const PostQueryGenerateForm = ({
         </div>
       ) : (
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-          asd
           <Form.Item
             label={t("contentPlanPage.post_query_generate_form.company")}
             validateStatus={errors.company ? "error" : ""}
