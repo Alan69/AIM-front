@@ -14,8 +14,8 @@ const Menu = () => {
         {location.pathname === "/login" ||
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
-        location.pathname === "/policy" ||
-        location.pathname === "/terms" ? (
+        location.pathname === "/privacy-policy" ||
+        location.pathname === "/terms-and-conditions" ? (
           <Link to="/home">{t("menuLanding.examples")}</Link>
         ) : (
           <a href="#OurWorksSection">{t("menuLanding.examples")}</a>
@@ -25,8 +25,8 @@ const Menu = () => {
         {location.pathname === "/login" ||
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
-        location.pathname === "/policy" ||
-        location.pathname === "/terms" ? (
+        location.pathname === "/privacy-policy" ||
+        location.pathname === "/terms-and-conditions" ? (
           <Link to="/home">{t("menuLanding.howItWorksSection")}</Link>
         ) : (
           <a href="#HowItWorkSection">{t("menuLanding.howItWorksSection")}</a>
@@ -36,8 +36,8 @@ const Menu = () => {
         {location.pathname === "/login" ||
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
-        location.pathname === "/policy" ||
-        location.pathname === "/terms" ? (
+        location.pathname === "/privacy-policy" ||
+        location.pathname === "/terms-and-conditions" ? (
           <Link to="/home">{t("menuLanding.benefits")}</Link>
         ) : (
           <a href="#AdvantagesSection">{t("menuLanding.benefits")}</a>
@@ -47,8 +47,8 @@ const Menu = () => {
         {location.pathname === "/login" ||
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
-        location.pathname === "/policy" ||
-        location.pathname === "/terms" ? (
+        location.pathname === "/privacy-policy" ||
+        location.pathname === "/terms-and-conditions" ? (
           <Link to="/home">{t("menuLanding.whatYouGetSection")}</Link>
         ) : (
           <a href="#WhatYouGetSection">{t("menuLanding.whatYouGetSection")}</a>
@@ -58,8 +58,8 @@ const Menu = () => {
         {location.pathname === "/login" ||
         location.pathname === "/signup" ||
         location.pathname === "/agreement" ||
-        location.pathname === "/policy" ||
-        location.pathname === "/terms" ? (
+        location.pathname === "/privacy-policy" ||
+        location.pathname === "/terms-and-conditions" ? (
           <Link to="/home">{t("menuLanding.faqSection")}</Link>
         ) : (
           <a href="#FAQSection">{t("menuLanding.faqSection")}</a>

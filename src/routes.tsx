@@ -66,8 +66,8 @@ const AppRoutes: FC = () => {
         <Route element={<UnauthorisedLayout />}>
           <Route path="/home" element={<LandingPage />} />
           <Route path="/agreement" element={<AgreementPage />} />
-          <Route path="/policy" element={<PolicyPage />} />
-          <Route path="/terms" element={<TermsAndConditionsPage />} />
+          <Route path="/privacy-policy" element={<PolicyPage />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/recovery" element={<RecoveryPage />} />
@@ -90,8 +90,8 @@ const AppRoutes: FC = () => {
       <Route element={<MainLayout />}>
         <Route path="/home" element={<LandingPage />} />
         <Route path="/agreement" element={<AgreementPage />} />
-        <Route path="/policy" element={<PolicyPage />} />
-        <Route path="/terms" element={<TermsAndConditionsPage />} />
+        <Route path="/privacy-policy" element={<PolicyPage />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditionsPage />} />
         <Route path="/account/profile/edit" element={<AccountPage />} />
         <Route path="/account/tariffs" element={<TariffListPage />} />
         <Route path="/tariffs" element={<TariffListPage />} />
