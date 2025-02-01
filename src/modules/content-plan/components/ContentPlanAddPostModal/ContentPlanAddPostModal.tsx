@@ -140,6 +140,11 @@ export const ContentPlanAddPostModal = ({
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime,
         active: true,
+        // @ts-ignore
+        post_images: selectNewPost.media.length
+          ? // @ts-ignore
+            selectNewPost.media.map((media) => media.id)
+          : undefined,
       });
       handleClearAddModal();
     }
@@ -283,6 +288,36 @@ export const ContentPlanAddPostModal = ({
       }
     }
     return null;
+  };
+
+  const renderImage = () => {
+    const mediaItem = selectNewPost;
+
+    return (
+      <div
+        className="mediaItem"
+        style={{
+          width: "250px",
+          height: "250px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          // @ts-ignore
+          src={mediaItem?.picture}
+          className="media"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+          alt={t("contentPlanPage.content_plan_add_post_modal.image_alt")}
+        />
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -459,7 +494,12 @@ export const ContentPlanAddPostModal = ({
                   styles.selectNewPost,
                   styles.selectNewPost__isActive
                 )}
-                avatar={renderMediaSlider()}
+                avatar={
+                  // @ts-ignore
+                  selectNewPost?.media?.length
+                    ? renderMediaSlider()
+                    : renderImage()
+                }
                 description={
                   <>
                     <Paragraph
