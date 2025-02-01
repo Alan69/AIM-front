@@ -33,16 +33,16 @@ export const MainLayout = memo(function MainLayout() {
       className={cn(
         location.pathname === "/home" ||
           location.pathname === "/agreement" ||
-          location.pathname === "/policy" ||
-          location.pathname === "/terms"
+          location.pathname === "/privacy-policy" ||
+          location.pathname === "/terms-and-conditions"
           ? ""
           : styles.layout
       )}
     >
       {location.pathname === "/home" ||
       location.pathname === "/agreement" ||
-      location.pathname === "/policy" ||
-      location.pathname === "/terms" ? (
+      location.pathname === "/privacy-policy" ||
+      location.pathname === "/terms-and-conditions" ? (
         <Header />
       ) : (
         <MenuNav isOpen={isOpen} handleSwitchMenu={handleSwitchMenu} />
@@ -51,8 +51,8 @@ export const MainLayout = memo(function MainLayout() {
         className={cn(
           location.pathname === "/home" ||
             location.pathname === "/agreement" ||
-            location.pathname === "/policy" ||
-            location.pathname === "/terms"
+            location.pathname === "/privacy-policy" ||
+            location.pathname === "/terms-and-conditions"
             ? styles.main
             : styles.body
         )}
@@ -72,8 +72,8 @@ export const MainLayout = memo(function MainLayout() {
         </Suspense>
         {location.pathname === "/home" ||
         location.pathname === "/agreement" ||
-        location.pathname === "/policy" ||
-        location.pathname === "/terms" ? (
+        location.pathname === "/privacy-policy" ||
+        location.pathname === "/terms-and-conditions" ? (
           <FooterLanding />
         ) : (
           <Footer className={styles.footer}>

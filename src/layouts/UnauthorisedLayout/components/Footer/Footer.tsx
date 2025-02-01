@@ -93,13 +93,13 @@ export const Footer = () => {
             {t("footerLanding.bottom.links.agreement")}
           </Link>
           <Link
-            to="/policy"
+            to="/privacy-policy"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
             {t("footerLanding.bottom.links.privacy_policy")}
           </Link>
           <Link
-            to="/terms"
+            to="/terms-and-conditions"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
             {t("footerLanding.bottom.links.terms_and_conditions")}
