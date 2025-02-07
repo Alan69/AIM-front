@@ -8,36 +8,31 @@ const Menu = () => {
   const location = useLocation();
   const { t } = useTranslation();
 
+  const isDocPage = 
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/agreement" ||
+    location.pathname === "/privacy-policy" ||
+    location.pathname === "/terms-and-conditions";
+
   return (
     <AntMenu mode="horizontal" className={styles.menu}>
       <AntMenu.Item key="examples" className={styles.item}>
-        {location.pathname === "/login" ||
-        location.pathname === "/signup" ||
-        location.pathname === "/agreement" ||
-        location.pathname === "/privacy-policy" ||
-        location.pathname === "/terms-and-conditions" ? (
+        {isDocPage ? (
           <Link to="/home">{t("menuLanding.examples")}</Link>
         ) : (
           <a href="#OurWorksSection">{t("menuLanding.examples")}</a>
         )}
       </AntMenu.Item>
       <AntMenu.Item key="how-it-works" className={styles.item}>
-        {location.pathname === "/login" ||
-        location.pathname === "/signup" ||
-        location.pathname === "/agreement" ||
-        location.pathname === "/privacy-policy" ||
-        location.pathname === "/terms-and-conditions" ? (
+        {isDocPage ? (
           <Link to="/home">{t("menuLanding.howItWorksSection")}</Link>
         ) : (
           <a href="#HowItWorkSection">{t("menuLanding.howItWorksSection")}</a>
         )}
       </AntMenu.Item>
       <AntMenu.Item key="benefits" className={styles.item}>
-        {location.pathname === "/login" ||
-        location.pathname === "/signup" ||
-        location.pathname === "/agreement" ||
-        location.pathname === "/privacy-policy" ||
-        location.pathname === "/terms-and-conditions" ? (
+        {isDocPage ? (
           <Link to="/home">{t("menuLanding.benefits")}</Link>
         ) : (
           <a href="#AdvantagesSection">{t("menuLanding.benefits")}</a>
@@ -64,6 +59,16 @@ const Menu = () => {
         ) : (
           <a href="#FAQSection">{t("menuLanding.faqSection")}</a>
         )}
+      </AntMenu.Item>
+      <AntMenu.Item key="privacy-policy">
+        <Link to="/privacy-policy">
+          {t("footerLanding.bottom.links.privacy_policy")}
+        </Link>
+      </AntMenu.Item>
+      <AntMenu.Item key="terms">
+        <Link to="/terms-and-conditions">
+          {t("footerLanding.bottom.links.terms_and_conditions")}
+        </Link>
       </AntMenu.Item>
     </AntMenu>
   );
