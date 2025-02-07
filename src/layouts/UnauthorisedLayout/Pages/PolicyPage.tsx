@@ -431,6 +431,28 @@ export const PolicyPage = () => {
         законодательством Республики Казахстан.
       </div>
 
+      <h3 className={styles.docsSection__subtitle}>Обработка данных Google</h3>
+      <div className={styles.docsSection__text}>
+        При использовании сервисов Google через нашу Платформу:
+      </div>
+      <ul className={styles.docsSection__list}>
+        <li className={styles.docsSection__list__item}>
+          Мы получаем доступ к данным вашего аккаунта Google только после вашего явного согласия
+        </li>
+        <li className={styles.docsSection__list__item}>
+          Данные используются исключительно для авторизации и предоставления запрошенных вами функций
+        </li>
+        <li className={styles.docsSection__list__item}>
+          Мы храним только необходимый минимум данных для функционирования сервиса
+        </li>
+        <li className={styles.docsSection__list__item}>
+          Мы не передаем данные вашего аккаунта Google третьим лицам без вашего явного согласия
+        </li>
+        <li className={styles.docsSection__list__item}>
+          Вы можете в любой момент отозвать доступ к данным Google через настройки вашего аккаунта Google
+        </li>
+      </ul>
+
       <h3 className={styles.docsSection__subtitle}>Дополнительные условия</h3>
       <div className={styles.docsSection__text}>
         9.1. Изменения в настоящую Политику конфиденциальности вносятся без
