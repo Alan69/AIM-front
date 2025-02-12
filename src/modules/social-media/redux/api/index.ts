@@ -129,6 +129,16 @@ export const postApi = baseApi.injectEndpoints({
       }),
       transformResponse: (response: string) => response,
     }),
+    addYoutube: build.query<string, void>({
+      query: () => ({
+        url: '/youtube/auth/',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }),
+      transformResponse: (response: string) => response,
+    }),
     removePlatform: build.mutation<string, string>({
       query: (id) => ({
         url: `/platforms/accounts/remove/${id}/`,
@@ -152,5 +162,6 @@ export const {
   useLazyAddTumblrQuery,
   useLazyAddTwitterQuery,
   useLazyAddVkQuery,
+  useLazyAddYoutubeQuery,
   useRemovePlatformMutation
 } = postApi;

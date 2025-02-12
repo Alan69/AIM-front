@@ -16,6 +16,7 @@ import {
   useLazyAddTumblrQuery,
   useLazyAddTwitterQuery,
   useLazyAddVkQuery,
+  useLazyAddYoutubeQuery,
 } from "modules/social-media/redux/api";
 
 const { Content } = Layout;
@@ -36,6 +37,7 @@ export const SocialMediaAddPage = () => {
   const [addTumblr] = useLazyAddTumblrQuery();
   const [addTwitter] = useLazyAddTwitterQuery();
   const [addVk] = useLazyAddVkQuery();
+  const [addYoutube] = useLazyAddYoutubeQuery();
 
   const addSocialMediaActions: any = {
     instagram: addInstagram,
@@ -48,6 +50,7 @@ export const SocialMediaAddPage = () => {
     tumblr: addTumblr,
     twitter: addTwitter,
     vk: addVk,
+    youtube: addYoutube,
   };
 
   const handleAddSocialMedia = (item: TSocialMediaData) => {
