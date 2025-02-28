@@ -26,6 +26,7 @@ export type TPostQueryCreateData = {
   text_style: string;
   lang: string;
   content: string;
+  with_image: boolean;
 }
 
 export type TPostQueryDataResponse = {
@@ -40,6 +41,7 @@ export type TPostQueryDataResponse = {
   content: string;
   time_create?: string;
   time_update?: string;
+  error_message?: string;
 }
 
 export type TPostQueryCreateReplayData = {
@@ -74,7 +76,7 @@ export const postQueryApi = baseApi.injectEndpoints({
       transformResponse: (response: TPostQueryData) => response,
     }),
     createPostQuery: build.mutation<TPostQueryDataResponse, TPostQueryCreateData>({
-      query: ({ content, company, product, post_type, text_style, lang }) => ({
+      query: ({ content, company, product, post_type, text_style, lang, with_image }) => ({
         url: '/post_queries/',
         method: 'POST',
         body: {
@@ -84,6 +86,7 @@ export const postQueryApi = baseApi.injectEndpoints({
           post_type,
           text_style,
           lang,
+          with_image,
         }
       }),
       transformResponse: (response: TPostQueryDataResponse) => response,

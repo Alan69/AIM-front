@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-import { Layout, Button, Form, Input, Select, message } from "antd";
+import { Layout, Button, Form, Input, Select, Switch, message } from "antd";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import {
   TPostQueryCreateData,
@@ -47,6 +47,7 @@ export const PostQueryCreatePage = () => {
       post_type: "",
       text_style: "",
       lang: "",
+      with_image: false,
     },
   });
 
@@ -64,13 +65,19 @@ export const PostQueryCreatePage = () => {
   }, [current_company, getProductListByCompanyId]);
 
   const onSubmit = (data: TPostQueryCreateData) => {
+    console.log('Form data before submission:', data);
     const updatedData = {
       ...data,
       company: current_company?.id,
+      with_image: data.with_image,
     };
+    console.log('Updated data for submission:', updatedData);
     createPostQuery(updatedData)
       .unwrap()
       .then((response) => {
+        if (response.error_message) {
+          message.warning(response.error_message);
+        }
         navigate(`/post/${response.post_id}`);
       })
       .catch((error) => {
@@ -221,6 +228,30 @@ export const PostQueryCreatePage = () => {
                       </Select.Option>
                     ))}
                 </Select>
+              )}
+            />
+          </Form.Item>
+
+          <Form.Item 
+            label={"С изображением"}
+            tooltip={"Включить/выключить генерацию изображения"}
+            className={styles.withImageSwitch}
+          >
+            <Controller
+              name="with_image"
+              control={control}
+              defaultValue={false}
+              render={({ field: { value, onChange } }) => (
+                <Switch 
+                  checked={value}
+                  onChange={(checked: boolean) => {
+                    onChange(checked);
+                    console.log('Switch value changed:', checked);
+                  }}
+                  disabled={isPostCreating}
+                  checkedChildren={"Да"}
+                  unCheckedChildren={"Нет"}
+                />
               )}
             />
           </Form.Item>
