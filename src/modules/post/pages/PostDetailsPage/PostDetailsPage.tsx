@@ -20,6 +20,7 @@ import {
   message,
   Tooltip,
   Upload,
+  Progress,
 } from "antd";
 import {
   ReloadOutlined,
@@ -31,6 +32,8 @@ import {
   DownOutlined,
   PlusOutlined,
   UploadOutlined,
+  HeartOutlined,
+  HeartFilled,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -55,6 +58,10 @@ import {
   useAddToSchedulersMutation,
 } from "modules/content-plan/redux/api";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "redux/store";
+import { postActions } from "../../redux/slices/post.slice";
+import { WebSocketService } from "services/websocket";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -88,6 +95,15 @@ export const PostDetailsPage = () => {
     useCreatePostImageMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
+  
+  // Add Redux state for generation status
+  const dispatch = useDispatch();
+  const { textGenerationStatus, imageGenerationStatus } = useSelector(
+    (state: RootState) => state.post
+  );
+  
+  // WebSocket state
+  const [wsService, setWsService] = useState<WebSocketService | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -307,36 +323,176 @@ export const PostDetailsPage = () => {
     }
   };
 
+  // Initialize WebSocket connection
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    if (id) {
+      // Reset generation status when component mounts or ID changes
+      dispatch(postActions.setTextGenerationStatus('pending'));
+      dispatch(postActions.setImageGenerationStatus('pending'));
+      
+      // Create WebSocket connection
+      // Use the correct protocol (ws or wss) based on the current page protocol
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      
+      // For local development, use localhost:8000 directly
+      const host = process.env.NODE_ENV === 'development' 
+        ? '127.0.0.1:8000'  // Use the Django development server directly
+        : window.location.host;
+        
+      const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
+      console.log('Connecting to WebSocket:', wsUrl);
+      
+      const ws = new WebSocketService(wsUrl, handleWebSocketMessage);
+      
+      ws.connect();
+      setWsService(ws);
+      
+      return () => {
+        ws.disconnect();
+      };
+    }
+  }, [id, dispatch]);
+  
+  // Handle WebSocket messages
+  const handleWebSocketMessage = (data: any) => {
+    console.log('WebSocket message received:', data);
+    
+    // Handle welcome message
+    if (data.type === 'welcome') {
+      console.log('WebSocket connection established');
+      
+      // Send initial post check request if needed
+      if (id && user?.profile?.user?.id) {
+        const message = {
+          query: 'post',
+          user: user.profile.user.id,
+          id: id,
+          time: new Date().toISOString(),
+          txt: true,
+          img: true,
+          previous_img: post?.picture || '/media/no_img.jpeg' // Add the current image to check if it changes
+        };
+        console.log('Sending post check request:', message);
+        wsService?.send(message);
+      }
+    }
+    
+    // Handle post status updates
+    if (data.type === 'post') {
+      console.log('Post status update received:', data);
+      
+      // Check if this is a status update
+      if (data['checking-status']) {
+        console.log('Checking status update:', data);
+        
+        // Update generation status based on the message
+        if (data.text_generated !== undefined) {
+          const status = data.text_generated ? 'completed' : 'pending';
+          console.log('Setting text generation status:', status);
+          dispatch(postActions.setTextGenerationStatus(status));
+        }
+        
+        if (data.image_generated !== undefined) {
+          const status = data.image_generated ? 'completed' : 'pending';
+          console.log('Setting image generation status:', status);
+          dispatch(postActions.setImageGenerationStatus(status));
+        }
+        
+        // If the message indicates we're still generating, set a timeout to force refresh
+        if (data.message && data.message.includes('Still generating')) {
+          setTimeout(() => {
+            console.log('Forcing refresh after delay');
+            refetch();
+            refetchPostMedias();
+          }, 3000);
+        }
+      } 
+      // Final result
+      else if (data.result === 'ok') {
+        console.log('Final result received:', data);
+        
+        // Update generation status based on the final result
+        if (data.text_generated !== undefined) {
+          const status = data.text_generated ? 'completed' : 'failed';
+          console.log('Setting final text generation status:', status);
+          dispatch(postActions.setTextGenerationStatus(status));
+        }
+        
+        if (data.image_generated !== undefined) {
+          const status = data.image_generated ? 'completed' : 'failed';
+          console.log('Setting final image generation status:', status);
+          dispatch(postActions.setImageGenerationStatus(status));
+        }
+        
+        // Always refresh the post data when we get a final result
+        console.log('Refreshing data after final result');
+        refetch();
+        refetchPostMedias();
+      }
+      // Handle error
+      else if (data.result === 'error') {
+        console.error('Error from WebSocket:', data.message);
+        message.error(data.message || 'Error checking post status');
+      }
+    }
+  };
+  
+  // Check if the post has an image and update the status accordingly
+  useEffect(() => {
+    if (post && post.picture && post.picture !== '/media/no_img.jpeg') {
+      console.log('Post has an image, updating status to completed:', post.picture);
+      dispatch(postActions.setImageGenerationStatus('completed'));
+      
+      // Refresh the post data when the image is generated
+      refetch();
+      refetchPostMedias();
+    }
+  }, [post, dispatch, refetch, refetchPostMedias]);
+  
+  // Force a refresh after 10 seconds if we're still in pending state
+  useEffect(() => {
+    if ((textGenerationStatus === 'pending' || imageGenerationStatus === 'pending') && id && post) {
+      const timer = setTimeout(() => {
+        console.log('Forcing refresh due to pending status');
+        refetch();
+        refetchPostMedias();
+        
+        // Also send a new WebSocket request
+        if (id && user?.profile?.user?.id && wsService) {
+          const message = {
+            query: 'post',
+            user: user.profile.user.id,
+            id: id,
+            time: new Date().toISOString(),
+            txt: true,
+            img: true,
+            previous_img: post?.picture || '/media/no_img.jpeg'
+          };
+          console.log('Sending refresh request after timeout:', message);
+          wsService.send(message);
+        }
+      }, 10000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [textGenerationStatus, imageGenerationStatus, id, user, wsService, post, refetch, refetchPostMedias]);
 
+  // Replace interval polling with WebSocket
+  useEffect(() => {
     if (post) {
       const {
-        main_text,
-        title,
-        hashtags,
-        picture,
-        img_prompt,
         txt_prompt,
+        img_prompt,
         img_style,
       } = post;
 
       setValue("imageDescription", img_prompt || "");
       setValue("textDescription", txt_prompt || "");
       setCurrentImgStyle(img_style);
-
-      if (!main_text || !title || !hashtags || picture?.includes("no_img")) {
-        interval = setInterval(() => {
-          refetch();
-          refetchPostMedias();
-        }, 5000);
-      }
+      
+      // No need for interval polling as we're using WebSocket now
     }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [post, refetch, setValue]);
+  }, [post, setValue]);
 
   if (isLoading)
     return (

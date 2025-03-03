@@ -16,8 +16,12 @@ export class WebSocketService {
       };
 
       this.ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        this.onMessage(data);
+        try {
+          const data = JSON.parse(event.data);
+          this.onMessage(data);
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
       };
 
       this.ws.onclose = () => {

@@ -6,13 +6,17 @@ interface PostState {
   generatedPost: TPostData | null;
   isCustomPostCreated: boolean;
   createdCustomPost: TPostData | null;
+  textGenerationStatus: 'pending' | 'in_progress' | 'completed' | 'failed';
+  imageGenerationStatus: 'pending' | 'in_progress' | 'completed' | 'failed';
 }
 
 const initialState: PostState = {
   isPostGenerated: false,
   generatedPost: null,
   createdCustomPost: null,
-  isCustomPostCreated: false
+  isCustomPostCreated: false,
+  textGenerationStatus: 'pending',
+  imageGenerationStatus: 'pending'
 };
 
 const postSlice = createSlice({
@@ -30,6 +34,12 @@ const postSlice = createSlice({
     },
     setIsCustomCreated: (state, { payload }: PayloadAction<boolean>) => {
       state.isCustomPostCreated = payload;
+    },
+    setTextGenerationStatus: (state, { payload }: PayloadAction<'pending' | 'in_progress' | 'completed' | 'failed'>) => {
+      state.textGenerationStatus = payload;
+    },
+    setImageGenerationStatus: (state, { payload }: PayloadAction<'pending' | 'in_progress' | 'completed' | 'failed'>) => {
+      state.imageGenerationStatus = payload;
     },
   },
 });
