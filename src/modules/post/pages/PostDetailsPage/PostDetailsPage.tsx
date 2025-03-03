@@ -334,10 +334,15 @@ export const PostDetailsPage = () => {
       // Use the correct protocol (ws or wss) based on the current page protocol
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       
-      // For local development, use localhost:8000 directly
-      const host = process.env.NODE_ENV === 'development' 
-        ? '127.0.0.1:8000'  // Use the Django development server directly
-        : window.location.host;
+      // Determine the correct host based on environment
+      let host;
+      if (process.env.NODE_ENV === 'development') {
+        // For local development, use localhost:8000 directly
+        host = '127.0.0.1:8000';
+      } else {
+        // For production, use the API domain
+        host = 'api.aimmagic.com';
+      }
         
       const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
       console.log('Connecting to WebSocket:', wsUrl);
@@ -459,6 +464,21 @@ export const PostDetailsPage = () => {
         
         // Also send a new WebSocket request
         if (id && user?.profile?.user?.id && wsService) {
+          // Determine the correct host based on environment
+          let apiHost;
+          if (process.env.NODE_ENV === 'development') {
+            apiHost = '127.0.0.1:8000';
+          } else {
+            apiHost = 'api.aimmagic.com';
+          }
+          
+          // Get the current image URL, ensuring it's a full URL for comparison
+          let previousImg = post?.picture || '/media/no_img.jpeg';
+          if (previousImg.startsWith('/media/') && previousImg !== '/media/no_img.jpeg') {
+            // Convert relative URL to absolute URL
+            previousImg = `${window.location.protocol}//${apiHost}${previousImg}`;
+          }
+          
           const message = {
             query: 'post',
             user: user.profile.user.id,
@@ -466,7 +486,7 @@ export const PostDetailsPage = () => {
             time: new Date().toISOString(),
             txt: true,
             img: true,
-            previous_img: post?.picture || '/media/no_img.jpeg'
+            previous_img: previousImg
           };
           console.log('Sending refresh request after timeout:', message);
           wsService.send(message);
