@@ -233,7 +233,7 @@ export const PostQueryCreatePage = () => {
           </Form.Item>
 
           <Form.Item 
-            label={"С изображением"}
+            label={"Создать изображение"}
             tooltip={"Включить/выключить генерацию изображения"}
             className={styles.withImageSwitch}
           >
