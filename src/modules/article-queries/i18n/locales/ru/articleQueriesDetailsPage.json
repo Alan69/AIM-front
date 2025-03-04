@@ -1,0 +1,23 @@
+{
+  "title": "Детали запроса статьи",
+  "details_section": {
+    "title": "Детали запроса",
+    "company": "Компания",
+    "product": "Продукт",
+    "article_type": "Тип статьи",
+    "article_style": "Стиль статьи",
+    "word_length": "Длина текста",
+    "language": "Язык",
+    "text": "Дополнительный текст",
+    "created_at": "Создано"
+  },
+  "articles_section": {
+    "title": "Сгенерированные статьи",
+    "not_found": "Для этого запроса не найдено статей."
+  },
+  "actions": {
+    "replay_button": "Сгенерировать снова",
+    "copy_button": "Копировать в буфер обмена",
+    "copied_message": "Скопировано в буфер обмена!"
+  }
+} 

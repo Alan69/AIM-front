@@ -11,6 +11,7 @@ import {
   RadarChartOutlined,
   BorderOuterOutlined,
   FileDoneOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import { Badge, Button, Menu } from "antd";
 import type { MenuProps } from "antd";
@@ -92,6 +93,15 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       label: (
         <Link to="/scenario-queries" onClick={handleSwitchMenu}>
           {t("menuMain.items.scenarios")}
+        </Link>
+      ),
+    },
+    {
+      key: "9",
+      icon: <FileTextOutlined />,
+      label: (
+        <Link to="/article-queries" onClick={handleSwitchMenu}>
+          {t("menuMain.items.articles")}
         </Link>
       ),
     },

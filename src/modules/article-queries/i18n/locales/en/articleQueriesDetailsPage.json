@@ -1,0 +1,23 @@
+{
+  "title": "Article Query Details",
+  "details_section": {
+    "title": "Query Details",
+    "company": "Company",
+    "product": "Product",
+    "article_type": "Article Type",
+    "article_style": "Article Style",
+    "word_length": "Word Length",
+    "language": "Language",
+    "text": "Additional Text",
+    "created_at": "Created At"
+  },
+  "articles_section": {
+    "title": "Generated Articles",
+    "not_found": "No articles found for this query."
+  },
+  "actions": {
+    "replay_button": "Generate Again",
+    "copy_button": "Copy to Clipboard",
+    "copied_message": "Copied to clipboard!"
+  }
+} 

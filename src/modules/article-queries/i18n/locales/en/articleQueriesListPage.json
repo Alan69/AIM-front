@@ -1,0 +1,11 @@
+{
+  "title": "Article creation history",
+  "columns": {
+    "product": "Product",
+    "article_type": "Article Type",
+    "article_style": "Article Style",
+    "date": "Creation Date"
+  },
+  "create_button": "Create",
+  "locale": "en-US"
+} 

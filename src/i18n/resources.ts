@@ -130,6 +130,15 @@ import postDeletePageRu from '../modules/post/i18n/locales/ru/postDeletePage.jso
 import contentPlanPageEn from '../modules/content-plan/i18n/locales/en/contentPlanPage.json';
 import contentPlanPageRu from '../modules/content-plan/i18n/locales/ru/contentPlanPage.json';
 
+import articleQueriesListPageEn from '../modules/article-queries/i18n/locales/en/articleQueriesListPage.json';
+import articleQueriesListPageRu from '../modules/article-queries/i18n/locales/ru/articleQueriesListPage.json';
+
+import articleQueriesCreatePageEn from '../modules/article-queries/i18n/locales/en/articleQueriesCreatePage.json';
+import articleQueriesCreatePageRu from '../modules/article-queries/i18n/locales/ru/articleQueriesCreatePage.json';
+
+import articleQueriesDetailsPageEn from '../modules/article-queries/i18n/locales/en/articleQueriesDetailsPage.json';
+import articleQueriesDetailsPageRu from '../modules/article-queries/i18n/locales/ru/articleQueriesDetailsPage.json';
+
 const resources = {
   en: {
     translation: {
@@ -190,7 +199,11 @@ const resources = {
       postUpdatePage: postUpdatePageEn,
       postDeletePage: postDeletePageEn,
       // MODULE content-plan:
-      contentPlanPage: contentPlanPageEn
+      contentPlanPage: contentPlanPageEn,
+      // MODULE article-queries:
+      articleQueriesListPage: articleQueriesListPageEn,
+      articleQueriesCreatePage: articleQueriesCreatePageEn,
+      articleQueriesDetailsPage: articleQueriesDetailsPageEn
     },
   },
   ru: {
@@ -252,7 +265,11 @@ const resources = {
       postUpdatePage: postUpdatePageRu,
       postDeletePage: postDeletePageRu,
       // MODULE content-plan:
-      contentPlanPage: contentPlanPageRu
+      contentPlanPage: contentPlanPageRu,
+      // MODULE article-queries:
+      articleQueriesListPage: articleQueriesListPageRu,
+      articleQueriesCreatePage: articleQueriesCreatePageRu,
+      articleQueriesDetailsPage: articleQueriesDetailsPageRu
     },
   },
 };

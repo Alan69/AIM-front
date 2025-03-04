@@ -45,6 +45,9 @@ import { IdeaQueriesDetailsPage } from "modules/idea-queries/pages/IdeaQueriesDe
 import { ScenarioQueriesListPage } from "modules/scenario-queries/pages/ScenarioQueriesListPage/ScenarioQueriesListPage";
 import { ScenarioQueriesCreatePage } from "modules/scenario-queries/pages/ScenarioQueriesCreatePage/ScenarioQueriesCreatePage";
 import { ScenarioQueriesDetailsPage } from "modules/scenario-queries/pages/ScenarioQueriesDetailsPage/ScenarioQueriesDetailsPage";
+import { ArticleQueriesListPage } from "modules/article-queries/pages/ArticleQueriesListPage/ArticleQueriesListPage";
+import { ArticleQueriesCreatePage } from "modules/article-queries/pages/ArticleQueriesCreatePage/ArticleQueriesCreatePage";
+import { ArticleQueriesDetailsPage } from "modules/article-queries/pages/ArticleQueriesDetailsPage/ArticleQueriesDetailsPage";
 
 const AppRoutes: FC = () => {
   const location = useLocation();
@@ -158,6 +161,10 @@ const AppRoutes: FC = () => {
           path="/scenario-queries/:id"
           element={<ScenarioQueriesDetailsPage />}
         />
+        <Route path="/article-queries" element={<ArticleQueriesListPage />} />
+        <Route path="/article-queries/list" element={<ArticleQueriesListPage />} />
+        <Route path="/article-queries/create" element={<ArticleQueriesCreatePage />} />
+        <Route path="/article-queries/:id" element={<ArticleQueriesDetailsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/post-query/create" replace />} />
     </Routes>
