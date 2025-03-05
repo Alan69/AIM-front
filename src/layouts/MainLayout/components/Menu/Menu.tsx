@@ -12,6 +12,7 @@ import {
   BorderOuterOutlined,
   FileDoneOutlined,
   FileTextOutlined,
+  LayoutOutlined,
 } from "@ant-design/icons";
 import { Badge, Button, Menu } from "antd";
 import type { MenuProps } from "antd";
@@ -102,6 +103,15 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       label: (
         <Link to="/article-queries" onClick={handleSwitchMenu}>
           {t("menuMain.items.articles")}
+        </Link>
+      ),
+    },
+    {
+      key: "10",
+      icon: <LayoutOutlined />,
+      label: (
+        <Link to="/design" onClick={handleSwitchMenu}>
+          {t("menuMain.items.design")}
         </Link>
       ),
     },

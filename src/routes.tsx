@@ -48,6 +48,8 @@ import { ScenarioQueriesDetailsPage } from "modules/scenario-queries/pages/Scena
 import { ArticleQueriesListPage } from "modules/article-queries/pages/ArticleQueriesListPage/ArticleQueriesListPage";
 import { ArticleQueriesCreatePage } from "modules/article-queries/pages/ArticleQueriesCreatePage/ArticleQueriesCreatePage";
 import { ArticleQueriesDetailsPage } from "modules/article-queries/pages/ArticleQueriesDetailsPage/ArticleQueriesDetailsPage";
+import TemplateListPage from "modules/design/pages/TemplateListPage";
+import TemplateEditorPage from "modules/design/pages/TemplateEditorPage";
 
 const AppRoutes: FC = () => {
   const location = useLocation();
@@ -165,6 +167,10 @@ const AppRoutes: FC = () => {
         <Route path="/article-queries/list" element={<ArticleQueriesListPage />} />
         <Route path="/article-queries/create" element={<ArticleQueriesCreatePage />} />
         <Route path="/article-queries/:id" element={<ArticleQueriesDetailsPage />} />
+        
+        {/* Design Module Routes */}
+        <Route path="/design" element={<TemplateListPage />} />
+        <Route path="/design/editor/:uuid" element={<TemplateEditorPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/post-query/create" replace />} />
     </Routes>

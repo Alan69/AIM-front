@@ -1,0 +1,80 @@
+.template-editor-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .editor-header {
+    background: #fff;
+    padding: 0 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    line-height: 64px;
+    z-index: 10;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .template-name-input {
+      width: 240px;
+    }
+
+    .header-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .editor-sider {
+    background: #fff;
+    border-right: 1px solid #f0f0f0;
+    overflow-y: auto;
+
+    &.right-sider {
+      border-right: none;
+      border-left: 1px solid #f0f0f0;
+    }
+  }
+
+  .editor-content {
+    padding: 0;
+    background: #f5f5f5;
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .editor-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .editor-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 16px;
+    text-align: center;
+
+    p {
+      font-size: 16px;
+      color: #888;
+    }
+  }
+} 
