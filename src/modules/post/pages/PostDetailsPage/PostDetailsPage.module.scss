@@ -98,7 +98,8 @@
 }
 
 .reloadButton,
-.downloadButton {
+.downloadButton,
+.editInDesignerButton {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -113,6 +114,10 @@
 
 .downloadButton {
   right: calc(32px + 16px);
+}
+
+.editInDesignerButton {
+  right: calc(32px + 16px + 32px + 16px);
 }
 
 .parameters {

@@ -1,0 +1,17 @@
+{
+  "save": "Save",
+  "save_to_post": "Save to Post",
+  "delete_template": "Delete Template",
+  "back": "Back",
+  "save_success": "Template saved successfully!",
+  "save_error": "Error saving template",
+  "save_to_post_success": "Image saved to post successfully!",
+  "save_to_post_error": "Failed to save image to post. Please try again.",
+  "delete_confirm_title": "Delete Template",
+  "delete_confirm_content": "Are you sure you want to delete this template? This action cannot be undone.",
+  "delete_success": "Template deleted successfully!",
+  "delete_error": "Error deleting template",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "loading": "Loading..."
+} 

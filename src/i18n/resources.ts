@@ -139,6 +139,10 @@ import articleQueriesCreatePageRu from '../modules/article-queries/i18n/locales/
 import articleQueriesDetailsPageEn from '../modules/article-queries/i18n/locales/en/articleQueriesDetailsPage.json';
 import articleQueriesDetailsPageRu from '../modules/article-queries/i18n/locales/ru/articleQueriesDetailsPage.json';
 
+// Design module translations
+import templateEditorPageEn from '../modules/design/i18n/locales/en/templateEditorPage.json';
+import templateEditorPageRu from '../modules/design/i18n/locales/ru/templateEditorPage.json';
+
 const resources = {
   en: {
     translation: {
@@ -203,7 +207,10 @@ const resources = {
       // MODULE article-queries:
       articleQueriesListPage: articleQueriesListPageEn,
       articleQueriesCreatePage: articleQueriesCreatePageEn,
-      articleQueriesDetailsPage: articleQueriesDetailsPageEn
+      articleQueriesDetailsPage: articleQueriesDetailsPageEn,
+      
+      // MODULE design:
+      templateEditorPage: templateEditorPageEn
     },
   },
   ru: {
@@ -269,7 +276,10 @@ const resources = {
       // MODULE article-queries:
       articleQueriesListPage: articleQueriesListPageRu,
       articleQueriesCreatePage: articleQueriesCreatePageRu,
-      articleQueriesDetailsPage: articleQueriesDetailsPageRu
+      articleQueriesDetailsPage: articleQueriesDetailsPageRu,
+      
+      // MODULE design:
+      templateEditorPage: templateEditorPageRu
     },
   },
 };

@@ -34,6 +34,7 @@ import {
   UploadOutlined,
   HeartOutlined,
   HeartFilled,
+  EditOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -62,6 +63,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
 import { postActions } from "../../redux/slices/post.slice";
 import { WebSocketService } from "services/websocket";
+import { createTemplate, createImageAsset } from "../../../design/services/designService";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -323,6 +325,74 @@ export const PostDetailsPage = () => {
     }
   };
 
+  const handleOpenInDesigner = async () => {
+    try {
+      // Create a new template with the post image
+      const templateName = `Edit from Post ${post?.id || ''}`;
+      const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
+      
+      // Canvas dimensions based on template size
+      const canvasWidth = 1080;
+      const canvasHeight = 1080;
+      
+      // Create a new template
+      const newTemplate = await createTemplate(templateName, templateSize);
+      
+      if (newTemplate && post?.picture) {
+        // Add the image to the template
+        await createImageAsset(
+          newTemplate.uuid,
+          post.picture,
+          0, // positionX
+          0, // positionY
+          canvasWidth, // width - use the full canvas width
+          canvasHeight // height - use the full canvas height
+        );
+        
+        // Navigate to the template editor with the new template
+        // Pass source=post and postId parameters to identify where we came from
+        navigate(`/design/editor/${newTemplate.uuid}?source=post&postId=${post.id}`);
+      }
+    } catch (error) {
+      console.error('Error creating template from post image:', error);
+      message.error(t("postDetailsPage.error_creating_template"));
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    try {
+      if (!post?.picture) {
+        message.error(t("postDetailsPage.image_not_found"));
+        return;
+      }
+
+      const response = await fetch(post.picture, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(t("postDetailsPage.image_download_error"));
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "image.jpg");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      message.success(t("postDetailsPage.image_download_success"));
+    } catch (error) {
+      console.error(t("postDetailsPage.image_download_error"), error);
+      message.error(t("postDetailsPage.image_download_error"));
+    }
+  };
+
   // Initialize WebSocket connection
   useEffect(() => {
     if (id) {
@@ -580,50 +650,7 @@ export const PostDetailsPage = () => {
                             )}
                             icon={<DownloadOutlined />}
                             shape="circle"
-                            onClick={async () => {
-                              try {
-                                if (!media.media) {
-                                  message.error(
-                                    t("postDetailsPage.image_not_found")
-                                  );
-                                  return;
-                                }
-
-                                const response = await fetch(media.media, {
-                                  method: "GET",
-                                  mode: "cors",
-                                  credentials: "include",
-                                });
-
-                                if (!response.ok) {
-                                  throw new Error(
-                                    t("postDetailsPage.image_download_error")
-                                  );
-                                }
-
-                                const blob = await response.blob();
-                                const url = window.URL.createObjectURL(blob);
-
-                                const link = document.createElement("a");
-                                link.href = url;
-                                link.setAttribute("download", "image.jpg");
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                window.URL.revokeObjectURL(url);
-                                message.success(
-                                  t("postDetailsPage.image_download_success")
-                                );
-                              } catch (error) {
-                                console.error(
-                                  t("postDetailsPage.image_download_error"),
-                                  error
-                                );
-                                message.error(
-                                  t("postDetailsPage.image_download_error")
-                                );
-                              }
-                            }}
+                            onClick={handleDownloadImage}
                           />
                         </div>
                       ))}
@@ -720,55 +747,14 @@ export const PostDetailsPage = () => {
                                 className={styles.downloadButton}
                                 icon={<DownloadOutlined />}
                                 shape="circle"
-                                onClick={async () => {
-                                  try {
-                                    if (!post?.picture) {
-                                      message.error(
-                                        t("postDetailsPage.image_not_found")
-                                      );
-                                      return;
-                                    }
-
-                                    const response = await fetch(post.picture, {
-                                      method: "GET",
-                                      mode: "cors",
-                                      credentials: "include",
-                                    });
-
-                                    if (!response.ok) {
-                                      throw new Error(
-                                        t(
-                                          "postDetailsPage.image_download_error"
-                                        )
-                                      );
-                                    }
-
-                                    const blob = await response.blob();
-                                    const url =
-                                      window.URL.createObjectURL(blob);
-
-                                    const link = document.createElement("a");
-                                    link.href = url;
-                                    link.setAttribute("download", "image.jpg");
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                    window.URL.revokeObjectURL(url);
-                                    message.success(
-                                      t(
-                                        "postDetailsPage.image_download_success"
-                                      )
-                                    );
-                                  } catch (error) {
-                                    console.error(
-                                      t("postDetailsPage.image_download_error"),
-                                      error
-                                    );
-                                    message.error(
-                                      t("postDetailsPage.image_download_error")
-                                    );
-                                  }
-                                }}
+                                onClick={handleDownloadImage}
+                              />
+                              <Button
+                                className={styles.editInDesignerButton}
+                                icon={<EditOutlined />}
+                                shape="circle"
+                                onClick={handleOpenInDesigner}
+                                title={t("postDetailsPage.edit_in_designer")}
                               />
                             </>
                           )}

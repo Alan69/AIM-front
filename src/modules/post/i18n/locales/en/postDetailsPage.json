@@ -29,5 +29,7 @@
   "invalid_file_type": "Invalid file type. Only JPEG and PNG are allowed.",
   "error_max_files": "You can upload up to 10 files",
   "image_upload_error": "Error adding an image",
-  "update_success": "Update was successful."
+  "update_success": "Update was successful.",
+  "edit_in_designer": "Edit in Designer",
+  "error_creating_template": "Error creating template from image"
 }

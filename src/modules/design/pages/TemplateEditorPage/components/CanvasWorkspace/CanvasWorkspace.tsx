@@ -17,6 +17,7 @@ interface CanvasWorkspaceProps {
   selectedElement: DesignElement | null;
   onSelectElement: (element: DesignElement | null) => void;
   onUpdateElements: (updatedTemplate: Template) => void;
+  onStageRef?: (ref: any) => void; // Optional callback to get the stage ref
 }
 
 const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
@@ -24,6 +25,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   selectedElement,
   onSelectElement,
   onUpdateElements,
+  onStageRef,
 }) => {
   const stageRef = useRef<any>(null);
   const transformerRef = useRef<any>(null);
@@ -36,6 +38,13 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const templateSize = template.size ? template.size.split('x').map(Number) : [1080, 1080];
   const canvasWidth = templateSize[0] || 1080;  // Add fallback values
   const canvasHeight = templateSize[1] || 1080; // Add fallback values
+
+  // Pass the stageRef to the parent component if onStageRef is provided
+  useEffect(() => {
+    if (onStageRef && stageRef.current) {
+      onStageRef(stageRef.current);
+    }
+  }, [onStageRef, stageRef.current]);
 
   // Log when template changes to help with debugging
   useEffect(() => {

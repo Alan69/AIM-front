@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Button, Input, Spin, message, Tooltip, Modal } from 'antd';
 import { 
   ArrowLeftOutlined, 
   SaveOutlined, 
   UndoOutlined, 
   RedoOutlined, 
-  DeleteOutlined 
+  DeleteOutlined,
+  CloudUploadOutlined
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { 
   fetchTemplateWithElements, 
   updateTemplate, 
@@ -25,12 +27,24 @@ import ElementsPanel from './components/ElementsPanel';
 import PropertiesPanel from './components/PropertiesPanel';
 import './TemplateEditorPage.scss';
 import debounce from 'lodash/debounce';
+import axios from 'axios';
+import { baseURL } from 'types/baseUrl';
+import Cookies from 'js-cookie';
+import html2canvas from 'html2canvas';
 
 const { Header, Sider, Content } = Layout;
 
 const TemplateEditorPage: React.FC = () => {
+  const { t } = useTranslation('templateEditorPage');
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Parse query parameters to check if we came from a post
+  const queryParams = new URLSearchParams(location.search);
+  const sourceType = queryParams.get('source');
+  const postId = queryParams.get('postId');
+  const isFromPost = sourceType === 'post' && postId;
   
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -39,8 +53,10 @@ const TemplateEditorPage: React.FC = () => {
   const [history, setHistory] = useState<Template[]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isSavingToPost, setIsSavingToPost] = useState<boolean>(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<any>(null);
 
   // Load template data on mount
   useEffect(() => {
@@ -671,6 +687,68 @@ const TemplateEditorPage: React.FC = () => {
     }
   };
 
+  // Function to save the canvas as an image and update the post
+  const handleSaveToPost = async () => {
+    if (!uuid || !isFromPost || !postId) return;
+    
+    try {
+      setIsSavingToPost(true);
+      
+      // First, save the template to ensure all changes are persisted
+      await handleSave();
+      
+      // Get the token from cookies
+      const token = Cookies.get('token');
+      
+      console.log('Sending template data to server for rendering...');
+      
+      // Send the template UUID and post ID to the server for server-side rendering
+      const response = await axios({
+        method: 'post',
+        url: `${baseURL}template-to-post/`,
+        data: {
+          template_uuid: uuid,
+          post_id: postId
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.data && response.data.success) {
+        message.success(t('save_to_post_success'));
+        // Navigate back to the post details page
+        navigate(`/posts/${postId}`);
+      } else {
+        throw new Error(response.data.message || 'Failed to update post image');
+      }
+    } catch (error: any) {
+      console.error('Error saving image to post:', error);
+      if (error.response && error.response.data) {
+        console.error('Server response:', error.response.data);
+        
+        // Check for specific error messages
+        if (error.response.data.picture) {
+          message.error(`${t('save_to_post_error')} ${error.response.data.picture[0]}`);
+        } else if (error.response.data.message) {
+          message.error(`${t('save_to_post_error')} ${error.response.data.message}`);
+        } else {
+          message.error(t('save_to_post_error'));
+        }
+      } else {
+        message.error(t('save_to_post_error'));
+      }
+    } finally {
+      setIsSavingToPost(false);
+    }
+  };
+
+  // Function to get a reference to the stage from CanvasWorkspace
+  const handleStageRef = (ref: any) => {
+    stageRef.current = ref;
+  };
+
   if (loading) {
     return (
       <div className="editor-loading">
@@ -752,6 +830,18 @@ const TemplateEditorPage: React.FC = () => {
           >
             Save
           </Button>
+          
+          {isFromPost && (
+            <Button 
+              type="primary" 
+              icon={<CloudUploadOutlined />} 
+              loading={isSavingToPost}
+              onClick={handleSaveToPost}
+              className="header-button save-to-post-button"
+            >
+              Save to Post
+            </Button>
+          )}
         </div>
       </Header>
       
@@ -768,6 +858,7 @@ const TemplateEditorPage: React.FC = () => {
             selectedElement={selectedElement}
             onSelectElement={handleSelectElement}
             onUpdateElements={handleUpdateElements}
+            onStageRef={handleStageRef}
           />
         </Content>
         
