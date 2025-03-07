@@ -671,37 +671,6 @@ const TemplateEditorPage: React.FC = () => {
     }
   };
 
-  const handleDebugElement = async () => {
-    if (!template || !selectedElement || !uuid) return;
-    
-    try {
-      let elementType: 'image' | 'text' | 'shape';
-      
-      if ('image' in selectedElement) {
-        elementType = 'image';
-      } else if ('text' in selectedElement) {
-        elementType = 'text';
-      } else if ('shapeType' in selectedElement) {
-        elementType = 'shape';
-      } else {
-        console.error('Unknown element type');
-        return;
-      }
-      
-      const result = await debugElementProperties(uuid, selectedElement.uuid, elementType);
-      console.log('Debug result:', result);
-      
-      if (result.success) {
-        const elementData = JSON.parse(result.elementData);
-        console.log('Element properties from server:', elementData);
-        message.info(`Element properties checked. See console for details.`);
-      }
-    } catch (error: any) {
-      console.error('Error debugging element:', error);
-      message.error(`Failed to debug element: ${error.message || 'Unknown error'}`);
-    }
-  };
-
   if (loading) {
     return (
       <div className="editor-loading">
@@ -741,14 +710,6 @@ const TemplateEditorPage: React.FC = () => {
         <div className="header-right">
           {selectedElement && (
             <>
-              <Tooltip title="Debug Element">
-                <Button 
-                  onClick={handleDebugElement}
-                  className="header-button"
-                >
-                  Debug
-                </Button>
-              </Tooltip>
               <Tooltip title="Delete Element">
                 <Button 
                   icon={<DeleteOutlined />} 

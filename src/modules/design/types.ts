@@ -4,9 +4,13 @@ export interface Template {
   isDefault: boolean;
   size: string;
   createdAt: string;
+  backgroundImage?: string;
   images?: ImageAsset[];
   texts?: TextElement[];
   shapes?: ShapeElement[];
+  imageAssets?: ImageAsset[];
+  textElements?: TextElement[];
+  shapeElements?: ShapeElement[];
 }
 
 export interface ImageAsset {

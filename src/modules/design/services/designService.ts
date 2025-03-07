@@ -36,6 +36,38 @@ export const GET_ALL_TEMPLATES = gql`
       size
       backgroundImage
       createdAt
+      imageAssets {
+        uuid
+        image
+        positionX
+        positionY
+        width
+        height
+        zIndex
+        rotation
+      }
+      textElements {
+        uuid
+        text
+        font
+        fontSize
+        color
+        positionX
+        positionY
+        zIndex
+        rotation
+      }
+      shapeElements {
+        uuid
+        shapeType
+        color
+        positionX
+        positionY
+        width
+        height
+        zIndex
+        rotation
+      }
     }
   }
 `;

@@ -95,7 +95,7 @@ const TemplateListPage: React.FC = () => {
           <Select 
             value={selectedSize} 
             onChange={handleSizeChange}
-            style={{ width: 150, marginRight: 16 }}
+            style={{ width: 170, marginRight: 16 }}
           >
             <Option value="1080x1080">Square 1080×1080</Option>
             <Option value="1080x1920">Portrait 1080×1920</Option>
@@ -142,10 +142,72 @@ const TemplateListPage: React.FC = () => {
                     <div 
                       className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
                     >
-                      {/* Template Preview Placeholder */}
-                      <div className="template-placeholder">
-                        {template.name}
-                      </div>
+                      {(template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length) ? (
+                        <div className="template-content-preview">
+                          {/* Render shapes */}
+                          {template.shapeElements?.map(shape => (
+                            <div
+                              key={shape.uuid}
+                              className="preview-shape"
+                              style={{
+                                position: 'absolute',
+                                left: `${shape.positionX / 10}%`,
+                                top: `${shape.positionY / 10}%`,
+                                width: `${shape.width / 10}%`,
+                                height: `${shape.height / 10}%`,
+                                backgroundColor: shape.color,
+                                transform: `rotate(${shape.rotation}deg)`,
+                                zIndex: shape.zIndex,
+                                borderRadius: shape.shapeType === 'circle' ? '50%' : '0'
+                              }}
+                            />
+                          ))}
+                          
+                          {/* Render text elements */}
+                          {template.textElements?.map(text => (
+                            <div
+                              key={text.uuid}
+                              className="preview-text"
+                              style={{
+                                position: 'absolute',
+                                left: `${text.positionX / 10}%`,
+                                top: `${text.positionY / 10}%`,
+                                color: text.color,
+                                fontSize: `${text.fontSize / 10}px`,
+                                fontFamily: text.font,
+                                transform: `rotate(${text.rotation}deg)`,
+                                zIndex: text.zIndex
+                              }}
+                            >
+                              {text.text}
+                            </div>
+                          ))}
+                          
+                          {/* Render images */}
+                          {template.imageAssets?.map(img => (
+                            <img
+                              key={img.uuid}
+                              src={img.image}
+                              alt=""
+                              className="preview-image"
+                              style={{
+                                position: 'absolute',
+                                left: `${img.positionX / 10}%`,
+                                top: `${img.positionY / 10}%`,
+                                width: `${img.width / 10}%`,
+                                height: `${img.height / 10}%`,
+                                transform: `rotate(${img.rotation}deg)`,
+                                zIndex: img.zIndex
+                              }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="template-placeholder">
+                          {template.name}
+                          <div className="template-size-indicator">{template.size}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="template-info">
