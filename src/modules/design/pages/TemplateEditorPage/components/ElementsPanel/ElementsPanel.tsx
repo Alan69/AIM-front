@@ -84,6 +84,17 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
   };
 
   const handleAddShapeElement = (shapeType: string) => {
+    console.log('Adding shape with type:', shapeType);
+    
+    // Validate shape type
+    if (!shapeType) {
+      shapeType = 'rectangle'; // Default to rectangle if no type provided
+    }
+    
+    // Log the shape type being passed
+    console.log('Final shape type being passed to onAddElement:', shapeType);
+    
+    // Pass the shape type to the parent component
     onAddElement(ElementType.SHAPE, { shapeType });
   };
 

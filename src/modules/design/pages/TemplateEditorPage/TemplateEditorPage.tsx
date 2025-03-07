@@ -15,13 +15,16 @@ import {
   createTextElement,
   createImageAsset,
   createShapeElement,
-  deleteElementFromTemplate
+  deleteElementFromTemplate,
+  updateElementInTemplate,
+  debugElementProperties
 } from '../../services/designService';
 import { Template, ElementType, DesignElement } from '../../types';
 import CanvasWorkspace from './components/CanvasWorkspace';
 import ElementsPanel from './components/ElementsPanel';
 import PropertiesPanel from './components/PropertiesPanel';
 import './TemplateEditorPage.scss';
+import debounce from 'lodash/debounce';
 
 const { Header, Sider, Content } = Layout;
 
@@ -76,11 +79,73 @@ const TemplateEditorPage: React.FC = () => {
     };
   }, [selectedElement]);
 
+  // Monitor template state changes with minimal logging
+  useEffect(() => {
+    if (template && template.shapes && template.shapes.length > 0) {
+      // Only log once when template is loaded, not on every update
+      if (template.shapes.some(shape => shape.positionX === 0 && shape.positionY === 0)) {
+        console.log('Warning: Some shapes have position (0,0) which may indicate a problem');
+      }
+    }
+  }, [template]);
+
   const loadTemplate = async (uuid: string) => {
     try {
       setLoading(true);
+      console.log(`Loading template with uuid: ${uuid}`);
+      
+      // Fetch template - data is now processed in fetchTemplateWithElements
       const data = await fetchTemplateWithElements(uuid);
+      
+      // Verify positions are properly set
+      if (data.shapes && data.shapes.length > 0) {
+        // Ensure position values are numbers
+        data.shapes.forEach((shape: any) => {
+          shape.positionX = Number(shape.positionX);
+          shape.positionY = Number(shape.positionY);
+          shape.width = Number(shape.width);
+          shape.height = Number(shape.height);
+          shape.zIndex = Number(shape.zIndex);
+          shape.rotation = Number(shape.rotation);
+        });
+      }
+      
+      if (data.texts && data.texts.length > 0) {
+        // Ensure position values are numbers
+        data.texts.forEach((text: any) => {
+          text.positionX = Number(text.positionX);
+          text.positionY = Number(text.positionY);
+          text.fontSize = Number(text.fontSize);
+          text.zIndex = Number(text.zIndex);
+          text.rotation = Number(text.rotation);
+        });
+      }
+      
+      if (data.images && data.images.length > 0) {
+        // Ensure position values are numbers
+        data.images.forEach((image: any) => {
+          image.positionX = Number(image.positionX);
+          image.positionY = Number(image.positionY);
+          image.width = Number(image.width);
+          image.height = Number(image.height);
+          image.zIndex = Number(image.zIndex);
+          image.rotation = Number(image.rotation);
+        });
+      }
+      
+      // Set the template with the processed data
       setTemplate(data);
+      
+      // Auto-select the first element if available to show properties
+      setTimeout(() => {
+        if (data.shapes && data.shapes.length > 0) {
+          handleSelectElement(data.shapes[0]);
+        } else if (data.texts && data.texts.length > 0) {
+          handleSelectElement(data.texts[0]);
+        } else if (data.images && data.images.length > 0) {
+          handleSelectElement(data.images[0]);
+        }
+      }, 100);
     } catch (error) {
       console.error('Error fetching template:', error);
       message.error('Failed to load template. Please try again.');
@@ -97,22 +162,131 @@ const TemplateEditorPage: React.FC = () => {
     setTemplateName(e.target.value);
   };
 
+  const processElementForSaving = (element: any, elementType: 'text' | 'image' | 'shape') => {
+    // Create a new object with explicitly converted numeric properties
+    const processedElement: any = {};
+    
+    // Copy all properties from the original element
+    Object.keys(element).forEach(key => {
+      const value = element[key];
+      
+      // Convert numeric properties to numbers
+      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'fontSize'].includes(key)) {
+        processedElement[key] = value !== null ? Number(value) : 0;
+      } else if (key === 'zIndex') {
+        // Ensure zIndex is an integer
+        processedElement[key] = value !== null ? parseInt(String(value)) : 0;
+      } else {
+        processedElement[key] = value;
+      }
+    });
+    
+    // Ensure required properties are present and numeric
+    processedElement.positionX = element.positionX !== null ? Number(element.positionX) : 0;
+    processedElement.positionY = element.positionY !== null ? Number(element.positionY) : 0;
+    processedElement.zIndex = element.zIndex !== null ? parseInt(String(element.zIndex)) : 0;
+    processedElement.rotation = element.rotation !== null ? Number(element.rotation) : 0;
+    
+    // Additional properties based on element type
+    if (elementType === 'text') {
+      processedElement.fontSize = element.fontSize !== null ? Number(element.fontSize) : 16;
+    }
+    
+    if (elementType === 'image' || elementType === 'shape') {
+      processedElement.width = element.width !== null ? Number(element.width) : 100;
+      processedElement.height = element.height !== null ? Number(element.height) : 100;
+    }
+    
+    // Ensure shape_type is preserved for shape elements
+    if (elementType === 'shape') {
+      // If shapeType is null or empty, set it to 'rectangle'
+      if (!element.shapeType) {
+        console.warn('Shape type is null or empty, defaulting to rectangle');
+        processedElement.shapeType = 'rectangle';
+      } else {
+        processedElement.shapeType = element.shapeType;
+      }
+    }
+    
+    console.log(`Processed ${elementType} element for saving:`, processedElement);
+    
+    return processedElement;
+  };
+
   const handleSave = async () => {
     if (!template || !uuid) return;
     
     try {
       setIsSaving(true);
-      await updateTemplate(uuid, { name: templateName });
+      console.log('Saving template with elements...');
+      
+      // Create a copy of the current template to preserve all properties
+      let updatedTemplateData = { ...template };
+      
+      // First, save all element properties if there are any changes
+      if (template.texts && template.texts.length > 0) {
+        console.log(`Saving ${template.texts.length} text elements...`);
+        for (const text of template.texts) {
+          const processedText = processElementForSaving(text, 'text');
+          console.log(`Saving text element ${text.uuid} with position: (${processedText.positionX}, ${processedText.positionY})`);
+          await updateElementInTemplate(uuid, text.uuid, 'text', JSON.stringify(processedText));
+          
+          // Update the element in our local copy
+          updatedTemplateData.texts = updatedTemplateData.texts?.map(t => 
+            t.uuid === text.uuid ? processedText : t
+          );
+        }
+      }
+      
+      if (template.images && template.images.length > 0) {
+        console.log(`Saving ${template.images.length} image elements...`);
+        for (const image of template.images) {
+          const processedImage = processElementForSaving(image, 'image');
+          console.log(`Saving image element ${image.uuid} with position: (${processedImage.positionX}, ${processedImage.positionY})`);
+          await updateElementInTemplate(uuid, image.uuid, 'image', JSON.stringify(processedImage));
+          
+          // Update the element in our local copy
+          updatedTemplateData.images = updatedTemplateData.images?.map(img => 
+            img.uuid === image.uuid ? processedImage : img
+          );
+        }
+      }
+      
+      if (template.shapes && template.shapes.length > 0) {
+        console.log(`Saving ${template.shapes.length} shape elements...`);
+        for (const shape of template.shapes) {
+          const processedShape = processElementForSaving(shape, 'shape');
+          console.log(`Saving shape element ${shape.uuid} with position: (${processedShape.positionX}, ${processedShape.positionY}), shapeType: ${processedShape.shapeType}`);
+          await updateElementInTemplate(uuid, shape.uuid, 'shape', JSON.stringify(processedShape));
+          
+          // Update the element in our local copy
+          updatedTemplateData.shapes = updatedTemplateData.shapes?.map(s => 
+            s.uuid === shape.uuid ? processedShape : s
+          );
+        }
+      }
+      
+      // Then save the template name
+      console.log(`Saving template name: ${templateName}`);
+      const updatedTemplate = await updateTemplate(uuid, { name: templateName });
+      
+      // Merge the updated template with our local copy to ensure all properties are preserved
+      updatedTemplateData = {
+        ...updatedTemplateData,
+        name: updatedTemplate.name,
+        isDefault: updatedTemplate.isDefault,
+        size: updatedTemplate.size,
+      };
+      
+      // Set the template directly without reloading from server
+      // This preserves all our correctly saved element positions
+      console.log('Template saved, using local data with preserved positions');
+      setTemplate(updatedTemplateData);
+      
       message.success('Template saved successfully');
     } catch (error: any) {
       console.error('Error saving template:', error);
-      
-      // More helpful error message
-      if (error?.message && error.message.includes('Authentication required')) {
-        message.error('Please log in to save your template.');
-      } else {
-        message.error('Failed to save template. Please try again.');
-      }
+      message.error(`Failed to save template: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -165,13 +339,182 @@ const TemplateEditorPage: React.FC = () => {
   }, [history, historyIndex]);
 
   const handleSelectElement = (element: DesignElement | null) => {
-    setSelectedElement(element);
+    console.log('Selecting element:', element);
+    
+    // If element has position values, log them for debugging
+    if (element && 'positionX' in element) {
+      console.log(`Selected element position: (${element.positionX}, ${element.positionY})`);
+      
+      // Create a deep copy of the element to avoid modifying the original reference
+      const processedElement = { ...element };
+      
+      // Ensure position values are numbers, not null
+      if (processedElement.positionX === null) processedElement.positionX = 0;
+      if (processedElement.positionY === null) processedElement.positionY = 0;
+      
+      // Log the final position values being passed to the PropertiesPanel
+      console.log(`Properties panel will receive element with position: (${processedElement.positionX}, ${processedElement.positionY})`);
+      
+      // Update the element in the template state to ensure consistency
+      if (template) {
+        let updatedTemplate = { ...template };
+        
+        if ('shapeType' in processedElement && updatedTemplate.shapes) {
+          updatedTemplate.shapes = updatedTemplate.shapes.map(shape => 
+            shape.uuid === processedElement.uuid ? processedElement : shape
+          );
+        } else if ('text' in processedElement && updatedTemplate.texts) {
+          updatedTemplate.texts = updatedTemplate.texts.map(text => 
+            text.uuid === processedElement.uuid ? processedElement : text
+          );
+        } else if ('image' in processedElement && updatedTemplate.images) {
+          updatedTemplate.images = updatedTemplate.images.map(image => 
+            image.uuid === processedElement.uuid ? processedElement : image
+          );
+        }
+        
+        setTemplate(updatedTemplate);
+      }
+      
+      // Set the processed element as the selected element
+      setSelectedElement(processedElement);
+    } else {
+      setSelectedElement(element);
+    }
   };
 
   const handleUpdateElements = useCallback((updatedTemplate: Template) => {
+    // Ensure all position values are numbers in the updated template
+    if (updatedTemplate.shapes && updatedTemplate.shapes.length > 0) {
+      updatedTemplate.shapes = updatedTemplate.shapes.map(shape => ({
+        ...shape,
+        positionX: Number(shape.positionX),
+        positionY: Number(shape.positionY),
+        width: Number(shape.width),
+        height: Number(shape.height),
+        zIndex: Number(shape.zIndex),
+        rotation: Number(shape.rotation)
+      }));
+    }
+    
+    if (updatedTemplate.texts && updatedTemplate.texts.length > 0) {
+      updatedTemplate.texts = updatedTemplate.texts.map(text => ({
+        ...text,
+        positionX: Number(text.positionX),
+        positionY: Number(text.positionY),
+        fontSize: Number(text.fontSize),
+        zIndex: Number(text.zIndex),
+        rotation: Number(text.rotation)
+      }));
+    }
+    
+    if (updatedTemplate.images && updatedTemplate.images.length > 0) {
+      updatedTemplate.images = updatedTemplate.images.map(image => ({
+        ...image,
+        positionX: Number(image.positionX),
+        positionY: Number(image.positionY),
+        width: Number(image.width),
+        height: Number(image.height),
+        zIndex: Number(image.zIndex),
+        rotation: Number(image.rotation)
+      }));
+    }
+    
     setTemplate(updatedTemplate);
     addElementToHistory(updatedTemplate);
   }, [addElementToHistory]);
+
+  // Create a debounced function for updating elements in the backend
+  const debouncedUpdateElement = useCallback(
+    debounce(async (templateId: string, element: DesignElement, elementType: 'text' | 'image' | 'shape') => {
+      try {
+        // Create a new object with explicitly converted numeric properties
+        const processedElement: any = {};
+        
+        // Copy all properties from the original element
+        Object.keys(element).forEach(key => {
+          const value = (element as any)[key];
+          
+          // Convert numeric properties to numbers
+          if (['positionX', 'positionY', 'width', 'height', 'zIndex', 'rotation', 'fontSize'].includes(key)) {
+            processedElement[key] = Number(value);
+          } else {
+            processedElement[key] = value;
+          }
+        });
+        
+        // Ensure required properties are present and numeric
+        if ('positionX' in element) processedElement.positionX = Number(element.positionX);
+        if ('positionY' in element) processedElement.positionY = Number(element.positionY);
+        if ('zIndex' in element) processedElement.zIndex = Number(element.zIndex);
+        if ('rotation' in element) processedElement.rotation = Number(element.rotation);
+        
+        // Additional properties based on element type
+        if (elementType === 'text' && 'fontSize' in element) {
+          processedElement.fontSize = Number((element as any).fontSize);
+        }
+        
+        if ((elementType === 'image' || elementType === 'shape') && 'width' in element) {
+          processedElement.width = Number((element as any).width);
+        }
+        
+        if ((elementType === 'image' || elementType === 'shape') && 'height' in element) {
+          processedElement.height = Number((element as any).height);
+        }
+        
+        console.log('Updating element with properties:', processedElement);
+        
+        // Convert to JSON string with explicit handling of numeric values
+        const jsonString = JSON.stringify(processedElement);
+        console.log('JSON string being sent:', jsonString);
+        
+        await updateElementInTemplate(
+          templateId,
+          element.uuid,
+          elementType,
+          jsonString
+        );
+      } catch (error) {
+        console.error('Error updating element:', error);
+      }
+    }, 500), // 500ms debounce time
+    []
+  );
+
+  // Function to handle element updates with real-time visual updates
+  const handleElementUpdate = useCallback((updatedElement: DesignElement) => {
+    if (!template || !selectedElement) return;
+    
+    let updatedTemplate: Template = { ...template };
+    let elementType: 'text' | 'image' | 'shape';
+    
+    if ('image' in selectedElement) {
+      elementType = 'image';
+      updatedTemplate.images = template.images?.map(img => 
+        img.uuid === selectedElement.uuid ? updatedElement as any : img
+      );
+    } else if ('text' in selectedElement) {
+      elementType = 'text';
+      updatedTemplate.texts = template.texts?.map(txt => 
+        txt.uuid === selectedElement.uuid ? updatedElement as any : txt
+      );
+    } else if ('shapeType' in selectedElement) {
+      elementType = 'shape';
+      updatedTemplate.shapes = template.shapes?.map(shape => 
+        shape.uuid === selectedElement.uuid ? updatedElement as any : shape
+      );
+    } else {
+      return;
+    }
+    
+    // Update the UI immediately
+    handleUpdateElements(updatedTemplate);
+    
+    // Debounced update to the backend
+    if (uuid) {
+      debouncedUpdateElement(uuid, updatedElement, elementType);
+    }
+  }, [template, selectedElement, handleUpdateElements, debouncedUpdateElement, uuid]);
 
   // Add functions to handle creating new elements
   const handleAddElement = async (elementType: ElementType, data?: any) => {
@@ -180,6 +523,10 @@ const TemplateEditorPage: React.FC = () => {
     try {
       let updatedTemplate: Template;
       
+      // Calculate center position of the canvas
+      const centerX = 300; // Default center X
+      const centerY = 300; // Default center Y
+      
       switch(elementType) {
         case 'text':
           // Default text properties
@@ -187,9 +534,9 @@ const TemplateEditorPage: React.FC = () => {
           const font = data?.font || 'Arial';
           const fontSize = data?.fontSize || 24;
           const color = data?.color || '#000000';
-          // Center the text on the canvas based on template size
-          const positionX = data?.positionX || 300;
-          const positionY = data?.positionY || 300;
+          // Center the text on the canvas
+          const positionX = data?.positionX || centerX;
+          const positionY = data?.positionY || centerY;
           
           console.log('Creating text element with:', { text, font, fontSize, color, positionX, positionY });
           
@@ -202,6 +549,13 @@ const TemplateEditorPage: React.FC = () => {
             positionX, 
             positionY
           );
+          
+          // Immediately save the element properties to ensure they persist
+          if (updatedTemplate.texts && updatedTemplate.texts.length > 0) {
+            const newText = updatedTemplate.texts[updatedTemplate.texts.length - 1];
+            const processedText = processElementForSaving(newText, 'text');
+            await updateElementInTemplate(uuid, newText.uuid, 'text', JSON.stringify(processedText));
+          }
           break;
         
         case 'image':
@@ -214,25 +568,49 @@ const TemplateEditorPage: React.FC = () => {
           updatedTemplate = await createImageAsset(
             uuid,
             image,
-            data?.positionX || 300,
-            data?.positionY || 300,
+            data?.positionX || centerX,
+            data?.positionY || centerY,
             data?.width || 200,
             data?.height || 200
           );
+          
+          // Immediately save the element properties
+          if (updatedTemplate.images && updatedTemplate.images.length > 0) {
+            const newImage = updatedTemplate.images[updatedTemplate.images.length - 1];
+            const processedImage = processElementForSaving(newImage, 'image');
+            await updateElementInTemplate(uuid, newImage.uuid, 'image', JSON.stringify(processedImage));
+          }
           break;
         
         case 'shape':
           // Default shape properties
+          // Use the shapeType from data, or default to 'rectangle' if not provided
           const shapeType = data?.shapeType || 'rectangle';
-          updatedTemplate = await createShapeElement(
-            uuid,
-            shapeType,
-            data?.color || '#000000',
-            data?.positionX || 300,
-            data?.positionY || 300,
-            data?.width || 100,
-            data?.height || 100
-          );
+          console.log('Creating shape element with type:', shapeType);
+          console.log('Full shape data received:', data);
+          
+          try {
+            updatedTemplate = await createShapeElement(
+              uuid,
+              shapeType,  // Use the provided shapeType
+              data?.color || '#000000',
+              data?.positionX || centerX,
+              data?.positionY || centerY,
+              data?.width || 100,
+              data?.height || 100
+            );
+            
+            // Immediately save the element properties
+            if (updatedTemplate.shapes && updatedTemplate.shapes.length > 0) {
+              const newShape = updatedTemplate.shapes[updatedTemplate.shapes.length - 1];
+              const processedShape = processElementForSaving(newShape, 'shape');
+              await updateElementInTemplate(uuid, newShape.uuid, 'shape', JSON.stringify(processedShape));
+            }
+          } catch (error: any) {
+            console.error('Error creating shape element:', error);
+            message.error(`Failed to add shape element: ${error.message || 'Unknown error'}`);
+            return;
+          }
           break;
           
         default:
@@ -240,8 +618,18 @@ const TemplateEditorPage: React.FC = () => {
           return;
       }
       
-      setTemplate(updatedTemplate);
-      addElementToHistory(updatedTemplate);
+      // Update the template in state
+      console.log('Updated template after adding element:', updatedTemplate);
+      console.log('Number of shapes in updated template:', updatedTemplate.shapes?.length || 0);
+
+      // Create a fresh copy to ensure React detects the change
+      const freshTemplate = { ...updatedTemplate };
+      setTemplate(freshTemplate);
+
+      // Add to history
+      addElementToHistory(freshTemplate);
+
+      // Show success message
       message.success(`Added ${elementType} element to canvas`);
     } catch (error: any) {
       console.error(`Error adding ${elementType} element:`, error);
@@ -283,6 +671,37 @@ const TemplateEditorPage: React.FC = () => {
     }
   };
 
+  const handleDebugElement = async () => {
+    if (!template || !selectedElement || !uuid) return;
+    
+    try {
+      let elementType: 'image' | 'text' | 'shape';
+      
+      if ('image' in selectedElement) {
+        elementType = 'image';
+      } else if ('text' in selectedElement) {
+        elementType = 'text';
+      } else if ('shapeType' in selectedElement) {
+        elementType = 'shape';
+      } else {
+        console.error('Unknown element type');
+        return;
+      }
+      
+      const result = await debugElementProperties(uuid, selectedElement.uuid, elementType);
+      console.log('Debug result:', result);
+      
+      if (result.success) {
+        const elementData = JSON.parse(result.elementData);
+        console.log('Element properties from server:', elementData);
+        message.info(`Element properties checked. See console for details.`);
+      }
+    } catch (error: any) {
+      console.error('Error debugging element:', error);
+      message.error(`Failed to debug element: ${error.message || 'Unknown error'}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="editor-loading">
@@ -321,14 +740,24 @@ const TemplateEditorPage: React.FC = () => {
         </div>
         <div className="header-right">
           {selectedElement && (
-            <Tooltip title="Delete Element">
-              <Button 
-                icon={<DeleteOutlined />} 
-                onClick={handleDeleteElement}
-                danger
-                className="header-button"
-              />
-            </Tooltip>
+            <>
+              <Tooltip title="Debug Element">
+                <Button 
+                  onClick={handleDebugElement}
+                  className="header-button"
+                >
+                  Debug
+                </Button>
+              </Tooltip>
+              <Tooltip title="Delete Element">
+                <Button 
+                  icon={<DeleteOutlined />} 
+                  onClick={handleDeleteElement}
+                  danger
+                  className="header-button"
+                />
+              </Tooltip>
+            </>
           )}
           <Tooltip title="Undo">
             <Button 
@@ -384,27 +813,7 @@ const TemplateEditorPage: React.FC = () => {
         <Sider width={300} className="editor-sider right-sider">
           <PropertiesPanel 
             selectedElement={selectedElement}
-            onUpdateElement={(updatedElement: DesignElement) => {
-              if (!template || !selectedElement) return;
-              
-              let updatedTemplate: Template = { ...template };
-              
-              if ('image' in selectedElement) {
-                updatedTemplate.images = template.images?.map(img => 
-                  img.uuid === selectedElement.uuid ? updatedElement as any : img
-                );
-              } else if ('text' in selectedElement) {
-                updatedTemplate.texts = template.texts?.map(txt => 
-                  txt.uuid === selectedElement.uuid ? updatedElement as any : txt
-                );
-              } else if ('shapeType' in selectedElement) {
-                updatedTemplate.shapes = template.shapes?.map(shape => 
-                  shape.uuid === selectedElement.uuid ? updatedElement as any : shape
-                );
-              }
-              
-              handleUpdateElements(updatedTemplate);
-            }}
+            onUpdateElement={handleElementUpdate}
           />
         </Sider>
       </Layout>
