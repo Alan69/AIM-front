@@ -811,6 +811,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             onClick={handleStageClick}
             onTap={handleStageClick}
             className="konva-stage"
+            x={stageSize.width / 2 - (canvasWidth * scale) / 2}
+            y={stageSize.height / 2 - (canvasHeight * scale) / 2}
           >
             <Layer>
               {/* Background */}
