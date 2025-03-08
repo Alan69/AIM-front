@@ -604,7 +604,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             Math.round(canvasWidth / 2 - 100),  // Round positions to integers
             Math.round(canvasHeight / 2 - 100),
             200,
-            200
+            200,
+            -1 // zIndex - set to -1 to place behind other elements
           ) as ImageAsset;
           
           if (imageElement) {

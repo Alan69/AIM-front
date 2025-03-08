@@ -352,7 +352,8 @@ export const PostDetailsPage = () => {
           0, // positionX
           0, // positionY
           canvasWidth, // width - use the full canvas width
-          canvasHeight // height - use the full canvas height
+          canvasHeight, // height - use the full canvas height
+          -1 // zIndex - set to -1 to place behind other elements
         );
         
         // Navigate to the template editor with the new template

@@ -587,7 +587,8 @@ const TemplateEditorPage: React.FC = () => {
             data?.positionX || centerX,
             data?.positionY || centerY,
             data?.width || 200,
-            data?.height || 200
+            data?.height || 200,
+            -1 // zIndex - set to -1 to place behind other elements
           );
           
           // Immediately save the element properties

@@ -143,6 +143,7 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
     $positionY: Float
     $width: Float
     $height: Float
+    $zIndex: Int
   ) {
     addImageToTemplate(
       templateId: $templateId
@@ -151,6 +152,7 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
       positionY: $positionY
       width: $width
       height: $height
+      zIndex: $zIndex
     ) {
       template {
         uuid
@@ -602,11 +604,12 @@ export const createImageAsset = async (
   positionX: number = 0,
   positionY: number = 0,
   width: number = 100,
-  height: number = 100
+  height: number = 100,
+  zIndex: number = -1
 ) => {
   const { data } = await client.mutate({
     mutation: ADD_IMAGE_TO_TEMPLATE,
-    variables: { templateId, image, positionX, positionY, width, height },
+    variables: { templateId, image, positionX, positionY, width, height, zIndex },
   });
   return data.addImageToTemplate.template;
 };
