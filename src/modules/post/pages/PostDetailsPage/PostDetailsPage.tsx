@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import React, { useEffect, useRef, useState } from "react";
 import {
   useCreatePostImageMutation,
@@ -35,6 +35,7 @@ import {
   HeartOutlined,
   HeartFilled,
   EditOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -73,8 +74,13 @@ const { Panel } = Collapse;
 export const PostDetailsPage = () => {
   const { t } = useTranslation();
 
-  const { id } = useParams<{ id: string }>();
+  const { id, postQueryId } = useParams<{ id: string; postQueryId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get the refresh parameter from the URL
+  const searchParams = new URLSearchParams(location.search);
+  const refreshParam = searchParams.get('refresh');
 
   const { data: post, isLoading, refetch } = useGetPostByIdQuery(id || "");
   const {
@@ -351,7 +357,14 @@ export const PostDetailsPage = () => {
         
         // Navigate to the template editor with the new template
         // Pass source=post and postId parameters to identify where we came from
-        navigate(`/design/editor/${newTemplate.uuid}?source=post&postId=${post.id}`);
+        let url = `/design/editor/${newTemplate.uuid}?source=post&postId=${post.id}`;
+        
+        // If we have a postQueryId, add it to the URL
+        if (postQueryId) {
+          url += `&postQueryId=${postQueryId}`;
+        }
+        
+        navigate(url);
       }
     } catch (error) {
       console.error('Error creating template from post image:', error);
@@ -390,6 +403,118 @@ export const PostDetailsPage = () => {
     } catch (error) {
       console.error(t("postDetailsPage.image_download_error"), error);
       message.error(t("postDetailsPage.image_download_error"));
+    }
+  };
+
+  // Function to add a cache-busting parameter to image URLs
+  const getImageUrlWithCacheBuster = (url: string | undefined) => {
+    if (!url) return '';
+    
+    // Add a timestamp to the URL to prevent caching
+    const timestamp = refreshParam || Date.now();
+    
+    // Check if the URL already has query parameters
+    const hasQueryParams = url.includes('?');
+    const separator = hasQueryParams ? '&' : '?';
+    
+    return `${url}${separator}t=${timestamp}`;
+  };
+  
+  // Check if the image has been updated from the TemplateEditorPage
+  useEffect(() => {
+    const imageUpdated = localStorage.getItem(`post_${id}_image_updated`);
+    const newImageUrl = localStorage.getItem(`post_${id}_new_image_url`);
+    const oldImageUrl = localStorage.getItem(`post_${id}_old_image_url`);
+    const updateTimestamp = localStorage.getItem(`post_${id}_update_timestamp`);
+    
+    if (imageUpdated === 'true' && newImageUrl && post) {
+      console.log('Image has been updated from TemplateEditorPage');
+      console.log('New image URL:', newImageUrl);
+      console.log('Old image URL:', oldImageUrl);
+      console.log('Update timestamp:', updateTimestamp);
+      
+      // Clear the localStorage flags
+      localStorage.removeItem(`post_${id}_image_updated`);
+      localStorage.removeItem(`post_${id}_new_image_url`);
+      localStorage.removeItem(`post_${id}_old_image_url`);
+      localStorage.removeItem(`post_${id}_update_timestamp`);
+      
+      // Force a refetch of the post data
+      refetch();
+      refetchPostMedias();
+      
+      // Show a notification that the image has been updated
+      message.success(t("postDetailsPage.image_updated_from_editor"));
+      
+      // Force browser to clear image cache
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        const src = img.getAttribute('src');
+        if (src && (src.includes(oldImageUrl || '') || src.includes(post.picture || ''))) {
+          console.log('Refreshing image:', src);
+          // Set a new src with cache buster
+          img.setAttribute('src', getImageUrlWithCacheBuster(newImageUrl));
+        }
+      });
+    }
+  }, [id, post, refetch, refetchPostMedias]);
+  
+  // Force a refetch when the component mounts or when the refresh parameter changes
+  useEffect(() => {
+    console.log('PostDetailsPage: Forcing refetch due to refresh parameter:', refreshParam);
+    // Refetch the post data
+    refetch();
+    refetchPostMedias();
+    
+    // Force browser to clear image cache
+    if (refreshParam) {
+      // Clear browser cache for images
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        const src = img.getAttribute('src');
+        if (src && src.includes(post?.picture || '')) {
+          console.log('Refreshing image:', src);
+          // Set a new src with cache buster
+          img.setAttribute('src', getImageUrlWithCacheBuster(src));
+        }
+      });
+    }
+  }, [id, refreshParam, refetch, refetchPostMedias, post?.picture]);
+  
+  // Add a function to handle image errors
+  const handleImageError = () => {
+    console.error('Image failed to load:', post?.picture);
+    // Try to reload the image with a new cache buster
+    const timestamp = Date.now();
+    if (post?.picture) {
+      const newSrc = `${post.picture}?t=${timestamp}`;
+      console.log('Retrying with new src:', newSrc);
+      // Find the image element and update its src
+      const imgElement = document.querySelector(`.${styles.picture}`) as HTMLImageElement;
+      if (imgElement) {
+        imgElement.src = newSrc;
+      }
+    }
+  };
+  
+  // Add a function to manually refresh the image
+  const handleRefreshImage = () => {
+    if (post?.picture) {
+      console.log('Manually refreshing image:', post.picture);
+      const timestamp = Date.now();
+      
+      // Find the image element and update its src
+      const imgElement = document.querySelector(`.${styles.picture}`) as HTMLImageElement;
+      if (imgElement) {
+        const newSrc = `${post.picture}?t=${timestamp}`;
+        imgElement.src = newSrc;
+      }
+      
+      // Also refetch the post data
+      refetch();
+      refetchPostMedias();
+      
+      message.success(t("postDetailsPage.refresh_image"));
     }
   };
 
@@ -729,11 +854,31 @@ export const PostDetailsPage = () => {
                             <LoadingOutlined className={styles.loader} />
                           ) : (
                             <>
-                              <Image
-                                src={post?.picture}
-                                className={styles.picture}
-                                alt={t("postDetailsPage.image_alt")}
-                              />
+                              {post?.picture && (
+                                <>
+                                  <Image
+                                    src={getImageUrlWithCacheBuster(post.picture)}
+                                    className={styles.picture}
+                                    alt={t("postDetailsPage.image_alt")}
+                                    onError={handleImageError}
+                                  />
+                                  {/* Add a direct link to the image as a fallback */}
+                                  {/* {refreshParam && (
+                                    <div className={styles.imageRefreshNotice}>
+                                      {t("postDetailsPage.image_updated")}
+                                      <br />
+                                      <a 
+                                        href={post.picture} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className={styles.viewDirectLink}
+                                      >
+                                        {t("postDetailsPage.view_direct")}
+                                      </a>
+                                    </div>
+                                  )} */}
+                                </>
+                              )}
 
                               <Button
                                 className={styles.reloadButton}

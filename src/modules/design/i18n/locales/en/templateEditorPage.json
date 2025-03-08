@@ -13,5 +13,6 @@
   "delete_error": "Error deleting template",
   "cancel": "Cancel",
   "confirm": "Confirm",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "image_preview": "Preview of the updated image"
 } 

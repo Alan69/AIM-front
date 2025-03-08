@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Button, Input, Spin, message, Tooltip, Modal } from 'antd';
+import { Layout, Button, Input, Spin, message, Tooltip, Modal, notification } from 'antd';
 import { 
   ArrowLeftOutlined, 
   SaveOutlined, 
@@ -701,11 +701,13 @@ const TemplateEditorPage: React.FC = () => {
       const token = Cookies.get('token');
       
       console.log('Sending template data to server for rendering...');
+      console.log('Template UUID:', uuid);
+      console.log('Post ID:', postId);
       
       // Send the template UUID and post ID to the server for server-side rendering
       const response = await axios({
         method: 'post',
-        url: `${baseURL}template-to-post/`,
+        url: `${baseURL}designs/template-to-post/`,
         data: {
           template_uuid: uuid,
           post_id: postId
@@ -716,10 +718,63 @@ const TemplateEditorPage: React.FC = () => {
         },
       });
       
+      console.log('Server response:', response.data);
+      
       if (response.data && response.data.success) {
         message.success(t('save_to_post_success'));
-        // Navigate back to the post details page
-        navigate(`/posts/${postId}`);
+        
+        // Check if we came from a post query details page
+        const postQueryId = queryParams.get('postQueryId');
+        
+        // Get the new image URL from the response
+        const newImageUrl = response.data.picture_url;
+        const oldImageUrl = response.data.old_picture_url;
+        
+        console.log('New image URL:', newImageUrl);
+        console.log('Old image URL:', oldImageUrl);
+        
+        // Add a timestamp to force a refresh of the page
+        const timestamp = Date.now();
+        
+        // Store the new image URL in localStorage to help the PostDetailsPage
+        // identify that the image has been updated
+        localStorage.setItem(`post_${postId}_image_updated`, 'true');
+        localStorage.setItem(`post_${postId}_new_image_url`, newImageUrl);
+        localStorage.setItem(`post_${postId}_old_image_url`, oldImageUrl || '');
+        localStorage.setItem(`post_${postId}_update_timestamp`, timestamp.toString());
+        
+        // If the response includes a thumbnail, show it in a notification
+        if (response.data.thumbnail) {
+          notification.success({
+            message: t('save_to_post_success'),
+            description: (
+              <div>
+                <p>{t('image_preview')}</p>
+                <img 
+                  src={response.data.thumbnail} 
+                  alt="Preview" 
+                  style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '10px' }} 
+                />
+              </div>
+            ),
+            duration: 5,
+          });
+        }
+        
+        // Navigate back to the post details page with the correct URL format
+        setTimeout(() => {
+          if (postQueryId) {
+            // If we have a post query ID, use the format with post query ID
+            const url = `/post/${postQueryId}/${postId}?refresh=${timestamp}`;
+            console.log('Navigating to:', url);
+            navigate(url, { replace: true });
+          } else {
+            // Otherwise use the simple format
+            const url = `/post/${postId}?refresh=${timestamp}`;
+            console.log('Navigating to:', url);
+            navigate(url, { replace: true });
+          }
+        }, 1000); // Add a longer delay to ensure the notification is shown
       } else {
         throw new Error(response.data.message || 'Failed to update post image');
       }
