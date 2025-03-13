@@ -427,7 +427,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             y={y}
             width={width}
             height={height}
-            fill={shape.color || "#1890ff"}
+            fill={shape.color || "#4A90E2"}
             rotation={rotation}
             zIndex={zIndex}
             draggable
@@ -447,7 +447,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             x={x}  // Use the position directly - handleElementTransform will handle the adjustment
             y={y}  // Use the position directly - handleElementTransform will handle the adjustment
             radius={width / 2}  // Use width for consistent sizing
-            fill={shape.color || "#1890ff"}
+            fill={shape.color || "#7ED321"}
             rotation={rotation}
             zIndex={zIndex}
             draggable
@@ -475,7 +475,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             y={y}
             points={points}
             closed={true}
-            fill={shape.color || "#1890ff"}
+            fill={shape.color || "#F5A623"}
             rotation={rotation}
             zIndex={zIndex}
             draggable
@@ -501,7 +501,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             x={x}
             y={y}
             points={linePoints}
-            stroke={shape.color || "#1890ff"}
+            stroke={shape.color || "#9013FE"}
             strokeWidth={4}
             rotation={rotation}
             zIndex={zIndex}
@@ -524,7 +524,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             numPoints={5}
             innerRadius={width / 4}
             outerRadius={width / 2}
-            fill={shape.color || "#1890ff"}
+            fill={shape.color || "#F8E71C"}
             rotation={rotation}
             zIndex={zIndex}
             draggable
@@ -546,7 +546,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             y={y}
             width={width}
             height={height}
-            fill={shape.color || "#1890ff"}
+            fill={shape.color || "#4A90E2"}
             rotation={rotation}
             zIndex={zIndex}
             draggable
@@ -625,13 +625,33 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           
         case ElementType.SHAPE:
           const shapeType = data?.shapeType || 'rectangle';
-          const shapeColor = data?.color || '#1890ff';
+          // Use the provided color or a default based on shape type
+          let shapeColor;
+          switch(shapeType) {
+            case 'rectangle':
+              shapeColor = data?.color || '#4A90E2';
+              break;
+            case 'circle':
+              shapeColor = data?.color || '#7ED321';
+              break;
+            case 'triangle':
+              shapeColor = data?.color || '#F5A623';
+              break;
+            case 'line':
+              shapeColor = data?.color || '#9013FE';
+              break;
+            case 'star':
+              shapeColor = data?.color || '#F8E71C';
+              break;
+            default:
+              shapeColor = data?.color || '#4A90E2';
+          }
           
           // Use the center of the canvas for new shapes
           const centerX = Math.round(canvasWidth / 2 - 50);
           const centerY = Math.round(canvasHeight / 2 - 50);
           
-          console.log(`Adding new shape: type=${shapeType}, position=(${centerX}, ${centerY})`);
+          console.log(`Adding new shape: type=${shapeType}, color=${shapeColor}, position=(${centerX}, ${centerY})`);
           
           const shapeElement = await createShapeElement(
             templateId,

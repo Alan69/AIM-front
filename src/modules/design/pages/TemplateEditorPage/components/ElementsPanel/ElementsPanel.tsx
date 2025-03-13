@@ -23,11 +23,11 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
 
   // Sample shape elements
   const shapeElements = [
-    { name: 'Rectangle', type: 'rectangle' },
-    { name: 'Circle', type: 'circle' },
-    { name: 'Triangle', type: 'triangle' },
-    { name: 'Line', type: 'line' },
-    { name: 'Star', type: 'star' },
+    { name: 'Rectangle', type: 'rectangle', color: '#4A90E2' },
+    { name: 'Circle', type: 'circle', color: '#7ED321' },
+    { name: 'Triangle', type: 'triangle', color: '#F5A623' },
+    { name: 'Line', type: 'line', color: '#9013FE' },
+    { name: 'Star', type: 'star', color: '#F8E71C' },
   ];
 
   const uploadProps = {
@@ -83,8 +83,8 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
     });
   };
 
-  const handleAddShapeElement = (shapeType: string) => {
-    console.log('Adding shape with type:', shapeType);
+  const handleAddShapeElement = (shapeType: string, color: string) => {
+    console.log('Adding shape with type:', shapeType, 'and color:', color);
     
     // Validate shape type
     if (!shapeType) {
@@ -94,8 +94,8 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
     // Log the shape type being passed
     console.log('Final shape type being passed to onAddElement:', shapeType);
     
-    // Pass the shape type to the parent component
-    onAddElement(ElementType.SHAPE, { shapeType });
+    // Pass the shape type and color to the parent component
+    onAddElement(ElementType.SHAPE, { shapeType, color });
   };
 
   return (
@@ -154,7 +154,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
                   <Card 
                     hoverable 
                     className="element-card shape-card"
-                    onClick={() => handleAddShapeElement(item.type)}
+                    onClick={() => handleAddShapeElement(item.type, item.color)}
                   >
                     <div className={`shape-preview shape-${item.type}`}></div>
                     <div className="shape-name">{item.name}</div>

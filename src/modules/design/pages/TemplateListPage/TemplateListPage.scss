@@ -37,13 +37,17 @@
   }
 
   .template-card {
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
     height: 100%;
     display: flex;
     flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
     &:hover {
       transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
 
     .template-preview {
@@ -55,21 +59,28 @@
       border-radius: 4px;
       overflow: hidden;
       padding: 8px;
+      min-height: 200px;
 
       .preview-container {
         position: relative;
         border: 1px solid #e8e8e8;
-        background-color: white;
+        background-color: #f8f8f8;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        width: 300px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         &.square {
-          width: 100%;
-          aspect-ratio: 1;
+          width: 300px;
+          height: 300px;
         }
 
         &.portrait {
-          width: 80%;
-          aspect-ratio: 9/16;
+          width: 240px;
+          height: 300px;
         }
 
         .template-content-preview {
@@ -79,24 +90,66 @@
           width: 100%;
           height: 100%;
           overflow: hidden;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          
+          img {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+          }
         }
 
-        .preview-shape,
-        .preview-text,
-        .preview-image {
+        .preview-shape {
           position: absolute;
           transform-origin: center;
+          pointer-events: none;
+          box-sizing: border-box;
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
         }
 
         .preview-text {
+          position: absolute;
+          transform-origin: center;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: 100%;
+          padding: 0;
+          pointer-events: none;
+          font-weight: bold;
+          display: block !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          text-align: center;
+          width: auto;
+          box-sizing: border-box;
         }
 
-        .preview-image {
-          object-fit: cover;
+        .preview-image-container {
+          position: absolute;
+          transform-origin: center;
+          overflow: hidden;
+          
+          &:hover {
+            outline: 2px solid rgba(0, 0, 255, 0.3); /* Debug outline on hover */
+          }
+          
+          .preview-image {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            opacity: 1 !important; /* Force image to be visible */
+            max-width: none !important; /* Override any max-width constraints */
+            max-height: none !important; /* Override any max-height constraints */
+            visibility: visible !important; /* Ensure visibility */
+          }
         }
 
         .template-placeholder {
@@ -115,6 +168,7 @@
           padding: 8px;
           overflow: hidden;
           text-overflow: ellipsis;
+          background-color: #f9f9f9;
 
           .template-size-indicator {
             margin-top: 8px;
@@ -129,13 +183,16 @@
     }
 
     .template-info {
-      padding: 12px 0 0;
+      padding: 12px;
+      border-top: 1px solid #f0f0f0;
+      background-color: #fff;
 
       .template-name {
         font-weight: 500;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: #333;
       }
 
       .template-size {
@@ -155,6 +212,44 @@
       margin-bottom: 16px;
     }
   }
+}
+
+/* Force all images to be visible with higher specificity */
+.template-list-page .template-preview .preview-container img,
+.template-list-page .template-preview img.preview-image,
+img.preview-image {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Ensure shapes and text are visible with even higher specificity */
+.template-list-page .template-preview .preview-container .preview-shape,
+.template-list-page .template-preview .preview-container .preview-text,
+.template-content-preview .preview-shape,
+.template-content-preview .preview-text {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Preview text style */
+.template-content-preview .preview-text {
+  text-align: center;
+  min-width: 50px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Special heading text style */
+.template-content-preview div.preview-text {
+  font-size: 18px !important;
+  font-weight: bold !important;
+  color: black !important;
+  line-height: 1.2 !important;
 }
 
 .template-thumbnail {

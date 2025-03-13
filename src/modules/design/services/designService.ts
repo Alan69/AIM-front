@@ -1,6 +1,8 @@
 import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import { baseURL } from 'types/baseUrl';
 
 // Create the HTTP link
 const httpLink = createHttpLink({
@@ -504,14 +506,147 @@ export const DEBUG_ELEMENT_PROPERTIES = gql`
   }
 `;
 
+// Utility function to ensure image data is properly formatted
+export const processImageData = (imageData: string): string => {
+  // Check if input is valid
+  if (!imageData || typeof imageData !== 'string') {
+    console.warn('Invalid image data received:', typeof imageData);
+    return '';
+  }
+
+  try {
+    // If it's already a data URL, return as is
+    if (imageData.startsWith('data:')) {
+      console.log('Image is already a data URL, length:', imageData.length);
+      // For debugging, log a small part of the data URL
+      console.log('Data URL preview:', imageData.substring(0, 50) + '...');
+      return imageData;
+    }
+    
+    // If it's an HTTP URL, return as is
+    if (imageData.startsWith('http')) {
+      console.log('Image is an HTTP URL:', imageData);
+      return imageData;
+    }
+
+    // If it's a base64 string without the data: prefix
+    if (imageData.match(/^[A-Za-z0-9+/=]+$/)) {
+      // Clean the base64 string
+      let cleanBase64 = imageData.replace(/\s/g, ''); // Remove whitespace
+      
+      // Ensure the length is a multiple of 4 by padding with =
+      while (cleanBase64.length % 4 !== 0) {
+        cleanBase64 += '=';
+      }
+      
+      // Try to detect image type from the first few bytes
+      let mimeType = 'image/jpeg'; // Default to JPEG
+      
+      // Check for PNG signature
+      if (cleanBase64.startsWith('iVBORw0KGg')) {
+        mimeType = 'image/png';
+      }
+      // Check for JPEG signature
+      else if (cleanBase64.startsWith('/9j/') || cleanBase64.startsWith('/9J/')) {
+        mimeType = 'image/jpeg';
+      }
+      // Check for SVG signature (less reliable in base64)
+      else if (cleanBase64.includes('PHN2Zz') || cleanBase64.includes('PHN2Zy')) {
+        mimeType = 'image/svg+xml';
+      }
+      
+      const result = `data:${mimeType};base64,${cleanBase64}`;
+      console.log(`Processed base64 image with mime type: ${mimeType}, length: ${cleanBase64.length}`);
+      // For debugging, log a small part of the result
+      console.log('Result preview:', result.substring(0, 50) + '...');
+      return result;
+    }
+
+    // If it's a relative path, construct the URL
+    const baseUrl = process.env.REACT_APP_API_URL || baseURL;
+    const mediaUrl = baseUrl.replace('/api/', '');
+    
+    // Check if the path already starts with /media/
+    if (imageData.startsWith('/media/')) {
+      const result = `${mediaUrl}${imageData}`;
+      console.log(`Constructed URL from media path: ${result}`);
+      return result;
+    }
+    
+    // Otherwise, assume it's a relative path that needs /media/ prefix
+    const result = `${mediaUrl}/media/${imageData}`;
+    console.log(`Constructed URL with media prefix: ${result}`);
+    return result;
+  } catch (error) {
+    console.error('Error processing image data:', error);
+    return '';
+  }
+};
+
 // Function to fetch all templates
 export const fetchAllTemplates = async (size?: string) => {
-  const { data } = await client.query({
-    query: GET_ALL_TEMPLATES,
-    variables: { size },
-    fetchPolicy: 'network-only',
-  });
-  return data.allTemplates;
+  try {
+    const { data } = await client.query({
+      query: GET_ALL_TEMPLATES,
+      variables: { size },
+      fetchPolicy: 'network-only',
+    });
+    
+    // Process the data to ensure all fields are correctly formatted
+    const processedTemplates = data.allTemplates.map((template: any) => {
+      // Process image assets
+      const imageAssets = template.imageAssets?.map((img: any) => ({
+        uuid: img.uuid,
+        image: processImageData(img.image),
+        positionX: Number(img.positionX),
+        positionY: Number(img.positionY),
+        width: Number(img.width),
+        height: Number(img.height),
+        zIndex: Number(img.zIndex),
+        rotation: Number(img.rotation)
+      })) || [];
+
+      // Process text elements
+      const textElements = template.textElements?.map((text: any) => ({
+        uuid: text.uuid,
+        text: text.text,
+        font: text.font,
+        fontSize: Number(text.fontSize),
+        color: text.color,
+        positionX: Number(text.positionX),
+        positionY: Number(text.positionY),
+        zIndex: Number(text.zIndex),
+        rotation: Number(text.rotation)
+      })) || [];
+
+      // Process shape elements
+      const shapeElements = template.shapeElements?.map((shape: any) => ({
+        uuid: shape.uuid,
+        shapeType: shape.shapeType,
+        color: shape.color,
+        positionX: Number(shape.positionX),
+        positionY: Number(shape.positionY),
+        width: Number(shape.width),
+        height: Number(shape.height),
+        zIndex: Number(shape.zIndex),
+        rotation: Number(shape.rotation)
+      })) || [];
+
+      // Return the processed template
+      return {
+        ...template,
+        imageAssets,
+        textElements,
+        shapeElements
+      };
+    });
+    
+    console.log('Processed templates from GraphQL:', processedTemplates);
+    return processedTemplates;
+  } catch (error) {
+    console.error('Error in fetchAllTemplates:', error);
+    throw error;
+  }
 };
 
 // Function to fetch a template with all its elements
@@ -804,4 +939,86 @@ export const debugElementProperties = async (
     variables: { templateId, elementUuid, elementType },
   });
   return data.debugElementProperties;
+};
+
+// Function to fetch all templates using REST API (alternative to GraphQL)
+export const fetchTemplatesREST = async (size?: string) => {
+  try {
+    const token = Cookies.get('token');
+    const params = size ? { size } : {};
+    
+    const response = await axios({
+      method: 'get',
+      url: `${baseURL}designs/templates/`,
+      params,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    
+    // Process the response data to match the expected format
+    const processedTemplates = response.data.map((template: any) => {
+      // Process image assets
+      const imageAssets = template.image_assets?.map((img: any) => ({
+        uuid: img.uuid,
+        image: processImageData(img.image),
+        positionX: Number(img.position_x),
+        positionY: Number(img.position_y),
+        width: Number(img.width),
+        height: Number(img.height),
+        zIndex: Number(img.z_index),
+        rotation: Number(img.rotation)
+      })) || [];
+
+      // Process text elements
+      const textElements = template.text_elements?.map((text: any) => ({
+        uuid: text.uuid,
+        text: text.text,
+        font: text.font,
+        fontSize: Number(text.font_size),
+        color: text.color,
+        positionX: Number(text.position_x),
+        positionY: Number(text.position_y),
+        zIndex: Number(text.z_index),
+        rotation: Number(text.rotation)
+      })) || [];
+
+      // Process shape elements
+      const shapeElements = template.shape_elements?.map((shape: any) => ({
+        uuid: shape.uuid,
+        shapeType: shape.shape_type,
+        color: shape.color,
+        positionX: Number(shape.position_x),
+        positionY: Number(shape.position_y),
+        width: Number(shape.width),
+        height: Number(shape.height),
+        zIndex: Number(shape.z_index),
+        rotation: Number(shape.rotation)
+      })) || [];
+
+      // Return the processed template
+      return {
+        uuid: template.uuid,
+        name: template.name,
+        isDefault: template.is_default,
+        size: template.size,
+        backgroundImage: template.background_image,
+        createdAt: template.created_at,
+        imageAssets,
+        textElements,
+        shapeElements,
+        // For backward compatibility
+        images: template.images || [],
+        texts: template.texts || [],
+        shapes: template.shapes || []
+      };
+    });
+    
+    console.log('Processed templates from REST API:', processedTemplates);
+    return processedTemplates;
+  } catch (error) {
+    console.error('Error fetching templates from REST API:', error);
+    throw error;
+  }
 }; 
