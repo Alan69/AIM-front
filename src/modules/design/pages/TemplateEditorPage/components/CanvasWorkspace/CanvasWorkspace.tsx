@@ -48,11 +48,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
 
   // Log when template changes to help with debugging
   useEffect(() => {
-    console.log('Template updated in CanvasWorkspace:', template);
-    console.log('Number of shapes:', template.shapes?.length || 0);
-    console.log('Number of texts:', template.texts?.length || 0);
-    console.log('Number of images:', template.images?.length || 0);
-    
     // Force re-render when template changes
     if (stageRef.current) {
       stageRef.current.batchDraw();
@@ -102,8 +97,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           
           // Set padding to give more space around text for easier selection
           transformerRef.current.padding(5);
-          
-          console.log('Configured transformer for text element');
         } else {
           // For shapes and images, use default anchors
           transformerRef.current.enabledAnchors([
@@ -111,8 +104,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           ]);
           transformerRef.current.keepRatio(false);
           transformerRef.current.padding(0);
-          
-          console.log('Configured transformer for shape/image element');
         }
         
         transformerRef.current.nodes([node]);
@@ -181,8 +172,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     if ('rotation' in processedElement) processedElement.rotation = Number(processedElement.rotation || 0);
     if ('fontSize' in processedElement) processedElement.fontSize = Number(processedElement.fontSize || 16);
     
-    console.log(`Element clicked:`, processedElement);
-    
     // Update the selected element
     onSelectElement(processedElement);
   };
@@ -195,8 +184,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   };
 
   const handleTransformEnd = (element: DesignElement) => {
-    console.log('Transform ended for element:', element);
-    
     // Create a deep copy of the element to avoid reference issues
     const updatedElement = { ...element };
     
@@ -218,9 +205,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         if ('height' in processedElement) processedElement.height = Number(processedElement.height);
         if ('zIndex' in processedElement) processedElement.zIndex = Number(processedElement.zIndex);
         if ('rotation' in processedElement) processedElement.rotation = Number(processedElement.rotation);
-        
-        // Log the processed element before saving
-        console.log(`Saving element to backend - type: ${elementType}, position: (${processedElement.positionX}, ${processedElement.positionY})`, processedElement);
         
         // Save to backend
         updateElementInTemplate(
@@ -244,8 +228,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       'text' in updatedElement ? 'text' : 
       'shapeType' in updatedElement ? 'shape' : 'unknown';
     
-    console.log(`Updating element in template - uuid: ${updatedElement.uuid}, type: ${elementType}`);
-    
     // Ensure all numeric values are properly converted to numbers
     if ('positionX' in updatedElement) updatedElement.positionX = Number(updatedElement.positionX || 0);
     if ('positionY' in updatedElement) updatedElement.positionY = Number(updatedElement.positionY || 0);
@@ -253,8 +235,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     if ('height' in updatedElement) updatedElement.height = Number(updatedElement.height || 100);
     if ('zIndex' in updatedElement) updatedElement.zIndex = Number(updatedElement.zIndex || 0);
     if ('rotation' in updatedElement) updatedElement.rotation = Number(updatedElement.rotation || 0);
-    
-    console.log(`Element data after normalization:`, updatedElement);
     
     // Update the appropriate array in the template
     if (elementType === 'image') {
@@ -271,7 +251,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       ) || [];
     }
     
-    console.log(`Updated template:`, updatedTemplate);
     onUpdateElements(updatedTemplate);
   };
 
@@ -290,8 +269,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const height = image.height !== null && !isNaN(Number(image.height)) ? Number(image.height) : 100;
     const rotation = image.rotation !== null && !isNaN(Number(image.rotation)) ? Number(image.rotation) : 0;
     const zIndex = image.zIndex !== null && !isNaN(Number(image.zIndex)) ? Number(image.zIndex) : 0;
-    
-    console.log(`Rendering image: ${image.uuid}, position: (${x}, ${y}), size: ${width}x${height}, zIndex: ${zIndex}, rotation: ${rotation}`);
     
     // Create a copy of the image with correct position values
     const imageWithCorrectPosition = {
@@ -333,8 +310,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const rotation = text.rotation !== null && !isNaN(Number(text.rotation)) ? Number(text.rotation) : 0;
     const zIndex = text.zIndex !== null && !isNaN(Number(text.zIndex)) ? Number(text.zIndex) : 0;
     
-    console.log(`Rendering text: ${text.uuid}, position: (${x}, ${y}), fontSize: ${fontSize}, zIndex: ${zIndex}, rotation: ${rotation}`);
-    
     // Create a copy of the text with correct position values
     const textWithCorrectPosition = {
       ...text,
@@ -368,15 +343,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   };
 
   const renderShapeElement = (shape: ShapeElement) => {
-    // Log shape details for debugging
-    console.log(`Rendering shape: ${shape.uuid}, type: ${shape.shapeType}, position: (${shape.positionX}, ${shape.positionY})`);
-    
-    // Log only critical information
-    if ((shape.positionX === 0 && shape.positionY === 0) || 
-        (shape.positionX === null || shape.positionY === null)) {
-      console.log(`Warning: Shape ${shape.uuid} has position issues which may indicate a problem`);
-    }
-    
     // Force position values to be numbers and don't default to 0 - this is critical
     // Only default to 0 if the value is null, undefined, or NaN after conversion
     const x = shape.positionX !== null && shape.positionX !== undefined ? 
@@ -399,8 +365,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     // If shapeType is null or invalid, default to rectangle
     const shapeType = shape.shapeType || 'rectangle';
-    
-    console.log(`Processed shape values: type=${shapeType}, x=${x}, y=${y}, width=${width}, height=${height}, rotation=${rotation}, zIndex=${zIndex}`);
     
     // Create a copy of the shape with correct position values to ensure it's properly rendered
     const shapeWithCorrectPosition = {
@@ -651,8 +615,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           const centerX = Math.round(canvasWidth / 2 - 50);
           const centerY = Math.round(canvasHeight / 2 - 50);
           
-          console.log(`Adding new shape: type=${shapeType}, color=${shapeColor}, position=(${centerX}, ${centerY})`);
-          
           const shapeElement = await createShapeElement(
             templateId,
             shapeType,
@@ -666,7 +628,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           ) as ShapeElement;
           
           if (shapeElement) {
-            console.log(`Shape element created:`, shapeElement);
             const updatedTemplateWithShape = { ...template };
             updatedTemplateWithShape.shapes = [...(template.shapes || []), shapeElement];
             onUpdateElements(updatedTemplateWithShape);
@@ -691,7 +652,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 'shape',
                 JSON.stringify(processedShape)
               );
-              console.log('Initial shape properties saved');
             } catch (error) {
               console.error('Error saving initial shape properties:', error);
             }
@@ -715,8 +675,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
     
-    console.log(`Element transform - node position: (${x}, ${y}), scale: (${scaleX}, ${scaleY})`);
-    
     // Update position for all element types
     updatedElement.positionX = Number(x);
     updatedElement.positionY = Number(y);
@@ -730,7 +688,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       
       // Apply the scale to fontSize
       updatedElement.fontSize = Math.round(originalFontSize * avgScale);
-      console.log(`Text scaling: original fontSize=${originalFontSize}, new fontSize=${updatedElement.fontSize}, scale=${avgScale}`);
       
       // Reset the node's scale to 1 after applying the transform
       node.scaleX(1);
@@ -750,8 +707,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         updatedElement.width = Number(node.width() * scaleX);
         updatedElement.height = Number(node.height() * scaleY);
       }
-      
-      console.log(`New dimensions: ${updatedElement.width}x${updatedElement.height}`);
       
       // Reset the node's scale to 1 after applying the transform
       node.scaleX(1);
@@ -786,8 +741,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       updatedElement.rotation = 0;
     if ('fontSize' in updatedElement && (updatedElement.fontSize === null || isNaN(updatedElement.fontSize)))
       updatedElement.fontSize = 16;
-    
-    console.log(`Updated element position: (${updatedElement.positionX}, ${updatedElement.positionY})`);
     
     // Update the element in the template UI
     updateElement(updatedElement);
