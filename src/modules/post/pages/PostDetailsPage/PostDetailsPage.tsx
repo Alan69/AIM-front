@@ -429,11 +429,6 @@ export const PostDetailsPage = () => {
     const updateTimestamp = localStorage.getItem(`post_${id}_update_timestamp`);
     
     if (imageUpdated === 'true' && newImageUrl && post) {
-      console.log('Image has been updated from TemplateEditorPage');
-      console.log('New image URL:', newImageUrl);
-      console.log('Old image URL:', oldImageUrl);
-      console.log('Update timestamp:', updateTimestamp);
-      
       // Clear the localStorage flags
       localStorage.removeItem(`post_${id}_image_updated`);
       localStorage.removeItem(`post_${id}_new_image_url`);
@@ -452,17 +447,15 @@ export const PostDetailsPage = () => {
       images.forEach(img => {
         const src = img.getAttribute('src');
         if (src && (src.includes(oldImageUrl || '') || src.includes(post.picture || ''))) {
-          console.log('Refreshing image:', src);
           // Set a new src with cache buster
           img.setAttribute('src', getImageUrlWithCacheBuster(newImageUrl));
         }
       });
     }
-  }, [id, post, refetch, refetchPostMedias]);
+  }, [id, post, refetch, refetchPostMedias, t]);
   
   // Force a refetch when the component mounts or when the refresh parameter changes
   useEffect(() => {
-    console.log('PostDetailsPage: Forcing refetch due to refresh parameter:', refreshParam);
     // Refetch the post data
     refetch();
     refetchPostMedias();
@@ -474,7 +467,6 @@ export const PostDetailsPage = () => {
       images.forEach(img => {
         const src = img.getAttribute('src');
         if (src && src.includes(post?.picture || '')) {
-          console.log('Refreshing image:', src);
           // Set a new src with cache buster
           img.setAttribute('src', getImageUrlWithCacheBuster(src));
         }
@@ -489,7 +481,6 @@ export const PostDetailsPage = () => {
     const timestamp = Date.now();
     if (post?.picture) {
       const newSrc = `${post.picture}?t=${timestamp}`;
-      console.log('Retrying with new src:', newSrc);
       // Find the image element and update its src
       const imgElement = document.querySelector(`.${styles.picture}`) as HTMLImageElement;
       if (imgElement) {
@@ -501,7 +492,6 @@ export const PostDetailsPage = () => {
   // Add a function to manually refresh the image
   const handleRefreshImage = () => {
     if (post?.picture) {
-      console.log('Manually refreshing image:', post.picture);
       const timestamp = Date.now();
       
       // Find the image element and update its src
@@ -541,7 +531,6 @@ export const PostDetailsPage = () => {
       }
         
       const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
-      console.log('Connecting to WebSocket:', wsUrl);
       
       const ws = new WebSocketService(wsUrl, handleWebSocketMessage);
       
@@ -556,12 +545,8 @@ export const PostDetailsPage = () => {
   
   // Handle WebSocket messages
   const handleWebSocketMessage = (data: any) => {
-    console.log('WebSocket message received:', data);
-    
     // Handle welcome message
     if (data.type === 'welcome') {
-      console.log('WebSocket connection established');
-      
       // Send initial post check request if needed
       if (id && user?.profile?.user?.id) {
         const message = {
@@ -573,36 +558,28 @@ export const PostDetailsPage = () => {
           img: true,
           previous_img: post?.picture || '/media/no_img.jpeg' // Add the current image to check if it changes
         };
-        console.log('Sending post check request:', message);
         wsService?.send(message);
       }
     }
     
     // Handle post status updates
     if (data.type === 'post') {
-      console.log('Post status update received:', data);
-      
       // Check if this is a status update
       if (data['checking-status']) {
-        console.log('Checking status update:', data);
-        
         // Update generation status based on the message
         if (data.text_generated !== undefined) {
           const status = data.text_generated ? 'completed' : 'pending';
-          console.log('Setting text generation status:', status);
           dispatch(postActions.setTextGenerationStatus(status));
         }
         
         if (data.image_generated !== undefined) {
           const status = data.image_generated ? 'completed' : 'pending';
-          console.log('Setting image generation status:', status);
           dispatch(postActions.setImageGenerationStatus(status));
         }
         
         // If the message indicates we're still generating, set a timeout to force refresh
         if (data.message && data.message.includes('Still generating')) {
           setTimeout(() => {
-            console.log('Forcing refresh after delay');
             refetch();
             refetchPostMedias();
           }, 3000);
@@ -610,23 +587,18 @@ export const PostDetailsPage = () => {
       } 
       // Final result
       else if (data.result === 'ok') {
-        console.log('Final result received:', data);
-        
         // Update generation status based on the final result
         if (data.text_generated !== undefined) {
           const status = data.text_generated ? 'completed' : 'failed';
-          console.log('Setting final text generation status:', status);
           dispatch(postActions.setTextGenerationStatus(status));
         }
         
         if (data.image_generated !== undefined) {
           const status = data.image_generated ? 'completed' : 'failed';
-          console.log('Setting final image generation status:', status);
           dispatch(postActions.setImageGenerationStatus(status));
         }
         
         // Always refresh the post data when we get a final result
-        console.log('Refreshing data after final result');
         refetch();
         refetchPostMedias();
       }
@@ -641,7 +613,6 @@ export const PostDetailsPage = () => {
   // Check if the post has an image and update the status accordingly
   useEffect(() => {
     if (post && post.picture && post.picture !== '/media/no_img.jpeg') {
-      console.log('Post has an image, updating status to completed:', post.picture);
       dispatch(postActions.setImageGenerationStatus('completed'));
       
       // Refresh the post data when the image is generated
@@ -654,7 +625,6 @@ export const PostDetailsPage = () => {
   useEffect(() => {
     if ((textGenerationStatus === 'pending' || imageGenerationStatus === 'pending') && id && post) {
       const timer = setTimeout(() => {
-        console.log('Forcing refresh due to pending status');
         refetch();
         refetchPostMedias();
         
@@ -684,7 +654,6 @@ export const PostDetailsPage = () => {
             img: true,
             previous_img: previousImg
           };
-          console.log('Sending refresh request after timeout:', message);
           wsService.send(message);
         }
       }, 10000);
