@@ -333,32 +333,68 @@ export const PostDetailsPage = () => {
 
   const handleOpenInDesigner = async () => {
     try {
-      // Create a new template with the post image
-      const templateName = `Edit from Post ${post?.id || ''}`;
-      const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
+      let templateUuid;
       
-      // Canvas dimensions based on template size
-      const canvasWidth = 1080;
-      const canvasHeight = 1080;
-      
-      // Create a new template
-      const newTemplate = await createTemplate(templateName, templateSize);
-      
-      if (newTemplate && post?.picture) {
-        // Add the image to the template
-        await createImageAsset(
-          newTemplate.uuid,
-          post.picture,
-          0, // positionX
-          0, // positionY
-          canvasWidth, // width - use the full canvas width
-          canvasHeight, // height - use the full canvas height
-          -1 // zIndex - set to -1 to place behind other elements
-        );
+      // Check if the post already has a template
+      if (post?.template) {
+        // Use the existing template
+        templateUuid = post.template;
+        console.log(`Using existing template ${templateUuid} for post ${post.id}`);
+      } else {
+        // Create a new template with the post image
+        const templateName = `Edit from Post ${post?.id || ''}`;
+        const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
         
-        // Navigate to the template editor with the new template
+        // Canvas dimensions based on template size
+        const canvasWidth = 1080;
+        const canvasHeight = 1080;
+        
+        // Create a new template
+        const newTemplate = await createTemplate(templateName, templateSize);
+        
+        if (newTemplate && post?.picture) {
+          // Add the image to the template
+          await createImageAsset(
+            newTemplate.uuid,
+            post.picture,
+            0, // positionX
+            0, // positionY
+            canvasWidth, // width - use the full canvas width
+            canvasHeight, // height - use the full canvas height
+            -1 // zIndex - set to -1 to place behind other elements
+          );
+          
+          // Update the post with the template UUID
+          if (post.id) {
+            try {
+              // Create form data for the request
+              const formData = new URLSearchParams();
+              formData.append('template_uuid', newTemplate.uuid);
+              
+              // Send the request to update the post with the template UUID
+              await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${post.id}/update-template/`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData,
+                credentials: 'include',
+              });
+              
+              console.log(`Post ${post.id} updated with template ${newTemplate.uuid}`);
+            } catch (error) {
+              console.error('Error updating post with template UUID:', error);
+            }
+          }
+          
+          templateUuid = newTemplate.uuid;
+        }
+      }
+      
+      if (templateUuid) {
+        // Navigate to the template editor with the template
         // Pass source=post and postId parameters to identify where we came from
-        let url = `/design/editor/${newTemplate.uuid}?source=post&postId=${post.id}`;
+        let url = `/design/editor/${templateUuid}?source=post&postId=${post?.id}`;
         
         // If we have a postQueryId, add it to the URL
         if (postQueryId) {
@@ -864,13 +900,17 @@ export const PostDetailsPage = () => {
                                 shape="circle"
                                 onClick={handleDownloadImage}
                               />
-                              <Button
-                                className={styles.editInDesignerButton}
-                                icon={<EditOutlined />}
-                                shape="circle"
-                                onClick={handleOpenInDesigner}
-                                title={t("postDetailsPage.edit_in_designer")}
-                              />
+                              <Tooltip title={post?.template 
+                                ? t("postDetailsPage.edit_in_designer_with_template") 
+                                : t("postDetailsPage.edit_in_designer")
+                              }>
+                                <Button
+                                  className={`${styles.editInDesignerButton} ${post?.template ? styles.hasTemplate : ''}`}
+                                  icon={<EditOutlined />}
+                                  shape="circle"
+                                  onClick={handleOpenInDesigner}
+                                />
+                              </Tooltip>
                             </>
                           )}
                         </div>

@@ -119,6 +119,20 @@
 
 .editInDesignerButton {
   right: calc(32px + 16px + 32px + 16px);
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.8);
+  
+  &.hasTemplate {
+    background-color: rgba(24, 144, 255, 0.2);
+    border-color: #1890ff;
+    color: #1890ff;
+    
+    &:hover {
+      background-color: rgba(24, 144, 255, 0.3);
+      border-color: #40a9ff;
+      color: #40a9ff;
+    }
+  }
 }
 
 .refreshImageButton {

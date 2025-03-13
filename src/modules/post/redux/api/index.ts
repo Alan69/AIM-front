@@ -27,6 +27,7 @@ export type TPostData = {
     id: string
   }
   previouspostimage: TPreviousPostImage[]
+  template?: string;
 }
 
 export type TCreatePost = {
@@ -51,6 +52,7 @@ export type TUpdatePost = {
   post_query: string;
   author: string;
   picture?: string;
+  template?: string;
 }
 
 export type TRecreatePostImage = {

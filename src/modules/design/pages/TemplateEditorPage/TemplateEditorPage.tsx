@@ -705,6 +705,27 @@ const TemplateEditorPage: React.FC = () => {
       console.log('Template UUID:', uuid);
       console.log('Post ID:', postId);
       
+      // Update the post with the template UUID if it's not already set
+      try {
+        const formData = new URLSearchParams();
+        formData.append('template_uuid', uuid);
+        
+        // Send the request to update the post with the template UUID
+        await fetch(`${baseURL}posts/${postId}/update-template/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+          credentials: 'include',
+        });
+        
+        console.log(`Post ${postId} updated with template ${uuid}`);
+      } catch (error) {
+        console.error('Error updating post with template UUID:', error);
+      }
+      
       // Send the template UUID and post ID to the server for server-side rendering
       const response = await axios({
         method: 'post',

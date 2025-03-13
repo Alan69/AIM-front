@@ -31,6 +31,7 @@
   "image_upload_error": "Error adding an image",
   "update_success": "Update was successful.",
   "edit_in_designer": "Edit in Designer",
+  "edit_in_designer_with_template": "Edit with existing template",
   "error_creating_template": "Error creating template from image",
   "image_updated": "Image has been updated",
   "view_direct": "View direct image",
