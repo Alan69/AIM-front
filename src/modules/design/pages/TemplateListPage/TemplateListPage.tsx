@@ -5,6 +5,7 @@ import { PlusOutlined, SearchOutlined, PictureOutlined } from '@ant-design/icons
 import { fetchAllTemplates, createTemplate, fetchTemplatesREST, processImageData } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -18,6 +19,7 @@ const TemplateListPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [selectedSize, setSelectedSize] = useState<TemplateSizeType>('1080x1080');
   const navigate = useNavigate();
+  const { user } = useTypedSelector((state) => state.auth);
 
   useEffect(() => {
     loadTemplates();
@@ -36,6 +38,12 @@ const TemplateListPage: React.FC = () => {
       
       // Process image data for all templates
       const processedTemplates = data.map((template: Template) => {
+        // Process background image if it exists
+        if (template.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
+          template.backgroundImage = processImageData(template.backgroundImage);
+        }
+        
+        // Process image assets
         if (template.imageAssets && template.imageAssets.length > 0) {
           template.imageAssets = template.imageAssets.map((img: any) => ({
             ...img,
@@ -87,7 +95,22 @@ const TemplateListPage: React.FC = () => {
 
   const handleCreateTemplate = async () => {
     try {
-      const newTemplate = await createTemplate(`New Template ${new Date().toLocaleTimeString()}`, selectedSize);
+      // Get the user ID from the user context
+      const userId = user?.profile?.user?.id;
+      
+      if (!userId) {
+        message.error('You must be logged in to create a template.');
+        return;
+      }
+      
+      console.log(`Creating template with user ID: ${userId}`);
+      const newTemplate = await createTemplate(
+        `New Template ${new Date().toLocaleTimeString()}`, 
+        selectedSize,
+        undefined, // No background image
+        userId     // Pass the user ID
+      );
+      
       navigate(`/design/editor/${newTemplate.uuid}`);
     } catch (error) {
       console.error('Error creating template:', error);
@@ -140,7 +163,32 @@ const TemplateListPage: React.FC = () => {
             zIndex: 1
           }}
         >
-          {/* Render the background image */}
+          {/* Render the background image if available */}
+          {template.backgroundImage && template.backgroundImage !== 'no_image.jpg' && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 0
+              }}
+            >
+              <img
+                src={template.backgroundImage}
+                alt=""
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
+            </div>
+          )}
+
+          {/* Render the first image asset (if any) */}
           {firstImage && (
             <div 
               style={{
@@ -399,7 +447,8 @@ const TemplateListPage: React.FC = () => {
                     <div 
                       className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
                     >
-                      {(template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length) ? (
+                      {(template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                        (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
                         renderTemplatePreview(template)
                       ) : (
                         <div className="template-placeholder">

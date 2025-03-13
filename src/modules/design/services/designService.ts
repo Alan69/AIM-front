@@ -122,7 +122,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
 
 // Mutation to create a template
 export const CREATE_TEMPLATE = gql`
-  mutation CreateTemplate($name: String!, $size: String!, $userId: UUID, $isDefault: Boolean, $backgroundImage: String) {
+  mutation CreateTemplate($name: String!, $size: String!, $userId: UUID!, $isDefault: Boolean, $backgroundImage: String) {
     createTemplate(name: $name, size: $size, userId: $userId, isDefault: $isDefault, backgroundImage: $backgroundImage) {
       template {
         uuid
@@ -328,45 +328,27 @@ export const ADD_SHAPE_TO_TEMPLATE = gql`
 
 // Mutation to update a template
 export const UPDATE_TEMPLATE = gql`
-  mutation UpdateTemplate($uuid: UUID!, $name: String, $isDefault: Boolean, $size: String) {
-    updateTemplate(uuid: $uuid, name: $name, isDefault: $isDefault, size: $size) {
+  mutation UpdateTemplate(
+    $uuid: UUID!
+    $name: String
+    $is_default: Boolean
+    $size: String
+    $background_image: String
+  ) {
+    updateTemplate(
+      uuid: $uuid
+      name: $name
+      isDefault: $is_default
+      size: $size
+      backgroundImage: $background_image
+    ) {
       template {
         uuid
         name
         isDefault
         size
-        texts {
-          uuid
-          text
-          font
-          fontSize
-          color
-          positionX
-          positionY
-          zIndex
-          rotation
-        }
-        images {
-          uuid
-          image
-          positionX
-          positionY
-          width
-          height
-          zIndex
-          rotation
-        }
-        shapes {
-          uuid
-          shapeType
-          color
-          positionX
-          positionY
-          width
-          height
-          zIndex
-          rotation
-        }
+        backgroundImage
+        createdAt
       }
     }
   }
@@ -562,15 +544,31 @@ export const processImageData = (imageData: string): string => {
       return result;
     }
 
+    // Extract the filename for better handling
+    const filename = imageData.split('/').pop();
+    
     // If it's a relative path, construct the URL
     const baseUrl = process.env.REACT_APP_API_URL || baseURL;
-    const mediaUrl = baseUrl.replace('/api/', '');
+    const mediaUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
     
     // Check if the path already starts with /media/
     if (imageData.startsWith('/media/')) {
       const result = `${mediaUrl}${imageData}`;
       console.log(`Constructed URL from media path: ${result}`);
       return result;
+    }
+    
+    // Try to handle special cases for media files
+    if (filename) {
+      // If the filename contains media path information, extract just the filename
+      const cleanFilename = filename.split('/').pop() || filename;
+      
+      // Try with direct localhost URL as a fallback
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const localhostUrl = `http://${window.location.hostname}:8000/media/${cleanFilename}`;
+        console.log(`Constructed localhost URL: ${localhostUrl}`);
+        return localhostUrl;
+      }
     }
     
     // Otherwise, assume it's a relative path that needs /media/ prefix
@@ -594,6 +592,12 @@ export const fetchAllTemplates = async (size?: string) => {
     
     // Process the data to ensure all fields are correctly formatted
     const processedTemplates = data.allTemplates.map((template: any) => {
+      // Process background image if it exists and is not the default
+      let backgroundImage = template.backgroundImage;
+      if (backgroundImage && backgroundImage !== 'no_image.jpg') {
+        backgroundImage = processImageData(backgroundImage);
+      }
+
       // Process image assets
       const imageAssets = template.imageAssets?.map((img: any) => ({
         uuid: img.uuid,
@@ -635,6 +639,7 @@ export const fetchAllTemplates = async (size?: string) => {
       // Return the processed template
       return {
         ...template,
+        backgroundImage,
         imageAssets,
         textElements,
         shapeElements
@@ -660,6 +665,11 @@ export const fetchTemplateWithElements = async (uuid: string) => {
   
   // Process numeric values to ensure they're properly converted
   const processedTemplate = { ...data.templateWithElements };
+  
+  // Process background image if it exists and is not the default
+  if (processedTemplate.backgroundImage && processedTemplate.backgroundImage !== 'no_image.jpg') {
+    processedTemplate.backgroundImage = processImageData(processedTemplate.backgroundImage);
+  }
   
   // Process shapes
   if (processedTemplate.shapes && processedTemplate.shapes.length > 0) {
@@ -724,7 +734,49 @@ export const fetchTemplateWithElements = async (uuid: string) => {
 };
 
 // Function to create a template
-export const createTemplate = async (name: string, size: string, userId?: string, isDefault: boolean = false, backgroundImage?: string) => {
+export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string) => {
+  console.log(`Creating template with name: ${name}, size: ${size}, backgroundImage: ${backgroundImage || 'none'}`);
+  
+  // If postId is provided, try to get the template_background from the post
+  if (postId) {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${postId}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Cookies.get('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const postData = await response.json();
+        if (postData.template_background) {
+          console.log(`Using template_background from post: ${postData.template_background}`);
+          backgroundImage = postData.template_background;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching post template_background:', error);
+    }
+  }
+  
+  // If userId is not provided, try to get it from cookies
+  if (!userId) {
+    const userDataCookie = Cookies.get('userData');
+    if (userDataCookie) {
+      try {
+        const userData = JSON.parse(userDataCookie);
+        userId = userData.id;
+        console.log(`Using user ID from cookies: ${userId}`);
+      } catch (error) {
+        console.error('Error parsing user data from cookies:', error);
+        throw new Error('User ID is required but not provided and could not be retrieved from cookies');
+      }
+    } else {
+      throw new Error('User ID is required but not provided and user is not logged in');
+    }
+  }
+  
   const { data } = await client.mutate({
     mutation: CREATE_TEMPLATE,
     variables: { name, size, userId, isDefault, backgroundImage },
@@ -735,18 +787,54 @@ export const createTemplate = async (name: string, size: string, userId?: string
 // Function to add an image asset to template
 export const createImageAsset = async (
   templateId: string,
-  image: string,
+  imageUrl: string,
   positionX: number = 0,
   positionY: number = 0,
   width: number = 100,
   height: number = 100,
-  zIndex: number = -1
+  zIndex: number = 0,
+  rotation: number = 0
 ) => {
-  const { data } = await client.mutate({
-    mutation: ADD_IMAGE_TO_TEMPLATE,
-    variables: { templateId, image, positionX, positionY, width, height, zIndex },
-  });
-  return data.addImageToTemplate.template;
+  try {
+    // First, get the current template to preserve the background image
+    const currentTemplate = await fetchTemplateWithElements(templateId);
+    const backgroundImage = currentTemplate.backgroundImage;
+    
+    const { data } = await client.mutate({
+      mutation: ADD_IMAGE_TO_TEMPLATE,
+      variables: { 
+        templateId, 
+        image: imageUrl, 
+        positionX: Number(positionX), 
+        positionY: Number(positionY), 
+        width: Number(width), 
+        height: Number(height),
+        zIndex: parseInt(String(zIndex)),
+        rotation: Number(rotation)
+      },
+    });
+    
+    // Ensure the background image is preserved in the returned template
+    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
+        (!data.addImageToTemplate.template.backgroundImage || 
+         data.addImageToTemplate.template.backgroundImage === 'no_image.jpg')) {
+      data.addImageToTemplate.template.backgroundImage = backgroundImage;
+      
+      // Update the template with the preserved background image
+      await client.mutate({
+        mutation: UPDATE_TEMPLATE,
+        variables: {
+          uuid: templateId,
+          background_image: backgroundImage
+        }
+      });
+    }
+    
+    return data.addImageToTemplate.template;
+  } catch (error) {
+    console.error('Error creating image asset:', error);
+    throw error;
+  }
 };
 
 // Function to add a text element to template
@@ -757,13 +845,51 @@ export const createTextElement = async (
   fontSize: number = 16,
   color: string = '#000000',
   positionX: number = 0,
-  positionY: number = 0
+  positionY: number = 0,
+  zIndex: number = 0,
+  rotation: number = 0
 ) => {
-  const { data } = await client.mutate({
-    mutation: ADD_TEXT_TO_TEMPLATE,
-    variables: { templateId, text, font, fontSize, color, positionX, positionY },
-  });
-  return data.addTextToTemplate.template;
+  try {
+    // First, get the current template to preserve the background image
+    const currentTemplate = await fetchTemplateWithElements(templateId);
+    const backgroundImage = currentTemplate.backgroundImage;
+    
+    const { data } = await client.mutate({
+      mutation: ADD_TEXT_TO_TEMPLATE,
+      variables: { 
+        templateId, 
+        text, 
+        font, 
+        fontSize: Number(fontSize), 
+        color, 
+        positionX: Number(positionX), 
+        positionY: Number(positionY),
+        zIndex: parseInt(String(zIndex)),
+        rotation: Number(rotation)
+      },
+    });
+    
+    // Ensure the background image is preserved in the returned template
+    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
+        (!data.addTextToTemplate.template.backgroundImage || 
+         data.addTextToTemplate.template.backgroundImage === 'no_image.jpg')) {
+      data.addTextToTemplate.template.backgroundImage = backgroundImage;
+      
+      // Update the template with the preserved background image
+      await client.mutate({
+        mutation: UPDATE_TEMPLATE,
+        variables: {
+          uuid: templateId,
+          background_image: backgroundImage
+        }
+      });
+    }
+    
+    return data.addTextToTemplate.template;
+  } catch (error) {
+    console.error('Error creating text element:', error);
+    throw error;
+  }
 };
 
 // Function to add a shape element to template
@@ -783,20 +909,11 @@ export const createShapeElement = async (
     shapeType = 'rectangle'; // Default to rectangle if no valid type
   }
   
-  console.log('Sending shape creation request with type:', shapeType);
-  console.log('Full request parameters:', { 
-    templateId, 
-    shapeType, 
-    color, 
-    positionX, 
-    positionY, 
-    width, 
-    height,
-    zIndex,
-    rotation
-  });
-  
   try {
+    // First, get the current template to preserve the background image
+    const currentTemplate = await fetchTemplateWithElements(templateId);
+    const backgroundImage = currentTemplate.backgroundImage;
+    
     const { data } = await client.mutate({
       mutation: ADD_SHAPE_TO_TEMPLATE,
       variables: { 
@@ -811,7 +928,23 @@ export const createShapeElement = async (
         rotation: Number(rotation)    // Ensure it's a number
       },
     });
-    console.log('Shape creation response:', data);
+    
+    // Ensure the background image is preserved in the returned template
+    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
+        (!data.addShapeToTemplate.template.backgroundImage || 
+         data.addShapeToTemplate.template.backgroundImage === 'no_image.jpg')) {
+      data.addShapeToTemplate.template.backgroundImage = backgroundImage;
+      
+      // Update the template with the preserved background image
+      await client.mutate({
+        mutation: UPDATE_TEMPLATE,
+        variables: {
+          uuid: templateId,
+          background_image: backgroundImage
+        }
+      });
+    }
+    
     return data.addShapeToTemplate.template;
   } catch (error) {
     console.error('Error creating shape:', error);
@@ -826,30 +959,54 @@ export const updateElementInTemplate = async (
   elementType: 'image' | 'text' | 'shape',
   updates: any
 ) => {
-  // Parse updates if it's a string
-  const updatesObj = typeof updates === 'string' ? JSON.parse(updates) : updates;
-  
-  // Ensure shape_type is not null for shape elements
-  if (elementType === 'shape' && (!updatesObj.shapeType || updatesObj.shapeType === '')) {
-    console.warn('Shape type is null or empty in updates, defaulting to rectangle');
-    updatesObj.shapeType = 'rectangle';
+  try {
+    // First, get the current template to preserve the background image
+    const currentTemplate = await fetchTemplateWithElements(templateId);
+    const backgroundImage = currentTemplate.backgroundImage;
+    
+    // Parse updates if it's a string
+    const updatesObj = typeof updates === 'string' ? JSON.parse(updates) : updates;
+    
+    // Ensure shape_type is not null for shape elements
+    if (elementType === 'shape' && (!updatesObj.shapeType || updatesObj.shapeType === '')) {
+      console.warn('Shape type is null or empty in updates, defaulting to rectangle');
+      updatesObj.shapeType = 'rectangle';
+    }
+    
+    // Ensure zIndex is an integer
+    if ('zIndex' in updatesObj) {
+      updatesObj.zIndex = parseInt(String(updatesObj.zIndex));
+    }
+    
+    // Convert back to string if needed
+    const finalUpdates = typeof updates === 'string' ? JSON.stringify(updatesObj) : updatesObj;
+    
+    const { data } = await client.mutate({
+      mutation: UPDATE_ELEMENT_IN_TEMPLATE,
+      variables: { templateId, elementUuid, elementType, updates: finalUpdates },
+    });
+    
+    // Ensure the background image is preserved in the returned template
+    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
+        (!data.updateElementInTemplate.template.backgroundImage || 
+         data.updateElementInTemplate.template.backgroundImage === 'no_image.jpg')) {
+      data.updateElementInTemplate.template.backgroundImage = backgroundImage;
+      
+      // Update the template with the preserved background image
+      await client.mutate({
+        mutation: UPDATE_TEMPLATE,
+        variables: {
+          uuid: templateId,
+          background_image: backgroundImage
+        }
+      });
+    }
+    
+    return data.updateElementInTemplate.template;
+  } catch (error) {
+    console.error('Error updating element:', error);
+    throw error;
   }
-  
-  // Ensure zIndex is an integer
-  if ('zIndex' in updatesObj) {
-    updatesObj.zIndex = parseInt(String(updatesObj.zIndex));
-  }
-  
-  // Convert back to string if needed
-  const finalUpdates = typeof updates === 'string' ? JSON.stringify(updatesObj) : updatesObj;
-  
-  console.log(`Updating ${elementType} element with updates:`, finalUpdates);
-  
-  const { data } = await client.mutate({
-    mutation: UPDATE_ELEMENT_IN_TEMPLATE,
-    variables: { templateId, elementUuid, elementType, updates: finalUpdates },
-  });
-  return data.updateElementInTemplate.template;
 };
 
 // Function to delete an element from a template
@@ -858,11 +1015,37 @@ export const deleteElementFromTemplate = async (
   elementUuid: string,
   elementType: 'image' | 'text' | 'shape'
 ) => {
-  const { data } = await client.mutate({
-    mutation: DELETE_ELEMENT_FROM_TEMPLATE,
-    variables: { templateId, elementUuid, elementType },
-  });
-  return data.deleteElementFromTemplate.template;
+  try {
+    // First, get the current template to preserve the background image
+    const currentTemplate = await fetchTemplateWithElements(templateId);
+    const backgroundImage = currentTemplate.backgroundImage;
+    
+    const { data } = await client.mutate({
+      mutation: DELETE_ELEMENT_FROM_TEMPLATE,
+      variables: { templateId, elementUuid, elementType },
+    });
+    
+    // Ensure the background image is preserved in the returned template
+    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
+        (!data.deleteElementFromTemplate.template.backgroundImage || 
+         data.deleteElementFromTemplate.template.backgroundImage === 'no_image.jpg')) {
+      data.deleteElementFromTemplate.template.backgroundImage = backgroundImage;
+      
+      // Update the template with the preserved background image
+      await client.mutate({
+        mutation: UPDATE_TEMPLATE,
+        variables: {
+          uuid: templateId,
+          background_image: backgroundImage
+        }
+      });
+    }
+    
+    return data.deleteElementFromTemplate.template;
+  } catch (error) {
+    console.error('Error deleting element:', error);
+    throw error;
+  }
 };
 
 // Function to update a template

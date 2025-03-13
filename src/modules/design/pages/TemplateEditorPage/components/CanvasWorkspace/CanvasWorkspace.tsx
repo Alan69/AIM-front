@@ -33,6 +33,9 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [images, setImages] = useState<Record<string, HTMLImageElement>>({});
+  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+  const [lastBackgroundImageUrl, setLastBackgroundImageUrl] = useState<string | null>(null);
+  const backgroundImageRef = useRef<HTMLImageElement | null>(null);
 
   // Parse template size
   const templateSize = template.size ? template.size.split('x').map(Number) : [1080, 1080];
@@ -45,6 +48,146 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       onStageRef(stageRef.current);
     }
   }, [onStageRef, stageRef.current]);
+
+  // Load background image if available
+  useEffect(() => {
+    const preloadBackgroundImage = async () => {
+      if (template.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
+        console.log('Loading background image:', template.backgroundImage);
+        
+        // Check if we already have this image loaded in our ref
+        if (backgroundImageRef.current && lastBackgroundImageUrl === template.backgroundImage) {
+          console.log('Using cached background image');
+          setBackgroundImage(backgroundImageRef.current);
+          return;
+        }
+        
+        try {
+          const img = new window.Image();
+          img.crossOrigin = 'Anonymous';
+          
+          // Create a promise to wait for the image to load
+          await new Promise<void>((resolve, reject) => {
+            img.onload = () => {
+              console.log('Background image loaded successfully');
+              setBackgroundImage(img);
+              backgroundImageRef.current = img; // Cache the loaded image
+              if (template.backgroundImage) {
+                setLastBackgroundImageUrl(template.backgroundImage);
+              }
+              resolve();
+            };
+            
+            img.onerror = async (e) => {
+              console.error('Error loading background image:', e);
+              
+              // Try multiple URL formats
+              const urlsToTry: string[] = [];
+              
+              // If the image fails to load, try to load it from different URL formats
+              if (template.backgroundImage) {
+                // Original URL
+                urlsToTry.push(template.backgroundImage);
+                
+                // Extract filename
+                const filename = template.backgroundImage.split('/').pop();
+                
+                if (filename) {
+                  // Get base URLs
+                  const baseUrl = process.env.REACT_APP_API_URL || '';
+                  const apiUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
+                  
+                  // Try with media prefix
+                  urlsToTry.push(`${apiUrl}/media/${filename}`);
+                  
+                  // Try with direct media path
+                  if (template.backgroundImage.includes('/media/')) {
+                    const mediaPath = template.backgroundImage.split('/media/')[1];
+                    if (mediaPath) {
+                      urlsToTry.push(`${apiUrl}/media/${mediaPath}`);
+                    }
+                  }
+                  
+                  // Try with localhost
+                  urlsToTry.push(`http://localhost:8000/media/${filename}`);
+                  urlsToTry.push(`http://127.0.0.1:8000/media/${filename}`);
+                  
+                  // Try with relative path
+                  urlsToTry.push(`/media/${filename}`);
+                }
+              }
+              
+              console.log('Trying alternative URLs:', urlsToTry);
+              
+              // Try each URL in sequence
+              for (let i = 1; i < urlsToTry.length; i++) {
+                try {
+                  const altImg = new window.Image();
+                  altImg.crossOrigin = 'Anonymous';
+                  
+                  const success = await new Promise<boolean>((resolveAlt) => {
+                    altImg.onload = () => {
+                      console.log(`Successfully loaded from alternative URL: ${urlsToTry[i]}`);
+                      setBackgroundImage(altImg);
+                      backgroundImageRef.current = altImg;
+                      if (template.backgroundImage) {
+                        setLastBackgroundImageUrl(template.backgroundImage);
+                      }
+                      resolveAlt(true);
+                    };
+                    
+                    altImg.onerror = () => {
+                      console.log(`Failed to load from alternative URL: ${urlsToTry[i]}`);
+                      resolveAlt(false);
+                    };
+                    
+                    altImg.src = urlsToTry[i];
+                  });
+                  
+                  if (success) {
+                    resolve();
+                    return;
+                  }
+                } catch (altError) {
+                  console.error(`Error trying alternative URL ${urlsToTry[i]}:`, altError);
+                }
+              }
+              
+              // If all alternatives fail, reject
+              console.error('All alternative URLs failed to load');
+              setBackgroundImage(null);
+              backgroundImageRef.current = null;
+              reject(e);
+            };
+            
+            if (template.backgroundImage) {
+              img.src = template.backgroundImage;
+            } else {
+              reject(new Error('Background image URL is undefined'));
+            }
+          });
+        } catch (error) {
+          console.error('Failed to load background image:', error);
+          setBackgroundImage(null);
+          backgroundImageRef.current = null;
+        }
+      } else {
+        setBackgroundImage(null);
+        backgroundImageRef.current = null;
+      }
+    };
+
+    preloadBackgroundImage();
+  }, [template.backgroundImage]);
+
+  // Store the current background image URL to detect changes
+  useEffect(() => {
+    if (template.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
+      setLastBackgroundImageUrl(template.backgroundImage);
+    } else {
+      setLastBackgroundImageUrl(null);
+    }
+  }, [template.backgroundImage]);
 
   // Log when template changes to help with debugging
   useEffect(() => {
@@ -219,6 +362,30 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     }
   };
 
+  // Helper function to ensure background image is preserved in template updates
+  const ensureBackgroundImagePreserved = (templateObj: Template): Template => {
+    // Always check if we have a cached background image URL
+    if (lastBackgroundImageUrl && (!templateObj.backgroundImage || templateObj.backgroundImage === 'no_image.jpg')) {
+      console.log('Preserving background image URL:', lastBackgroundImageUrl);
+      return {
+        ...templateObj,
+        backgroundImage: lastBackgroundImageUrl
+      };
+    }
+    
+    // If the template has a background image, make sure it's preserved
+    if (templateObj.backgroundImage && templateObj.backgroundImage !== 'no_image.jpg') {
+      console.log('Template has background image:', templateObj.backgroundImage);
+      
+      // Update our cached URL
+      if (templateObj.backgroundImage !== lastBackgroundImageUrl) {
+        setLastBackgroundImageUrl(templateObj.backgroundImage);
+      }
+    }
+    
+    return templateObj;
+  };
+
   const updateElement = (updatedElement: DesignElement) => {
     const updatedTemplate = { ...template };
     
@@ -251,7 +418,18 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       ) || [];
     }
     
-    onUpdateElements(updatedTemplate);
+    // Ensure background image is preserved
+    if (lastBackgroundImageUrl) {
+      updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+    } else if (backgroundImage) {
+      // If we have a background image loaded but no URL cached, use the template's URL
+      updatedTemplate.backgroundImage = template.backgroundImage;
+    }
+    
+    // Use the helper function to ensure background image is preserved
+    const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
+    
+    onUpdateElements(finalTemplate);
   };
 
   const renderImageElement = (image: ImageAsset) => {
@@ -533,6 +711,17 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     }
     
     try {
+      // Create a copy of the template to preserve the background image
+      const updatedTemplate = { ...template };
+      
+      // Ensure background image is preserved before any operations
+      if (lastBackgroundImageUrl) {
+        updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+      } else if (backgroundImage) {
+        // If we have a background image loaded but no URL cached, use the template's URL
+        updatedTemplate.backgroundImage = template.backgroundImage;
+      }
+      
       switch (elementType) {
         case ElementType.TEXT:
           const fontStyle = data || {};
@@ -551,9 +740,16 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           ) as TextElement;
           
           if (textElement) {
-            const updatedTemplate = { ...template };
             updatedTemplate.texts = [...(template.texts || []), textElement];
-            onUpdateElements(updatedTemplate);
+            // Double-check background image is preserved
+            if (lastBackgroundImageUrl) {
+              updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+            }
+            
+            // Use the helper function to ensure background image is preserved
+            const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
+            
+            onUpdateElements(finalTemplate);
             onSelectElement(textElement);
           }
           break;
@@ -579,9 +775,16 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             img.onload = () => {
               setImages(prev => ({ ...prev, [imageElement.uuid]: img }));
               
-              const updatedTemplate = { ...template };
+              // Double-check background image is preserved
+              if (lastBackgroundImageUrl) {
+                updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+              }
               updatedTemplate.images = [...(template.images || []), imageElement];
-              onUpdateElements(updatedTemplate);
+              
+              // Use the helper function to ensure background image is preserved
+              const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
+              
+              onUpdateElements(finalTemplate);
               onSelectElement(imageElement);
             };
           }
@@ -628,9 +831,16 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           ) as ShapeElement;
           
           if (shapeElement) {
-            const updatedTemplateWithShape = { ...template };
-            updatedTemplateWithShape.shapes = [...(template.shapes || []), shapeElement];
-            onUpdateElements(updatedTemplateWithShape);
+            // Double-check background image is preserved
+            if (lastBackgroundImageUrl) {
+              updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+            }
+            updatedTemplate.shapes = [...(template.shapes || []), shapeElement];
+            
+            // Use the helper function to ensure background image is preserved
+            const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
+            
+            onUpdateElements(finalTemplate);
             onSelectElement(shapeElement);
             
             // Immediately update the element to ensure all properties are saved
@@ -665,37 +875,40 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
 
   // Event handler for transform and drag events
   const handleElementTransform = (e: any, element: DesignElement) => {
+    // Get the node that was transformed
     const node = e.target;
     
-    // Create a deep copy of the element
+    // Create a deep copy of the element to avoid reference issues
     const updatedElement = { ...element };
     
-    // Get the node's current position, scale, and size
-    const { x, y } = node.position();
+    // Get the node's new position
+    const newPos = node.position();
+    
+    // Get the node's new scale
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
     
     // Update position for all element types
-    updatedElement.positionX = Number(x);
-    updatedElement.positionY = Number(y);
+    if ('positionX' in updatedElement) {
+      updatedElement.positionX = Number(newPos.x);
+      updatedElement.positionY = Number(newPos.y);
+    }
     
-    // Handle different element types
+    // Update size for text elements
     if ('text' in updatedElement) {
-      // For text elements, adjust fontSize based on scale
-      // Use the average of scaleX and scaleY to maintain proportions
-      const avgScale = (scaleX + scaleY) / 2;
-      const originalFontSize = updatedElement.fontSize || 16;
-      
-      // Apply the scale to fontSize
-      updatedElement.fontSize = Math.round(originalFontSize * avgScale);
-      
-      // Reset the node's scale to 1 after applying the transform
-      node.scaleX(1);
-      node.scaleY(1);
-      
-      // Update the node's fontSize directly
-      node.fontSize(updatedElement.fontSize);
-    } else if ('width' in updatedElement) {
+      // For text elements, we need to update the font size based on scale
+      if ('fontSize' in updatedElement) {
+        updatedElement.fontSize = Number(updatedElement.fontSize) * scaleX;
+        
+        // Reset the node's scale to 1 after applying the transform
+        node.scaleX(1);
+        node.scaleY(1);
+        
+        // Update the node's font size directly
+        node.fontSize(updatedElement.fontSize);
+      }
+    } 
+    else if ('width' in updatedElement) {
       // Calculate the new width and height based on scale for shapes and images
       if (node.getClassName() === 'Circle') {
         // For circles, use the radius * 2 to get diameter
@@ -739,17 +952,41 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       updatedElement.zIndex = 0;
     if ('rotation' in updatedElement && (updatedElement.rotation === null || isNaN(updatedElement.rotation))) 
       updatedElement.rotation = 0;
-    if ('fontSize' in updatedElement && (updatedElement.fontSize === null || isNaN(updatedElement.fontSize)))
-      updatedElement.fontSize = 16;
     
-    // Update the element in the template UI
+    // Update the element in the template
     updateElement(updatedElement);
     
-    // Update the selected element to reflect the changes in the Properties panel in real-time
-    onSelectElement(updatedElement);
+    // Create a copy of the template with the updated element
+    const updatedTemplate = { ...template };
     
-    // Call the handleTransformEnd function with the updated element
-    handleTransformEnd(updatedElement);
+    // Ensure background image is preserved
+    if (lastBackgroundImageUrl) {
+      updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+    } else if (backgroundImage) {
+      // If we have a background image loaded but no URL cached, use the template's URL
+      updatedTemplate.backgroundImage = template.backgroundImage;
+    }
+    
+    // Update the appropriate array in the template
+    if ('text' in updatedElement) {
+      updatedTemplate.texts = template.texts?.map(txt => 
+        txt.uuid === updatedElement.uuid ? updatedElement as TextElement : txt
+      ) || [];
+    } else if ('image' in updatedElement) {
+      updatedTemplate.images = template.images?.map(img => 
+        img.uuid === updatedElement.uuid ? updatedElement as ImageAsset : img
+      ) || [];
+    } else if ('shapeType' in updatedElement) {
+      updatedTemplate.shapes = template.shapes?.map(shape => 
+        shape.uuid === updatedElement.uuid ? updatedElement as ShapeElement : shape
+      ) || [];
+    }
+    
+    // Use the helper function to ensure background image is preserved
+    const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
+    
+    // Update the template
+    onUpdateElements(finalTemplate);
   };
 
   return (
@@ -799,14 +1036,25 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           >
             <Layer>
               {/* Background */}
-              <Rect
-                x={0}
-                y={0}
-                width={canvasWidth}
-                height={canvasHeight}
-                fill="white"
-                stroke="#ddd"
-              />
+              {backgroundImage ? (
+                <KonvaImage
+                  x={0}
+                  y={0}
+                  width={canvasWidth}
+                  height={canvasHeight}
+                  image={backgroundImage}
+                  listening={false} // Make it non-interactive
+                />
+              ) : (
+                <Rect
+                  x={0}
+                  y={0}
+                  width={canvasWidth}
+                  height={canvasHeight}
+                  fill="white"
+                  stroke="#ddd"
+                />
+              )}
               
               {/* Design Elements - render only when ready */}
               {/* Sort all elements by z-index and render them in order */}

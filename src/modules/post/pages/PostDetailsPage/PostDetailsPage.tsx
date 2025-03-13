@@ -65,6 +65,7 @@ import { RootState } from "redux/store";
 import { postActions } from "../../redux/slices/post.slice";
 import { WebSocketService } from "services/websocket";
 import { createTemplate, createImageAsset } from "../../../design/services/designService";
+import Cookies from "js-cookie";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -345,46 +346,98 @@ export const PostDetailsPage = () => {
         const templateName = `Edit from Post ${post?.id || ''}`;
         const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
         
-        // Canvas dimensions based on template size
-        const canvasWidth = 1080;
-        const canvasHeight = 1080;
+        // Get the post image URL
+        let postImageUrl = post?.picture || '';
+        console.log(`Original post image URL: ${postImageUrl}`);
         
-        // Create a new template
-        const newTemplate = await createTemplate(templateName, templateSize);
+        // Store the original post image URL in the template_background field
+        if (post?.id && postImageUrl) {
+          try {
+            // Create form data for the request
+            const formData = new URLSearchParams();
+            formData.append('template_background', postImageUrl);
+            
+            // Send the request to update the post with the template background
+            await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${post.id}/update-template-background/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Bearer ${Cookies.get('token')}`
+              },
+              body: formData
+            });
+            
+            console.log(`Stored original post image URL in template_background field: ${postImageUrl}`);
+          } catch (error) {
+            console.error('Error updating template_background:', error);
+          }
+        }
         
-        if (newTemplate && post?.picture) {
-          // Add the image to the template
-          await createImageAsset(
-            newTemplate.uuid,
-            post.picture,
-            0, // positionX
-            0, // positionY
-            canvasWidth, // width - use the full canvas width
-            canvasHeight, // height - use the full canvas height
-            -1 // zIndex - set to -1 to place behind other elements
-          );
+        // Make sure we have the full URL path
+        if (postImageUrl && !postImageUrl.startsWith('http')) {
+          // If it's a relative URL, convert to absolute
+          const baseUrl = process.env.REACT_APP_API_URL || '';
+          const apiUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
           
-          // Update the post with the template UUID
-          if (post.id) {
-            try {
-              // Create form data for the request
-              const formData = new URLSearchParams();
-              formData.append('template_uuid', newTemplate.uuid);
-              
-              // Send the request to update the post with the template UUID
-              await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${post.id}/update-template/`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData,
-                credentials: 'include',
-              });
-              
-              console.log(`Post ${post.id} updated with template ${newTemplate.uuid}`);
-            } catch (error) {
-              console.error('Error updating post with template UUID:', error);
+          // If it starts with /media, append it to the API URL
+          if (postImageUrl.startsWith('/media/')) {
+            postImageUrl = `${apiUrl}${postImageUrl}`;
+          } else {
+            // Otherwise, assume it needs /media/ prefix
+            postImageUrl = `${apiUrl}/media/${postImageUrl}`;
+          }
+          console.log(`Converted to absolute URL: ${postImageUrl}`);
+        }
+        
+        // Ensure the URL is accessible by checking if it's a valid URL
+        try {
+          new URL(postImageUrl);
+        } catch (e) {
+          console.error('Invalid URL:', postImageUrl);
+          // Try to fix the URL
+          if (postImageUrl) {
+            const filename = postImageUrl.split('/').pop();
+            if (filename) {
+              postImageUrl = `http://localhost:8000/media/${filename}`;
+              console.log(`Fixed URL: ${postImageUrl}`);
             }
+          }
+        }
+        
+        // Get the user ID from the user context
+        const userId = user?.profile?.user?.id;
+        console.log(`Creating template with user ID: ${userId}`);
+        
+        // Create a new template with the post image as background
+        const newTemplate = await createTemplate(
+          templateName, 
+          templateSize, 
+          postImageUrl, // Use the actual image URL directly
+          userId,
+          false, // isDefault
+          post?.id // Pass the post ID
+        );
+        
+        if (newTemplate && post?.id) {
+          // Update the post with the template UUID
+          try {
+            // Create form data for the request
+            const formData = new URLSearchParams();
+            formData.append('template_uuid', newTemplate.uuid);
+            
+            // Send the request to update the post with the template UUID
+            await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${post.id}/update-template/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: formData,
+              credentials: 'include',
+            });
+            
+            console.log(`Post ${post.id} updated with template ${newTemplate.uuid}`);
+          } catch (error) {
+            console.error('Error updating post with template UUID:', error);
           }
           
           templateUuid = newTemplate.uuid;
