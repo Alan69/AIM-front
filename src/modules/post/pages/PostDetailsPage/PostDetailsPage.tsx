@@ -350,29 +350,6 @@ export const PostDetailsPage = () => {
         let postImageUrl = post?.picture || '';
         console.log(`Original post image URL: ${postImageUrl}`);
         
-        // Store the original post image URL in the template_background field
-        if (post?.id && postImageUrl) {
-          try {
-            // Create form data for the request
-            const formData = new URLSearchParams();
-            formData.append('template_background', postImageUrl);
-            
-            // Send the request to update the post with the template background
-            await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${post.id}/update-template-background/`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Bearer ${Cookies.get('token')}`
-              },
-              body: formData
-            });
-            
-            console.log(`Stored original post image URL in template_background field: ${postImageUrl}`);
-          } catch (error) {
-            console.error('Error updating template_background:', error);
-          }
-        }
-        
         // Make sure we have the full URL path
         if (postImageUrl && !postImageUrl.startsWith('http')) {
           // If it's a relative URL, convert to absolute
@@ -415,7 +392,7 @@ export const PostDetailsPage = () => {
           postImageUrl, // Use the actual image URL directly
           userId,
           false, // isDefault
-          post?.id // Pass the post ID
+          post?.id // Pass the post ID to fetch the post image if needed
         );
         
         if (newTemplate && post?.id) {

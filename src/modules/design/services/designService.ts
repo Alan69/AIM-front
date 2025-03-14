@@ -737,8 +737,8 @@ export const fetchTemplateWithElements = async (uuid: string) => {
 export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string) => {
   console.log(`Creating template with name: ${name}, size: ${size}, backgroundImage: ${backgroundImage || 'none'}`);
   
-  // If postId is provided, try to get the template_background from the post
-  if (postId) {
+  // If postId is provided, try to get the picture from the post to use as background
+  if (postId && (!backgroundImage || backgroundImage === 'no_image.jpg')) {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${postId}/`, {
         method: 'GET',
@@ -750,13 +750,13 @@ export const createTemplate = async (name: string, size: string, backgroundImage
       
       if (response.ok) {
         const postData = await response.json();
-        if (postData.template_background) {
-          console.log(`Using template_background from post: ${postData.template_background}`);
-          backgroundImage = postData.template_background;
+        if (postData.picture) {
+          console.log(`Using picture from post as background: ${postData.picture}`);
+          backgroundImage = postData.picture;
         }
       }
     } catch (error) {
-      console.error('Error fetching post template_background:', error);
+      console.error('Error fetching post picture:', error);
     }
   }
   
