@@ -11,6 +11,7 @@ export type TUserData = {
   email?: string;
   current_company: TCompanyData | null;
   tariff: TTariffData;
+  is_staff: boolean;
 }
 
 export type TProfileData = {

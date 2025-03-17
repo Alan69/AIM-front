@@ -25,6 +25,7 @@ import { ReactComponent as IconLogo } from "assets/logo.svg";
 import styles from "./Menu.module.scss";
 import { useIsSmallLaptop } from "hooks/media";
 import { useTranslation } from "react-i18next";
+import { useTypedSelector } from 'hooks/useTypedSelector';
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -38,6 +39,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
   const dispatch = useDispatch();
   const isSmallLaptop = useIsSmallLaptop();
   const { t } = useTranslation();
+  const { user } = useTypedSelector((state) => state.auth);
 
   const logOut = () => {
     dispatch(authActions.logOut());
@@ -98,7 +100,7 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       ),
     },
     {
-      key: "9",
+      key: "8",
       icon: <FileTextOutlined />,
       label: (
         <Link to="/article-queries" onClick={handleSwitchMenu}>
@@ -108,15 +110,6 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
     },
     {
       key: "10",
-      icon: <LayoutOutlined />,
-      label: (
-        <Link to="/design" onClick={handleSwitchMenu}>
-          {t("menuMain.items.design")}
-        </Link>
-      ),
-    },
-    {
-      key: "8",
       icon: <CalendarOutlined />,
       label: (
         <div className={styles.soon}>
@@ -137,6 +130,18 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       ),
     },
   ];
+
+  if (user?.profile?.user?.is_staff) {
+    items.splice(8, 0, {
+      key: "9",
+      icon: <LayoutOutlined />,
+      label: (
+        <Link to="/design" onClick={handleSwitchMenu}>
+          {t("menuMain.items.design")}
+        </Link>
+      ),
+    });
+  }
 
   return (
     <div

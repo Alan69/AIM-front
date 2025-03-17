@@ -947,6 +947,7 @@ export const PostDetailsPage = () => {
                                 shape="circle"
                                 onClick={handleDownloadImage}
                               />
+                              {user?.profile?.user?.is_staff && (
                               <Tooltip title={post?.template 
                                 ? t("postDetailsPage.edit_in_designer_with_template") 
                                 : t("postDetailsPage.edit_in_designer")
@@ -958,6 +959,7 @@ export const PostDetailsPage = () => {
                                   onClick={handleOpenInDesigner}
                                 />
                               </Tooltip>
+                              )}
                             </>
                           )}
                         </div>
