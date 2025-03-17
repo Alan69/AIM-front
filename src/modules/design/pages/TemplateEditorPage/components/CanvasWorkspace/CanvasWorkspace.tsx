@@ -93,29 +93,29 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 const filename = template.backgroundImage.split('/').pop();
                 
                 if (filename) {
-                  // Get base URLs
-                  const baseUrl = process.env.REACT_APP_API_URL || '';
-                  const apiUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
+                  // Use environment-aware URLs
+                  const baseUrl = 'https://api.aimmagic.com'
                   
                   // Try with media prefix
-                  urlsToTry.push(`${apiUrl}/media/${filename}`);
+                  urlsToTry.push(`${baseUrl}/media/${filename}`);
                   
                   // Try with direct media path
                   if (template.backgroundImage.includes('/media/')) {
                     const mediaPath = template.backgroundImage.split('/media/')[1];
                     if (mediaPath) {
-                      urlsToTry.push(`${apiUrl}/media/${mediaPath}`);
+                      urlsToTry.push(`${baseUrl}/media/${mediaPath}`);
                     }
                   }
-                  
-                  // Try with localhost
-                  urlsToTry.push(`http://localhost:8000/media/${filename}`);
-                  urlsToTry.push(`http://127.0.0.1:8000/media/${filename}`);
                   
                   // Try with relative path
                   urlsToTry.push(`/media/${filename}`);
                 }
               }
+              
+              // For development fallbacks, you can still include:
+              // if (process.env.NODE_ENV !== 'production') {
+              //   urlsToTry.push(`http://127.0.0.1:8000/media/${filename}`);
+              // }
               
               console.log('Trying alternative URLs:', urlsToTry);
               
