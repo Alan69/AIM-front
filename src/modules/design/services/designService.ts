@@ -2,11 +2,11 @@ import { ApolloClient, InMemoryCache, gql, createHttpLink } from '@apollo/client
 import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { baseURL } from 'types/baseUrl';
+import { baseURL, graphqlURL } from 'types/baseUrl';
 
 // Create the HTTP link
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/graphql/',
+  uri: graphqlURL || 'http://127.0.0.1:8000/graphql/',
 });
 
 // Add the authorization headers to the request

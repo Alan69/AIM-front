@@ -605,13 +605,13 @@ export const PostDetailsPage = () => {
       
       // Determine the correct host based on environment
       let host;
-      if (process.env.NODE_ENV === 'development') {
-        // For local development, use localhost:8000 directly
-        host = '127.0.0.1:8000';
-      } else {
+      // if (process.env.NODE_ENV === 'development') {
+      //   // For local development, use localhost:8000 directly
+      //   host = '127.0.0.1:8000';
+      // } else {
         // For production, use the API domain
-        host = 'api.aimmagic.com';
-      }
+      host = 'api.aimmagic.com';
+      // }
         
       const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
       
@@ -715,11 +715,11 @@ export const PostDetailsPage = () => {
         if (id && user?.profile?.user?.id && wsService) {
           // Determine the correct host based on environment
           let apiHost;
-          if (process.env.NODE_ENV === 'development') {
-            apiHost = '127.0.0.1:8000';
-          } else {
-            apiHost = 'api.aimmagic.com';
-          }
+          // if (process.env.NODE_ENV === 'development') {
+          //   apiHost = '127.0.0.1:8000';
+          // } else {
+          apiHost = 'api.aimmagic.com';
+          // }
           
           // Get the current image URL, ensuring it's a full URL for comparison
           let previousImg = post?.picture || '/media/no_img.jpeg';
