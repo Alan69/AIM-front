@@ -65,7 +65,7 @@ import { RootState } from "redux/store";
 import { postActions } from "../../redux/slices/post.slice";
 import { WebSocketService } from "services/websocket";
 import { createTemplate, createImageAsset } from "../../../design/services/designService";
-import Cookies from "js-cookie";
+const baseApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -334,10 +334,27 @@ export const PostDetailsPage = () => {
 
   const handleOpenInDesigner = async () => {
     try {
+      // Add more detailed logging
+      console.log("Full post data:", post);
+      console.log("Post template value:", post?.template, typeof post?.template);
+      
+      // Try to fetch the post directly to see what the API returns
+      try {
+        const response = await fetch(`${baseApiUrl}/posts/${post?.id}/`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const postData = await response.json();
+        console.log("Post data from API:", postData);
+        console.log("Template from API:", postData.template);
+      } catch (error) {
+        console.error("Error fetching post data:", error);
+      }
+      
       let templateUuid;
       
-      // Check if the post already has a template
-      if (post?.template) {
+      // Check if the post already has a template - use more robust checking
+      if (post?.template && post.template !== "null" && post.template !== null && post.template !== "undefined") {
         // Use the existing template
         templateUuid = post.template;
         console.log(`Using existing template ${templateUuid} for post ${post.id}`);
@@ -403,7 +420,7 @@ export const PostDetailsPage = () => {
             formData.append('template_uuid', newTemplate.uuid);
             
             // Send the request to update the post with the template UUID
-            await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${post.id}/update-template/`, {
+            await fetch(`${baseApiUrl}/posts/${post.id}/update-template/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

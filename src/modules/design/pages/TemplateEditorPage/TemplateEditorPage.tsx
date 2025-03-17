@@ -705,25 +705,52 @@ const TemplateEditorPage: React.FC = () => {
       console.log('Template UUID:', uuid);
       console.log('Post ID:', postId);
       
-      // Update the post with the template UUID if it's not already set
+      // Skip updating the post with the template UUID if it's already set to this template
+      // This prevents creating a new template when saving to post
+      let shouldUpdatePostTemplate = true;
+      
       try {
-        const formData = new URLSearchParams();
-        formData.append('template_uuid', uuid);
-        
-        // Send the request to update the post with the template UUID
-        await fetch(`${baseURL}posts/${postId}/update-template/`, {
-          method: 'POST',
+        // Check if the post already has this template
+        const postResponse = await fetch(`${baseURL}posts/${postId}/`, {
+          method: 'GET',
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': `Bearer ${token}`,
           },
-          body: formData,
           credentials: 'include',
         });
         
-        console.log(`Post ${postId} updated with template ${uuid}`);
+        if (postResponse.ok) {
+          const postData = await postResponse.json();
+          if (postData.template === uuid) {
+            console.log(`Post ${postId} already has template ${uuid}, skipping update`);
+            shouldUpdatePostTemplate = false;
+          }
+        }
       } catch (error) {
-        console.error('Error updating post with template UUID:', error);
+        console.error('Error checking post template:', error);
+      }
+      
+      // Only update the post with the template UUID if needed
+      if (shouldUpdatePostTemplate) {
+        try {
+          const formData = new URLSearchParams();
+          formData.append('template_uuid', uuid);
+          
+          // Send the request to update the post with the template UUID
+          await fetch(`${baseURL}posts/${postId}/update-template/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+            credentials: 'include',
+          });
+          
+          console.log(`Post ${postId} updated with template ${uuid}`);
+        } catch (error) {
+          console.error('Error updating post with template UUID:', error);
+        }
       }
       
       // Send the template UUID and post ID to the server for server-side rendering
