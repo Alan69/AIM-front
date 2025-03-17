@@ -5,6 +5,11 @@ export interface Template {
   size: string;
   createdAt: string;
   backgroundImage?: string;
+  like?: boolean;
+  user?: {
+    id: string;
+    username?: string;
+  };
   images?: ImageAsset[];
   texts?: TextElement[];
   shapes?: ShapeElement[];

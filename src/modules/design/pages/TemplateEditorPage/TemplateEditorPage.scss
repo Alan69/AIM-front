@@ -34,6 +34,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      
+      &.liked {
+        color: #ff4d4f;
+      }
+    }
+    
+    .heart-icon {
+      font-size: 18px;
+      
+      &.filled {
+        color: #ff4d4f;
+      }
     }
   }
 

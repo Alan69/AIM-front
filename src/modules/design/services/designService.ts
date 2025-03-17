@@ -37,7 +37,12 @@ export const GET_ALL_TEMPLATES = gql`
       isDefault
       size
       backgroundImage
+      like
       createdAt
+      user {
+        id
+        username
+      }
       imageAssets {
         uuid
         image
@@ -83,7 +88,12 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
       isDefault
       size
       backgroundImage
+      like
       createdAt
+      user {
+        id
+        username
+      }
       images {
         uuid
         image
@@ -334,6 +344,7 @@ export const UPDATE_TEMPLATE = gql`
     $is_default: Boolean
     $size: String
     $background_image: String
+    $like: Boolean
   ) {
     updateTemplate(
       uuid: $uuid
@@ -341,6 +352,7 @@ export const UPDATE_TEMPLATE = gql`
       isDefault: $is_default
       size: $size
       backgroundImage: $background_image
+      like: $like
     ) {
       template {
         uuid
@@ -348,6 +360,7 @@ export const UPDATE_TEMPLATE = gql`
         isDefault
         size
         backgroundImage
+        like
         createdAt
       }
     }

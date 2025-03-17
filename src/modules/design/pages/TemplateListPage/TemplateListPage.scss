@@ -50,6 +50,14 @@
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
 
+    .heart-icon {
+      font-size: 18px;
+      
+      &.filled {
+        color: #ff4d4f;
+      }
+    }
+
     .template-preview {
       flex: 1;
       display: flex;

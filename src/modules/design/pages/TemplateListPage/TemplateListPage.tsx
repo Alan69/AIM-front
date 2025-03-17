@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message } from 'antd';
-import { PlusOutlined, SearchOutlined, PictureOutlined } from '@ant-design/icons';
-import { fetchAllTemplates, createTemplate, fetchTemplatesREST, processImageData } from '../../services/designService';
+import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
+import { fetchAllTemplates, createTemplate, fetchTemplatesREST, processImageData, updateTemplate } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -74,8 +74,17 @@ const TemplateListPage: React.FC = () => {
     }
     
     // Filter by tab
-    if (activeTab === 'my') {
-      filtered = filtered.filter(template => !template.isDefault);
+    if (activeTab === 'all') {
+      // Show all templates, both default and user-created
+      // No filtering needed
+    } else if (activeTab === 'my') {
+      // Show only user-created templates
+      filtered = filtered.filter(template => 
+        !template.isDefault && template.user?.id === user?.profile?.user?.id
+      );
+    } else if (activeTab === 'liked') {
+      // Show only liked templates
+      filtered = filtered.filter(template => template.like);
     }
     
     setFilteredTemplates(filtered);
@@ -120,6 +129,48 @@ const TemplateListPage: React.FC = () => {
 
   const handleTemplateClick = (uuid: string) => {
     navigate(`/design/editor/${uuid}`);
+  };
+
+  const handleToggleLike = async (e: React.MouseEvent, template: Template) => {
+    e.stopPropagation(); // Prevent card click event
+    
+    try {
+      const newLikeStatus = !template.like;
+      
+      // Optimistically update UI
+      const updatedTemplates = templates.map(t => 
+        t.uuid === template.uuid ? { ...t, like: newLikeStatus } : t
+      );
+      setTemplates(updatedTemplates);
+      
+      // Update filtered templates as well
+      const updatedFilteredTemplates = filteredTemplates.map(t => 
+        t.uuid === template.uuid ? { ...t, like: newLikeStatus } : t
+      );
+      setFilteredTemplates(updatedFilteredTemplates);
+      
+      // Update template in the backend
+      await updateTemplate(template.uuid, { like: newLikeStatus });
+      
+      // Show success message
+      message.success(newLikeStatus ? 'Added to favorites' : 'Removed from favorites');
+    } catch (error) {
+      console.error('Error toggling like status:', error);
+      
+      // Revert UI state if the API call fails
+      const revertedTemplates = templates.map(t => 
+        t.uuid === template.uuid ? { ...t, like: template.like } : t
+      );
+      setTemplates(revertedTemplates);
+      
+      // Update filtered templates as well
+      const revertedFilteredTemplates = filteredTemplates.map(t => 
+        t.uuid === template.uuid ? { ...t, like: template.like } : t
+      );
+      setFilteredTemplates(revertedFilteredTemplates);
+      
+      message.error('Failed to update favorite status');
+    }
   };
 
   const renderTemplatePreview = (template: Template) => {
@@ -427,6 +478,7 @@ const TemplateListPage: React.FC = () => {
       <Tabs activeKey={activeTab} onChange={handleTabChange} className="template-tabs">
         <TabPane tab="All Templates" key="all" />
         <TabPane tab="My Templates" key="my" />
+        <TabPane tab="Liked Templates" key="liked" />
       </Tabs>
 
       {loading ? (
@@ -442,6 +494,19 @@ const TemplateListPage: React.FC = () => {
                   hoverable
                   className="template-card"
                   onClick={() => handleTemplateClick(template.uuid)}
+                  actions={[
+                    template.like ? 
+                      <HeartFilled 
+                        key="like" 
+                        className="heart-icon filled" 
+                        onClick={(e) => handleToggleLike(e, template)} 
+                      /> : 
+                      <HeartOutlined 
+                        key="like" 
+                        className="heart-icon" 
+                        onClick={(e) => handleToggleLike(e, template)} 
+                      />
+                  ]}
                 >
                   <div className="template-preview">
                     <div 

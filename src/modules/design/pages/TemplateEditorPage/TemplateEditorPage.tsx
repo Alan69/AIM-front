@@ -7,7 +7,9 @@ import {
   UndoOutlined, 
   RedoOutlined, 
   DeleteOutlined,
-  CloudUploadOutlined
+  CloudUploadOutlined,
+  HeartOutlined,
+  HeartFilled
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -57,6 +59,7 @@ const TemplateEditorPage: React.FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   // Load template data on mount
   useEffect(() => {
@@ -65,10 +68,12 @@ const TemplateEditorPage: React.FC = () => {
     }
   }, [uuid]);
 
-  // Initialize history when template is loaded
+  // Initialize history and like status when template is loaded
   useEffect(() => {
     if (template) {
       setTemplateName(template.name);
+      // Set like status from template
+      setIsLiked(template.like || false);
       // Only initialize history if it's empty
       if (history.length === 0) {
         setHistory([template]);
@@ -853,6 +858,30 @@ const TemplateEditorPage: React.FC = () => {
     stageRef.current = ref;
   };
 
+  // Add function to toggle like status
+  const handleToggleLike = async () => {
+    if (!template) return;
+    
+    try {
+      const newLikeStatus = !isLiked;
+      setIsLiked(newLikeStatus);
+      
+      // Update template with new like status
+      const updatedTemplate = await updateTemplate(template.uuid, { like: newLikeStatus });
+      
+      // Update template state with the response
+      setTemplate(updatedTemplate);
+      
+      // Show success message
+      message.success(newLikeStatus ? 'Added to favorites' : 'Removed from favorites');
+    } catch (error) {
+      console.error('Error toggling like status:', error);
+      // Revert UI state if the API call fails
+      setIsLiked(!isLiked);
+      message.error('Failed to update favorite status');
+    }
+  };
+
   if (loading) {
     return (
       <div className="editor-loading">
@@ -890,6 +919,16 @@ const TemplateEditorPage: React.FC = () => {
           />
         </div>
         <div className="header-right">
+          <Tooltip title={isLiked ? "Remove from favorites" : "Add to favorites"}>
+            <Button
+              icon={isLiked ? 
+                <HeartFilled className="heart-icon filled" /> : 
+                <HeartOutlined className="heart-icon" />
+              }
+              onClick={handleToggleLike}
+              className={`header-button ${isLiked ? 'liked' : ''}`}
+            />
+          </Tooltip>
           {selectedElement && (
             <>
               <Tooltip title="Delete Element">
