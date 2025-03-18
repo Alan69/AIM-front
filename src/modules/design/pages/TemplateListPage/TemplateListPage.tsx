@@ -244,11 +244,11 @@ const TemplateListPage: React.FC = () => {
             <div 
               style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 1
+                left: `${(firstImage.positionX / originalWidth) * 100}%`,
+                top: `${(firstImage.positionY / originalHeight) * 100}%`,
+                width: `${(firstImage.width / originalWidth) * 100}%`,
+                height: `${(firstImage.height / originalHeight) * 100}%`,
+                zIndex: 100 + (firstImage.zIndex || 0)
               }}
             >
               <img
@@ -258,7 +258,8 @@ const TemplateListPage: React.FC = () => {
                   width: '100%',
                   height: '100%',
                   objectFit: 'contain',
-                  display: 'block'
+                  display: 'block',
+                  transform: `rotate(${firstImage.rotation || 0}deg)`
                 }}
               />
             </div>
@@ -383,37 +384,10 @@ const TemplateListPage: React.FC = () => {
           
           {/* Render text elements - scaled and positioned relative to the canvas */}
           {template.textElements?.map(text => {
-            // For the "Heading" text, position it in the middle of the pink rectangle
-            if (text.text === 'Heading') {
-              return (
-                <div
-                  key={text.uuid}
-                  className="preview-text"
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    bottom: '12.5%', // Middle of the pink rectangle
-                    transform: 'translateX(-50%)',
-                    color: '#000000',
-                    fontSize: `${Math.max(12, 22 * scaleFactor)}px`, // Scale font size but ensure minimum readability
-                    fontFamily: 'Arial, sans-serif',
-                    fontWeight: 'bold',
-                    zIndex: 200,
-                    textAlign: 'center',
-                    display: 'block',
-                    opacity: 1,
-                    visibility: 'visible'
-                  }}
-                >
-                  {text.text}
-                </div>
-              );
-            }
-            
-            // For other text elements, use the default positioning
+            // Calculate scaled positions and sizes consistently
             const scaledLeft = (text.positionX / originalWidth) * 100;
             const scaledTop = (text.positionY / originalHeight) * 100;
-            const scaledFontSize = Math.max(10, text.fontSize * scaleFactor); // Ensure minimum readable size
+            const scaledFontSize = (text.fontSize / originalWidth) * 100 * 0.5; // Scale font size relative to width
             
             return (
               <div
@@ -424,14 +398,15 @@ const TemplateListPage: React.FC = () => {
                   left: `${scaledLeft}%`,
                   top: `${scaledTop}%`,
                   color: text.color || '#000000',
-                  fontSize: `${scaledFontSize}px`,
+                  fontSize: `${Math.max(8, scaledFontSize)}px`, // Ensure minimum readability
                   fontFamily: text.font || 'Arial',
-                  transform: `translate(-50%, -50%) rotate(${text.rotation}deg)`,
+                  transform: `rotate(${text.rotation || 0}deg)`,
                   zIndex: 200 + (text.zIndex || 0),
                   display: 'block',
                   opacity: 1,
                   visibility: 'visible',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {text.text}
