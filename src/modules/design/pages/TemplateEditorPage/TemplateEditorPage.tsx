@@ -710,7 +710,7 @@ const TemplateEditorPage: React.FC = () => {
           // Default text properties
           const text = data?.text || 'New Text';
           const font = data?.font || 'Arial';
-          const fontSize = data?.fontSize || 24;
+          const fontSize = data?.fontSize || 100;
           const color = data?.color || '#000000';
           
           updatedTemplate = await createTextElement(
@@ -719,8 +719,8 @@ const TemplateEditorPage: React.FC = () => {
             font,
             fontSize,
             color,
-            data?.positionX || centerX,
-            data?.positionY || centerY
+            data?.positionX || 500,
+            data?.positionY || 500
           );
           
           // Immediately save the element properties
@@ -741,8 +741,8 @@ const TemplateEditorPage: React.FC = () => {
           updatedTemplate = await createImageAsset(
             uuid,
             image,
-            data?.positionX || centerX,
-            data?.positionY || centerY,
+            data?.positionX || 500,
+            data?.positionY || 500,
             data?.width || 200,
             data?.height || 200,
             -1 // zIndex - set to -1 to place behind other elements
@@ -783,8 +783,8 @@ const TemplateEditorPage: React.FC = () => {
               uuid,
               shapeType,  // Use the provided shapeType
               data?.color || '#000000',
-              shapePositionX, // Use validated position X
-              shapePositionY, // Use validated position Y
+              shapePositionX || 500, // Use validated position X or 500
+              shapePositionY || 500, // Use validated position Y or 500
               data?.width || 100,
               data?.height || 100,
               data?.zIndex || 0,

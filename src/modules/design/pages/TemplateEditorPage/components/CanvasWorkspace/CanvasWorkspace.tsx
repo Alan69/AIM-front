@@ -738,7 +738,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       switch (elementType) {
         case ElementType.TEXT:
           const fontStyle = data || {};
-          const fontSize = fontStyle.fontSize || 24;
+          const fontSize = fontStyle.fontSize || 100;
           const font = fontStyle.fontFamily || 'Arial';
           const color = fontStyle.color || '#000000';
           
@@ -748,8 +748,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             font,
             fontSize,
             color,
-            Math.round(canvasWidth / 2 - 50),  // Round positions to integers
-            Math.round(canvasHeight / 2 - 20)
+            500,  // Fixed X position at 500
+            500   // Fixed Y position at 500
           ) as TextElement;
           
           if (textElement) {
@@ -774,8 +774,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           const imageElement = await createImageAsset(
             templateId,
             imageUrl,
-            Math.round(canvasWidth / 2 - 100),  // Round positions to integers
-            Math.round(canvasHeight / 2 - 100),
+            500,  // Fixed X position at 500
+            500,  // Fixed Y position at 500
             200,
             200,
             -1 // zIndex - set to -1 to place behind other elements
@@ -827,20 +827,19 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
               shapeColor = data?.color || '#4A90E2';
           }
           
-          // Use the center of the canvas for new shapes
-          // Ensure positions are valid numbers and never null
-          const centerX = Math.round(canvasWidth / 2 - 50);
-          const centerY = Math.round(canvasHeight / 2 - 50);
+          // Use fixed position for new shapes
+          const posX = 500;
+          const posY = 500;
           
-          console.log(`Creating shape at position: (${centerX}, ${centerY})`);
+          console.log(`Creating shape at position: (${posX}, ${posY})`);
           
           try {
             const shapeElement = await createShapeElement(
               templateId,
               shapeType,
               shapeColor,
-              centerX,  // Explicit X position (never null)
-              centerY,  // Explicit Y position (never null)
+              posX,  // Fixed X position at 500
+              posY,  // Fixed Y position at 500
               100,      // Width
               100,      // Height
               0,        // Z-Index
@@ -863,8 +862,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
               // Immediately update the element to ensure all properties are saved
               const processedShape = {
                 ...shapeElement,
-                positionX: Number(centerX),
-                positionY: Number(centerY),
+                positionX: Number(posX),
+                positionY: Number(posY),
                 width: 100,
                 height: 100,
                 zIndex: 0,
