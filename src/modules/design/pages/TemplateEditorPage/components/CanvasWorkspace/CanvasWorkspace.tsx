@@ -387,7 +387,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   };
 
   const updateElement = (updatedElement: DesignElement) => {
-    const updatedTemplate = { ...template };
+    // Create a deep clone of the template to avoid reference issues
+    const updatedTemplate = JSON.parse(JSON.stringify(template));
     
     // Determine element type
     const elementType = 
@@ -402,20 +403,24 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     if ('height' in updatedElement) updatedElement.height = Number(updatedElement.height || 100);
     if ('zIndex' in updatedElement) updatedElement.zIndex = Number(updatedElement.zIndex || 0);
     if ('rotation' in updatedElement) updatedElement.rotation = Number(updatedElement.rotation || 0);
+    if ('fontSize' in updatedElement) updatedElement.fontSize = Number(updatedElement.fontSize || 16);
+    
+    // Use deep clone for the updated element to avoid reference issues
+    const clonedElement = JSON.parse(JSON.stringify(updatedElement));
     
     // Update the appropriate array in the template
-    if (elementType === 'image') {
-      updatedTemplate.images = template.images?.map(img => 
-        img.uuid === updatedElement.uuid ? updatedElement as ImageAsset : img
-      ) || [];
-    } else if (elementType === 'text') {
-      updatedTemplate.texts = template.texts?.map(txt => 
-        txt.uuid === updatedElement.uuid ? updatedElement as TextElement : txt
-      ) || [];
-    } else if (elementType === 'shape') {
-      updatedTemplate.shapes = template.shapes?.map(shape => 
-        shape.uuid === updatedElement.uuid ? updatedElement as ShapeElement : shape
-      ) || [];
+    if (elementType === 'image' && updatedTemplate.images) {
+      updatedTemplate.images = updatedTemplate.images.map((img: ImageAsset) => 
+        img.uuid === clonedElement.uuid ? { ...img, ...clonedElement } : img
+      );
+    } else if (elementType === 'text' && updatedTemplate.texts) {
+      updatedTemplate.texts = updatedTemplate.texts.map((txt: TextElement) => 
+        txt.uuid === clonedElement.uuid ? { ...txt, ...clonedElement } : txt
+      );
+    } else if (elementType === 'shape' && updatedTemplate.shapes) {
+      updatedTemplate.shapes = updatedTemplate.shapes.map((shape: ShapeElement) => 
+        shape.uuid === clonedElement.uuid ? { ...shape, ...clonedElement } : shape
+      );
     }
     
     // Ensure background image is preserved
@@ -426,10 +431,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       updatedTemplate.backgroundImage = template.backgroundImage;
     }
     
-    // Use the helper function to ensure background image is preserved
-    const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
-    
-    onUpdateElements(finalTemplate);
+    // Pass the updated template to the parent component
+    onUpdateElements(updatedTemplate);
   };
 
   const renderImageElement = (image: ImageAsset) => {
@@ -521,6 +524,13 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   };
 
   const renderShapeElement = (shape: ShapeElement) => {
+    if (!shape) {
+      console.error('Attempted to render null or undefined shape');
+      return null;
+    }
+    
+    console.log(`Rendering shape ${shape.uuid} with position: (${shape.positionX}, ${shape.positionY})`);
+    
     // Force position values to be numbers and don't default to 0 - this is critical
     // Only default to 0 if the value is null, undefined, or NaN after conversion
     const x = shape.positionX !== null && shape.positionX !== undefined ? 
@@ -543,6 +553,9 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     // If shapeType is null or invalid, default to rectangle
     const shapeType = shape.shapeType || 'rectangle';
+    
+    // Log the processed values for debugging
+    console.log(`Processed shape ${shape.uuid} position: (${x}, ${y}), size: ${width}x${height}`);
     
     // Create a copy of the shape with correct position values to ensure it's properly rendered
     const shapeWithCorrectPosition = {
@@ -815,56 +828,63 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
           }
           
           // Use the center of the canvas for new shapes
+          // Ensure positions are valid numbers and never null
           const centerX = Math.round(canvasWidth / 2 - 50);
           const centerY = Math.round(canvasHeight / 2 - 50);
           
-          const shapeElement = await createShapeElement(
-            templateId,
-            shapeType,
-            shapeColor,
-            centerX,  // Explicit X position
-            centerY,  // Explicit Y position
-            100,      // Width
-            100,      // Height
-            0,        // Z-Index
-            0         // Initial rotation
-          ) as ShapeElement;
+          console.log(`Creating shape at position: (${centerX}, ${centerY})`);
           
-          if (shapeElement) {
-            // Double-check background image is preserved
-            if (lastBackgroundImageUrl) {
-              updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+          try {
+            const shapeElement = await createShapeElement(
+              templateId,
+              shapeType,
+              shapeColor,
+              centerX,  // Explicit X position (never null)
+              centerY,  // Explicit Y position (never null)
+              100,      // Width
+              100,      // Height
+              0,        // Z-Index
+              0         // Initial rotation
+            ) as ShapeElement;
+            
+            if (shapeElement) {
+              // Double-check background image is preserved
+              if (lastBackgroundImageUrl) {
+                updatedTemplate.backgroundImage = lastBackgroundImageUrl;
+              }
+              updatedTemplate.shapes = [...(template.shapes || []), shapeElement];
+              
+              // Use the helper function to ensure background image is preserved
+              const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
+              
+              onUpdateElements(finalTemplate);
+              onSelectElement(shapeElement);
+              
+              // Immediately update the element to ensure all properties are saved
+              const processedShape = {
+                ...shapeElement,
+                positionX: Number(centerX),
+                positionY: Number(centerY),
+                width: 100,
+                height: 100,
+                zIndex: 0,
+                rotation: 0
+              };
+              
+              // Save the element properties to ensure they persist
+              try {
+                await updateElementInTemplate(
+                  templateId,
+                  shapeElement.uuid,
+                  'shape',
+                  JSON.stringify(processedShape)
+                );
+              } catch (error) {
+                console.error('Error saving initial shape properties:', error);
+              }
             }
-            updatedTemplate.shapes = [...(template.shapes || []), shapeElement];
-            
-            // Use the helper function to ensure background image is preserved
-            const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
-            
-            onUpdateElements(finalTemplate);
-            onSelectElement(shapeElement);
-            
-            // Immediately update the element to ensure all properties are saved
-            const processedShape = {
-              ...shapeElement,
-              positionX: Number(centerX),
-              positionY: Number(centerY),
-              width: 100,
-              height: 100,
-              zIndex: 0,
-              rotation: 0
-            };
-            
-            // Save the element properties to ensure they persist
-            try {
-              await updateElementInTemplate(
-                templateId,
-                shapeElement.uuid,
-                'shape',
-                JSON.stringify(processedShape)
-              );
-            } catch (error) {
-              console.error('Error saving initial shape properties:', error);
-            }
+          } catch (error) {
+            console.error('Error creating shape element:', error);
           }
           break;
       }

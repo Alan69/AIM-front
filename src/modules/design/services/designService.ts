@@ -922,7 +922,35 @@ export const createShapeElement = async (
     shapeType = 'rectangle'; // Default to rectangle if no valid type
   }
   
+  // Ensure position values are never null or NaN
+  const validPositionX = positionX !== null && positionX !== undefined && !isNaN(Number(positionX)) 
+    ? Number(positionX) 
+    : 0;
+  
+  const validPositionY = positionY !== null && positionY !== undefined && !isNaN(Number(positionY)) 
+    ? Number(positionY) 
+    : 0;
+  
+  // Ensure other numeric values are valid
+  const validWidth = width !== null && width !== undefined && !isNaN(Number(width)) 
+    ? Number(width) 
+    : 100;
+  
+  const validHeight = height !== null && height !== undefined && !isNaN(Number(height)) 
+    ? Number(height) 
+    : 100;
+  
+  const validZIndex = zIndex !== null && zIndex !== undefined && !isNaN(Number(zIndex)) 
+    ? parseInt(String(zIndex)) 
+    : 0;
+  
+  const validRotation = rotation !== null && rotation !== undefined && !isNaN(Number(rotation)) 
+    ? Number(rotation) 
+    : 0;
+  
   try {
+    console.log(`Creating shape with positionX: ${validPositionX}, positionY: ${validPositionY}`);
+    
     // First, get the current template to preserve the background image
     const currentTemplate = await fetchTemplateWithElements(templateId);
     const backgroundImage = currentTemplate.backgroundImage;
@@ -933,12 +961,12 @@ export const createShapeElement = async (
         templateId, 
         shapeType,  // Use the provided shapeType
         color, 
-        positionX: Number(positionX), // Ensure it's a number
-        positionY: Number(positionY), // Ensure it's a number
-        width: Number(width),         // Ensure it's a number
-        height: Number(height),       // Ensure it's a number
-        zIndex: parseInt(String(zIndex)), // Ensure it's an integer
-        rotation: Number(rotation)    // Ensure it's a number
+        positionX: validPositionX, // Use validated position X
+        positionY: validPositionY, // Use validated position Y
+        width: validWidth,
+        height: validHeight,
+        zIndex: validZIndex,
+        rotation: validRotation
       },
     });
     

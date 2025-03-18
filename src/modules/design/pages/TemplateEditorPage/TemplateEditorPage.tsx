@@ -23,7 +23,7 @@ import {
   updateElementInTemplate,
   debugElementProperties
 } from '../../services/designService';
-import { Template, ElementType, DesignElement } from '../../types';
+import { Template, ElementType, DesignElement, ImageAsset, TextElement, ShapeElement } from '../../types';
 import CanvasWorkspace from './components/CanvasWorkspace';
 import ElementsPanel from './components/ElementsPanel';
 import PropertiesPanel from './components/PropertiesPanel';
@@ -405,45 +405,196 @@ const TemplateEditorPage: React.FC = () => {
   };
 
   const handleUpdateElements = useCallback((updatedTemplate: Template) => {
-    // Ensure all position values are numbers in the updated template
+    // Create a deep copy of the current template to ensure we don't lose any properties
+    const currentTemplate = template ? JSON.parse(JSON.stringify(template)) : null;
+    if (!currentTemplate) {
+      // If there's no current template, just use the updated one
+      setTemplate(updatedTemplate);
+      addElementToHistory(updatedTemplate);
+      return;
+    }
+    
+    // Create a deep clone of the current template to avoid reference issues
+    const mergedTemplate = JSON.parse(JSON.stringify(currentTemplate));
+    
+    // Process shapes - create maps for efficient lookup and merging
     if (updatedTemplate.shapes && updatedTemplate.shapes.length > 0) {
-      updatedTemplate.shapes = updatedTemplate.shapes.map(shape => ({
-        ...shape,
-        positionX: Number(shape.positionX),
-        positionY: Number(shape.positionY),
-        width: Number(shape.width),
-        height: Number(shape.height),
-        zIndex: Number(shape.zIndex),
-        rotation: Number(shape.rotation)
-      }));
+      // Create a map of existing shapes by UUID for efficient lookup
+      const shapeMap = new Map(
+        (mergedTemplate.shapes || []).map((shape: ShapeElement) => [shape.uuid, shape])
+      );
+      
+      // Process each shape in the updated template
+      updatedTemplate.shapes.forEach((shape: ShapeElement) => {
+        // Get existing shape if it exists and properly cast the type
+        const existingShape = shapeMap.get(shape.uuid) as ShapeElement | undefined;
+        
+        // Normalize numeric values and ensure they are valid
+        const processedShape = {
+          ...(existingShape || {}), // Start with existing properties if available
+          ...shape, // Then apply updated properties
+          positionX: shape.positionX !== null && shape.positionX !== undefined && !isNaN(Number(shape.positionX)) 
+            ? Number(shape.positionX) 
+            : existingShape?.positionX !== null && existingShape?.positionX !== undefined && !isNaN(Number(existingShape?.positionX))
+              ? Number(existingShape.positionX)
+              : 0,
+          positionY: shape.positionY !== null && shape.positionY !== undefined && !isNaN(Number(shape.positionY)) 
+            ? Number(shape.positionY) 
+            : existingShape?.positionY !== null && existingShape?.positionY !== undefined && !isNaN(Number(existingShape?.positionY))
+              ? Number(existingShape.positionY)
+              : 0,
+          width: shape.width !== null && shape.width !== undefined && !isNaN(Number(shape.width)) 
+            ? Number(shape.width) 
+            : existingShape?.width !== null && existingShape?.width !== undefined && !isNaN(Number(existingShape?.width))
+              ? Number(existingShape.width)
+              : 100,
+          height: shape.height !== null && shape.height !== undefined && !isNaN(Number(shape.height)) 
+            ? Number(shape.height) 
+            : existingShape?.height !== null && existingShape?.height !== undefined && !isNaN(Number(existingShape?.height))
+              ? Number(existingShape.height)
+              : 100,
+          zIndex: shape.zIndex !== null && shape.zIndex !== undefined && !isNaN(Number(shape.zIndex)) 
+            ? Number(shape.zIndex) 
+            : existingShape?.zIndex !== null && existingShape?.zIndex !== undefined && !isNaN(Number(existingShape?.zIndex))
+              ? Number(existingShape.zIndex)
+              : 0,
+          rotation: shape.rotation !== null && shape.rotation !== undefined && !isNaN(Number(shape.rotation)) 
+            ? Number(shape.rotation) 
+            : existingShape?.rotation !== null && existingShape?.rotation !== undefined && !isNaN(Number(existingShape?.rotation))
+              ? Number(existingShape.rotation)
+              : 0,
+          shapeType: shape.shapeType || existingShape?.shapeType || 'rectangle',
+          color: shape.color || existingShape?.color || '#000000'
+        };
+        
+        // Update the shape in our map
+        shapeMap.set(shape.uuid, processedShape);
+      });
+      
+      // Convert the map back to an array
+      mergedTemplate.shapes = Array.from(shapeMap.values());
     }
     
+    // Process texts - similar approach as with shapes
     if (updatedTemplate.texts && updatedTemplate.texts.length > 0) {
-      updatedTemplate.texts = updatedTemplate.texts.map(text => ({
-        ...text,
-        positionX: Number(text.positionX),
-        positionY: Number(text.positionY),
-        fontSize: Number(text.fontSize),
-        zIndex: Number(text.zIndex),
-        rotation: Number(text.rotation)
-      }));
+      // Create a map of existing texts by UUID for efficient lookup
+      const textMap = new Map(
+        (mergedTemplate.texts || []).map((text: TextElement) => [text.uuid, text])
+      );
+      
+      // Process each text in the updated template
+      updatedTemplate.texts.forEach((text: TextElement) => {
+        // Get existing text if it exists and properly cast the type
+        const existingText = textMap.get(text.uuid) as TextElement | undefined;
+        
+        // Normalize numeric values and ensure they are valid
+        const processedText = {
+          ...(existingText || {}), // Start with existing properties if available
+          ...text, // Then apply updated properties
+          positionX: text.positionX !== null && text.positionX !== undefined && !isNaN(Number(text.positionX)) 
+            ? Number(text.positionX) 
+            : existingText?.positionX !== null && existingText?.positionX !== undefined && !isNaN(Number(existingText?.positionX))
+              ? Number(existingText.positionX)
+              : 0,
+          positionY: text.positionY !== null && text.positionY !== undefined && !isNaN(Number(text.positionY)) 
+            ? Number(text.positionY) 
+            : existingText?.positionY !== null && existingText?.positionY !== undefined && !isNaN(Number(existingText?.positionY))
+              ? Number(existingText.positionY)
+              : 0,
+          fontSize: text.fontSize !== null && text.fontSize !== undefined && !isNaN(Number(text.fontSize)) 
+            ? Number(text.fontSize) 
+            : existingText?.fontSize !== null && existingText?.fontSize !== undefined && !isNaN(Number(existingText?.fontSize))
+              ? Number(existingText.fontSize)
+              : 16,
+          zIndex: text.zIndex !== null && text.zIndex !== undefined && !isNaN(Number(text.zIndex)) 
+            ? Number(text.zIndex) 
+            : existingText?.zIndex !== null && existingText?.zIndex !== undefined && !isNaN(Number(existingText?.zIndex))
+              ? Number(existingText.zIndex)
+              : 0,
+          rotation: text.rotation !== null && text.rotation !== undefined && !isNaN(Number(text.rotation)) 
+            ? Number(text.rotation) 
+            : existingText?.rotation !== null && existingText?.rotation !== undefined && !isNaN(Number(existingText?.rotation))
+              ? Number(existingText.rotation)
+              : 0,
+          text: text.text || existingText?.text || '',
+          font: text.font || existingText?.font || 'Arial',
+          color: text.color || existingText?.color || '#000000'
+        };
+        
+        // Update the text in our map
+        textMap.set(text.uuid, processedText);
+      });
+      
+      // Convert the map back to an array
+      mergedTemplate.texts = Array.from(textMap.values());
     }
     
+    // Process images - similar approach as with shapes and texts
     if (updatedTemplate.images && updatedTemplate.images.length > 0) {
-      updatedTemplate.images = updatedTemplate.images.map(image => ({
-        ...image,
-        positionX: Number(image.positionX),
-        positionY: Number(image.positionY),
-        width: Number(image.width),
-        height: Number(image.height),
-        zIndex: Number(image.zIndex),
-        rotation: Number(image.rotation)
-      }));
+      // Create a map of existing images by UUID for efficient lookup
+      const imageMap = new Map(
+        (mergedTemplate.images || []).map((image: ImageAsset) => [image.uuid, image])
+      );
+      
+      // Process each image in the updated template
+      updatedTemplate.images.forEach((image: ImageAsset) => {
+        // Get existing image if it exists and properly cast the type
+        const existingImage = imageMap.get(image.uuid) as ImageAsset | undefined;
+        
+        // Normalize numeric values and ensure they are valid
+        const processedImage = {
+          ...(existingImage || {}), // Start with existing properties if available
+          ...image, // Then apply updated properties
+          positionX: image.positionX !== null && image.positionX !== undefined && !isNaN(Number(image.positionX)) 
+            ? Number(image.positionX) 
+            : existingImage?.positionX !== null && existingImage?.positionX !== undefined && !isNaN(Number(existingImage?.positionX))
+              ? Number(existingImage.positionX)
+              : 0,
+          positionY: image.positionY !== null && image.positionY !== undefined && !isNaN(Number(image.positionY)) 
+            ? Number(image.positionY) 
+            : existingImage?.positionY !== null && existingImage?.positionY !== undefined && !isNaN(Number(existingImage?.positionY))
+              ? Number(existingImage.positionY)
+              : 0,
+          width: image.width !== null && image.width !== undefined && !isNaN(Number(image.width)) 
+            ? Number(image.width) 
+            : existingImage?.width !== null && existingImage?.width !== undefined && !isNaN(Number(existingImage?.width))
+              ? Number(existingImage.width)
+              : 100,
+          height: image.height !== null && image.height !== undefined && !isNaN(Number(image.height)) 
+            ? Number(image.height) 
+            : existingImage?.height !== null && existingImage?.height !== undefined && !isNaN(Number(existingImage?.height))
+              ? Number(existingImage.height)
+              : 100,
+          zIndex: image.zIndex !== null && image.zIndex !== undefined && !isNaN(Number(image.zIndex)) 
+            ? Number(image.zIndex) 
+            : existingImage?.zIndex !== null && existingImage?.zIndex !== undefined && !isNaN(Number(existingImage?.zIndex))
+              ? Number(existingImage.zIndex)
+              : 0,
+          rotation: image.rotation !== null && image.rotation !== undefined && !isNaN(Number(image.rotation)) 
+            ? Number(image.rotation) 
+            : existingImage?.rotation !== null && existingImage?.rotation !== undefined && !isNaN(Number(existingImage?.rotation))
+              ? Number(existingImage.rotation)
+              : 0,
+          image: image.image || existingImage?.image || ''
+        };
+        
+        // Update the image in our map
+        imageMap.set(image.uuid, processedImage);
+      });
+      
+      // Convert the map back to an array
+      mergedTemplate.images = Array.from(imageMap.values());
     }
     
-    setTemplate(updatedTemplate);
-    addElementToHistory(updatedTemplate);
-  }, [addElementToHistory]);
+    // Preserve background image from updated template if it exists
+    if (updatedTemplate.backgroundImage) {
+      mergedTemplate.backgroundImage = updatedTemplate.backgroundImage;
+    }
+    
+    // Update the template state and history
+    setTemplate(mergedTemplate);
+    addElementToHistory(mergedTemplate);
+  }, [addElementToHistory, template]);
 
   // Create a debounced function for updating elements in the backend
   const debouncedUpdateElement = useCallback(
@@ -542,36 +693,37 @@ const TemplateEditorPage: React.FC = () => {
     if (!template || !uuid) return;
     
     try {
-      let updatedTemplate: Template;
+      // Calculate center of canvas for default position if not specified
+      const templateSize = template.size.split('x').map(Number);
+      const centerX = templateSize[0] / 2;
+      const centerY = templateSize[1] / 2;
       
-      // Calculate center position of the canvas
-      const centerX = 300; // Default center X
-      const centerY = 300; // Default center Y
+      // Store a deep clone of the current template state
+      const currentTemplate = JSON.parse(JSON.stringify(template));
       
-      switch(elementType) {
+      // Variable to hold the updated template after adding the element
+      let updatedTemplate;
+      
+      // Add element based on type
+      switch (elementType) {
         case 'text':
           // Default text properties
           const text = data?.text || 'New Text';
           const font = data?.font || 'Arial';
           const fontSize = data?.fontSize || 24;
           const color = data?.color || '#000000';
-          // Center the text on the canvas
-          const positionX = data?.positionX || centerX;
-          const positionY = data?.positionY || centerY;
-          
-          console.log('Creating text element with:', { text, font, fontSize, color, positionX, positionY });
           
           updatedTemplate = await createTextElement(
-            uuid, 
-            text, 
-            font, 
-            fontSize, 
-            color, 
-            positionX, 
-            positionY
+            uuid,
+            text,
+            font,
+            fontSize,
+            color,
+            data?.positionX || centerX,
+            data?.positionY || centerY
           );
           
-          // Immediately save the element properties to ensure they persist
+          // Immediately save the element properties
           if (updatedTemplate.texts && updatedTemplate.texts.length > 0) {
             const newText = updatedTemplate.texts[updatedTemplate.texts.length - 1];
             const processedText = processElementForSaving(newText, 'text');
@@ -611,21 +763,47 @@ const TemplateEditorPage: React.FC = () => {
           console.log('Creating shape element with type:', shapeType);
           console.log('Full shape data received:', data);
           
+          // Ensure position values are valid numbers
+          const shapePositionX = data?.positionX !== null && 
+                                  data?.positionX !== undefined && 
+                                  !isNaN(Number(data?.positionX)) 
+                                ? Number(data?.positionX) 
+                                : centerX;
+          
+          const shapePositionY = data?.positionY !== null && 
+                                  data?.positionY !== undefined && 
+                                  !isNaN(Number(data?.positionY)) 
+                                ? Number(data?.positionY) 
+                                : centerY;
+          
+          console.log(`Using validated position: (${shapePositionX}, ${shapePositionY}) for new shape`);
+          
           try {
             updatedTemplate = await createShapeElement(
               uuid,
               shapeType,  // Use the provided shapeType
               data?.color || '#000000',
-              data?.positionX || centerX,
-              data?.positionY || centerY,
+              shapePositionX, // Use validated position X
+              shapePositionY, // Use validated position Y
               data?.width || 100,
-              data?.height || 100
+              data?.height || 100,
+              data?.zIndex || 0,
+              data?.rotation || 0
             );
             
             // Immediately save the element properties
             if (updatedTemplate.shapes && updatedTemplate.shapes.length > 0) {
               const newShape = updatedTemplate.shapes[updatedTemplate.shapes.length - 1];
-              const processedShape = processElementForSaving(newShape, 'shape');
+              // Ensure position values are explicitly set in the processed shape
+              const processedShape = {
+                ...processElementForSaving(newShape, 'shape'),
+                positionX: shapePositionX,
+                positionY: shapePositionY,
+                width: data?.width || 100,
+                height: data?.height || 100,
+                zIndex: data?.zIndex || 0,
+                rotation: data?.rotation || 0
+              };
               await updateElementInTemplate(uuid, newShape.uuid, 'shape', JSON.stringify(processedShape));
             }
           } catch (error: any) {
@@ -640,17 +818,49 @@ const TemplateEditorPage: React.FC = () => {
           return;
       }
       
+      // Now we need to merge the new element with the current template state
+      // This ensures we don't lose any existing element properties
+      
+      // Create a fresh template that starts with our current state
+      const freshTemplate = JSON.parse(JSON.stringify(currentTemplate));
+      
+      // Merge in the new element based on its type
+      if (elementType === 'text' && updatedTemplate.texts) {
+        const newText = updatedTemplate.texts[updatedTemplate.texts.length - 1];
+        // Ensure the new text has all properties properly converted to numbers
+        if (newText) {
+          const processedNewText = processElementForSaving(newText, 'text');
+          // Add the new text to our existing texts array
+          freshTemplate.texts = [...(freshTemplate.texts || []), processedNewText];
+        }
+      } else if (elementType === 'image' && updatedTemplate.images) {
+        const newImage = updatedTemplate.images[updatedTemplate.images.length - 1];
+        if (newImage) {
+          const processedNewImage = processElementForSaving(newImage, 'image');
+          freshTemplate.images = [...(freshTemplate.images || []), processedNewImage];
+        }
+      } else if (elementType === 'shape' && updatedTemplate.shapes) {
+        const newShape = updatedTemplate.shapes[updatedTemplate.shapes.length - 1];
+        if (newShape) {
+          const processedNewShape = processElementForSaving(newShape, 'shape');
+          freshTemplate.shapes = [...(freshTemplate.shapes || []), processedNewShape];
+        }
+      }
+      
+      // Preserve the background image
+      if (updatedTemplate.backgroundImage) {
+        freshTemplate.backgroundImage = updatedTemplate.backgroundImage;
+      }
+      
       // Update the template in state
-      console.log('Updated template after adding element:', updatedTemplate);
-      console.log('Number of shapes in updated template:', updatedTemplate.shapes?.length || 0);
-
-      // Create a fresh copy to ensure React detects the change
-      const freshTemplate = { ...updatedTemplate };
+      console.log('Updated template after adding element:', freshTemplate);
+      
+      // Set the processed template
       setTemplate(freshTemplate);
-
+      
       // Add to history
       addElementToHistory(freshTemplate);
-
+      
       // Show success message
       message.success(`Added ${elementType} element to canvas`);
     } catch (error: any) {
@@ -664,6 +874,9 @@ const TemplateEditorPage: React.FC = () => {
     if (!template || !selectedElement || !uuid) return;
     
     try {
+      // Store a deep clone of the current template state
+      const currentTemplate = JSON.parse(JSON.stringify(template));
+      
       // Determine element type
       let elementType: 'image' | 'text' | 'shape';
       if ('image' in selectedElement) {
@@ -677,15 +890,40 @@ const TemplateEditorPage: React.FC = () => {
         return;
       }
       
-      const updatedTemplate = await deleteElementFromTemplate(
+      // Call the backend API to delete the element
+      const serverUpdatedTemplate = await deleteElementFromTemplate(
         uuid,
         selectedElement.uuid,
         elementType
       );
       
-      setTemplate(updatedTemplate);
+      // Create a fresh template based on our current state
+      const freshTemplate = JSON.parse(JSON.stringify(currentTemplate));
+      
+      // Remove the deleted element from the appropriate array
+      if (elementType === 'image' && freshTemplate.images) {
+        freshTemplate.images = freshTemplate.images.filter(
+          (img: ImageAsset) => img.uuid !== selectedElement.uuid
+        );
+      } else if (elementType === 'text' && freshTemplate.texts) {
+        freshTemplate.texts = freshTemplate.texts.filter(
+          (txt: TextElement) => txt.uuid !== selectedElement.uuid
+        );
+      } else if (elementType === 'shape' && freshTemplate.shapes) {
+        freshTemplate.shapes = freshTemplate.shapes.filter(
+          (shape: ShapeElement) => shape.uuid !== selectedElement.uuid
+        );
+      }
+      
+      // Preserve the background image from server response
+      if (serverUpdatedTemplate.backgroundImage) {
+        freshTemplate.backgroundImage = serverUpdatedTemplate.backgroundImage;
+      }
+      
+      // Update the template state
+      setTemplate(freshTemplate);
       setSelectedElement(null);
-      addElementToHistory(updatedTemplate);
+      addElementToHistory(freshTemplate);
       message.success(`${elementType} element deleted`);
     } catch (error: any) {
       console.error('Error deleting element:', error);
