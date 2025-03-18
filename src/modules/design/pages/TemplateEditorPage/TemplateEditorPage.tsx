@@ -360,47 +360,53 @@ const TemplateEditorPage: React.FC = () => {
   }, [history, historyIndex]);
 
   const handleSelectElement = (element: DesignElement | null) => {
-    console.log('Selecting element:', element);
-    
-    // If element has position values, log them for debugging
-    if (element && 'positionX' in element) {
-      console.log(`Selected element position: (${element.positionX}, ${element.positionY})`);
+    if (element) {
+      // Create a deep clone of the element to avoid reference issues
+      const processedElement = JSON.parse(JSON.stringify(element));
       
-      // Create a deep copy of the element to avoid modifying the original reference
-      const processedElement = { ...element };
-      
-      // Ensure position values are numbers, not null
-      if (processedElement.positionX === null) processedElement.positionX = 0;
-      if (processedElement.positionY === null) processedElement.positionY = 0;
-      
-      // Log the final position values being passed to the PropertiesPanel
-      console.log(`Properties panel will receive element with position: (${processedElement.positionX}, ${processedElement.positionY})`);
-      
-      // Update the element in the template state to ensure consistency
-      if (template) {
-        let updatedTemplate = { ...template };
-        
-        if ('shapeType' in processedElement && updatedTemplate.shapes) {
-          updatedTemplate.shapes = updatedTemplate.shapes.map(shape => 
-            shape.uuid === processedElement.uuid ? processedElement : shape
-          );
-        } else if ('text' in processedElement && updatedTemplate.texts) {
-          updatedTemplate.texts = updatedTemplate.texts.map(text => 
-            text.uuid === processedElement.uuid ? processedElement : text
-          );
-        } else if ('image' in processedElement && updatedTemplate.images) {
-          updatedTemplate.images = updatedTemplate.images.map(image => 
-            image.uuid === processedElement.uuid ? processedElement : image
-          );
-        }
-        
-        setTemplate(updatedTemplate);
+      // Ensure all numeric properties are properly converted to numbers
+      if ('positionX' in processedElement) {
+        processedElement.positionX = Number(processedElement.positionX);
+        processedElement.positionY = Number(processedElement.positionY);
+        processedElement.zIndex = Number(processedElement.zIndex);
+        processedElement.rotation = Number(processedElement.rotation);
       }
       
-      // Set the processed element as the selected element
+      // Process additional properties based on element type
+      if ('text' in processedElement) {
+        processedElement.fontSize = Number(processedElement.fontSize);
+      } else if ('width' in processedElement) {
+        processedElement.width = Number(processedElement.width);
+        processedElement.height = Number(processedElement.height);
+      }
+      
+      // Update the local state of the selected element
       setSelectedElement(processedElement);
+      
+      // Also update the element in the template to ensure consistency
+      const updatedTemplate = { ...template };
+      if ('text' in processedElement && updatedTemplate.texts) {
+        updatedTemplate.texts = updatedTemplate.texts.map(text => 
+          text.uuid === processedElement.uuid ? processedElement : text
+        );
+      } else if ('image' in processedElement && updatedTemplate.images) {
+        updatedTemplate.images = updatedTemplate.images.map(image => 
+          image.uuid === processedElement.uuid ? processedElement : image
+        );
+      } else if ('shapeType' in processedElement && updatedTemplate.shapes) {
+        updatedTemplate.shapes = updatedTemplate.shapes.map(shape => 
+          shape.uuid === processedElement.uuid ? processedElement : shape
+        );
+      }
+      
+      // Don't update the entire template as this could cause unnecessary re-renders
+      // Just ensure the selected element is up to date
+      setSelectedElement(processedElement);
+      
+      // Log the current state for debugging
+      console.log("Selected element updated:", processedElement);
     } else {
-      setSelectedElement(element);
+      setSelectedElement(null);
     }
   };
 

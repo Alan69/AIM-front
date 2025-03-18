@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { Collapse, Input, Slider, Form, Select, Typography, InputNumber, Button, Divider, ColorPicker } from 'antd';
 import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { DesignElement, ElementType } from '../../../../types';
@@ -15,32 +15,27 @@ interface PropertiesPanelProps {
   onDuplicateElement?: (elementId: string) => void;
 }
 
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return function(this: any, ...args: Parameters<T>) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
 const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ 
   selectedElement, 
   onUpdateElement,
   onDeleteElement,
   onDuplicateElement
 }) => {
-  // Local state for input values
-  const [localValues, setLocalValues] = useState<Record<string, any>>({});
+  // Keep track of the latest element state with a ref for immediate access
+  const latestElementRef = useRef<DesignElement | null>(null);
   
-  // Ensure position values are properly displayed - hooks must be called at the top level
-  useEffect(() => {
-    if (selectedElement && 'positionX' in selectedElement) {
-      // Force re-render when selected element changes to ensure position values are displayed correctly
-      console.log(`Properties panel received element with position: (${selectedElement.positionX}, ${selectedElement.positionY})`);
-      
-      // If position values are null, log a warning
-      if (selectedElement.positionX === null || selectedElement.positionY === null) {
-        console.warn(`Element has null position values, this may cause display issues`);
-      }
-      
-      // Reset local values when selected element changes
-      setLocalValues({});
-    }
-  }, [selectedElement]);
-
-  // Create a local copy of the selected element with guaranteed non-null position values
+  // Force re-renders when element changes
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+  
+  // Process the selected element to ensure valid values
   const processedElement = useMemo(() => {
     if (!selectedElement) return null;
     
@@ -67,30 +62,52 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       if ('fontSize' in processed) {
         processed.fontSize = processed.fontSize !== null ? Number(processed.fontSize) : 16;
       }
-      
-      console.log(`Properties panel using processed element with position: (${processed.positionX}, ${processed.positionY}), zIndex: ${processed.zIndex}, rotation: ${processed.rotation}`);
     }
     
+    console.log("Processed element:", processed);
     return processed;
   }, [selectedElement]);
+  
+  // Create debounced version of update function to prevent rapid updates
+  const debouncedUpdate = useCallback(
+    debounce((element: DesignElement) => {
+      console.log("Sending update to parent component:", element);
+      onUpdateElement(element);
+    }, 50), // Short delay to batch updates
+    [onUpdateElement]
+  );
 
-  // Helper function to get the current value (from local state or processed element)
+  // Update our ref whenever the selected element changes from the canvas
+  useEffect(() => {
+    if (processedElement) {
+      console.log("Updating element ref from selected element changes:", processedElement);
+      // Store the normalized element in our ref
+      latestElementRef.current = { ...processedElement };
+      
+      // Force re-render to update all form fields
+      setUpdateTrigger(prev => prev + 1);
+    }
+  }, [
+    // Only track basic properties and the element itself
+    processedElement?.positionX,
+    processedElement?.positionY,
+    processedElement?.zIndex,
+    processedElement?.rotation,
+    processedElement?.uuid,
+    // Use a stringified version of the element to detect all changes
+    JSON.stringify(processedElement)
+  ]);
+
+  // Helper function to get current value
   const getCurrentValue = (key: string, defaultValue: any = 0) => {
-    // First check if we have a local value (which takes precedence)
-    if (key in localValues) {
-      console.log(`Using local value for ${key}:`, localValues[key]);
-      return localValues[key];
+    // Always use the latest reference to ensure up-to-date values
+    const element = latestElementRef.current;
+    
+    if (element && key in element) {
+      const value = (element as any)[key];
+      return value !== null && value !== undefined ? value : defaultValue;
     }
     
-    // Otherwise use the value from the processed element
-    if (processedElement && key in processedElement) {
-      const value = (processedElement as any)[key];
-      console.log(`Using element value for ${key}:`, value);
-      return value;
-    }
-    
-    // Fall back to default value if neither exists
-    console.log(`Using default value for ${key}:`, defaultValue);
     return defaultValue;
   };
 
@@ -102,94 +119,69 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     );
   }
 
-  // Log only critical information
-  if (('positionX' in processedElement && processedElement.positionX === 0 && processedElement.positionY === 0)) {
-    console.log(`Warning: Selected element has position (0,0) which may indicate a problem`);
-  }
+  // Handle updates from user input in the property panel
+  const handlePropertyChange = (key: string, value: any) => {
+    if (!latestElementRef.current) return;
+    
+    // Log the change
+    console.log(`Updating property ${key} to:`, value);
+    
+    // Get the current state of the element
+    const currentElement = { ...latestElementRef.current };
+    
+    // Process the value based on its type
+    if (typeof value === 'number' || 
+        key === 'zIndex' || key === 'fontSize' || 
+        key === 'width' || key === 'height' || 
+        key === 'positionX' || key === 'positionY' || 
+        key === 'rotation') {
+      // Ensure numeric values are stored as numbers
+      (currentElement as any)[key] = Number(value);
+    } else {
+      // Other values (strings, etc)
+      (currentElement as any)[key] = value;
+    }
+    
+    // Update our ref first to ensure it has the latest state
+    latestElementRef.current = currentElement;
+    
+    // Force a re-render to update all fields
+    setUpdateTrigger(prev => prev + 1);
+    
+    // Send the update to the parent component with a clone to avoid reference issues
+    debouncedUpdate({ ...currentElement });
+  };
 
+  // Specialized handlers for different property types
   const handleNumberChange = (key: string, value: number | null) => {
-    if (value !== null && processedElement) {
-      // Update local state immediately for responsive UI
-      setLocalValues(prev => ({ ...prev, [key]: value }));
-      
-      // Create a deep copy of the selected element
-      const updatedElement = { ...processedElement };
-      
-      // Ensure the value is a number
-      (updatedElement as any)[key] = Number(value);
-      
-      // Update the parent component
-      onUpdateElement(updatedElement);
+    if (value !== null) {
+      handlePropertyChange(key, value);
     }
   };
 
   const handleTextChange = (key: string, value: string) => {
-    if (processedElement) {
-      // Update local state immediately for responsive UI
-      setLocalValues(prev => ({ ...prev, [key]: value }));
-      
-      // Create a deep copy of the element
-      const updatedElement = { ...processedElement };
-      
-      // Update the property
-      (updatedElement as any)[key] = value;
-      
-      // Log the change for debugging
-      console.log(`Text changed for ${key}:`, value);
-      
-      // Update the element
-      onUpdateElement(updatedElement);
-    }
+    handlePropertyChange(key, value);
   };
 
   const handleColorChange = (key: string, value: any) => {
-    if (processedElement) {
-      // Update local state immediately for responsive UI
-      setLocalValues(prev => ({ ...prev, [key]: value }));
-      
-      // Create a deep copy of the element
-      const updatedElement = { ...processedElement };
-      
-      // Ensure we're using a string color value
-      const colorValue = typeof value === 'string' ? value : value.toHexString();
-      
-      // Update the property
-      (updatedElement as any)[key] = colorValue;
-      
-      // Log the change for debugging
-      console.log(`Color changed for ${key}:`, colorValue);
-      
-      // Update the element
-      onUpdateElement(updatedElement);
-    }
+    // Handle both string colors and ColorPicker's color objects
+    const colorValue = typeof value === 'string' ? value : value.toHexString();
+    handlePropertyChange(key, colorValue);
   };
 
-  const handleInputFinish = (key: string, value: any) => {
-    if (processedElement) {
-      // First, ensure the value is applied to the element
-      const updatedElement = { ...processedElement };
-      
-      // Apply the value based on its type
-      if (typeof value === 'number' || key === 'zIndex' || key === 'fontSize' || 
-          key === 'width' || key === 'height' || key === 'positionX' || key === 'positionY' || 
-          key === 'rotation') {
-        (updatedElement as any)[key] = Number(value);
-      } else {
-        (updatedElement as any)[key] = value;
-      }
-      
-      // Update the element with the final value
-      onUpdateElement(updatedElement);
-      
-      // Then clear local state for this key
-      setLocalValues(prev => {
-        const newValues = { ...prev };
-        delete newValues[key];
-        return newValues;
-      });
-      
-      console.log(`Input finished for ${key}, final value:`, value);
-    }
+  // Improved color picker component that better handles hex colors
+  const renderColorPicker = (key: string, defaultValue: string = '#000000') => {
+    const currentValue = getCurrentValue(key, defaultValue);
+    console.log(`Rendering color picker for ${key} with value:`, currentValue);
+    
+    return (
+      <ColorPicker
+        value={currentValue}
+        onChange={(value) => handleColorChange(key, value)}
+        className="full-width"
+        format="hex"
+      />
+    );
   };
 
   const renderCommonProperties = () => (
@@ -200,8 +192,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             <InputNumber
               value={getCurrentValue('positionX', 0)}
               onChange={(value) => handleNumberChange('positionX', value)}
-              onPressEnter={() => handleInputFinish('positionX', getCurrentValue('positionX', 0))}
-              onBlur={() => handleInputFinish('positionX', getCurrentValue('positionX', 0))}
               className="full-width"
             />
           </Form.Item>
@@ -209,8 +199,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             <InputNumber
               value={getCurrentValue('positionY', 0)}
               onChange={(value) => handleNumberChange('positionY', value)}
-              onPressEnter={() => handleInputFinish('positionY', getCurrentValue('positionY', 0))}
-              onBlur={() => handleInputFinish('positionY', getCurrentValue('positionY', 0))}
               className="full-width"
             />
           </Form.Item>
@@ -222,8 +210,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               <InputNumber
                 value={getCurrentValue('width', 100)}
                 onChange={(value) => handleNumberChange('width', value)}
-                onPressEnter={() => handleInputFinish('width', getCurrentValue('width', 100))}
-                onBlur={() => handleInputFinish('width', getCurrentValue('width', 100))}
                 className="full-width"
                 min={1}
               />
@@ -232,8 +218,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               <InputNumber
                 value={getCurrentValue('height', 100)}
                 onChange={(value) => handleNumberChange('height', value)}
-                onPressEnter={() => handleInputFinish('height', getCurrentValue('height', 100))}
-                onBlur={() => handleInputFinish('height', getCurrentValue('height', 100))}
                 className="full-width"
                 min={1}
               />
@@ -245,7 +229,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <Slider
             value={getCurrentValue('rotation', 0)}
             onChange={(value) => handleNumberChange('rotation', value)}
-            onAfterChange={(value) => handleInputFinish('rotation', value)}
             min={0}
             max={360}
           />
@@ -258,8 +241,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <InputNumber
             value={getCurrentValue('zIndex', 0)}
             onChange={(value) => handleNumberChange('zIndex', value)}
-            onPressEnter={() => handleInputFinish('zIndex', getCurrentValue('zIndex', 0))}
-            onBlur={() => handleInputFinish('zIndex', getCurrentValue('zIndex', 0))}
             className="full-width"
             step={1}
           />
@@ -277,20 +258,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <Input.TextArea
             value={getCurrentValue('text', '')}
             onChange={(e) => handleTextChange('text', e.target.value)}
-            onPressEnter={(e) => {
-              // Prevent default behavior (which might submit a form)
-              e.preventDefault();
-              // Get the current value from the input
-              const currentValue = (e.target as HTMLTextAreaElement).value;
-              // Apply the final value
-              handleInputFinish('text', currentValue);
-            }}
-            onBlur={(e) => {
-              // Get the current value from the input
-              const currentValue = e.target.value;
-              // Apply the final value
-              handleInputFinish('text', currentValue);
-            }}
             rows={4}
           />
         </Form.Item>
@@ -299,7 +266,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <Select
             value={getCurrentValue('font', 'Arial')}
             onChange={(value) => handleTextChange('font', value)}
-            onBlur={() => handleInputFinish('font', getCurrentValue('font', 'Arial'))}
             className="full-width"
           >
             <Select.Option value="Arial">Arial</Select.Option>
@@ -314,21 +280,14 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <InputNumber
             value={getCurrentValue('fontSize', 16)}
             onChange={(value) => handleNumberChange('fontSize', value)}
-            onPressEnter={() => handleInputFinish('fontSize', getCurrentValue('fontSize', 16))}
-            onBlur={() => handleInputFinish('fontSize', getCurrentValue('fontSize', 16))}
             className="full-width"
             min={8}
-            max={72}
+            max={200}
           />
         </Form.Item>
         
         <Form.Item label="Text Color">
-          <ColorPicker
-            value={getCurrentValue('color', '#000000')}
-            onChange={(value) => handleColorChange('color', value.toHexString())}
-            onChangeComplete={(value) => handleInputFinish('color', value.toHexString())}
-            className="full-width"
-          />
+          {renderColorPicker('color', '#000000')}
         </Form.Item>
       </Collapse.Panel>
     );
@@ -343,7 +302,6 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <Select
             value={getCurrentValue('shapeType', 'rectangle')}
             onChange={(value) => handleTextChange('shapeType', value)}
-            onBlur={() => handleInputFinish('shapeType', getCurrentValue('shapeType', 'rectangle'))}
             className="full-width"
           >
             <Select.Option value="rectangle">Rectangle</Select.Option>
@@ -355,12 +313,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         </Form.Item>
         
         <Form.Item label="Fill Color">
-          <ColorPicker
-            value={getCurrentValue('color', '#000000')}
-            onChange={(value) => handleColorChange('color', value.toHexString())}
-            onChangeComplete={(value) => handleInputFinish('color', value.toHexString())}
-            className="full-width"
-          />
+          {renderColorPicker('color', '#000000')}
         </Form.Item>
       </Collapse.Panel>
     );

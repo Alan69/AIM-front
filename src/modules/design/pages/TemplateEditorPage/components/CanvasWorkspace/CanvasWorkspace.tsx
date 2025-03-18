@@ -41,6 +41,9 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const templateSize = template.size ? template.size.split('x').map(Number) : [1080, 1080];
   const canvasWidth = templateSize[0] || 1080;  // Add fallback values
   const canvasHeight = templateSize[1] || 1080; // Add fallback values
+  
+  // Extract the template ID for API calls
+  const templateId = template.uuid;
 
   // Pass the stageRef to the parent component if onStageRef is provided
   useEffect(() => {
@@ -387,26 +390,46 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   };
 
   const updateElement = (updatedElement: DesignElement) => {
-    // Create a deep clone of the template to avoid reference issues
-    const updatedTemplate = JSON.parse(JSON.stringify(template));
+    // Determine the element type to know which array to update
+    let elementType: 'text' | 'image' | 'shape';
+    let clonedElement = { ...updatedElement }; // Create a deep copy
     
-    // Determine element type
-    const elementType = 
-      'image' in updatedElement ? 'image' : 
-      'text' in updatedElement ? 'text' : 
-      'shapeType' in updatedElement ? 'shape' : 'unknown';
+    if ('text' in updatedElement) {
+      elementType = 'text';
+    } else if ('image' in updatedElement) {
+      elementType = 'image';
+    } else if ('shapeType' in updatedElement) {
+      elementType = 'shape';
+    } else {
+      console.error('Unknown element type');
+      return;
+    }
     
-    // Ensure all numeric values are properly converted to numbers
-    if ('positionX' in updatedElement) updatedElement.positionX = Number(updatedElement.positionX || 0);
-    if ('positionY' in updatedElement) updatedElement.positionY = Number(updatedElement.positionY || 0);
-    if ('width' in updatedElement) updatedElement.width = Number(updatedElement.width || 100);
-    if ('height' in updatedElement) updatedElement.height = Number(updatedElement.height || 100);
-    if ('zIndex' in updatedElement) updatedElement.zIndex = Number(updatedElement.zIndex || 0);
-    if ('rotation' in updatedElement) updatedElement.rotation = Number(updatedElement.rotation || 0);
-    if ('fontSize' in updatedElement) updatedElement.fontSize = Number(updatedElement.fontSize || 16);
+    // Ensure numeric properties are correctly formatted as numbers
+    if ('positionX' in clonedElement) {
+      clonedElement.positionX = Number(clonedElement.positionX);
+      clonedElement.positionY = Number(clonedElement.positionY);
+    }
     
-    // Use deep clone for the updated element to avoid reference issues
-    const clonedElement = JSON.parse(JSON.stringify(updatedElement));
+    if ('zIndex' in clonedElement) {
+      clonedElement.zIndex = Number(clonedElement.zIndex);
+    }
+    
+    if ('rotation' in clonedElement) {
+      clonedElement.rotation = Number(clonedElement.rotation);
+    }
+    
+    if ('width' in clonedElement) {
+      clonedElement.width = Number(clonedElement.width);
+      clonedElement.height = Number(clonedElement.height);
+    }
+    
+    if ('fontSize' in clonedElement) {
+      clonedElement.fontSize = Number(clonedElement.fontSize);
+    }
+    
+    // Create a new template with the updated element
+    let updatedTemplate = { ...template };
     
     // Update the appropriate array in the template
     if (elementType === 'image' && updatedTemplate.images) {
@@ -433,6 +456,9 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     // Pass the updated template to the parent component
     onUpdateElements(updatedTemplate);
+    
+    // Also select the updated element to update the properties panel
+    onSelectElement(clonedElement);
   };
 
   const renderImageElement = (image: ImageAsset) => {
@@ -1006,6 +1032,54 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     // Update the template
     onUpdateElements(finalTemplate);
+    
+    // Also update the selected element to refresh the properties panel
+    onSelectElement(updatedElement);
+    
+    // Update the element in the backend
+    if (templateId) {
+      let elementType: 'text' | 'image' | 'shape';
+      
+      if ('text' in updatedElement) {
+        elementType = 'text';
+      } else if ('image' in updatedElement) {
+        elementType = 'image';
+      } else if ('shapeType' in updatedElement) {
+        elementType = 'shape';
+      } else {
+        console.error('Unknown element type');
+        return;
+      }
+      
+      // Create a normalized object for the backend update
+      const normalizedElement = { ...updatedElement };
+      
+      // Ensure numeric values are properly formatted
+      if ('positionX' in normalizedElement) normalizedElement.positionX = Number(normalizedElement.positionX);
+      if ('positionY' in normalizedElement) normalizedElement.positionY = Number(normalizedElement.positionY);
+      if ('width' in normalizedElement) normalizedElement.width = Number(normalizedElement.width);
+      if ('height' in normalizedElement) normalizedElement.height = Number(normalizedElement.height);
+      if ('zIndex' in normalizedElement) normalizedElement.zIndex = Number(normalizedElement.zIndex);
+      if ('rotation' in normalizedElement) normalizedElement.rotation = Number(normalizedElement.rotation);
+      if ('fontSize' in normalizedElement) normalizedElement.fontSize = Number(normalizedElement.fontSize);
+      
+      // Convert the element to a JSON string
+      const jsonElement = JSON.stringify(normalizedElement);
+      
+      console.log(`Sending canvas update to backend for ${elementType} element:`, jsonElement);
+      
+      // Call the update API with a slight delay to avoid overloading
+      setTimeout(() => {
+        updateElementInTemplate(
+          templateId,
+          updatedElement.uuid,
+          elementType,
+          jsonElement
+        ).catch(error => {
+          console.error('Error updating element in backend:', error);
+        });
+      }, 100);
+    }
   };
 
   return (
