@@ -192,8 +192,23 @@ const TemplateEditorPage: React.FC = () => {
       const value = element[key];
       
       // Convert numeric properties to numbers
-      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'fontSize', 'opacity'].includes(key)) {
-        processedElement[key] = value !== null ? Number(value) : 0;
+      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'opacity'].includes(key)) {
+        processedElement[key] = value !== null && value !== undefined ? Number(value) : 
+          (key === 'opacity' ? 1.0 : 0);
+      } else if (key === 'fontSize') {
+        // Special handling for fontSize - ensure it's never null, undefined, 0, or NaN
+        if (value === null || value === undefined || Number(value) === 0 || isNaN(Number(value))) {
+          processedElement[key] = 50; // Default font size of 50
+          console.log(`Setting default fontSize: 50 for element ${element.uuid}`);
+        } else {
+          processedElement[key] = Number(value);
+          // Make sure fontSize is never too small (minimum 10)
+          if (processedElement[key] < 10) {
+            processedElement[key] = 10;
+            console.log(`Corrected too small fontSize for element ${element.uuid}: min value set to 10`);
+          }
+          console.log(`Processing fontSize for element ${element.uuid}: original=${value}, converted=${processedElement[key]}`);
+        }
       } else if (key === 'zIndex') {
         // Ensure zIndex is an integer
         processedElement[key] = value !== null ? parseInt(String(value)) : 0;
@@ -207,11 +222,29 @@ const TemplateEditorPage: React.FC = () => {
     processedElement.positionY = element.positionY !== null ? Number(element.positionY) : 0;
     processedElement.zIndex = element.zIndex !== null ? parseInt(String(element.zIndex)) : 0;
     processedElement.rotation = element.rotation !== null ? Number(element.rotation) : 0;
-    processedElement.opacity = element.opacity !== null ? Number(element.opacity) : 1.0;
+    
+    // Ensure opacity is always set with a reasonable default
+    processedElement.opacity = element.opacity !== null && element.opacity !== undefined ? 
+      Number(element.opacity) : 1.0;
     
     // Additional properties based on element type
     if (elementType === 'text') {
-      processedElement.fontSize = element.fontSize !== null ? Number(element.fontSize) : 16;
+      // Ensure fontSize is properly set for text elements
+      if (!('fontSize' in processedElement) || 
+          processedElement.fontSize === null || 
+          processedElement.fontSize === 0 || 
+          isNaN(processedElement.fontSize)) {
+        processedElement.fontSize = 50;
+        console.log(`Ensuring text element ${element.uuid} has proper fontSize: 50`);
+      }
+      
+      // Double check the fontSize is at least 10
+      if (processedElement.fontSize < 10) {
+        processedElement.fontSize = 10;
+        console.log(`Final check: Corrected fontSize to minimum of 10 for text element ${element.uuid}`);
+      }
+      
+      console.log(`Final fontSize for text element ${element.uuid}: ${processedElement.fontSize}`);
     }
     
     if (elementType === 'image' || elementType === 'shape') {
@@ -738,7 +771,7 @@ const TemplateEditorPage: React.FC = () => {
           if (updatedTemplate.texts && updatedTemplate.texts.length > 0) {
             const newText = updatedTemplate.texts[updatedTemplate.texts.length - 1];
             const processedText = processElementForSaving(newText, 'text');
-            await updateElementInTemplate(uuid, newText.uuid, 'text', JSON.stringify(processedText));
+            await updateElementInTemplate(uuid, newText.uuid, 'text', processedText);
           }
           break;
         
@@ -763,7 +796,7 @@ const TemplateEditorPage: React.FC = () => {
           if (updatedTemplate.images && updatedTemplate.images.length > 0) {
             const newImage = updatedTemplate.images[updatedTemplate.images.length - 1];
             const processedImage = processElementForSaving(newImage, 'image');
-            await updateElementInTemplate(uuid, newImage.uuid, 'image', JSON.stringify(processedImage));
+            await updateElementInTemplate(uuid, newImage.uuid, 'image', processedImage);
           }
           break;
         
@@ -815,7 +848,7 @@ const TemplateEditorPage: React.FC = () => {
                 zIndex: data?.zIndex || 0,
                 rotation: data?.rotation || 0
               };
-              await updateElementInTemplate(uuid, newShape.uuid, 'shape', JSON.stringify(processedShape));
+              await updateElementInTemplate(uuid, newShape.uuid, 'shape', processedShape);
             }
           } catch (error: any) {
             console.error('Error creating shape element:', error);

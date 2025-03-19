@@ -1001,9 +1001,41 @@ export const updateElementInTemplate = async (
       updatesToSend.shapeType = updatesToSend.shapeType;
     }
     
-    if ('fontSize' in updatesToSend) {
-      // Update for backward compatibility with front-end naming
-      updatesToSend.fontSize = parseInt(String(updatesToSend.fontSize));
+    // Special handling for text elements and fontSize
+    if (elementType === 'text') {
+      // Ensure fontSize is always included for text elements
+      if ('fontSize' in updatesToSend) {
+        const rawFontSize = updatesToSend.fontSize;
+        updatesToSend.fontSize = parseInt(String(updatesToSend.fontSize));
+        
+        // Handle invalid values
+        if (isNaN(updatesToSend.fontSize) || updatesToSend.fontSize <= 0) {
+          updatesToSend.fontSize = 50; // Sensible default
+          console.warn(`Invalid fontSize value: ${rawFontSize}, using default: 50`);
+        }
+        
+        console.log(`Setting fontSize to: ${updatesToSend.fontSize} (from: ${rawFontSize})`);
+      } else if (updates.fontSize) {
+        // Try to get fontSize from the updates object directly
+        const rawFontSize = updates.fontSize;
+        updatesToSend.fontSize = parseInt(String(updates.fontSize));
+        
+        // Handle invalid values
+        if (isNaN(updatesToSend.fontSize) || updatesToSend.fontSize <= 0) {
+          updatesToSend.fontSize = 50; // Sensible default
+          console.warn(`Invalid fontSize value: ${rawFontSize}, using default: 50`);
+        }
+        
+        console.log(`Retrieved fontSize from updates: ${updatesToSend.fontSize} (from: ${rawFontSize})`);
+      } else {
+        // If no fontSize is found, set a reasonable default
+        updatesToSend.fontSize = 50;
+        console.log(`No fontSize found, using default: ${updatesToSend.fontSize}`);
+      }
+      
+      // Clamp fontSize to reasonable limits
+      updatesToSend.fontSize = Math.max(8, Math.min(500, updatesToSend.fontSize));
+      console.log(`Final fontSize after clamping: ${updatesToSend.fontSize}`);
     }
     
     if ('width' in updatesToSend) {

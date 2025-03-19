@@ -436,7 +436,18 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     }
     
     if ('fontSize' in clonedElement) {
+      // Handle fontSize with special care to ensure it's a valid number
+      const rawFontSize = clonedElement.fontSize;
       clonedElement.fontSize = Number(clonedElement.fontSize);
+      
+      // Make sure it's a valid number and reasonable size
+      if (isNaN(clonedElement.fontSize) || clonedElement.fontSize <= 0) {
+        clonedElement.fontSize = 50; // Default to 50 if invalid
+        console.log(`Fixed invalid fontSize: ${rawFontSize} → 50`);
+      }
+      
+      // Log the fontSize being used
+      console.log(`Using fontSize: ${clonedElement.fontSize} for text element ${clonedElement.uuid}`);
     }
     
     // Create a new template with the updated element
@@ -527,7 +538,23 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     // Ensure all position and size values are valid numbers
     const x = text.positionX !== null && !isNaN(Number(text.positionX)) ? Number(text.positionX) : 0;
     const y = text.positionY !== null && !isNaN(Number(text.positionY)) ? Number(text.positionY) : 0;
-    const fontSize = text.fontSize !== null && !isNaN(Number(text.fontSize)) ? Number(text.fontSize) : 16;
+    
+    // Handle fontSize with special care
+    let fontSize = 50; // Default size
+    if (text.fontSize !== null && text.fontSize !== undefined) {
+      const parsedFontSize = Number(text.fontSize);
+      if (!isNaN(parsedFontSize) && parsedFontSize > 0) {
+        fontSize = parsedFontSize;
+      } else {
+        console.warn(`Invalid fontSize detected: ${text.fontSize}, using default (50)`);
+      }
+    } else {
+      console.warn(`Missing fontSize for text element ${text.uuid}, using default (50)`);
+    }
+    
+    // Log the fontSize being used for rendering
+    console.log(`Rendering text "${text.text}" with fontSize: ${fontSize}`);
+    
     const rotation = text.rotation !== null && !isNaN(Number(text.rotation)) ? Number(text.rotation) : 0;
     const zIndex = text.zIndex !== null && !isNaN(Number(text.zIndex)) ? Number(text.zIndex) : 0;
     const opacity = text.opacity !== null && !isNaN(Number(text.opacity)) ? Number(text.opacity) : 1.0;

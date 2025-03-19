@@ -304,11 +304,19 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         
         <Form.Item label="Font Size">
           <InputNumber
-            value={getCurrentValue('fontSize', 16)}
-            onChange={(value) => handleNumberChange('fontSize', value)}
+            value={getCurrentValue('fontSize', 50)}
+            onChange={(value) => {
+              console.log(`Font size changed to: ${value}`);
+              // Ensure value is never null or undefined
+              const processedValue = value !== null && value !== undefined ? Number(value) : 50;
+              // Ensure it's at least 8 and a valid number
+              const finalValue = isNaN(processedValue) || processedValue < 8 ? 50 : processedValue;
+              console.log(`Processed font size: ${finalValue}`);
+              handleNumberChange('fontSize', finalValue);
+            }}
             className="full-width"
             min={8}
-            max={200}
+            max={500}
           />
         </Form.Item>
         
