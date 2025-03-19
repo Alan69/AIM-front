@@ -27,6 +27,7 @@ export interface ImageAsset {
   height: number;
   zIndex: number;
   rotation: number;
+  opacity: number;
 }
 
 export interface TextElement {
@@ -39,6 +40,7 @@ export interface TextElement {
   positionY: number;
   zIndex: number;
   rotation: number;
+  opacity: number;
 }
 
 export interface ShapeElement {
@@ -51,6 +53,7 @@ export interface ShapeElement {
   height: number;
   zIndex: number;
   rotation: number;
+  opacity: number;
 }
 
 export type DesignElement = ImageAsset | TextElement | ShapeElement;

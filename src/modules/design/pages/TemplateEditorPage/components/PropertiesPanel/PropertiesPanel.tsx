@@ -245,6 +245,32 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             step={1}
           />
         </Form.Item>
+
+        <Form.Item 
+          label="Opacity"
+          tooltip="Controls the transparency of the element. 0 is completely transparent, 1 is fully opaque."
+        >
+          <div className="form-row">
+            <Slider
+              value={getCurrentValue('opacity', 1.0)}
+              onChange={(value) => handleNumberChange('opacity', value)}
+              min={0}
+              max={1}
+              step={0.01}
+              className="slider-with-input"
+            />
+            <InputNumber
+              value={getCurrentValue('opacity', 1.0)}
+              onChange={(value) => handleNumberChange('opacity', value)}
+              min={0}
+              max={1}
+              step={0.01}
+              className="input-with-slider"
+              formatter={value => `${Math.round((Number(value) || 0) * 100)}%`}
+              parser={value => Number(value?.replace('%', '')) / 100}
+            />
+          </div>
+        </Form.Item>
       </Form>
     </Panel>
   );

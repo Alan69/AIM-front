@@ -52,6 +52,7 @@ export const GET_ALL_TEMPLATES = gql`
         height
         zIndex
         rotation
+        opacity
       }
       textElements {
         uuid
@@ -63,6 +64,7 @@ export const GET_ALL_TEMPLATES = gql`
         positionY
         zIndex
         rotation
+        opacity
       }
       shapeElements {
         uuid
@@ -74,6 +76,7 @@ export const GET_ALL_TEMPLATES = gql`
         height
         zIndex
         rotation
+        opacity
       }
     }
   }
@@ -103,6 +106,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
         height
         zIndex
         rotation
+        opacity
       }
       texts {
         uuid
@@ -114,6 +118,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
         positionY
         zIndex
         rotation
+        opacity
       }
       shapes {
         uuid
@@ -125,6 +130,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
         height
         zIndex
         rotation
+        opacity
       }
     }
   }
@@ -149,28 +155,30 @@ export const CREATE_TEMPLATE = gql`
 // Mutation to add an image to a template
 export const ADD_IMAGE_TO_TEMPLATE = gql`
   mutation AddImageToTemplate(
-    $templateId: UUID!
-    $image: String!
-    $positionX: Float
-    $positionY: Float
-    $width: Float
-    $height: Float
-    $zIndex: Int
+    $templateId: UUID!, 
+    $image: String!, 
+    $positionX: Float!, 
+    $positionY: Float!, 
+    $width: Float!, 
+    $height: Float!, 
+    $zIndex: Int!,
+    $rotation: Float!,
+    $opacity: Float!
   ) {
     addImageToTemplate(
-      templateId: $templateId
-      image: $image
-      positionX: $positionX
-      positionY: $positionY
-      width: $width
-      height: $height
-      zIndex: $zIndex
+      templateId: $templateId, 
+      image: $image, 
+      positionX: $positionX, 
+      positionY: $positionY, 
+      width: $width, 
+      height: $height, 
+      zIndex: $zIndex,
+      rotation: $rotation,
+      opacity: $opacity
     ) {
       template {
         uuid
         name
-        size
-        isDefault
         images {
           uuid
           image
@@ -180,28 +188,7 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
           height
           zIndex
           rotation
-        }
-        texts {
-          uuid
-          text
-          font
-          fontSize
-          color
-          positionX
-          positionY
-          zIndex
-          rotation
-        }
-        shapes {
-          uuid
-          shapeType
-          color
-          positionX
-          positionY
-          width
-          height
-          zIndex
-          rotation
+          opacity
         }
       }
     }
@@ -211,28 +198,32 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
 // Mutation to add a text element to a template
 export const ADD_TEXT_TO_TEMPLATE = gql`
   mutation AddTextToTemplate(
-    $templateId: UUID!
-    $text: String!
-    $font: String
-    $fontSize: Int
-    $color: String
-    $positionX: Float
-    $positionY: Float
+    $templateId: UUID!, 
+    $text: String!, 
+    $font: String!, 
+    $fontSize: Int!, 
+    $color: String!, 
+    $positionX: Float!, 
+    $positionY: Float!, 
+    $zIndex: Int!,
+    $rotation: Float!,
+    $opacity: Float!
   ) {
     addTextToTemplate(
-      templateId: $templateId
-      text: $text
-      font: $font
-      fontSize: $fontSize
-      color: $color
-      positionX: $positionX
-      positionY: $positionY
+      templateId: $templateId, 
+      text: $text, 
+      font: $font, 
+      fontSize: $fontSize, 
+      color: $color, 
+      positionX: $positionX, 
+      positionY: $positionY, 
+      zIndex: $zIndex,
+      rotation: $rotation,
+      opacity: $opacity
     ) {
       template {
         uuid
         name
-        size
-        isDefault
         texts {
           uuid
           text
@@ -243,27 +234,7 @@ export const ADD_TEXT_TO_TEMPLATE = gql`
           positionY
           zIndex
           rotation
-        }
-        images {
-          uuid
-          image
-          positionX
-          positionY
-          width
-          height
-          zIndex
-          rotation
-        }
-        shapes {
-          uuid
-          shapeType
-          color
-          positionX
-          positionY
-          width
-          height
-          zIndex
-          rotation
+          opacity
         }
       }
     }
@@ -273,32 +244,32 @@ export const ADD_TEXT_TO_TEMPLATE = gql`
 // Mutation to add a shape element to a template
 export const ADD_SHAPE_TO_TEMPLATE = gql`
   mutation AddShapeToTemplate(
-    $templateId: UUID!
-    $shapeType: String! = "rectangle"
-    $color: String = "#000000"
-    $positionX: Float = 0
-    $positionY: Float = 0
-    $width: Float = 100
-    $height: Float = 100
-    $zIndex: Int = 0
-    $rotation: Float = 0
+    $templateId: UUID!, 
+    $shapeType: String!, 
+    $color: String!, 
+    $positionX: Float!, 
+    $positionY: Float!, 
+    $width: Float!, 
+    $height: Float!, 
+    $zIndex: Int!,
+    $rotation: Float!,
+    $opacity: Float!
   ) {
     addShapeToTemplate(
-      templateId: $templateId
-      shapeType: $shapeType
-      color: $color
-      positionX: $positionX
-      positionY: $positionY
-      width: $width
-      height: $height
-      zIndex: $zIndex
-      rotation: $rotation
+      templateId: $templateId, 
+      shapeType: $shapeType, 
+      color: $color, 
+      positionX: $positionX, 
+      positionY: $positionY, 
+      width: $width, 
+      height: $height, 
+      zIndex: $zIndex,
+      rotation: $rotation,
+      opacity: $opacity
     ) {
       template {
         uuid
         name
-        size
-        isDefault
         shapes {
           uuid
           shapeType
@@ -309,27 +280,7 @@ export const ADD_SHAPE_TO_TEMPLATE = gql`
           height
           zIndex
           rotation
-        }
-        images {
-          uuid
-          image
-          positionX
-          positionY
-          width
-          height
-          zIndex
-          rotation
-        }
-        texts {
-          uuid
-          text
-          font
-          fontSize
-          color
-          positionX
-          positionY
-          zIndex
-          rotation
+          opacity
         }
       }
     }
@@ -379,19 +330,20 @@ export const DELETE_TEMPLATE = gql`
 // Mutation to update a template element
 export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
   mutation UpdateElementInTemplate(
-    $templateId: UUID!
-    $elementUuid: UUID!
-    $elementType: String!
+    $templateId: UUID!, 
+    $elementUuid: UUID!, 
+    $elementType: String!, 
     $updates: JSONString!
   ) {
     updateElementInTemplate(
-      templateId: $templateId
-      elementUuid: $elementUuid
-      elementType: $elementType
+      templateId: $templateId, 
+      elementUuid: $elementUuid, 
+      elementType: $elementType, 
       updates: $updates
     ) {
       template {
         uuid
+        name
         images {
           uuid
           image
@@ -401,6 +353,7 @@ export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
           height
           zIndex
           rotation
+          opacity
         }
         texts {
           uuid
@@ -412,6 +365,7 @@ export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
           positionY
           zIndex
           rotation
+          opacity
         }
         shapes {
           uuid
@@ -423,6 +377,7 @@ export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
           height
           zIndex
           rotation
+          opacity
         }
       }
     }
@@ -455,6 +410,7 @@ export const DELETE_ELEMENT_FROM_TEMPLATE = gql`
           height
           zIndex
           rotation
+          opacity
         }
         texts {
           uuid
@@ -466,6 +422,7 @@ export const DELETE_ELEMENT_FROM_TEMPLATE = gql`
           positionY
           zIndex
           rotation
+          opacity
         }
         shapes {
           uuid
@@ -477,6 +434,7 @@ export const DELETE_ELEMENT_FROM_TEMPLATE = gql`
           height
           zIndex
           rotation
+          opacity
         }
       }
     }
@@ -620,7 +578,8 @@ export const fetchAllTemplates = async (size?: string) => {
         width: Number(img.width),
         height: Number(img.height),
         zIndex: Number(img.zIndex),
-        rotation: Number(img.rotation)
+        rotation: Number(img.rotation),
+        opacity: Number(img.opacity)
       })) || [];
 
       // Process text elements
@@ -633,7 +592,8 @@ export const fetchAllTemplates = async (size?: string) => {
         positionX: Number(text.positionX),
         positionY: Number(text.positionY),
         zIndex: Number(text.zIndex),
-        rotation: Number(text.rotation)
+        rotation: Number(text.rotation),
+        opacity: Number(text.opacity)
       })) || [];
 
       // Process shape elements
@@ -646,7 +606,8 @@ export const fetchAllTemplates = async (size?: string) => {
         width: Number(shape.width),
         height: Number(shape.height),
         zIndex: Number(shape.zIndex),
-        rotation: Number(shape.rotation)
+        rotation: Number(shape.rotation),
+        opacity: Number(shape.opacity)
       })) || [];
 
       // Return the processed template
@@ -700,6 +661,7 @@ export const fetchTemplateWithElements = async (uuid: string) => {
         height: shape.height !== null ? Number(shape.height) : 100,
         zIndex: shape.zIndex !== null ? parseInt(String(shape.zIndex)) : 0,
         rotation: shape.rotation !== null ? Number(shape.rotation) : 0,
+        opacity: shape.opacity !== null ? Number(shape.opacity) : 1.0
       };
     });
   }
@@ -719,6 +681,7 @@ export const fetchTemplateWithElements = async (uuid: string) => {
         fontSize: text.fontSize !== null ? Number(text.fontSize) : 16,
         zIndex: text.zIndex !== null ? parseInt(String(text.zIndex)) : 0,
         rotation: text.rotation !== null ? Number(text.rotation) : 0,
+        opacity: text.opacity !== null ? Number(text.opacity) : 1.0
       };
     });
   }
@@ -739,6 +702,7 @@ export const fetchTemplateWithElements = async (uuid: string) => {
         height: image.height !== null ? Number(image.height) : 100,
         zIndex: image.zIndex !== null ? parseInt(String(image.zIndex)) : 0,
         rotation: image.rotation !== null ? Number(image.rotation) : 0,
+        opacity: image.opacity !== null ? Number(image.opacity) : 1.0
       };
     });
   }
@@ -806,7 +770,8 @@ export const createImageAsset = async (
   width: number = 100,
   height: number = 100,
   zIndex: number = 0,
-  rotation: number = 0
+  rotation: number = 0,
+  opacity: number = 1.0
 ) => {
   try {
     // First, get the current template to preserve the background image
@@ -816,17 +781,18 @@ export const createImageAsset = async (
     const { data } = await client.mutate({
       mutation: ADD_IMAGE_TO_TEMPLATE,
       variables: { 
-        templateId, 
-        image: imageUrl, 
+        templateId,
+        image: imageUrl,
         positionX: Number(positionX), 
         positionY: Number(positionY), 
         width: Number(width), 
         height: Number(height),
         zIndex: parseInt(String(zIndex)),
-        rotation: Number(rotation)
+        rotation: Number(rotation),
+        opacity: Number(opacity)
       },
     });
-    
+
     // Ensure the background image is preserved in the returned template
     if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
         (!data.addImageToTemplate.template.backgroundImage || 
@@ -860,7 +826,8 @@ export const createTextElement = async (
   positionX: number = 500,
   positionY: number = 500,
   zIndex: number = 0,
-  rotation: number = 0
+  rotation: number = 0,
+  opacity: number = 1.0
 ) => {
   try {
     // First, get the current template to preserve the background image
@@ -870,18 +837,19 @@ export const createTextElement = async (
     const { data } = await client.mutate({
       mutation: ADD_TEXT_TO_TEMPLATE,
       variables: { 
-        templateId, 
-        text, 
-        font, 
+        templateId,
+        text,
+        font,
         fontSize: Number(fontSize), 
-        color, 
+        color,
         positionX: Number(positionX), 
         positionY: Number(positionY),
         zIndex: parseInt(String(zIndex)),
-        rotation: Number(rotation)
+        rotation: Number(rotation),
+        opacity: Number(opacity)
       },
     });
-    
+
     // Ensure the background image is preserved in the returned template
     if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
         (!data.addTextToTemplate.template.backgroundImage || 
@@ -915,13 +883,14 @@ export const createShapeElement = async (
   width: number = 100,
   height: number = 100,
   zIndex: number = 0,
-  rotation: number = 0
+  rotation: number = 0,
+  opacity: number = 1.0
 ) => {
   // Ensure shapeType is valid
   if (!shapeType || shapeType.trim() === '') {
     shapeType = 'rectangle'; // Default to rectangle if no valid type
   }
-  
+
   // Ensure position values are never null or NaN
   const validPositionX = positionX !== null && positionX !== undefined && !isNaN(Number(positionX)) 
     ? Number(positionX) 
@@ -947,6 +916,10 @@ export const createShapeElement = async (
   const validRotation = rotation !== null && rotation !== undefined && !isNaN(Number(rotation)) 
     ? Number(rotation) 
     : 0;
+    
+  const validOpacity = opacity !== null && opacity !== undefined && !isNaN(Number(opacity)) 
+    ? Number(opacity) 
+    : 1.0;
   
   try {
     console.log(`Creating shape with positionX: ${validPositionX}, positionY: ${validPositionY}`);
@@ -958,18 +931,19 @@ export const createShapeElement = async (
     const { data } = await client.mutate({
       mutation: ADD_SHAPE_TO_TEMPLATE,
       variables: { 
-        templateId, 
+        templateId,
         shapeType,  // Use the provided shapeType
-        color, 
+        color,
         positionX: validPositionX, // Use validated position X
         positionY: validPositionY, // Use validated position Y
         width: validWidth,
         height: validHeight,
         zIndex: validZIndex,
-        rotation: validRotation
+        rotation: validRotation,
+        opacity: validOpacity
       },
     });
-    
+
     // Ensure the background image is preserved in the returned template
     if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
         (!data.addShapeToTemplate.template.backgroundImage || 
@@ -1001,51 +975,75 @@ export const updateElementInTemplate = async (
   updates: any
 ) => {
   try {
-    // First, get the current template to preserve the background image
-    const currentTemplate = await fetchTemplateWithElements(templateId);
-    const backgroundImage = currentTemplate.backgroundImage;
+    console.log(`Updating ${elementType} element: ${elementUuid} with updates:`, updates);
     
-    // Parse updates if it's a string
-    const updatesObj = typeof updates === 'string' ? JSON.parse(updates) : updates;
+    // Ensure the updates contain valid property names
+    const updatesToSend = { ...updates };
     
-    // Ensure shape_type is not null for shape elements
-    if (elementType === 'shape' && (!updatesObj.shapeType || updatesObj.shapeType === '')) {
-      console.warn('Shape type is null or empty in updates, defaulting to rectangle');
-      updatesObj.shapeType = 'rectangle';
+    // Convert property names to match the API convention if needed
+    if ('positionX' in updatesToSend) {
+      // Update for backward compatibility with front-end naming
+      updatesToSend.positionX = Number(updatesToSend.positionX);
     }
     
-    // Ensure zIndex is an integer
-    if ('zIndex' in updatesObj) {
-      updatesObj.zIndex = parseInt(String(updatesObj.zIndex));
+    if ('positionY' in updatesToSend) {
+      // Update for backward compatibility with front-end naming
+      updatesToSend.positionY = Number(updatesToSend.positionY);
     }
     
-    // Convert back to string if needed
-    const finalUpdates = typeof updates === 'string' ? JSON.stringify(updatesObj) : updatesObj;
+    if ('zIndex' in updatesToSend) {
+      // Update for backward compatibility with front-end naming
+      updatesToSend.zIndex = parseInt(String(updatesToSend.zIndex));
+    }
+    
+    if ('shapeType' in updatesToSend) {
+      // Update for backward compatibility with front-end naming
+      updatesToSend.shapeType = updatesToSend.shapeType;
+    }
+    
+    if ('fontSize' in updatesToSend) {
+      // Update for backward compatibility with front-end naming
+      updatesToSend.fontSize = parseInt(String(updatesToSend.fontSize));
+    }
+    
+    if ('width' in updatesToSend) {
+      updatesToSend.width = Number(updatesToSend.width);
+    }
+    
+    if ('height' in updatesToSend) {
+      updatesToSend.height = Number(updatesToSend.height);
+    }
+    
+    if ('rotation' in updatesToSend) {
+      updatesToSend.rotation = Number(updatesToSend.rotation);
+    }
+    
+    if ('opacity' in updatesToSend) {
+      updatesToSend.opacity = Number(updatesToSend.opacity);
+    } else {
+      // Ensure opacity is always sent with a default value if missing
+      updatesToSend.opacity = 1.0;
+    }
+    
+    // Convert the updates to a JSON string (GraphQL requirement)
+    const updatesJson = JSON.stringify(updatesToSend);
+    
+    console.log(`Sending ${elementType} element updates to server:`, updatesJson);
     
     const { data } = await client.mutate({
       mutation: UPDATE_ELEMENT_IN_TEMPLATE,
-      variables: { templateId, elementUuid, elementType, updates: finalUpdates },
+      variables: {
+        templateId,
+        elementUuid,
+        elementType,
+        updates: updatesJson
+      }
     });
     
-    // Ensure the background image is preserved in the returned template
-    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
-        (!data.updateElementInTemplate.template.backgroundImage || 
-         data.updateElementInTemplate.template.backgroundImage === 'no_image.jpg')) {
-      data.updateElementInTemplate.template.backgroundImage = backgroundImage;
-      
-      // Update the template with the preserved background image
-      await client.mutate({
-        mutation: UPDATE_TEMPLATE,
-        variables: {
-          uuid: templateId,
-          background_image: backgroundImage
-        }
-      });
-    }
-    
+    console.log(`Updated ${elementType} element successfully`);
     return data.updateElementInTemplate.template;
   } catch (error) {
-    console.error('Error updating element:', error);
+    console.error(`Error updating ${elementType} element:`, error);
     throw error;
   }
 };
@@ -1111,6 +1109,7 @@ export const updateTemplate = async (uuid: string, updates: any) => {
       height: shape.height !== null ? Number(shape.height) : 100,
       zIndex: shape.zIndex !== null ? parseInt(String(shape.zIndex)) : 0,
       rotation: shape.rotation !== null ? Number(shape.rotation) : 0,
+      opacity: shape.opacity !== null ? Number(shape.opacity) : 1.0,
       shapeType: shape.shapeType || 'rectangle'
     }));
   }
@@ -1123,7 +1122,8 @@ export const updateTemplate = async (uuid: string, updates: any) => {
       positionY: text.positionY !== null ? Number(text.positionY) : 0,
       fontSize: text.fontSize !== null ? Number(text.fontSize) : 16,
       zIndex: text.zIndex !== null ? parseInt(String(text.zIndex)) : 0,
-      rotation: text.rotation !== null ? Number(text.rotation) : 0
+      rotation: text.rotation !== null ? Number(text.rotation) : 0,
+      opacity: text.opacity !== null ? Number(text.opacity) : 1.0
     }));
   }
   
@@ -1136,7 +1136,8 @@ export const updateTemplate = async (uuid: string, updates: any) => {
       width: image.width !== null ? Number(image.width) : 100,
       height: image.height !== null ? Number(image.height) : 100,
       zIndex: image.zIndex !== null ? parseInt(String(image.zIndex)) : 0,
-      rotation: image.rotation !== null ? Number(image.rotation) : 0
+      rotation: image.rotation !== null ? Number(image.rotation) : 0,
+      opacity: image.opacity !== null ? Number(image.opacity) : 1.0
     }));
   }
   
@@ -1294,7 +1295,8 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
           text.positionX,
           text.positionY,
           text.zIndex,
-          text.rotation
+          text.rotation,
+          text.opacity
         );
       }
     }
@@ -1310,7 +1312,8 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
           image.width,
           image.height,
           image.zIndex,
-          image.rotation
+          image.rotation,
+          image.opacity
         );
       }
     }
@@ -1327,7 +1330,8 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
           shape.width,
           shape.height,
           shape.zIndex,
-          shape.rotation
+          shape.rotation,
+          shape.opacity
         );
       }
     }

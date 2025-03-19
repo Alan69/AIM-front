@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Stage, Layer, Rect, Circle, Line, Text, Image as KonvaImage, Star, Group, Transformer } from 'react-konva';
 import { Button, Tooltip, Slider } from 'antd';
 import { ZoomInOutlined, ZoomOutOutlined, UndoOutlined, RedoOutlined } from '@ant-design/icons';
@@ -11,6 +11,10 @@ import {
   updateElementInTemplate 
 } from '../../../../services/designService';
 import './CanvasWorkspace.scss';
+import Konva from 'konva';
+
+// Define the KonvaEvent type
+type KonvaEvent = Konva.KonvaEventObject<Event>;
 
 interface CanvasWorkspaceProps {
   template: Template;
@@ -392,7 +396,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const updateElement = (updatedElement: DesignElement) => {
     // Determine the element type to know which array to update
     let elementType: 'text' | 'image' | 'shape';
-    let clonedElement = { ...updatedElement }; // Create a deep copy
+    let clonedElement = { ...updatedElement } as DesignElement; // Create a deep copy with proper typing
     
     if ('text' in updatedElement) {
       elementType = 'text';
@@ -417,6 +421,13 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     if ('rotation' in clonedElement) {
       clonedElement.rotation = Number(clonedElement.rotation);
+    }
+    
+    if ('opacity' in clonedElement) {
+      clonedElement.opacity = Number(clonedElement.opacity);
+    } else {
+      // Ensure opacity is set if it doesn't exist
+      (clonedElement as any).opacity = 1.0;
     }
     
     if ('width' in clonedElement) {
@@ -476,6 +487,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const height = image.height !== null && !isNaN(Number(image.height)) ? Number(image.height) : 100;
     const rotation = image.rotation !== null && !isNaN(Number(image.rotation)) ? Number(image.rotation) : 0;
     const zIndex = image.zIndex !== null && !isNaN(Number(image.zIndex)) ? Number(image.zIndex) : 0;
+    const opacity = image.opacity !== null && !isNaN(Number(image.opacity)) ? Number(image.opacity) : 1.0;
     
     // Create a copy of the image with correct position values
     const imageWithCorrectPosition = {
@@ -485,7 +497,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       width: width,
       height: height,
       rotation: rotation,
-      zIndex: zIndex
+      zIndex: zIndex,
+      opacity: opacity
     };
 
     return (
@@ -499,6 +512,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         height={height}
         rotation={rotation}
         zIndex={zIndex}
+        opacity={opacity}
         draggable
         onClick={() => handleElementClick(imageWithCorrectPosition)}
         onTap={() => handleElementClick(imageWithCorrectPosition)}
@@ -516,6 +530,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const fontSize = text.fontSize !== null && !isNaN(Number(text.fontSize)) ? Number(text.fontSize) : 16;
     const rotation = text.rotation !== null && !isNaN(Number(text.rotation)) ? Number(text.rotation) : 0;
     const zIndex = text.zIndex !== null && !isNaN(Number(text.zIndex)) ? Number(text.zIndex) : 0;
+    const opacity = text.opacity !== null && !isNaN(Number(text.opacity)) ? Number(text.opacity) : 1.0;
     
     // Create a copy of the text with correct position values
     const textWithCorrectPosition = {
@@ -524,7 +539,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       positionY: y,
       fontSize: fontSize,
       rotation: rotation,
-      zIndex: zIndex
+      zIndex: zIndex,
+      opacity: opacity
     };
 
     return (
@@ -539,6 +555,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         fill={text.color || '#000000'}
         rotation={rotation}
         zIndex={zIndex}
+        opacity={opacity}
         draggable
         onClick={() => handleElementClick(textWithCorrectPosition)}
         onTap={() => handleElementClick(textWithCorrectPosition)}
@@ -577,6 +594,9 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const zIndex = shape.zIndex !== null && shape.zIndex !== undefined ? 
       (isNaN(Number(shape.zIndex)) ? 0 : Number(shape.zIndex)) : 0;
     
+    const opacity = shape.opacity !== null && shape.opacity !== undefined ? 
+      (isNaN(Number(shape.opacity)) ? 1.0 : Number(shape.opacity)) : 1.0;
+    
     // If shapeType is null or invalid, default to rectangle
     const shapeType = shape.shapeType || 'rectangle';
     
@@ -592,7 +612,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       height: height,
       rotation: rotation,
       zIndex: zIndex,
-      shapeType: shapeType
+      shapeType: shapeType,
+      opacity: opacity
     };
     
     // Instead of using a Group with nested elements at (0,0),
@@ -611,6 +632,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             fill={shape.color || "#4A90E2"}
             rotation={rotation}
             zIndex={zIndex}
+            opacity={opacity}
             draggable
             onClick={() => handleElementClick(shapeWithCorrectPosition)}
             onTap={() => handleElementClick(shapeWithCorrectPosition)}
@@ -631,6 +653,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             fill={shape.color || "#7ED321"}
             rotation={rotation}
             zIndex={zIndex}
+            opacity={opacity}
             draggable
             onClick={() => handleElementClick(shapeWithCorrectPosition)}
             onTap={() => handleElementClick(shapeWithCorrectPosition)}
@@ -659,6 +682,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             fill={shape.color || "#F5A623"}
             rotation={rotation}
             zIndex={zIndex}
+            opacity={opacity}
             draggable
             onClick={() => handleElementClick(shapeWithCorrectPosition)}
             onTap={() => handleElementClick(shapeWithCorrectPosition)}
@@ -686,6 +710,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             strokeWidth={4}
             rotation={rotation}
             zIndex={zIndex}
+            opacity={opacity}
             draggable
             onClick={() => handleElementClick(shapeWithCorrectPosition)}
             onTap={() => handleElementClick(shapeWithCorrectPosition)}
@@ -708,6 +733,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             fill={shape.color || "#F8E71C"}
             rotation={rotation}
             zIndex={zIndex}
+            opacity={opacity}
             draggable
             onClick={() => handleElementClick(shapeWithCorrectPosition)}
             onTap={() => handleElementClick(shapeWithCorrectPosition)}
@@ -730,6 +756,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             fill={shape.color || "#4A90E2"}
             rotation={rotation}
             zIndex={zIndex}
+            opacity={opacity}
             draggable
             onClick={() => handleElementClick(shapeWithCorrectPosition)}
             onTap={() => handleElementClick(shapeWithCorrectPosition)}
@@ -919,84 +946,64 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   };
 
   // Event handler for transform and drag events
-  const handleElementTransform = (e: any, element: DesignElement) => {
-    // Get the node that was transformed
+  const handleElementTransform = (e: KonvaEvent, element: DesignElement) => {
+    if (!element) return;
+    
+    // Get the node from the event target
     const node = e.target;
     
-    // Create a deep copy of the element to avoid reference issues
+    // Create a copy of the element to avoid modifying the original directly
     const updatedElement = { ...element };
     
-    // Get the node's new position
-    const newPos = node.position();
-    
-    // Get the node's new scale
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-    
-    // Update position for all element types
-    if ('positionX' in updatedElement) {
-      updatedElement.positionX = Number(newPos.x);
-      updatedElement.positionY = Number(newPos.y);
-    }
-    
-    // Update size for text elements
-    if ('text' in updatedElement) {
-      // For text elements, we need to update the font size based on scale
-      if ('fontSize' in updatedElement) {
-        updatedElement.fontSize = Number(updatedElement.fontSize) * scaleX;
+    // Update position, size, and rotation
+    if (node) {
+      const nodeAttrs = node.attrs;
+      
+      // For positions, directly use node.x() and node.y() which will be accurate
+      if ('positionX' in updatedElement) {
+        updatedElement.positionX = node.x();
+        updatedElement.positionY = node.y();
+      }
+      
+      // For width and height, we need to check if the element type has these properties
+      if ('width' in updatedElement && node.width) {
+        // For images and shapes, they have width and height
+        updatedElement.width = node.width() * node.scaleX();
+        updatedElement.height = node.height() * node.scaleY();
         
-        // Reset the node's scale to 1 after applying the transform
+        // Reset scale after applying it to the dimensions
         node.scaleX(1);
         node.scaleY(1);
-        
-        // Update the node's font size directly
-        node.fontSize(updatedElement.fontSize);
-      }
-    } 
-    else if ('width' in updatedElement) {
-      // Calculate the new width and height based on scale for shapes and images
-      if (node.getClassName() === 'Circle') {
-        // For circles, use the radius * 2 to get diameter
-        const radius = node.radius();
-        updatedElement.width = Number(radius * 2 * scaleX);
-        updatedElement.height = Number(radius * 2 * scaleY);
-      } else {
-        // For rectangles, images, and other shapes
-        updatedElement.width = Number(node.width() * scaleX);
-        updatedElement.height = Number(node.height() * scaleY);
       }
       
-      // Reset the node's scale to 1 after applying the transform
-      node.scaleX(1);
-      node.scaleY(1);
-      
-      // If the element has width and height, update the node's size directly
-      if (node.getClassName() === 'Circle') {
-        // For circles, set the radius (half of width)
-        node.radius(updatedElement.width / 2);
-      } else {
-        // For rectangles, images, and other shapes
-        node.width(updatedElement.width);
-        node.height(updatedElement.height);
+      // If rotation is a property of the element, update it
+      if ('rotation' in updatedElement) {
+        updatedElement.rotation = node.rotation();
       }
+      
+      // If opacity is a property of the element, ensure it's preserved
+      if ('opacity' in updatedElement) {
+        // Keep the existing opacity value
+        updatedElement.opacity = Number(updatedElement.opacity);
+      } else {
+        // Ensure opacity exists and has a default value
+        (updatedElement as any).opacity = 1.0;
+      }
+      
+      // Handle NaN values
+      if ('positionX' in updatedElement && (updatedElement.positionX === null || isNaN(updatedElement.positionX))) 
+        updatedElement.positionX = 0;
+      if ('positionY' in updatedElement && (updatedElement.positionY === null || isNaN(updatedElement.positionY))) 
+        updatedElement.positionY = 0;
+      if ('width' in updatedElement && (updatedElement.width === null || isNaN(updatedElement.width))) 
+        updatedElement.width = 100;
+      if ('height' in updatedElement && (updatedElement.height === null || isNaN(updatedElement.height))) 
+        updatedElement.height = 100;
+      if ('rotation' in updatedElement && (updatedElement.rotation === null || isNaN(updatedElement.rotation))) 
+        updatedElement.rotation = 0;
+      if ('opacity' in updatedElement && (updatedElement.opacity === null || isNaN(updatedElement.opacity))) 
+        updatedElement.opacity = 1.0;
     }
-    
-    // Update rotation for all element types
-    updatedElement.rotation = Number(node.rotation());
-    
-    // Ensure all values are numbers, not null
-    if ('positionX' in updatedElement && (updatedElement.positionX === null || isNaN(updatedElement.positionX))) 
-      updatedElement.positionX = 0;
-    if ('positionY' in updatedElement && (updatedElement.positionY === null || isNaN(updatedElement.positionY))) 
-      updatedElement.positionY = 0;
-    if ('width' in updatedElement && (updatedElement.width === null || isNaN(updatedElement.width))) 
-      updatedElement.width = 100;
-    if ('height' in updatedElement && (updatedElement.height === null || isNaN(updatedElement.height))) 
-      updatedElement.height = 100;
-    if ('zIndex' in updatedElement && (updatedElement.zIndex === null || isNaN(updatedElement.zIndex))) 
-      updatedElement.zIndex = 0;
-    if ('rotation' in updatedElement && (updatedElement.rotation === null || isNaN(updatedElement.rotation))) 
-      updatedElement.rotation = 0;
     
     // Update the element in the template
     updateElement(updatedElement);
@@ -1035,51 +1042,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     // Also update the selected element to refresh the properties panel
     onSelectElement(updatedElement);
-    
-    // Update the element in the backend
-    if (templateId) {
-      let elementType: 'text' | 'image' | 'shape';
-      
-      if ('text' in updatedElement) {
-        elementType = 'text';
-      } else if ('image' in updatedElement) {
-        elementType = 'image';
-      } else if ('shapeType' in updatedElement) {
-        elementType = 'shape';
-      } else {
-        console.error('Unknown element type');
-        return;
-      }
-      
-      // Create a normalized object for the backend update
-      const normalizedElement = { ...updatedElement };
-      
-      // Ensure numeric values are properly formatted
-      if ('positionX' in normalizedElement) normalizedElement.positionX = Number(normalizedElement.positionX);
-      if ('positionY' in normalizedElement) normalizedElement.positionY = Number(normalizedElement.positionY);
-      if ('width' in normalizedElement) normalizedElement.width = Number(normalizedElement.width);
-      if ('height' in normalizedElement) normalizedElement.height = Number(normalizedElement.height);
-      if ('zIndex' in normalizedElement) normalizedElement.zIndex = Number(normalizedElement.zIndex);
-      if ('rotation' in normalizedElement) normalizedElement.rotation = Number(normalizedElement.rotation);
-      if ('fontSize' in normalizedElement) normalizedElement.fontSize = Number(normalizedElement.fontSize);
-      
-      // Convert the element to a JSON string
-      const jsonElement = JSON.stringify(normalizedElement);
-      
-      console.log(`Sending canvas update to backend for ${elementType} element:`, jsonElement);
-      
-      // Call the update API with a slight delay to avoid overloading
-      setTimeout(() => {
-        updateElementInTemplate(
-          templateId,
-          updatedElement.uuid,
-          elementType,
-          jsonElement
-        ).catch(error => {
-          console.error('Error updating element in backend:', error);
-        });
-      }, 100);
-    }
   };
 
   return (

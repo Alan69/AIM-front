@@ -192,7 +192,7 @@ const TemplateEditorPage: React.FC = () => {
       const value = element[key];
       
       // Convert numeric properties to numbers
-      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'fontSize'].includes(key)) {
+      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'fontSize', 'opacity'].includes(key)) {
         processedElement[key] = value !== null ? Number(value) : 0;
       } else if (key === 'zIndex') {
         // Ensure zIndex is an integer
@@ -207,6 +207,7 @@ const TemplateEditorPage: React.FC = () => {
     processedElement.positionY = element.positionY !== null ? Number(element.positionY) : 0;
     processedElement.zIndex = element.zIndex !== null ? parseInt(String(element.zIndex)) : 0;
     processedElement.rotation = element.rotation !== null ? Number(element.rotation) : 0;
+    processedElement.opacity = element.opacity !== null ? Number(element.opacity) : 1.0;
     
     // Additional properties based on element type
     if (elementType === 'text') {
@@ -249,8 +250,8 @@ const TemplateEditorPage: React.FC = () => {
         console.log(`Saving ${template.texts.length} text elements...`);
         for (const text of template.texts) {
           const processedText = processElementForSaving(text, 'text');
-          console.log(`Saving text element ${text.uuid} with position: (${processedText.positionX}, ${processedText.positionY})`);
-          await updateElementInTemplate(uuid, text.uuid, 'text', JSON.stringify(processedText));
+          console.log(`Saving text element ${text.uuid} with position: (${processedText.positionX}, ${processedText.positionY}), opacity: ${processedText.opacity}`);
+          await updateElementInTemplate(uuid, text.uuid, 'text', processedText);
           
           // Update the element in our local copy
           updatedTemplateData.texts = updatedTemplateData.texts?.map(t => 
@@ -263,8 +264,8 @@ const TemplateEditorPage: React.FC = () => {
         console.log(`Saving ${template.images.length} image elements...`);
         for (const image of template.images) {
           const processedImage = processElementForSaving(image, 'image');
-          console.log(`Saving image element ${image.uuid} with position: (${processedImage.positionX}, ${processedImage.positionY})`);
-          await updateElementInTemplate(uuid, image.uuid, 'image', JSON.stringify(processedImage));
+          console.log(`Saving image element ${image.uuid} with position: (${processedImage.positionX}, ${processedImage.positionY}), opacity: ${processedImage.opacity}`);
+          await updateElementInTemplate(uuid, image.uuid, 'image', processedImage);
           
           // Update the element in our local copy
           updatedTemplateData.images = updatedTemplateData.images?.map(img => 
@@ -277,8 +278,8 @@ const TemplateEditorPage: React.FC = () => {
         console.log(`Saving ${template.shapes.length} shape elements...`);
         for (const shape of template.shapes) {
           const processedShape = processElementForSaving(shape, 'shape');
-          console.log(`Saving shape element ${shape.uuid} with position: (${processedShape.positionX}, ${processedShape.positionY}), shapeType: ${processedShape.shapeType}`);
-          await updateElementInTemplate(uuid, shape.uuid, 'shape', JSON.stringify(processedShape));
+          console.log(`Saving shape element ${shape.uuid} with position: (${processedShape.positionX}, ${processedShape.positionY}), shapeType: ${processedShape.shapeType}, opacity: ${processedShape.opacity}`);
+          await updateElementInTemplate(uuid, shape.uuid, 'shape', processedShape);
           
           // Update the element in our local copy
           updatedTemplateData.shapes = updatedTemplateData.shapes?.map(s => 
@@ -614,7 +615,7 @@ const TemplateEditorPage: React.FC = () => {
           const value = (element as any)[key];
           
           // Convert numeric properties to numbers
-          if (['positionX', 'positionY', 'width', 'height', 'zIndex', 'rotation', 'fontSize'].includes(key)) {
+          if (['positionX', 'positionY', 'width', 'height', 'zIndex', 'rotation', 'fontSize', 'opacity'].includes(key)) {
             processedElement[key] = Number(value);
           } else {
             processedElement[key] = value;
@@ -640,17 +641,21 @@ const TemplateEditorPage: React.FC = () => {
           processedElement.height = Number((element as any).height);
         }
         
+        // Ensure opacity is always included
+        if ('opacity' in element) {
+          processedElement.opacity = Number((element as any).opacity);
+        } else {
+          processedElement.opacity = 1.0;
+        }
+        
         console.log('Updating element with properties:', processedElement);
         
-        // Convert to JSON string with explicit handling of numeric values
-        const jsonString = JSON.stringify(processedElement);
-        console.log('JSON string being sent:', jsonString);
-        
+        // Send the processed element directly
         await updateElementInTemplate(
           templateId,
           element.uuid,
           elementType,
-          jsonString
+          processedElement
         );
       } catch (error) {
         console.error('Error updating element:', error);
