@@ -237,21 +237,23 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       if (node) {
         // Configure transformer based on element type
         if ('text' in selectedElement) {
-          // For text elements, enable all anchors and keep ratio false
-          transformerRef.current.enabledAnchors([
-            'top-left', 'top-center', 'top-right',
-            'middle-left', 'middle-right',
-            'bottom-left', 'bottom-center', 'bottom-right'
-          ]);
-          transformerRef.current.keepRatio(false);
+          // For text elements, disable all anchors to prevent resizing, only allow movement and rotation
+          transformerRef.current.enabledAnchors([]); // Disable all resize anchors
+          transformerRef.current.resizeEnabled(false); // Disable resizing completely
+          transformerRef.current.rotateEnabled(true); // Keep rotation enabled
+          transformerRef.current.keepRatio(true); // Maintain aspect ratio (though resizing is disabled)
           
           // Set padding to give more space around text for easier selection
           transformerRef.current.padding(5);
+          
+          console.log("Text element selected: Disabled resizing, enabled rotation only");
         } else {
           // For shapes and images, use default anchors
           transformerRef.current.enabledAnchors([
             'top-left', 'top-right', 'bottom-left', 'bottom-right'
           ]);
+          transformerRef.current.resizeEnabled(true);
+          transformerRef.current.rotateEnabled(true);
           transformerRef.current.keepRatio(false);
           transformerRef.current.padding(0);
         }
@@ -539,21 +541,12 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const x = text.positionX !== null && !isNaN(Number(text.positionX)) ? Number(text.positionX) : 0;
     const y = text.positionY !== null && !isNaN(Number(text.positionY)) ? Number(text.positionY) : 0;
     
-    // Handle fontSize with special care
-    let fontSize = 50; // Default size
-    if (text.fontSize !== null && text.fontSize !== undefined) {
-      const parsedFontSize = Number(text.fontSize);
-      if (!isNaN(parsedFontSize) && parsedFontSize > 0) {
-        fontSize = parsedFontSize;
-      } else {
-        console.warn(`Invalid fontSize detected: ${text.fontSize}, using default (50)`);
-      }
-    } else {
-      console.warn(`Missing fontSize for text element ${text.uuid}, using default (50)`);
-    }
+    // Use the exact fontSize as stored in the database without any validation
+    // This ensures consistent rendering with what was saved
+    const fontSize = Number(text.fontSize);
     
     // Log the fontSize being used for rendering
-    console.log(`Rendering text "${text.text}" with fontSize: ${fontSize}`);
+    console.log(`Rendering text "${text.text}" with exact fontSize: ${fontSize}`);
     
     const rotation = text.rotation !== null && !isNaN(Number(text.rotation)) ? Number(text.rotation) : 0;
     const zIndex = text.zIndex !== null && !isNaN(Number(text.zIndex)) ? Number(text.zIndex) : 0;
@@ -992,8 +985,20 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         updatedElement.positionY = node.y();
       }
       
-      // For width and height, we need to check if the element type has these properties
-      if ('width' in updatedElement && node.width) {
+      // For text elements, preserve the fontSize and prevent resizing
+      if ('text' in updatedElement) {
+        // Preserve the original fontSize
+        if ('fontSize' in updatedElement && 'fontSize' in element) {
+          // Keep the original fontSize, don't allow changes
+          updatedElement.fontSize = element.fontSize;
+          console.log(`Preserving original fontSize: ${updatedElement.fontSize} during text transform`);
+        }
+        
+        // Only update rotation for text elements
+        if ('rotation' in updatedElement) {
+          updatedElement.rotation = node.rotation();
+        }
+      } else if ('width' in updatedElement && node.width) {
         // For images and shapes, they have width and height
         updatedElement.width = node.width() * node.scaleX();
         updatedElement.height = node.height() * node.scaleY();
@@ -1001,11 +1006,11 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         // Reset scale after applying it to the dimensions
         node.scaleX(1);
         node.scaleY(1);
-      }
-      
-      // If rotation is a property of the element, update it
-      if ('rotation' in updatedElement) {
-        updatedElement.rotation = node.rotation();
+        
+        // If rotation is a property of the element, update it
+        if ('rotation' in updatedElement) {
+          updatedElement.rotation = node.rotation();
+        }
       }
       
       // If opacity is a property of the element, ensure it's preserved
