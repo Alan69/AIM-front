@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message } from 'antd';
 import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
-import { fetchAllTemplates, createTemplate, fetchTemplatesREST, processImageData, updateTemplate } from '../../services/designService';
+import { fetchAllTemplates, createTemplate, fetchTemplatesREST, processImageData, updateTemplate, copyTemplate } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -75,16 +75,20 @@ const TemplateListPage: React.FC = () => {
     
     // Filter by tab
     if (activeTab === 'all') {
-      // Show all templates, both default and user-created
-      // No filtering needed
+      // Show only default templates and user-created templates
+      filtered = filtered.filter(template => 
+        template.isDefault
+      );
     } else if (activeTab === 'my') {
-      // Show only user-created templates
+      // Show only user-created templates (not default templates)
       filtered = filtered.filter(template => 
         !template.isDefault && template.user?.id === user?.profile?.user?.id
       );
     } else if (activeTab === 'liked') {
-      // Show only liked templates
-      filtered = filtered.filter(template => template.like);
+      // Show only liked templates that are either default or created by the user
+      filtered = filtered.filter(template => 
+        template.like && (template.isDefault || template.user?.id === user?.profile?.user?.id)
+      );
     }
     
     setFilteredTemplates(filtered);
@@ -127,8 +131,80 @@ const TemplateListPage: React.FC = () => {
     }
   };
 
-  const handleTemplateClick = (uuid: string) => {
-    navigate(`/design/editor/${uuid}`);
+  const handleTemplateClick = async (uuid: string) => {
+    // Find the template that was clicked
+    const template = templates.find(t => t.uuid === uuid);
+    
+    if (!template) {
+      console.error('Template not found:', uuid);
+      return;
+    }
+    
+    // If it's a default template, make a copy for the user
+    if (template.isDefault) {
+      try {
+        setLoading(true);
+        
+        // Get the user ID
+        const userId = user?.profile?.user?.id;
+        
+        if (!userId) {
+          message.error('You must be logged in to use this template.');
+          return;
+        }
+        
+        // Ensure we have a valid size
+        const templateSize = template.size === '1080x1920' ? '1080x1920' : '1080x1080';
+        console.log(`Creating copy of template: ${template.name} with size: ${templateSize}`);
+        
+        message.loading({
+          content: 'Creating a copy of this template...',
+          key: 'templateCopy',
+          duration: 0,
+        });
+        
+        // Create a new template name
+        const newTemplateName = `Copy of ${template.name}`;
+        
+        // Use the copyTemplate function to create a full copy with all elements
+        const newTemplate = await copyTemplate(uuid, newTemplateName, userId);
+        
+        // Verify the size was preserved correctly
+        if (newTemplate.size !== templateSize) {
+          console.log(`Size mismatch detected. Original: ${templateSize}, New: ${newTemplate.size}`);
+          
+          // Fix the size if needed
+          await updateTemplate(newTemplate.uuid, { 
+            size: templateSize
+          });
+          
+          console.log(`Template size updated to: ${templateSize}`);
+        }
+        
+        // Navigate to the new template in the editor
+        message.success({
+          content: 'Template copied successfully!',
+          key: 'templateCopy',
+          duration: 2,
+        });
+        
+        // Refresh the template list to show the new template
+        loadTemplates();
+        
+        // Navigate to the new template
+        navigate(`/design/editor/${newTemplate.uuid}`);
+      } catch (error) {
+        console.error('Error copying template:', error);
+        message.error({
+          content: 'Failed to copy template. Please try again.',
+          key: 'templateCopy',
+        });
+        setLoading(false);
+      }
+    } else {
+      // If it's not a default template, just navigate to it
+      navigate(`/design/editor/${uuid}`);
+    }
   };
 
   const handleToggleLike = async (e: React.MouseEvent, template: Template) => {
@@ -501,7 +577,12 @@ const TemplateListPage: React.FC = () => {
                   </div>
                   <div className="template-info">
                     <div className="template-name">{template.name}</div>
-                    <div className="template-size">{template.size}</div>
+                    <div className="template-size">
+                      {template.size}
+                      {template.isDefault && (
+                        <span className="template-default-badge"></span>
+                      )}
+                    </div>
                   </div>
                 </Card>
               </Col>

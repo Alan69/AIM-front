@@ -120,6 +120,12 @@
       .template-size {
         font-size: 12px;
         color: #999;
+        
+        .template-default-badge {
+          display: inline-block;
+          color: #1890ff;
+          font-weight: 500;
+        }
       }
     }
   }

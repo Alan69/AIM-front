@@ -1245,4 +1245,106 @@ export const fetchTemplatesREST = async (size?: string) => {
     console.error('Error fetching templates from REST API:', error);
     throw error;
   }
+};
+
+// Function to copy a template with all its elements
+export const copyTemplate = async (sourceTemplateId: string, newName: string, userId: string) => {
+  try {
+    // Fetch the source template with all elements
+    const sourceTemplate = await fetchTemplateWithElements(sourceTemplateId);
+    
+    console.log('Copying template:', sourceTemplate);
+    console.log('Source template size:', sourceTemplate.size);
+    
+    // Make sure the size is correct format and not undefined
+    const templateSize = sourceTemplate.size === '1080x1920' ? '1080x1920' : '1080x1080';
+    console.log('Using template size:', templateSize);
+    
+    // Create a new template with the same properties
+    const newTemplate = await createTemplate(
+      newName,
+      templateSize, // Use our validated size
+      sourceTemplate.backgroundImage,
+      userId,
+      false // Not a default template
+    );
+    
+    console.log('New template created with ID:', newTemplate.uuid);
+    console.log('New template size after creation:', newTemplate.size);
+    
+    // Immediately update the template to ensure correct size
+    console.log('Explicitly setting template size to:', templateSize);
+    await client.mutate({
+      mutation: UPDATE_TEMPLATE,
+      variables: {
+        uuid: newTemplate.uuid,
+        size: templateSize
+      }
+    });
+    
+    // Copy all text elements
+    if (sourceTemplate.texts && sourceTemplate.texts.length > 0) {
+      for (const text of sourceTemplate.texts) {
+        await createTextElement(
+          newTemplate.uuid,
+          text.text,
+          text.font,
+          text.fontSize,
+          text.color,
+          text.positionX,
+          text.positionY,
+          text.zIndex,
+          text.rotation
+        );
+      }
+    }
+    
+    // Copy all image elements
+    if (sourceTemplate.images && sourceTemplate.images.length > 0) {
+      for (const image of sourceTemplate.images) {
+        await createImageAsset(
+          newTemplate.uuid,
+          image.image,
+          image.positionX,
+          image.positionY,
+          image.width,
+          image.height,
+          image.zIndex,
+          image.rotation
+        );
+      }
+    }
+    
+    // Copy all shape elements
+    if (sourceTemplate.shapes && sourceTemplate.shapes.length > 0) {
+      for (const shape of sourceTemplate.shapes) {
+        await createShapeElement(
+          newTemplate.uuid,
+          shape.shapeType,
+          shape.color,
+          shape.positionX,
+          shape.positionY,
+          shape.width,
+          shape.height,
+          shape.zIndex,
+          shape.rotation
+        );
+      }
+    }
+    
+    // Double-check size after all elements are added
+    const finalTemplate = await fetchTemplateWithElements(newTemplate.uuid);
+    if (finalTemplate.size !== templateSize) {
+      console.log('Final size check - fixing template size from', finalTemplate.size, 'to', templateSize);
+      await updateTemplate(newTemplate.uuid, { 
+        size: templateSize 
+      });
+    }
+    
+    // Fetch the final template with all copied elements and correct size
+    return await fetchTemplateWithElements(newTemplate.uuid);
+  } catch (error) {
+    console.error('Error copying template:', error);
+    throw error;
+  }
 }; 
