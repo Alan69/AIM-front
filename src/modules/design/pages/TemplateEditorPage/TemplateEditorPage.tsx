@@ -9,9 +9,12 @@ import {
   DeleteOutlined,
   CloudUploadOutlined,
   HeartOutlined,
-  HeartFilled
+  HeartFilled,
+  CopyOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useTypedSelector } from 'hooks/useTypedSelector';
 import { 
   fetchTemplateWithElements, 
   updateTemplate, 
@@ -21,7 +24,8 @@ import {
   createShapeElement,
   deleteElementFromTemplate,
   updateElementInTemplate,
-  debugElementProperties
+  debugElementProperties,
+  copyTemplate
 } from '../../services/designService';
 import { Template, ElementType, DesignElement, ImageAsset, TextElement, ShapeElement } from '../../types';
 import CanvasWorkspace from './components/CanvasWorkspace';
@@ -60,6 +64,8 @@ const TemplateEditorPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<any>(null);
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const { user } = useTypedSelector((state) => state.auth);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   // Load template data on mount
   useEffect(() => {
@@ -1164,6 +1170,101 @@ const TemplateEditorPage: React.FC = () => {
     }
   };
 
+  // Function to copy the current template
+  const handleCopyTemplate = async () => {
+    if (!template || !uuid) return;
+    
+    try {
+      setIsSaving(true);
+      
+      // Create a new name for the copied template
+      const newName = `Copy of ${templateName}`;
+      
+      // Get current user ID from Redux store
+      const userId = user?.profile?.user?.id;
+      
+      if (!userId) {
+        message.error('You must be logged in to copy a template.');
+        return;
+      }
+      
+      // Copy the template with all its elements
+      const newTemplate = await copyTemplate(uuid, newName, userId);
+      
+      message.success('Template copied successfully!');
+      
+      // Navigate to the new template in the editor
+      navigate(`/design/editor/${newTemplate.uuid}`);
+    } catch (error) {
+      console.error('Error copying template:', error);
+      message.error('Failed to copy template. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Function to download the template as an image
+  const handleDownloadImage = async () => {
+    if (!stageRef.current) {
+      message.error('Canvas not ready. Please try again.');
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+      console.log('Starting download process');
+      
+      // Get the Konva stage node
+      const stage = stageRef.current.getStage();
+      if (!stage) {
+        console.error('Stage reference is invalid');
+        message.error('Could not access canvas. Please try again.');
+        return;
+      }
+      
+      // Get canvas dimensions from template
+      const [width, height] = template?.size.split('x').map(Number) || [1080, 1080];
+      console.log(`Using dimensions: ${width}x${height}`);
+      
+      // Convert stage directly to data URL
+      const dataURL = stage.toDataURL({
+        pixelRatio: 2, // Higher quality
+        mimeType: 'image/png',
+        quality: 1,
+        width: width,
+        height: height
+      });
+      
+      console.log(`Generated data URL of length: ${dataURL.length}`);
+      
+      if (!dataURL || dataURL.length < 1000) {
+        console.error('Generated image is too small or empty');
+        message.error('Failed to generate image. Please try again.');
+        return;
+      }
+      
+      // Create download link
+      const link = document.createElement('a');
+      const fileName = `${templateName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.png`;
+      
+      link.download = fileName;
+      link.href = dataURL;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('Download triggered successfully');
+      message.success('Template downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading template as image:', error);
+      message.error('Failed to download template as image');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="editor-loading">
@@ -1244,6 +1345,22 @@ const TemplateEditorPage: React.FC = () => {
               icon={<DeleteOutlined />} 
               danger
               onClick={showDeleteConfirm}
+              className="header-button"
+            />
+          </Tooltip>
+          <Tooltip title="Download Template">
+            <Button 
+              icon={<DownloadOutlined />}
+              loading={isDownloading}
+              onClick={handleDownloadImage}
+              className="header-button"
+            />
+          </Tooltip>
+          <Tooltip title="Copy Template">
+            <Button 
+              icon={<CopyOutlined />}
+              loading={isSaving}
+              onClick={handleCopyTemplate}
               className="header-button"
             />
           </Tooltip>
