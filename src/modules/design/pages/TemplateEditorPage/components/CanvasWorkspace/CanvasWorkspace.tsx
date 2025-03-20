@@ -40,6 +40,33 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const [lastBackgroundImageUrl, setLastBackgroundImageUrl] = useState<string | null>(null);
   const backgroundImageRef = useRef<HTMLImageElement | null>(null);
+  const [checkerboardPattern, setCheckerboardPattern] = useState<HTMLImageElement | null>(null);
+
+  // Create checkerboard pattern once
+  useEffect(() => {
+    // Create a checkerboard pattern
+    const size = 20;
+    const canvas = document.createElement('canvas');
+    canvas.width = size * 2;
+    canvas.height = size * 2;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      // Draw white background
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, size * 2, size * 2);
+      // Draw gray squares
+      ctx.fillStyle = '#ccc';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillRect(size, size, size, size);
+    }
+    
+    // Create an image from the canvas
+    const image = new window.Image();
+    image.onload = () => {
+      setCheckerboardPattern(image);
+    };
+    image.src = canvas.toDataURL();
+  }, []);
 
   // Parse template size
   const templateSize = template.size ? template.size.split('x').map(Number) : [1080, 1080];
@@ -1136,14 +1163,17 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                   listening={false} // Make it non-interactive
                 />
               ) : (
-                <Rect
-                  x={0}
-                  y={0}
-                  width={canvasWidth}
-                  height={canvasHeight}
-                  fill="white"
-                  stroke="#ddd"
-                />
+                <>
+                  {/* Transparent checkerboard background */}
+                  <Rect
+                    x={0}
+                    y={0}
+                    width={canvasWidth}
+                    height={canvasHeight}
+                    fillPatternImage={checkerboardPattern || undefined}
+                    stroke="#ddd"
+                  />
+                </>
               )}
               
               {/* Design Elements - render only when ready */}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs, List, Button, Card, Upload, message } from 'antd';
-import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined } from '@ant-design/icons';
-import { ElementType } from '../../../../types';
+import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { ElementType, Template, DesignElement } from '../../../../types';
 import './ElementsPanel.scss';
 
 const { TabPane } = Tabs;
@@ -9,9 +9,17 @@ const { Dragger } = Upload;
 
 interface ElementsPanelProps {
   onAddElement: (elementType: ElementType, data?: any) => void;
+  template?: Template; // Add template prop to access all elements
+  selectedElement?: DesignElement | null; // Add selected element prop
+  onSelectElement?: (element: DesignElement | null) => void; // Add select element handler
 }
 
-const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
+const ElementsPanel: React.FC<ElementsPanelProps> = ({ 
+  onAddElement,
+  template,
+  selectedElement,
+  onSelectElement
+}) => {
   // Sample text elements
   const textElements = [
     { name: 'Heading', style: { fontSize: 32, fontWeight: 'bold' } },
@@ -93,6 +101,77 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
     onAddElement(ElementType.SHAPE, { shapeType, color });
   };
 
+  // Function to handle selecting an element from the list
+  const handleSelectElement = (element: DesignElement) => {
+    if (onSelectElement) {
+      onSelectElement(element);
+    }
+  };
+
+  // Get all elements for the Elements List
+  const getAllElements = () => {
+    if (!template) return [];
+    
+    const allElements: Array<DesignElement & { elementType: string }> = [];
+    
+    // Add text elements
+    if (template.texts) {
+      template.texts.forEach(text => {
+        allElements.push({ ...text, elementType: 'text' });
+      });
+    }
+    
+    // Add image elements
+    if (template.images) {
+      template.images.forEach(image => {
+        allElements.push({ ...image, elementType: 'image' });
+      });
+    }
+    
+    // Add shape elements
+    if (template.shapes) {
+      template.shapes.forEach(shape => {
+        allElements.push({ ...shape, elementType: 'shape' });
+      });
+    }
+    
+    // Sort elements by z-index, highest first (for selection priority)
+    return allElements.sort((a, b) => {
+      const zIndexA = a.zIndex !== undefined ? Number(a.zIndex) : 0;
+      const zIndexB = b.zIndex !== undefined ? Number(b.zIndex) : 0;
+      return zIndexB - zIndexA;
+    });
+  };
+
+  // Get element display name
+  const getElementName = (element: DesignElement & { elementType: string }) => {
+    if (element.elementType === 'text') {
+      return `Text: ${(element as any).text || 'Text'}`;
+    } else if (element.elementType === 'image') {
+      return `Image ${element.uuid.slice(0, 6)}`;
+    } else if (element.elementType === 'shape') {
+      return `Shape: ${(element as any).shapeType || 'Shape'}`;
+    }
+    return `Element ${element.uuid.slice(0, 6)}`;
+  };
+
+  // Get element icon/preview
+  const getElementIcon = (element: DesignElement & { elementType: string }) => {
+    if (element.elementType === 'text') {
+      return <FontSizeOutlined />;
+    } else if (element.elementType === 'image') {
+      return <PictureOutlined />;
+    } else if (element.elementType === 'shape') {
+      return <BorderOutlined />;
+    }
+    return null;
+  };
+
+  // Check if element is currently selected
+  const isElementSelected = (element: DesignElement) => {
+    return selectedElement?.uuid === element.uuid;
+  };
+
   return (
     <div className="elements-panel">
       <Tabs defaultActiveKey="images" tabPosition="top" className="elements-tabs">
@@ -160,6 +239,38 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({ onAddElement }) => {
           </div>
         </TabPane>
       </Tabs>
+      
+      {/* Elements List Panel */}
+      <div className="elements-list-panel">
+        <div className="elements-list-header">
+          <UnorderedListOutlined /> Elements
+        </div>
+        {template && (
+          <List
+            className="elements-list"
+            size="small"
+            dataSource={getAllElements()}
+            renderItem={element => (
+              <List.Item 
+                key={element.uuid}
+                className={`element-list-item ${isElementSelected(element) ? 'selected' : ''}`}
+                onClick={() => handleSelectElement(element)}
+              >
+                <div className="element-list-icon">
+                  {getElementIcon(element)}
+                </div>
+                <div className="element-list-name">
+                  {getElementName(element)}
+                </div>
+                <div className="element-list-z-index">
+                  {element.zIndex !== undefined ? `z: ${element.zIndex}` : ''}
+                </div>
+              </List.Item>
+            )}
+            locale={{ emptyText: 'No elements added yet' }}
+          />
+        )}
+      </div>
     </div>
   );
 };

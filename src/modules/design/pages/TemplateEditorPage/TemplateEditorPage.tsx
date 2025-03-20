@@ -1391,6 +1391,9 @@ const TemplateEditorPage: React.FC = () => {
         <Sider width={250} className="editor-sider left-sider">
           <ElementsPanel 
             onAddElement={handleAddElement}
+            template={template}
+            selectedElement={selectedElement}
+            onSelectElement={handleSelectElement}
           />
         </Sider>
         
