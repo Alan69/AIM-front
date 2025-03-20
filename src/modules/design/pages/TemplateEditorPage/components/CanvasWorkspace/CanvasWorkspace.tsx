@@ -501,6 +501,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     const rotation = image.rotation !== null && !isNaN(Number(image.rotation)) ? Number(image.rotation) : 0;
     const zIndex = image.zIndex !== null && !isNaN(Number(image.zIndex)) ? Number(image.zIndex) : 0;
     const opacity = image.opacity !== null && !isNaN(Number(image.opacity)) ? Number(image.opacity) : 1.0;
+    const borderRadius = image.borderRadius !== null && !isNaN(Number(image.borderRadius)) ? Number(image.borderRadius) : 0;
     
     // Create a copy of the image with correct position values
     const imageWithCorrectPosition = {
@@ -511,7 +512,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
       height: height,
       rotation: rotation,
       zIndex: zIndex,
-      opacity: opacity
+      opacity: opacity,
+      borderRadius: borderRadius
     };
 
     return (
@@ -526,6 +528,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         rotation={rotation}
         zIndex={zIndex}
         opacity={opacity}
+        cornerRadius={borderRadius}
         draggable
         onClick={() => handleElementClick(imageWithCorrectPosition)}
         onTap={() => handleElementClick(imageWithCorrectPosition)}

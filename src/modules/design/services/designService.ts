@@ -53,6 +53,7 @@ export const GET_ALL_TEMPLATES = gql`
         zIndex
         rotation
         opacity
+        borderRadius
       }
       textElements {
         uuid
@@ -107,6 +108,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
         zIndex
         rotation
         opacity
+        borderRadius
       }
       texts {
         uuid
@@ -163,7 +165,8 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
     $height: Float!, 
     $zIndex: Int!,
     $rotation: Float!,
-    $opacity: Float!
+    $opacity: Float!,
+    $borderRadius: Float!
   ) {
     addImageToTemplate(
       templateId: $templateId, 
@@ -174,7 +177,8 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
       height: $height, 
       zIndex: $zIndex,
       rotation: $rotation,
-      opacity: $opacity
+      opacity: $opacity,
+      borderRadius: $borderRadius
     ) {
       template {
         uuid
@@ -189,6 +193,7 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
           zIndex
           rotation
           opacity
+          borderRadius
         }
       }
     }
@@ -354,6 +359,7 @@ export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
           zIndex
           rotation
           opacity
+          borderRadius
         }
         texts {
           uuid
@@ -411,6 +417,7 @@ export const DELETE_ELEMENT_FROM_TEMPLATE = gql`
           zIndex
           rotation
           opacity
+          borderRadius
         }
         texts {
           uuid
@@ -579,7 +586,8 @@ export const fetchAllTemplates = async (size?: string) => {
         height: Number(img.height),
         zIndex: Number(img.zIndex),
         rotation: Number(img.rotation),
-        opacity: Number(img.opacity)
+        opacity: Number(img.opacity),
+        borderRadius: Number(img.borderRadius)
       })) || [];
 
       // Process text elements
@@ -702,7 +710,8 @@ export const fetchTemplateWithElements = async (uuid: string) => {
         height: image.height !== null ? Number(image.height) : 100,
         zIndex: image.zIndex !== null ? parseInt(String(image.zIndex)) : 0,
         rotation: image.rotation !== null ? Number(image.rotation) : 0,
-        opacity: image.opacity !== null ? Number(image.opacity) : 1.0
+        opacity: image.opacity !== null ? Number(image.opacity) : 1.0,
+        borderRadius: image.borderRadius !== null ? Number(image.borderRadius) : 0
       };
     });
   }
@@ -771,45 +780,110 @@ export const createImageAsset = async (
   height: number = 100,
   zIndex: number = 0,
   rotation: number = 0,
-  opacity: number = 1.0
+  opacity: number = 1.0,
+  borderRadius: number = 0
 ) => {
   try {
-    // First, get the current template to preserve the background image
-    const currentTemplate = await fetchTemplateWithElements(templateId);
-    const backgroundImage = currentTemplate.backgroundImage;
-    
-    const { data } = await client.mutate({
-      mutation: ADD_IMAGE_TO_TEMPLATE,
-      variables: { 
+    // Ensure the user is authenticated
+    const token = Cookies.get('token');
+    if (!token) {
+      console.error('User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    // Make the GraphQL request
+    const result = await client.mutate({
+      mutation: gql`
+        mutation AddImageToTemplate(
+          $templateId: UUID!
+          $image: String!
+          $positionX: Float
+          $positionY: Float
+          $width: Float
+          $height: Float
+          $zIndex: Int
+          $rotation: Float
+          $opacity: Float
+          $borderRadius: Float
+        ) {
+          addImageToTemplate(
+            templateId: $templateId
+            image: $image
+            positionX: $positionX
+            positionY: $positionY
+            width: $width
+            height: $height
+            zIndex: $zIndex
+            rotation: $rotation
+            opacity: $opacity
+            borderRadius: $borderRadius
+          ) {
+            template {
+              uuid
+              name
+              size
+              backgroundImage
+              like
+              images {
+                uuid
+                image
+                positionX
+                positionY
+                width
+                height
+                zIndex
+                rotation
+                opacity
+                borderRadius
+              }
+              texts {
+                uuid
+                text
+                font
+                fontSize
+                color
+                positionX
+                positionY
+                zIndex
+                rotation
+                opacity
+              }
+              shapes {
+                uuid
+                shapeType
+                color
+                positionX
+                positionY
+                width
+                height
+                zIndex
+                rotation
+                opacity
+              }
+            }
+          }
+        }
+      `,
+      variables: {
         templateId,
         image: imageUrl,
-        positionX: Number(positionX), 
-        positionY: Number(positionY), 
-        width: Number(width), 
-        height: Number(height),
-        zIndex: parseInt(String(zIndex)),
-        rotation: Number(rotation),
-        opacity: Number(opacity)
+        positionX,
+        positionY,
+        width,
+        height,
+        zIndex,
+        rotation,
+        opacity,
+        borderRadius
+      },
+      context: {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
       },
     });
 
-    // Ensure the background image is preserved in the returned template
-    if (backgroundImage && backgroundImage !== 'no_image.jpg' && 
-        (!data.addImageToTemplate.template.backgroundImage || 
-         data.addImageToTemplate.template.backgroundImage === 'no_image.jpg')) {
-      data.addImageToTemplate.template.backgroundImage = backgroundImage;
-      
-      // Update the template with the preserved background image
-      await client.mutate({
-        mutation: UPDATE_TEMPLATE,
-        variables: {
-          uuid: templateId,
-          background_image: backgroundImage
-        }
-      });
-    }
-    
-    return data.addImageToTemplate.template;
+    return result.data.addImageToTemplate.template;
   } catch (error) {
     console.error('Error creating image asset:', error);
     throw error;
@@ -1169,7 +1243,8 @@ export const updateTemplate = async (uuid: string, updates: any) => {
       height: image.height !== null ? Number(image.height) : 100,
       zIndex: image.zIndex !== null ? parseInt(String(image.zIndex)) : 0,
       rotation: image.rotation !== null ? Number(image.rotation) : 0,
-      opacity: image.opacity !== null ? Number(image.opacity) : 1.0
+      opacity: image.opacity !== null ? Number(image.opacity) : 1.0,
+      borderRadius: image.borderRadius !== null ? Number(image.borderRadius) : 0
     }));
   }
   
@@ -1345,7 +1420,8 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
           image.height,
           image.zIndex,
           image.rotation,
-          image.opacity
+          image.opacity,
+          image.borderRadius
         );
       }
     }

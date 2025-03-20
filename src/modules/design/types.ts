@@ -28,6 +28,7 @@ export interface ImageAsset {
   zIndex: number;
   rotation: number;
   opacity: number;
+  borderRadius?: number;
 }
 
 export interface TextElement {

@@ -360,8 +360,40 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       <Panel header="Image Properties" key="image">
         <Form layout="vertical" className="properties-form">
           <div className="image-preview">
-            <img src={processedElement.image} alt="Preview" />
+            <img 
+              src={processedElement.image} 
+              alt="Preview" 
+              style={{ 
+                borderRadius: `${getCurrentValue('borderRadius', 0)}px`,
+                maxWidth: '100%',
+                maxHeight: '200px'
+              }}
+            />
           </div>
+          
+          <Form.Item 
+            label="Border Radius" 
+            tooltip="Adjust the roundness of image corners. Higher values make the image more rounded."
+          >
+            <div className="form-row">
+              <Slider
+                value={getCurrentValue('borderRadius', 0)}
+                onChange={(value) => handleNumberChange('borderRadius', value)}
+                min={0}
+                max={200}
+                step={1}
+                className="slider-with-input"
+              />
+              <InputNumber
+                value={getCurrentValue('borderRadius', 0)}
+                onChange={(value) => handleNumberChange('borderRadius', value)}
+                min={0}
+                max={200}
+                step={1}
+                className="input-with-slider"
+              />
+            </div>
+          </Form.Item>
         </Form>
       </Panel>
     );
