@@ -1,8 +1,11 @@
-import React from 'react';
-import { Tabs, List, Button, Card, Upload, message } from 'antd';
-import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { ElementType, Template, DesignElement } from '../../../../types';
+import React, { useState, useEffect } from 'react';
+import { Tabs, List, Button, Card, Upload, message, Spin, Empty } from 'antd';
+import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, FileImageOutlined } from '@ant-design/icons';
+import { ElementType, Template, DesignElement, UserAsset } from '../../../../types';
+import { getUserAssets, createUserAsset } from '../../../../services/designService';
 import './ElementsPanel.scss';
+import { useSelector } from 'react-redux';
+import { RootState } from 'redux/rootReducer';
 
 const { TabPane } = Tabs;
 const { Dragger } = Upload;
@@ -20,6 +23,55 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   selectedElement,
   onSelectElement
 }) => {
+  const [userAssets, setUserAssets] = useState<UserAsset[]>([]);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+  
+  // Get user from Redux store
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userId = user?.profile?.user?.id;
+
+  // Add user ID to window for easier access by services
+  useEffect(() => {
+    if (userId && typeof window !== 'undefined') {
+      // Store userId in window for services to access
+      (window as any).__USER_ID__ = userId;
+      
+      // Also ensure it's in localStorage as a fallback
+      try {
+        if (!localStorage.getItem('userData') && user) {
+          localStorage.setItem('userData', JSON.stringify(user.profile.user));
+        }
+      } catch (e) {
+        console.warn('Failed to store user data in localStorage:', e);
+      }
+    }
+  }, [userId, user]);
+
+  // Load user assets on component mount
+  useEffect(() => {
+    loadUserAssets();
+  }, [userId]); // Reload when userId changes
+
+  // Function to load user assets
+  const loadUserAssets = async () => {
+    try {
+      setLoadingAssets(true);
+      const assets = await getUserAssets();
+      setUserAssets(assets || []);
+    } catch (error) {
+      console.error('Error loading user assets:', error);
+      
+      // Show a more user-friendly error message based on the error type
+      if (error instanceof Error && error.message === 'User not authenticated') {
+        message.error('Please log in to view your saved images');
+      } else {
+        message.error('Failed to load your saved images');
+      }
+    } finally {
+      setLoadingAssets(false);
+    }
+  };
+
   // Sample text elements
   const textElements = [
     { name: 'Heading', style: { fontSize: 32, fontWeight: 'bold' } },
@@ -55,12 +107,29 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       // For now, we'll use the FileReader to convert the image to a data URL
       const reader = new FileReader();
       
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const imageUrl = e.target?.result as string;
         if (imageUrl) {
-          // Only add the element when we have a valid image URL
-          onAddElement(ElementType.IMAGE, { image: imageUrl });
-          message.success(`${file.name} added to canvas`);
+          try {
+            // Save the image as a user asset
+            await createUserAsset(
+              imageUrl, 
+              file.name
+            );
+            
+            // Refresh the user assets list
+            loadUserAssets();
+            
+            // Only add the element when we have a valid image URL
+            onAddElement(ElementType.IMAGE, { image: imageUrl });
+            message.success(`${file.name} added to canvas and saved to your assets`);
+          } catch (error) {
+            console.error('Error saving image asset:', error);
+            // Still add the image to the canvas even if saving as asset failed
+            onAddElement(ElementType.IMAGE, { image: imageUrl });
+            message.success(`${file.name} added to canvas`);
+            message.error('Failed to save image to your assets');
+          }
         } else {
           message.error(`Failed to load image: ${file.name}`);
         }
@@ -106,6 +175,12 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     if (onSelectElement) {
       onSelectElement(element);
     }
+  };
+
+  // Handle adding an image from user assets
+  const handleAddUserAsset = (asset: UserAsset) => {
+    onAddElement(ElementType.IMAGE, { image: asset.image });
+    message.success(`Image added to canvas`);
   };
 
   // Get all elements for the Elements List
@@ -189,6 +264,60 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 Supports JPG, PNG, SVG, and GIF
               </p>
             </Dragger>
+          </div>
+        </TabPane>
+        
+        <TabPane 
+          tab={<><FileImageOutlined /> My Assets</>} 
+          key="assets"
+        >
+          <div className="tab-content">
+            {loadingAssets ? (
+              <div className="assets-loading">
+                <Spin tip="Loading your images..." />
+              </div>
+            ) : userAssets.length > 0 ? (
+              <List
+                grid={{ gutter: 16, column: 2 }}
+                dataSource={userAssets}
+                renderItem={asset => (
+                  <List.Item>
+                    <Card 
+                      hoverable 
+                      className="asset-card"
+                      onClick={() => handleAddUserAsset(asset)}
+                      cover={
+                        <div className="asset-image-container">
+                          <img 
+                            alt={asset.name} 
+                            src={asset.thumbnail || asset.image} 
+                            className="asset-image"
+                          />
+                        </div>
+                      }
+                    >
+                      <div className="asset-name" title={asset.name}>
+                        {asset.name}
+                      </div>
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <Empty 
+                description="No saved images yet" 
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            )}
+            <div className="refresh-assets">
+              <Button 
+                type="link" 
+                onClick={loadUserAssets}
+                disabled={loadingAssets}
+              >
+                Refresh
+              </Button>
+            </div>
           </div>
         </TabPane>
         

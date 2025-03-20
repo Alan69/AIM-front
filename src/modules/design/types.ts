@@ -1,3 +1,11 @@
+export interface UserAsset {
+  uuid: string;
+  image: string;
+  name: string;
+  thumbnail: string;
+  createdAt: string;
+}
+
 export interface Template {
   uuid: string;
   name: string;

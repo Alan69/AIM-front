@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { baseURL, graphqlURL } from 'types/baseUrl';
+import { Template, ElementType, ImageAsset, TextElement, ShapeElement, UserAsset } from '../types';
 
 // Create the HTTP link
 const httpLink = createHttpLink({
@@ -31,7 +32,7 @@ const client = new ApolloClient({
 // Query to get all templates
 export const GET_ALL_TEMPLATES = gql`
   query GetAllTemplates($size: String) {
-    allTemplates(size: $size) {
+    templates(size: $size) {
       uuid
       name
       isDefault
@@ -86,7 +87,7 @@ export const GET_ALL_TEMPLATES = gql`
 // Query to get a template with all its elements
 export const GET_TEMPLATE_WITH_ELEMENTS = gql`
   query GetTemplateWithElements($uuid: UUID!) {
-    templateWithElements(uuid: $uuid) {
+    template(uuid: $uuid) {
       uuid
       name
       isDefault
@@ -569,7 +570,7 @@ export const fetchAllTemplates = async (size?: string) => {
     });
     
     // Process the data to ensure all fields are correctly formatted
-    const processedTemplates = data.allTemplates.map((template: any) => {
+    const processedTemplates = data.templates.map((template: any) => {
       // Process background image if it exists and is not the default
       let backgroundImage = template.backgroundImage;
       if (backgroundImage && backgroundImage !== 'no_image.jpg') {
@@ -646,7 +647,7 @@ export const fetchTemplateWithElements = async (uuid: string) => {
   });
   
   // Process numeric values to ensure they're properly converted
-  const processedTemplate = { ...data.templateWithElements };
+  const processedTemplate = { ...data.template };
   
   // Process background image if it exists and is not the default
   if (processedTemplate.backgroundImage && processedTemplate.backgroundImage !== 'no_image.jpg') {
@@ -1458,5 +1459,236 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
   } catch (error) {
     console.error('Error copying template:', error);
     throw error;
+  }
+};
+
+// Function to create a user asset (independent of templates)
+export const createUserAsset = async (
+  imageUrl: string,
+  name?: string,
+  thumbnail?: string
+) => {
+  try {
+    // Ensure the user is authenticated
+    const token = Cookies.get('token');
+    if (!token) {
+      console.error('User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    // Try multiple sources to get the user ID
+    let userId;
+    
+    // First try from the user_id cookie
+    const userIdCookie = Cookies.get('user_id');
+    if (userIdCookie) {
+      userId = userIdCookie;
+    } else {
+      // Try from the window.__USER_ID__ property that may be set by components
+      if (typeof window !== 'undefined' && (window as any).__USER_ID__) {
+        userId = (window as any).__USER_ID__;
+      }
+      
+      // Try from userData cookie (which contains the user object)
+      if (!userId) {
+        const userDataCookie = Cookies.get('userData');
+        if (userDataCookie) {
+          try {
+            const userData = JSON.parse(userDataCookie);
+            if (userData && userData.id) {
+              userId = userData.id;
+            }
+          } catch (error) {
+            console.warn('Error parsing userData cookie:', error);
+          }
+        }
+      }
+      
+      // If still no user ID, try to get it from localStorage
+      if (!userId) {
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            if (userData && userData.id) {
+              userId = userData.id;
+            }
+          } catch (error) {
+            console.warn('Error parsing userData from localStorage:', error);
+          }
+        }
+      }
+      
+      // Try to get from auth Redux store via window.__REDUX_STATE__
+      if (!userId && typeof window !== 'undefined' && (window as any).__REDUX_STATE__) {
+        try {
+          const reduxState = (window as any).__REDUX_STATE__;
+          if (reduxState.auth && reduxState.auth.user && 
+              reduxState.auth.user.profile && 
+              reduxState.auth.user.profile.user && 
+              reduxState.auth.user.profile.user.id) {
+            userId = reduxState.auth.user.profile.user.id;
+          }
+        } catch (error) {
+          console.warn('Error accessing Redux state:', error);
+        }
+      }
+    }
+    
+    // If we still don't have a user ID, we can't create the asset
+    if (!userId) {
+      console.error('User ID not found in any storage location, cannot create asset');
+      throw new Error('User ID not found');
+    }
+
+    // Make the GraphQL request
+    const result = await client.mutate({
+      mutation: gql`
+        mutation CreateUserAsset(
+          $userId: UUID!
+          $image: String!
+          $name: String
+          $thumbnail: String
+        ) {
+          createUserAsset(
+            userId: $userId
+            image: $image
+            name: $name
+            thumbnail: $thumbnail
+          ) {
+            asset {
+              uuid
+              image
+              name
+              thumbnail
+              createdAt
+            }
+          }
+        }
+      `,
+      variables: {
+        userId,
+        image: imageUrl,
+        name,
+        thumbnail
+      },
+      context: {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
+    });
+
+    return result.data.createUserAsset.asset;
+  } catch (error) {
+    console.error('Error creating user asset:', error);
+    throw error;
+  }
+};
+
+// Function to get all user assets
+export const getUserAssets = async () => {
+  try {
+    // Ensure the user is authenticated
+    const token = Cookies.get('token');
+    if (!token) {
+      console.error('User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    // Try multiple sources to get the user ID
+    let userId;
+    
+    // First try from the user_id cookie
+    const userIdCookie = Cookies.get('user_id');
+    if (userIdCookie) {
+      userId = userIdCookie;
+    } else {
+      // Try from the window.__USER_ID__ property that may be set by components
+      if (typeof window !== 'undefined' && (window as any).__USER_ID__) {
+        userId = (window as any).__USER_ID__;
+      }
+      
+      // Try from userData cookie (which contains the user object)
+      if (!userId) {
+        const userDataCookie = Cookies.get('userData');
+        if (userDataCookie) {
+          try {
+            const userData = JSON.parse(userDataCookie);
+            if (userData && userData.id) {
+              userId = userData.id;
+            }
+          } catch (error) {
+            console.warn('Error parsing userData cookie:', error);
+          }
+        }
+      }
+      
+      // If still no user ID, try to get it from localStorage
+      if (!userId) {
+        const userDataString = localStorage.getItem('userData');
+        if (userDataString) {
+          try {
+            const userData = JSON.parse(userDataString);
+            if (userData && userData.id) {
+              userId = userData.id;
+            }
+          } catch (error) {
+            console.warn('Error parsing userData from localStorage:', error);
+          }
+        }
+      }
+      
+      // Try to get from auth Redux store via window.__REDUX_STATE__
+      if (!userId && typeof window !== 'undefined' && (window as any).__REDUX_STATE__) {
+        try {
+          const reduxState = (window as any).__REDUX_STATE__;
+          if (reduxState.auth && reduxState.auth.user && 
+              reduxState.auth.user.profile && 
+              reduxState.auth.user.profile.user && 
+              reduxState.auth.user.profile.user.id) {
+            userId = reduxState.auth.user.profile.user.id;
+          }
+        } catch (error) {
+          console.warn('Error accessing Redux state:', error);
+        }
+      }
+    }
+    
+    // If we still don't have a user ID, return an empty array
+    if (!userId) {
+      console.warn('User ID not found in any storage location, returning empty assets list');
+      return [];
+    }
+
+    // Make the GraphQL request
+    const result = await client.query({
+      query: gql`
+        query GetUserAssets($userId: UUID!) {
+          userAssets(userId: $userId) {
+            uuid
+            image
+            name
+            thumbnail
+            createdAt
+          }
+        }
+      `,
+      variables: {
+        userId
+      },
+      context: {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
+      fetchPolicy: 'network-only' // Don't use cache for this query
+    });
+
+    return result.data.userAssets as UserAsset[];
+  } catch (error) {
+    console.error('Error fetching user assets:', error);
+    // Return empty array instead of throwing to avoid breaking the UI
+    return [];
   }
 }; 
