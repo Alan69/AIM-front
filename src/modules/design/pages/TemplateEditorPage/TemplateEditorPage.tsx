@@ -37,6 +37,7 @@ import axios from 'axios';
 import { baseURL } from 'types/baseUrl';
 import Cookies from 'js-cookie';
 import html2canvas from 'html2canvas';
+import Konva from 'konva';
 
 const { Header, Sider, Content } = Layout;
 
@@ -994,7 +995,7 @@ const TemplateEditorPage: React.FC = () => {
       // Get the token from cookies
       const token = Cookies.get('token');
       
-      console.log('Sending template data to server for rendering...');
+      console.log('Preparing to capture canvas and send to server...');
       console.log('Template UUID:', uuid);
       console.log('Post ID:', postId);
       
@@ -1046,31 +1047,145 @@ const TemplateEditorPage: React.FC = () => {
         }
       }
       
-      // Send the template UUID and post ID to the server for server-side rendering
-      const response = await axios({
-        method: 'post',
-        url: `${baseURL}designs/template-to-post/`,
-        data: {
-          template_uuid: uuid,
-          post_id: postId
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+      // CAPTURE THE CANVAS AS PNG IMAGE WITHOUT BLACK BORDERS
+      if (!stageRef.current) {
+        throw new Error('Canvas stage reference is not available');
+      }
+      
+      console.log('Capturing canvas as clean image...');
+      const stage = stageRef.current;
+      
+      // Parse the template size
+      const templateSize = template?.size ? template.size.split('x').map(Number) : [1080, 1080];
+      const canvasWidth = templateSize[0] || 1080;
+      const canvasHeight = templateSize[1] || 1080;
+      
+      // Remove transformer temporarily if it exists to avoid including it in the capture
+      const transformer = stage.findOne('Transformer');
+      if (transformer) {
+        transformer.visible(false);
+        transformer.getLayer()?.batchDraw();
+      }
+      
+      // We'll create a new temporary in-memory Konva stage with exact template dimensions
+      // This ensures we get just the contents without any stage padding/positioning
+      const tempStage = new Konva.Stage({
+        container: document.createElement('div'), // This won't be added to the DOM
+        width: canvasWidth,
+        height: canvasHeight
       });
       
-      console.log('Server response:', response.data);
+      // Create a new layer for our content
+      const tempLayer = new Konva.Layer();
+      tempStage.add(tempLayer);
       
-      if (response.data && response.data.success) {
+      // First, add the background image or color
+      if (template?.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
+        // If there's a background image, we need to clone it
+        const bgImage = stage.findOne('.background-image') || 
+                       stage.findOne('Image');  // fallback to first image
+        
+        if (bgImage) {
+          // Clone the background image
+          const clonedBg = bgImage.clone({
+            x: 0,
+            y: 0,
+            width: canvasWidth,
+            height: canvasHeight,
+            draggable: false
+          });
+          tempLayer.add(clonedBg);
+        }
+      } else {
+        // Add a white background if no background image
+        const bg = new Konva.Rect({
+          x: 0,
+          y: 0,
+          width: canvasWidth,
+          height: canvasHeight,
+          fill: 'white'
+        });
+        tempLayer.add(bg);
+      }
+      
+      // Next, we'll manually clone all elements from the original stage
+      // Sort elements by z-index and clone them to our temp stage
+      const allElements = [
+        ...((template?.shapes || []).map(shape => ({ element: shape, type: 'shape', zIndex: shape.zIndex || 0 }))),
+        ...((template?.texts || []).map(text => ({ element: text, type: 'text', zIndex: text.zIndex || 0 }))),
+        ...((template?.images || []).map(image => ({ element: image, type: 'image', zIndex: image.zIndex || 0 })))
+      ].sort((a, b) => a.zIndex - b.zIndex);
+      
+      // For each element in the sorted list, find its Konva node and clone it
+      allElements.forEach(item => {
+        const node = stage.findOne(`.${item.element.uuid}`);
+        if (node) {
+          const clone = node.clone();
+          tempLayer.add(clone);
+        }
+      });
+      
+      // Draw the temporary stage
+      tempStage.draw();
+      
+      // Export the temp stage to PNG
+      const dataURL = tempStage.toDataURL({
+        pixelRatio: 2,  // Higher quality
+        mimeType: 'image/png'
+      });
+      
+      // Clean up
+      tempStage.destroy();
+      
+      // Restore transformer visibility
+      if (transformer) {
+        transformer.visible(true);
+        transformer.getLayer()?.batchDraw();
+      }
+      
+      console.log('Canvas captured successfully without black borders');
+      
+      // Convert data URL to Blob
+      const binaryString = atob(dataURL.split(',')[1]);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'image/png' });
+      
+      // Create a FormData object
+      const formData = new FormData();
+      formData.append('template_uuid', uuid);
+      formData.append('post_id', postId);
+      formData.append('image', blob, 'canvas_capture.png');
+      
+      // Send the form data to the server
+      const response = await fetch(`${baseURL}designs/template-to-post/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+      
+      const responseData = await response.json();
+      console.log('Server response:', responseData);
+      
+      if (responseData && responseData.success) {
         message.success(t('save_to_post_success'));
         
         // Check if we came from a post query details page
         const postQueryId = queryParams.get('postQueryId');
         
         // Get the new image URL from the response
-        const newImageUrl = response.data.picture_url;
-        const oldImageUrl = response.data.old_picture_url;
+        const newImageUrl = responseData.picture_url;
+        const oldImageUrl = responseData.old_picture_url;
         
         console.log('New image URL:', newImageUrl);
         console.log('Old image URL:', oldImageUrl);
@@ -1086,14 +1201,14 @@ const TemplateEditorPage: React.FC = () => {
         localStorage.setItem(`post_${postId}_update_timestamp`, timestamp.toString());
         
         // If the response includes a thumbnail, show it in a notification
-        if (response.data.thumbnail) {
+        if (responseData.thumbnail) {
           notification.success({
             message: t('save_to_post_success'),
             description: (
               <div>
                 <p>{t('image_preview')}</p>
                 <img 
-                  src={response.data.thumbnail} 
+                  src={responseData.thumbnail} 
                   alt="Preview" 
                   style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '10px' }} 
                 />
@@ -1118,7 +1233,7 @@ const TemplateEditorPage: React.FC = () => {
           }
         }, 1000); // Add a longer delay to ensure the notification is shown
       } else {
-        throw new Error(response.data.message || 'Failed to update post image');
+        throw new Error(responseData.message || 'Failed to update post image');
       }
     } catch (error: any) {
       console.error('Error saving image to post:', error);

@@ -1161,6 +1161,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                   height={canvasHeight}
                   image={backgroundImage}
                   listening={false} // Make it non-interactive
+                  name="background-image"
                 />
               ) : (
                 <>
