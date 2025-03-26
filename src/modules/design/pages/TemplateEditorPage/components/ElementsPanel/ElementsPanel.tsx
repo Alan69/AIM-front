@@ -1,37 +1,136 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { Fragment } from 'react';
 import { Tabs, List, Button, Card, Upload, message, Spin, Empty } from 'antd';
-import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, FileImageOutlined } from '@ant-design/icons';
+import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, FileImageOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { ElementType, Template, DesignElement, UserAsset } from '../../../../types';
-import { getUserAssets, createUserAsset } from '../../../../services/designService';
+import { getUserAssets, createUserAsset, updateElementInTemplate } from '../../../../services/designService';
 import './ElementsPanel.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
+import type { FC } from 'react';
 
 const { TabPane } = Tabs;
 const { Dragger } = Upload;
 
 interface ElementsPanelProps {
   onAddElement: (elementType: ElementType, data?: any) => void;
-  template?: Template; // Add template prop to access all elements
-  selectedElement?: DesignElement | null; // Add selected element prop
-  onSelectElement?: (element: DesignElement | null) => void; // Add select element handler
+  template?: Template;
+  selectedElement?: DesignElement | null;
+  onSelectElement?: (element: DesignElement | null) => void;
+  onElementsOrderChange?: () => void;
 }
+
+const ElementItem = React.memo(({
+  element,
+  index,
+  totalElements,
+  isElementSelected,
+  handleSelectElement,
+  getElementIcon,
+  getElementName,
+  onMoveElement
+}: {
+  element: DesignElement & { elementType: string };
+  index: number;
+  totalElements: number;
+  isElementSelected: (element: DesignElement) => boolean;
+  handleSelectElement: (element: DesignElement) => void;
+  getElementIcon: (element: DesignElement & { elementType: string }) => React.ReactNode;
+  getElementName: (element: DesignElement & { elementType: string }) => string;
+  onMoveElement: (oldIndex: number, newIndex: number) => void;
+}) => (
+  <div
+    className={`element-list-item ${isElementSelected(element) ? 'selected' : ''}`}
+    onClick={() => handleSelectElement(element)}
+  >
+    <div className="element-list-icon">
+      {getElementIcon(element)}
+    </div>
+    <div className="element-list-name">
+      {getElementName(element)}
+    </div>
+    <div className="element-list-z-index">
+      {element.zIndex !== undefined ? `z: ${element.zIndex}` : ''}
+    </div>
+    <div className="element-list-actions">
+      {index > 0 && (
+        <Button
+          type="text"
+          icon={<ArrowUpOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMoveElement(index, index - 1);
+          }}
+        />
+      )}
+      {index < totalElements - 1 && (
+        <Button
+          type="text"
+          icon={<ArrowDownOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMoveElement(index, index + 1);
+          }}
+        />
+      )}
+    </div>
+  </div>
+));
+
+ElementItem.displayName = 'ElementItem';
+
+const ElementsList = React.memo(({
+  elements,
+  onMoveElement,
+  isElementSelected,
+  handleSelectElement,
+  getElementIcon,
+  getElementName
+}: {
+  elements: Array<DesignElement & { elementType: string }>;
+  onMoveElement: (oldIndex: number, newIndex: number) => void;
+  isElementSelected: (element: DesignElement) => boolean;
+  handleSelectElement: (element: DesignElement) => void;
+  getElementIcon: (element: DesignElement & { elementType: string }) => React.ReactNode;
+  getElementName: (element: DesignElement & { elementType: string }) => string;
+}) => {
+  return (
+    <div className="elements-list">
+      {elements.map((element, index) => (
+        <ElementItem
+          key={element.uuid}
+          element={element}
+          index={index}
+          totalElements={elements.length}
+          isElementSelected={isElementSelected}
+          handleSelectElement={handleSelectElement}
+          getElementIcon={getElementIcon}
+          getElementName={getElementName}
+          onMoveElement={onMoveElement}
+        />
+      ))}
+    </div>
+  );
+});
+
+ElementsList.displayName = 'ElementsList';
 
 const ElementsPanel: React.FC<ElementsPanelProps> = ({ 
   onAddElement,
   template,
   selectedElement,
-  onSelectElement
+  onSelectElement,
+  onElementsOrderChange
 }) => {
-  const [userAssets, setUserAssets] = useState<UserAsset[]>([]);
-  const [loadingAssets, setLoadingAssets] = useState(false);
+  const [userAssets, setUserAssets] = React.useState<UserAsset[]>([]);
+  const [loadingAssets, setLoadingAssets] = React.useState(false);
   
   // Get user from Redux store
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.profile?.user?.id;
 
   // Add user ID to window for easier access by services
-  useEffect(() => {
+  React.useEffect(() => {
     if (userId && typeof window !== 'undefined') {
       // Store userId in window for services to access
       (window as any).__USER_ID__ = userId;
@@ -48,7 +147,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   }, [userId, user]);
 
   // Load user assets on component mount
-  useEffect(() => {
+  React.useEffect(() => {
     loadUserAssets();
   }, [userId]); // Reload when userId changes
 
@@ -247,6 +346,37 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     return selectedElement?.uuid === element.uuid;
   };
 
+  // Update handleMoveElement to work with react-beautiful-dnd
+  const handleMoveElement = async (oldIndex: number, newIndex: number) => {
+    if (!template) return;
+
+    const elements = getAllElements();
+    const newElements = [...elements];
+    const [movedItem] = newElements.splice(oldIndex, 1);
+    newElements.splice(newIndex, 0, movedItem);
+
+    // Update z-index for all elements
+    const updates = newElements.map((item, index) => {
+      const newZIndex = newElements.length - index; // Higher z-index for items at the top
+      return updateElementInTemplate(
+        template.uuid,
+        item.uuid,
+        item.elementType as 'image' | 'text' | 'shape',
+        { zIndex: newZIndex }
+      );
+    });
+
+    try {
+      await Promise.all(updates);
+      message.success('Element order updated');
+      // Notify parent component about the order change
+      onElementsOrderChange?.();
+    } catch (error) {
+      console.error('Error updating element order:', error);
+      message.error('Failed to update element order');
+    }
+  };
+
   return (
     <div className="elements-panel">
       <Tabs defaultActiveKey="images" tabPosition="top" className="elements-tabs">
@@ -375,28 +505,13 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
           <UnorderedListOutlined /> Elements
         </div>
         {template && (
-          <List
-            className="elements-list"
-            size="small"
-            dataSource={getAllElements()}
-            renderItem={element => (
-              <List.Item 
-                key={element.uuid}
-                className={`element-list-item ${isElementSelected(element) ? 'selected' : ''}`}
-                onClick={() => handleSelectElement(element)}
-              >
-                <div className="element-list-icon">
-                  {getElementIcon(element)}
-                </div>
-                <div className="element-list-name">
-                  {getElementName(element)}
-                </div>
-                <div className="element-list-z-index">
-                  {element.zIndex !== undefined ? `z: ${element.zIndex}` : ''}
-                </div>
-              </List.Item>
-            )}
-            locale={{ emptyText: 'No elements added yet' }}
+          <ElementsList
+            elements={getAllElements()}
+            onMoveElement={handleMoveElement}
+            isElementSelected={isElementSelected}
+            handleSelectElement={handleSelectElement}
+            getElementIcon={getElementIcon}
+            getElementName={getElementName}
           />
         )}
       </div>

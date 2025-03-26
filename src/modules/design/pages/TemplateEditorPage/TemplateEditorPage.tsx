@@ -1265,6 +1265,23 @@ const TemplateEditorPage: React.FC = () => {
     }
   };
 
+  // Add this function to handle element order changes
+  const handleElementsOrderChange = useCallback(() => {
+    if (!template || !uuid) return;
+    
+    // Fetch the latest template data to refresh the canvas
+    fetchTemplateWithElements(uuid)
+      .then((updatedTemplate) => {
+        if (updatedTemplate) {
+          setTemplate(updatedTemplate);
+        }
+      })
+      .catch((error) => {
+        console.error('Error refreshing template:', error);
+        message.error('Failed to refresh the canvas');
+      });
+  }, [template, uuid]);
+
   if (loading) {
     return (
       <div className="editor-loading">
@@ -1394,6 +1411,7 @@ const TemplateEditorPage: React.FC = () => {
             template={template}
             selectedElement={selectedElement}
             onSelectElement={handleSelectElement}
+            onElementsOrderChange={handleElementsOrderChange}
           />
         </Sider>
         
