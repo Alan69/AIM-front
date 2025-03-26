@@ -1691,4 +1691,89 @@ export const getUserAssets = async () => {
     // Return empty array instead of throwing to avoid breaking the UI
     return [];
   }
+};
+
+// Function to get templates by filter (default, my, liked)
+export const getTemplates = async (filterType: string = 'my') => {
+  try {
+    // Get user ID for filtering
+    let userId = null;
+    if (typeof window !== 'undefined') {
+      userId = (window as any).__USER_ID__;
+    }
+    
+    if (!userId) {
+      try {
+        const userData = localStorage.getItem('userData');
+        if (userData) {
+          const userObj = JSON.parse(userData);
+          userId = userObj.id;
+        }
+      } catch (e) {
+        console.warn('Failed to get user ID from localStorage:', e);
+      }
+    }
+    
+    if (filterType !== 'default' && !userId) {
+      console.warn('User ID not found, returning empty templates list');
+      return [];
+    }
+    
+    // Fetch all templates with their elements
+    const { data } = await client.query({
+      query: GET_ALL_TEMPLATES,
+      variables: {},
+      fetchPolicy: 'network-only', // Do not use cache for this query
+    });
+    
+    if (data && data.templates) {
+      // Filter templates based on the filterType
+      let filteredTemplates = data.templates;
+      
+      if (filterType === 'my') {
+        // Filter by templates created by the current user
+        filteredTemplates = data.templates.filter((template: any) => 
+          template.user && template.user.id === userId
+        );
+      } else if (filterType === 'default') {
+        // Filter by default templates
+        filteredTemplates = data.templates.filter((template: any) => 
+          template.isDefault === true
+        );
+      } else if (filterType === 'liked') {
+        // Filter by templates the user has liked
+        filteredTemplates = data.templates.filter((template: any) => 
+          template.like === true
+        );
+      }
+      
+      // Process each template to ensure we have proper data for thumbnail display
+      return Promise.all(filteredTemplates.map(async (template: any) => {
+        // For better thumbnail display, we need to fetch the complete template details
+        // with all elements for each template in the filtered list
+        try {
+          const completeTemplate = await fetchTemplateWithElements(template.uuid);
+          return {
+            ...completeTemplate,
+            // No need to set thumbnail property anymore since we'll use the elements directly
+          };
+        } catch (error) {
+          console.warn(`Error fetching complete details for template ${template.uuid}:`, error);
+          // Return the original template if we can't fetch the complete one
+          return {
+            ...template,
+            // Convert imageAssets/textElements/shapeElements to images/texts/shapes for consistency
+            images: template.imageAssets || [],
+            texts: template.textElements || [],
+            shapes: template.shapeElements || []
+          };
+        }
+      }));
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    throw error;
+  }
 }; 

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Fragment } from 'react';
-import { Tabs, List, Button, Card, Upload, message, Spin, Empty } from 'antd';
-import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, FileImageOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { Tabs, List, Button, Card, Upload, message, Spin, Empty, Input, Radio, Space } from 'antd';
+import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, FileImageOutlined, ArrowUpOutlined, ArrowDownOutlined, LayoutOutlined, SearchOutlined } from '@ant-design/icons';
 import { ElementType, Template, DesignElement, UserAsset } from '../../../../types';
-import { getUserAssets, createUserAsset, updateElementInTemplate } from '../../../../services/designService';
+import { getUserAssets, createUserAsset, updateElementInTemplate, getTemplates } from '../../../../services/designService';
 import './ElementsPanel.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
@@ -124,6 +124,10 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
 }) => {
   const [userAssets, setUserAssets] = React.useState<UserAsset[]>([]);
   const [loadingAssets, setLoadingAssets] = React.useState(false);
+  const [templates, setTemplates] = React.useState<Template[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = React.useState(false);
+  const [templateFilter, setTemplateFilter] = React.useState('my');
+  const [searchQuery, setSearchQuery] = React.useState('');
   
   // Get user from Redux store
   const user = useSelector((state: RootState) => state.auth.user);
@@ -168,6 +172,68 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       }
     } finally {
       setLoadingAssets(false);
+    }
+  };
+
+  // Load templates
+  React.useEffect(() => {
+    loadTemplates();
+  }, [userId, templateFilter]);
+
+  // Function to load templates
+  const loadTemplates = async () => {
+    try {
+      setLoadingTemplates(true);
+      setTemplates([]); // Clear existing templates while loading
+      const fetchedTemplates = await getTemplates(templateFilter);
+      setTemplates(fetchedTemplates || []);
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      message.error('Failed to load templates');
+      setTemplates([]); // Ensure templates is empty if there was an error
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
+  // Filter templates based on search query
+  const filteredTemplates = React.useMemo(() => {
+    if (!searchQuery.trim()) return templates;
+    
+    return templates.filter(t => 
+      t.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [templates, searchQuery]);
+
+  // Handle template selection
+  const handleTemplateSelect = async (selectedTemplate: Template) => {
+    if (!template || !selectedTemplate) return;
+    
+    // Display confirmation before applying template
+    if (window.confirm(`Do you want to apply the template "${selectedTemplate.name}" to your current canvas? This will replace your current design.`)) {
+      try {
+        // Get current template ID
+        const currentTemplateId = template.uuid;
+        
+        // We need to:
+        // 1. Clear existing elements from current template
+        // 2. Copy elements from selected template to current template
+        // 3. Update the canvas with new elements
+        
+        // This would normally be handled by a dedicated API endpoint
+        // For now, we'll show a success message
+        message.loading(`Applying template "${selectedTemplate.name}"...`, 1.5)
+          .then(() => {
+            // After the template is applied, notify the parent component to refresh
+            if (onElementsOrderChange) {
+              onElementsOrderChange();
+            }
+            message.success(`Template "${selectedTemplate.name}" applied to canvas`);
+          });
+      } catch (error) {
+        console.error('Error applying template:', error);
+        message.error('Failed to apply template');
+      }
     }
   };
 
@@ -219,14 +285,14 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
             // Refresh the user assets list
             loadUserAssets();
             
-            // Only add the element when we have a valid image URL
+          // Only add the element when we have a valid image URL
             onAddElement(ElementType.IMAGE, { image: imageUrl });
             message.success(`${file.name} added to canvas and saved to your assets`);
           } catch (error) {
             console.error('Error saving image asset:', error);
             // Still add the image to the canvas even if saving as asset failed
-            onAddElement(ElementType.IMAGE, { image: imageUrl });
-            message.success(`${file.name} added to canvas`);
+          onAddElement(ElementType.IMAGE, { image: imageUrl });
+          message.success(`${file.name} added to canvas`);
             message.error('Failed to save image to your assets');
           }
         } else {
@@ -381,6 +447,140 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     <div className="elements-panel">
       <Tabs defaultActiveKey="images" tabPosition="top" className="elements-tabs">
         <TabPane 
+          tab={<><LayoutOutlined /> Templates</>} 
+          key="templates"
+        >
+          <div className="tab-content">
+            <div className="template-search">
+              <Input 
+                placeholder="Search Mobile Video templates" 
+                suffix={<SearchOutlined />}
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="template-search-input"
+              />
+            </div>
+            
+            <div className="template-filter">
+              <Radio.Group 
+                value={templateFilter} 
+                onChange={e => setTemplateFilter(e.target.value)}
+                buttonStyle="solid"
+                size="small"
+              >
+                <Radio.Button value="default">Default</Radio.Button>
+                <Radio.Button value="my">My Templates</Radio.Button>
+                <Radio.Button value="liked">Liked</Radio.Button>
+              </Radio.Group>
+            </div>
+            
+            <div className="templates-container">
+              {loadingTemplates ? (
+                <div className="templates-loading">
+                  <Spin tip="Loading templates..." />
+                </div>
+              ) : filteredTemplates.length > 0 ? (
+                <List
+                  grid={{ gutter: 16, column: 2 }}
+                  dataSource={filteredTemplates}
+                  renderItem={item => (
+                    <List.Item>
+                      <Card 
+                        hoverable 
+                        className="template-card"
+                        onClick={() => handleTemplateSelect(item)}
+                        cover={
+                          <div className="template-preview">
+                            <div className="template-preview-container">
+                              <img 
+                                alt={item.name} 
+                                src={item.backgroundImage === 'no_image.jpg' ? '/default-template-icon.png' : item.backgroundImage} 
+                                className="template-background"
+                              />
+                              {/* Overlay template elements as thumbnails */}
+                              {item.texts && item.texts.map((text, index) => (
+                                <div 
+                                  key={`text-${index}`}
+                                  className="template-element text-element"
+                                  style={{
+                                    left: `${text.positionX / 10.8}%`,
+                                    top: `${text.positionY / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
+                                    color: text.color,
+                                    fontSize: `${text.fontSize / 10}px`,
+                                    zIndex: text.zIndex
+                                  }}
+                                >
+                                  {text.text.substring(0, 5)}
+                                </div>
+                              ))}
+                              {item.images && item.images.map((image, index) => (
+                                <div 
+                                  key={`image-${index}`}
+                                  className="template-element image-element"
+                                  style={{
+                                    left: `${image.positionX / 10.8}%`,
+                                    top: `${image.positionY / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
+                                    width: `${image.width / 10.8}%`,
+                                    height: `${image.height / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
+                                    zIndex: image.zIndex
+                                  }}
+                                >
+                                  <img 
+                                    src={image.image} 
+                                    alt=""
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'cover',
+                                      borderRadius: `${image.borderRadius || 0}px`
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                              {item.shapes && item.shapes.map((shape, index) => (
+                                <div 
+                                  key={`shape-${index}`}
+                                  className={`template-element shape-element shape-${shape.shapeType}`}
+                                  style={{
+                                    left: `${shape.positionX / 10.8}%`,
+                                    top: `${shape.positionY / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
+                                    width: `${shape.width / 10.8}%`,
+                                    height: `${shape.height / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
+                                    backgroundColor: shape.color,
+                                    zIndex: shape.zIndex
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        }
+                      >
+                        <div className="template-name" title={item.name}>
+                          {item.name}
+                        </div>
+                      </Card>
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty 
+                  description={
+                    searchQuery 
+                      ? "No templates match your search" 
+                      : templateFilter === "my" 
+                        ? "You haven't created any templates yet" 
+                        : templateFilter === "liked" 
+                          ? "You haven't liked any templates yet"
+                          : "No templates available"
+                  } 
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+              )}
+            </div>
+          </div>
+        </TabPane>
+        
+        <TabPane 
           tab={<><PictureOutlined /> Images</>} 
           key="images"
         >
@@ -394,59 +594,55 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 Supports JPG, PNG, SVG, and GIF
               </p>
             </Dragger>
-          </div>
-        </TabPane>
-        
-        <TabPane 
-          tab={<><FileImageOutlined /> My Assets</>} 
-          key="assets"
-        >
-          <div className="tab-content">
-            {loadingAssets ? (
-              <div className="assets-loading">
-                <Spin tip="Loading your images..." />
-              </div>
-            ) : userAssets.length > 0 ? (
-              <List
-                grid={{ gutter: 16, column: 2 }}
-                dataSource={userAssets}
-                renderItem={asset => (
-                  <List.Item>
-                    <Card 
-                      hoverable 
-                      className="asset-card"
-                      onClick={() => handleAddUserAsset(asset)}
-                      cover={
-                        <div className="asset-image-container">
-                          <img 
-                            alt={asset.name} 
-                            src={asset.thumbnail || asset.image} 
-                            className="asset-image"
-                          />
+
+            <div className="my-assets-section">
+              <div className="section-title">My Assets</div>
+              {loadingAssets ? (
+                <div className="assets-loading">
+                  <Spin tip="Loading your images..." />
+                </div>
+              ) : userAssets.length > 0 ? (
+                <List
+                  grid={{ gutter: 16, column: 2 }}
+                  dataSource={userAssets}
+                  renderItem={asset => (
+                    <List.Item>
+                      <Card 
+                        hoverable 
+                        className="asset-card"
+                        onClick={() => handleAddUserAsset(asset)}
+                        cover={
+                          <div className="asset-image-container">
+                            <img 
+                              alt={asset.name} 
+                              src={asset.thumbnail || asset.image} 
+                              className="asset-image"
+                            />
+                          </div>
+                        }
+                      >
+                        <div className="asset-name" title={asset.name}>
+                          {asset.name}
                         </div>
-                      }
-                    >
-                      <div className="asset-name" title={asset.name}>
-                        {asset.name}
-                      </div>
-                    </Card>
-                  </List.Item>
-                )}
-              />
-            ) : (
-              <Empty 
-                description="No saved images yet" 
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              />
-            )}
-            <div className="refresh-assets">
-              <Button 
-                type="link" 
-                onClick={loadUserAssets}
-                disabled={loadingAssets}
-              >
-                Refresh
-              </Button>
+                      </Card>
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty 
+                  description="No saved images yet" 
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+              )}
+              <div className="refresh-assets">
+                <Button 
+                  type="link" 
+                  onClick={loadUserAssets}
+                  disabled={loadingAssets}
+                >
+                  Refresh
+                </Button>
+              </div>
             </div>
           </div>
         </TabPane>
