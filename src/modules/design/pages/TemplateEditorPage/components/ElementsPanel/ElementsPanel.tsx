@@ -196,14 +196,29 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     }
   };
 
-  // Filter templates based on search query
+  // Filter templates based on search query, size, and exclude current template
   const filteredTemplates = React.useMemo(() => {
-    if (!searchQuery.trim()) return templates;
+    let filtered = templates;
     
-    return templates.filter(t => 
-      t.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [templates, searchQuery]);
+    // Filter out templates with different sizes than the current template
+    if (template?.size) {
+      filtered = filtered.filter(t => t.size === template.size);
+    }
+    
+    // Filter out the current template
+    if (template?.uuid) {
+      filtered = filtered.filter(t => t.uuid !== template.uuid);
+    }
+    
+    // Apply search query filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(t => 
+        t.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  }, [templates, searchQuery, template?.uuid, template?.size]);
 
   // Handle template selection
   const handleTemplateSelect = async (selectedTemplate: Template) => {
@@ -586,7 +601,9 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                         ? "You haven't created any templates yet" 
                         : templateFilter === "liked" 
                           ? "You haven't liked any templates yet"
-                          : "No templates available"
+                          : template?.size
+                            ? `No templates available with size ${template.size}`
+                            : "No templates available"
                   } 
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
