@@ -209,30 +209,45 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   const handleTemplateSelect = async (selectedTemplate: Template) => {
     if (!template || !selectedTemplate) return;
     
-    // Display confirmation before applying template
-    if (window.confirm(`Do you want to apply the template "${selectedTemplate.name}" to your current canvas? This will replace your current design.`)) {
+    // Display confirmation before applying template elements
+    if (window.confirm(`Do you want to add elements from template "${selectedTemplate.name}" to your current canvas?`)) {
       try {
-        // Get current template ID
-        const currentTemplateId = template.uuid;
-        
-        // We need to:
-        // 1. Clear existing elements from current template
-        // 2. Copy elements from selected template to current template
-        // 3. Update the canvas with new elements
-        
-        // This would normally be handled by a dedicated API endpoint
-        // For now, we'll show a success message
-        message.loading(`Applying template "${selectedTemplate.name}"...`, 1.5)
-          .then(() => {
-            // After the template is applied, notify the parent component to refresh
-            if (onElementsOrderChange) {
-              onElementsOrderChange();
-            }
-            message.success(`Template "${selectedTemplate.name}" applied to canvas`);
-          });
+        message.loading(`Adding elements from "${selectedTemplate.name}"...`, 1.5);
+
+        // Add text elements
+        if (selectedTemplate.texts) {
+          for (const text of selectedTemplate.texts) {
+            onAddElement(ElementType.TEXT, {
+              ...text,
+              uuid: undefined // Let the server generate a new UUID
+            });
+          }
+        }
+
+        // Add image elements
+        if (selectedTemplate.images) {
+          for (const image of selectedTemplate.images) {
+            onAddElement(ElementType.IMAGE, {
+              ...image,
+              uuid: undefined // Let the server generate a new UUID
+            });
+          }
+        }
+
+        // Add shape elements
+        if (selectedTemplate.shapes) {
+          for (const shape of selectedTemplate.shapes) {
+            onAddElement(ElementType.SHAPE, {
+              ...shape,
+              uuid: undefined // Let the server generate a new UUID
+            });
+          }
+        }
+
+        message.success(`Elements from "${selectedTemplate.name}" added to canvas`);
       } catch (error) {
-        console.error('Error applying template:', error);
-        message.error('Failed to apply template');
+        console.error('Error adding template elements:', error);
+        message.error('Failed to add template elements');
       }
     }
   };
