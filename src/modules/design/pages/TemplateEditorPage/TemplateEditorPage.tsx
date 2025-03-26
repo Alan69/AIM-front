@@ -1201,22 +1201,22 @@ const TemplateEditorPage: React.FC = () => {
         localStorage.setItem(`post_${postId}_update_timestamp`, timestamp.toString());
         
         // If the response includes a thumbnail, show it in a notification
-        if (responseData.thumbnail) {
-          notification.success({
-            message: t('save_to_post_success'),
-            description: (
-              <div>
-                <p>{t('image_preview')}</p>
-                <img 
-                  src={responseData.thumbnail} 
-                  alt="Preview" 
-                  style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '10px' }} 
-                />
-              </div>
-            ),
-            duration: 5,
-          });
-        }
+        // if (responseData.thumbnail) {
+        //   notification.success({
+        //     message: t('save_to_post_success'),
+        //     description: (
+        //       <div>
+        //         <p>{t('image_preview')}</p>
+        //         <img 
+        //           src={responseData.thumbnail} 
+        //           alt="Preview" 
+        //           style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '10px' }} 
+        //         />
+        //       </div>
+        //     ),
+        //     duration: 5,
+        //   });
+        // }
         
         // Navigate back to the post details page with the correct URL format
         setTimeout(() => {
