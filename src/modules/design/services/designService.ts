@@ -721,55 +721,156 @@ export const fetchTemplateWithElements = async (uuid: string) => {
 };
 
 // Function to create a template
-export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string) => {
-  console.log(`Creating template with name: ${name}, size: ${size}, backgroundImage: ${backgroundImage || 'none'}`);
-  
-  // If postId is provided, try to get the picture from the post to use as background
-  if (postId && (!backgroundImage || backgroundImage === 'no_image.jpg')) {
+export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string, mediaId?: string) => {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  console.log('Creating template with name:', name);
+  console.log('Background image:', backgroundImage);
+  console.log('Post ID:', postId);
+  console.log('Media ID:', mediaId);
+
+  // If mediaId is provided, check if a template already exists for this media
+  if (mediaId) {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/api/posts/${postId}/`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Cookies.get('token')}`
-        }
-      });
+      // Fetch the media details to check if it already has a template
+      const response = await fetch(`${API_URL}/api/post-media/${mediaId}/`);
+      const mediaData = await response.json();
       
+      console.log('Fetched media data:', mediaData);
+      
+      // If the media already has a template, return that template instead of creating a new one
+      if (mediaData.template) {
+        console.log('Media already has template:', mediaData.template);
+        
+        // Fetch existing template with its elements
+        const existingTemplate = await fetchTemplateWithElements(mediaData.template);
+        console.log('Using existing template:', existingTemplate);
+        
+        // If background image is specified, update the existing template with the new background
+        if (backgroundImage && existingTemplate.backgroundImage !== backgroundImage) {
+          console.log('Updating existing template background image');
+          await updateTemplate(mediaData.template, { backgroundImage });
+          existingTemplate.backgroundImage = backgroundImage;
+        }
+        
+        return existingTemplate;
+      }
+    } catch (error) {
+      console.error('Error checking for existing template:', error);
+      // Continue with creating a new template if there was an error
+    }
+  }
+
+  // If mediaId is provided, fetch the post media image to use as background
+  if (mediaId && !backgroundImage) {
+    try {
+      // Use the API endpoint to get the media
+      const response = await fetch(`${API_URL}/api/post-media/${mediaId}/`);
+      if (response.ok) {
+        const mediaData = await response.json();
+        console.log('Post media data received:', mediaData);
+        
+        if (mediaData.media) {
+          // Use the media URL exactly as returned by the server
+          backgroundImage = mediaData.media;
+          console.log('Using media image as background:', backgroundImage);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching post media:', error);
+    }
+  } else if (postId && !backgroundImage) {
+    // If postId is provided but no backgroundImage, fetch the post image
+    try {
+      const response = await fetch(`${API_URL}/api/posts/${postId}/`);
       if (response.ok) {
         const postData = await response.json();
-        if (postData.picture) {
-          console.log(`Using picture from post as background: ${postData.picture}`);
+        
+        if (postData.picture && postData.picture !== 'no_img.jpeg') {
           backgroundImage = postData.picture;
+          console.log('Using post image as background:', backgroundImage);
         }
       }
     } catch (error) {
       console.error('Error fetching post picture:', error);
     }
   }
-  
-  // If userId is not provided, try to get it from cookies
+
+  // Get the user's ID from cookies if not provided
   if (!userId) {
-    const userDataCookie = Cookies.get('userData');
-    if (userDataCookie) {
-      try {
-        const userData = JSON.parse(userDataCookie);
-        userId = userData.id;
-        console.log(`Using user ID from cookies: ${userId}`);
-      } catch (error) {
-        console.error('Error parsing user data from cookies:', error);
-        throw new Error('User ID is required but not provided and could not be retrieved from cookies');
+    try {
+      const cookies = document.cookie.split(';');
+      const userCookie = cookies.find(cookie => cookie.trim().startsWith('user='));
+      if (userCookie) {
+        const userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+        userId = userObj.id;
       }
-    } else {
-      throw new Error('User ID is required but not provided and user is not logged in');
+    } catch (error) {
+      console.error('Error getting user ID from cookies:', error);
     }
   }
-  
-  const { data } = await client.mutate({
-    mutation: CREATE_TEMPLATE,
-    variables: { name, size, userId, isDefault, backgroundImage },
-  });
-  return data.createTemplate.template;
-};
+
+  // If still no userId, throw an error as it's required
+  if (!userId) {
+    throw new Error('User ID is required to create a template');
+  }
+
+  try {
+    // Use the existing CREATE_TEMPLATE mutation
+    const { data } = await client.mutate({
+      mutation: CREATE_TEMPLATE,
+      variables: { 
+        name, 
+        size, 
+        userId, 
+        isDefault, 
+        backgroundImage 
+      },
+    });
+
+    const template = data.createTemplate.template;
+    console.log('Created template:', template);
+
+    // If created for a media item, update the media's template reference
+    if (mediaId && template) {
+      console.log('Updating media with new template:', template.uuid);
+      try {
+        const updateResponse = await fetch(`${API_URL}/api/post-media/${mediaId}/update-template/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ template_uuid: template.uuid }),
+        });
+        
+        if (!updateResponse.ok) {
+          console.error('Failed to update media with template reference');
+        } else {
+          console.log('Successfully updated media with template reference');
+        }
+      } catch (error) {
+        console.error('Error updating media with template reference:', error);
+      }
+    }
+
+    // For compatibility with the rest of the codebase
+    const formattedTemplate = {
+      uuid: template.uuid,
+      name: template.name,
+      size: template.size,
+      backgroundImage: template.backgroundImage,
+      isDefault: template.isDefault,
+      user: { id: userId },
+      images: [],  // Initialize with empty arrays
+      texts: [],
+      shapes: []
+    };
+
+    return formattedTemplate;
+  } catch (error) {
+    console.error('Error creating template:', error);
+    throw error;
+  }
+}
 
 // Function to add an image asset to template
 export const createImageAsset = async (

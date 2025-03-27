@@ -51,7 +51,9 @@ const TemplateEditorPage: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const sourceType = queryParams.get('source');
   const postId = queryParams.get('postId');
+  const mediaId = queryParams.get('mediaId');
   const isFromPost = sourceType === 'post' && postId;
+  const isFromPostMedia = sourceType === 'postMedia' && postId && mediaId;
   
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -984,7 +986,16 @@ const TemplateEditorPage: React.FC = () => {
 
   // Function to save the canvas as an image and update the post
   const handleSaveToPost = async () => {
-    if (!uuid || !isFromPost || !postId) return;
+    // Check if we're coming from a post or post media
+    const sourceType = queryParams.get('source');
+    const postId = queryParams.get('postId');
+    const mediaId = queryParams.get('mediaId');
+    
+    // Handle both cases: coming from post or from post media
+    const isFromPost = sourceType === 'post' && postId;
+    const isFromPostMedia = sourceType === 'postMedia' && postId && mediaId;
+    
+    if (!uuid || !(isFromPost || isFromPostMedia)) return;
     
     try {
       setIsSavingToPost(true);
@@ -998,52 +1009,88 @@ const TemplateEditorPage: React.FC = () => {
       console.log('Preparing to capture canvas and send to server...');
       console.log('Template UUID:', uuid);
       console.log('Post ID:', postId);
+      if (isFromPostMedia) {
+        console.log('Media ID:', mediaId);
+      }
       
-      // Skip updating the post with the template UUID if it's already set to this template
-      // This prevents creating a new template when saving to post
-      let shouldUpdatePostTemplate = true;
+      // Skip updating with the template UUID if it's already set to this template
+      let shouldUpdateTemplate = true;
       
       try {
-        // Check if the post already has this template
-        const postResponse = await fetch(`${baseURL}posts/${postId}/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          credentials: 'include',
-        });
-        
-        if (postResponse.ok) {
-          const postData = await postResponse.json();
-          if (postData.template === uuid) {
-            console.log(`Post ${postId} already has template ${uuid}, skipping update`);
-            shouldUpdatePostTemplate = false;
+        if (isFromPostMedia && mediaId) {
+          // Check if the media already has this template
+          const mediaResponse = await fetch(`${baseURL}post-media/${mediaId}/`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          });
+          
+          if (mediaResponse.ok) {
+            const mediaData = await mediaResponse.json();
+            if (mediaData.template === uuid) {
+              console.log(`Post media ${mediaId} already has template ${uuid}, skipping update`);
+              shouldUpdateTemplate = false;
+            }
+          }
+        } else if (isFromPost) {
+          // Check if the post already has this template
+          const postResponse = await fetch(`${baseURL}posts/${postId}/`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          });
+          
+          if (postResponse.ok) {
+            const postData = await postResponse.json();
+            if (postData.template === uuid) {
+              console.log(`Post ${postId} already has template ${uuid}, skipping update`);
+              shouldUpdateTemplate = false;
+            }
           }
         }
       } catch (error) {
-        console.error('Error checking post template:', error);
+        console.error('Error checking template:', error);
       }
       
-      // Only update the post with the template UUID if needed
-      if (shouldUpdatePostTemplate) {
+      // Only update the template UUID if needed
+      if (shouldUpdateTemplate) {
         try {
           const formData = new URLSearchParams();
           formData.append('template_uuid', uuid);
           
-          // Send the request to update the post with the template UUID
-          await fetch(`${baseURL}posts/${postId}/update-template/`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: formData,
-            credentials: 'include',
-          });
-          
-          console.log(`Post ${postId} updated with template ${uuid}`);
+          if (isFromPostMedia && mediaId) {
+            // Send the request to update the post media with the template UUID
+            await fetch(`${baseURL}post-media/${mediaId}/update-template/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: formData,
+              credentials: 'include',
+            });
+            
+            console.log(`Post media ${mediaId} updated with template ${uuid}`);
+          } else if (isFromPost) {
+            // Send the request to update the post with the template UUID
+            await fetch(`${baseURL}posts/${postId}/update-template/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: formData,
+              credentials: 'include',
+            });
+            
+            console.log(`Post ${postId} updated with template ${uuid}`);
+          }
         } catch (error) {
-          console.error('Error updating post with template UUID:', error);
+          console.error('Error updating template UUID:', error);
         }
       }
       
@@ -1158,6 +1205,16 @@ const TemplateEditorPage: React.FC = () => {
       const formData = new FormData();
       formData.append('template_uuid', uuid);
       formData.append('post_id', postId);
+      
+      if (isFromPostMedia && mediaId) {
+        // If coming from post media, update the existing media instead of creating a new one
+        formData.append('media_id', mediaId);
+        formData.append('operation', 'update_post_media');
+      } else {
+        // If coming from post directly, update the post image
+        formData.append('operation', 'update_post_image');
+      }
+      
       formData.append('image', blob, 'canvas_capture.png');
       
       // Send the form data to the server
@@ -1184,8 +1241,8 @@ const TemplateEditorPage: React.FC = () => {
         const postQueryId = queryParams.get('postQueryId');
         
         // Get the new image URL from the response
-        const newImageUrl = responseData.picture_url;
-        const oldImageUrl = responseData.old_picture_url;
+        const newImageUrl = responseData.picture_url || responseData.media_url;
+        const oldImageUrl = responseData.old_picture_url || responseData.old_media_url;
         
         console.log('New image URL:', newImageUrl);
         console.log('Old image URL:', oldImageUrl);
@@ -1199,24 +1256,6 @@ const TemplateEditorPage: React.FC = () => {
         localStorage.setItem(`post_${postId}_new_image_url`, newImageUrl);
         localStorage.setItem(`post_${postId}_old_image_url`, oldImageUrl || '');
         localStorage.setItem(`post_${postId}_update_timestamp`, timestamp.toString());
-        
-        // If the response includes a thumbnail, show it in a notification
-        // if (responseData.thumbnail) {
-        //   notification.success({
-        //     message: t('save_to_post_success'),
-        //     description: (
-        //       <div>
-        //         <p>{t('image_preview')}</p>
-        //         <img 
-        //           src={responseData.thumbnail} 
-        //           alt="Preview" 
-        //           style={{ maxWidth: '100%', maxHeight: '200px', marginTop: '10px' }} 
-        //         />
-        //       </div>
-        //     ),
-        //     duration: 5,
-        //   });
-        // }
         
         // Navigate back to the post details page with the correct URL format
         setTimeout(() => {
@@ -1505,7 +1544,8 @@ const TemplateEditorPage: React.FC = () => {
             Save
           </Button>
           
-          {isFromPost && (
+          {/* Show different save buttons based on source */}
+          {sourceType === 'post' && postId && (
             <Button 
               type="primary" 
               icon={<CloudUploadOutlined />} 
@@ -1514,6 +1554,18 @@ const TemplateEditorPage: React.FC = () => {
               className="header-button save-to-post-button"
             >
               Save to Post
+            </Button>
+          )}
+          
+          {sourceType === 'postMedia' && postId && mediaId && (
+            <Button 
+              type="primary" 
+              icon={<CloudUploadOutlined />} 
+              loading={isSavingToPost}
+              onClick={handleSaveToPost}
+              className="header-button save-to-post-button"
+            >
+              Save to Post Media
             </Button>
           )}
         </div>

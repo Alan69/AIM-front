@@ -83,6 +83,7 @@ export type TPostMediaData = {
   id: string;
   post: string;
   media: string;
+  template?: string;
 }
 
 export type TCreatePostImage = {

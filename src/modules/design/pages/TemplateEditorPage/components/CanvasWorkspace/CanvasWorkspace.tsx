@@ -114,54 +114,129 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             
             img.onerror = async (e) => {
               console.error('Error loading background image:', e);
+              console.log('Failed URL:', template.backgroundImage);
               
               // Try multiple URL formats
               const urlsToTry: string[] = [];
               
               // If the image fails to load, try to load it from different URL formats
-              if (template.backgroundImage) {
-                // Original URL
-                urlsToTry.push(template.backgroundImage);
+              if (template?.backgroundImage) {
+                // Extract original URL and add it first
+                const backgroundImage = template.backgroundImage;
                 
-                // Extract filename
-                const filename = template.backgroundImage.split('/').pop();
+                // Always try the original URL first
+                urlsToTry.push(backgroundImage);
                 
-                if (filename) {
-                  // Use environment-aware URLs
-                  const baseUrl = 'https://api.aimmagic.com'
+                // Extract filename and clean it up
+                let filename = backgroundImage.split('/').pop() || '';
+                if (!filename) {
+                  filename = backgroundImage;
+                }
+                
+                // Remove any query parameters
+                if (filename.includes('?')) {
+                  filename = filename.split('?')[0];
+                }
+                
+                console.log('Extracted filename:', filename);
+                
+                // Base URLs that will be used in our alternative URLs
+                const baseUrls = [
+                  'http://localhost:8000',
+                  'http://127.0.0.1:8000',
+                  process.env.REACT_APP_API_URL || 'http://localhost:8000'
+                ];
+                
+                // Extract useful path components
+                const userIdMatch = backgroundImage.match(/user_([a-zA-Z0-9-]+)/);
+                const userId = userIdMatch ? userIdMatch[1] : '';
+                const hasPostsImg = backgroundImage.includes('posts_img');
+                const hasPreviousPostsMedia = backgroundImage.includes('previous_posts_media');
+                
+                console.log('URL analysis:', {
+                  userId,
+                  hasPostsImg,
+                  hasPreviousPostsMedia
+                });
+                
+                // HIGHEST PRIORITY: Directly use the exact user/posts_img pattern (AI-generated image)
+                if (userId && hasPostsImg) {
+                  console.log('Detected AI-generated image pattern with userId:', userId);
                   
-                  // Try with media prefix
-                  urlsToTry.push(`${baseUrl}/media/${filename}`);
-                  
-                  // Try with direct media path
-                  if (template.backgroundImage.includes('/media/')) {
-                    const mediaPath = template.backgroundImage.split('/media/')[1];
+                  // Extract the full path after /media/
+                  let mediaPath = '';
+                  if (backgroundImage.includes('/media/')) {
+                    mediaPath = backgroundImage.split('/media/')[1];
+                    console.log('Extracted media path:', mediaPath);
+                    
+                    // Use the exact path structure from the original URL
                     if (mediaPath) {
-                      urlsToTry.push(`${baseUrl}/media/${mediaPath}`);
+                      baseUrls.forEach(baseUrl => {
+                        urlsToTry.push(`${baseUrl}/media/${mediaPath}`);
+                      });
                     }
                   }
                   
-                  // Try with relative path
-                  urlsToTry.push(`/media/${filename}`);
+                  // Also try the explicit format shown in the example
+                  baseUrls.forEach(baseUrl => {
+                    urlsToTry.push(`${baseUrl}/media/user_${userId}/posts_img/${filename}`);
+                  });
+                }
+                // SECOND PRIORITY: previous_posts_media pattern (manually uploaded image)
+                else if (hasPreviousPostsMedia) {
+                  console.log('Detected manually uploaded image pattern');
+                  baseUrls.forEach(baseUrl => {
+                    urlsToTry.push(`${baseUrl}/media/previous_posts_media/${filename}`);
+                  });
+                }
+                // FALLBACK: Try both patterns if we couldn't determine the type
+                else {
+                  console.log('No specific pattern detected, trying both formats');
+                  
+                  // Try user posts_img pattern (check if we have any userId hint)
+                  if (userId) {
+                    baseUrls.forEach(baseUrl => {
+                      urlsToTry.push(`${baseUrl}/media/user_${userId}/posts_img/${filename}`);
+                    });
+                  }
+                  
+                  // Try previous_posts_media pattern
+                  baseUrls.forEach(baseUrl => {
+                    urlsToTry.push(`${baseUrl}/media/previous_posts_media/${filename}`);
+                  });
+                  
+                  // Try just the filename as basic fallback
+                  baseUrls.forEach(baseUrl => {
+                    urlsToTry.push(`${baseUrl}/media/${filename}`);
+                  });
+                }
+                
+                // If we have a full path, try it directly
+                if (backgroundImage.includes('/media/')) {
+                  const mediaPath = backgroundImage.split('/media/')[1];
+                  if (mediaPath) {
+                    baseUrls.forEach(baseUrl => {
+                      urlsToTry.push(`${baseUrl}/media/${mediaPath}`);
+                    });
+                  }
                 }
               }
               
-              // For development fallbacks, you can still include:
-              // if (process.env.NODE_ENV !== 'production') {
-              //   urlsToTry.push(`http://127.0.0.1:8000/media/${filename}`);
-              // }
-              
-              console.log('Trying alternative URLs:', urlsToTry);
+              // Remove duplicates from urlsToTry and log them
+              const uniqueUrls = Array.from(new Set(urlsToTry));
+              console.log('Trying alternative URLs:', uniqueUrls);
               
               // Try each URL in sequence
-              for (let i = 1; i < urlsToTry.length; i++) {
+              for (let i = 0; i < uniqueUrls.length; i++) {
                 try {
+                  console.log(`Trying URL ${i+1}/${uniqueUrls.length}: ${uniqueUrls[i]}`);
+                  
                   const altImg = new window.Image();
                   altImg.crossOrigin = 'Anonymous';
                   
                   const success = await new Promise<boolean>((resolveAlt) => {
                     altImg.onload = () => {
-                      console.log(`Successfully loaded from alternative URL: ${urlsToTry[i]}`);
+                      console.log(`Successfully loaded from alternative URL: ${uniqueUrls[i]}`);
                       setBackgroundImage(altImg);
                       backgroundImageRef.current = altImg;
                       if (template.backgroundImage) {
@@ -171,11 +246,11 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                     };
                     
                     altImg.onerror = () => {
-                      console.log(`Failed to load from alternative URL: ${urlsToTry[i]}`);
+                      console.log(`Failed to load from alternative URL: ${uniqueUrls[i]}`);
                       resolveAlt(false);
                     };
                     
-                    altImg.src = urlsToTry[i];
+                    altImg.src = uniqueUrls[i];
                   });
                   
                   if (success) {
@@ -183,7 +258,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                     return;
                   }
                 } catch (altError) {
-                  console.error(`Error trying alternative URL ${urlsToTry[i]}:`, altError);
+                  console.error(`Error trying alternative URL ${uniqueUrls[i]}:`, altError);
                 }
               }
               

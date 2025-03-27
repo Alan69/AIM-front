@@ -7,6 +7,7 @@ import {
   usePostNowMutation,
   useRecreatePostImageMutation,
   useRecreatePostTextMutation,
+  TPostMediaData,
   useUpdatePostMutation,
 } from "../../redux/api";
 import {
@@ -64,7 +65,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
 import { postActions } from "../../redux/slices/post.slice";
 import { WebSocketService } from "services/websocket";
-import { createTemplate, createImageAsset } from "../../../design/services/designService";
+import { createTemplate, createImageAsset, copyTemplate } from "../../../design/services/designService";
 const baseApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const { Content } = Layout;
@@ -332,68 +333,84 @@ export const PostDetailsPage = () => {
     }
   };
 
-  const handleOpenInDesigner = async () => {
+  const handleOpenInDesigner = async (mediaItem: TPostMediaData) => {
     try {
       // Add more detailed logging
       console.log("Full post data:", post);
-      console.log("Post template value:", post?.template, typeof post?.template);
+      console.log("Selected media item:", mediaItem);
+      console.log("Media template value:", mediaItem?.template, typeof mediaItem?.template);
       
-      // Try to fetch the post directly to see what the API returns
+      // Try to fetch the post media directly to see what the API returns
+      let mediaData;
       try {
-        const response = await fetch(`${baseApiUrl}/posts/${post?.id}/`, {
+        const response = await fetch(`${baseApiUrl}/post-media/${mediaItem.id}/`, {
           method: 'GET',
           credentials: 'include',
         });
-        const postData = await response.json();
-        console.log("Post data from API:", postData);
-        console.log("Template from API:", postData.template);
+        mediaData = await response.json();
+        console.log("Media data from API:", mediaData);
+        console.log("Template from API:", mediaData.template);
       } catch (error) {
-        console.error("Error fetching post data:", error);
+        console.error("Error fetching media data:", error);
       }
       
       let templateUuid;
       
-      // Check if the post already has a template - use more robust checking
-      if (post?.template && post.template !== "null" && post.template !== null && post.template !== "undefined") {
-        // Use the existing template
-        templateUuid = post.template;
-        console.log(`Using existing template ${templateUuid} for post ${post.id}`);
+      // Check if the media already has a template - use more robust checking
+      if (mediaData?.template && 
+          mediaData.template !== "null" && 
+          mediaData.template !== "undefined" && 
+          mediaData.template !== null) {
+        
+        console.log(`Using existing template ${mediaData.template} for media ${mediaItem.id}`);
+        templateUuid = mediaData.template;
+        
+        // Navigate directly to the existing template
+        let url = `/design/editor/${templateUuid}?source=postMedia&postId=${post?.id}&mediaId=${mediaItem.id}`;
+        
+        // If we have a postQueryId, add it to the URL
+        if (postQueryId) {
+          url += `&postQueryId=${postQueryId}`;
+        }
+        
+        navigate(url);
+        return; // Exit early since we're using the existing template
       } else {
-        // Create a new template with the post image
-        const templateName = `Edit from Post ${post?.id || ''}`;
+        // Create a new template with the media image
+        const templateName = `Edit from Post ${post?.id || ''} Media ${mediaItem.id}`;
         const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
         
-        // Get the post image URL
-        let postImageUrl = post?.picture || '';
-        console.log(`Original post image URL: ${postImageUrl}`);
+        // Get the media image URL
+        let mediaImageUrl = mediaItem?.media || '';
+        console.log(`Original media image URL: ${mediaImageUrl}`);
         
         // Make sure we have the full URL path
-        if (postImageUrl && !postImageUrl.startsWith('http')) {
+        if (mediaImageUrl && !mediaImageUrl.startsWith('http')) {
           // If it's a relative URL, convert to absolute
           const baseUrl = process.env.REACT_APP_API_URL || '';
           const apiUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
           
           // If it starts with /media, append it to the API URL
-          if (postImageUrl.startsWith('/media/')) {
-            postImageUrl = `${apiUrl}${postImageUrl}`;
+          if (mediaImageUrl.startsWith('/media/')) {
+            mediaImageUrl = `${apiUrl}${mediaImageUrl}`;
           } else {
             // Otherwise, assume it needs /media/ prefix
-            postImageUrl = `${apiUrl}/media/${postImageUrl}`;
+            mediaImageUrl = `${apiUrl}/media/${mediaImageUrl}`;
           }
-          console.log(`Converted to absolute URL: ${postImageUrl}`);
+          console.log(`Converted to absolute URL: ${mediaImageUrl}`);
         }
         
         // Ensure the URL is accessible by checking if it's a valid URL
         try {
-          new URL(postImageUrl);
+          new URL(mediaImageUrl);
         } catch (e) {
-          console.error('Invalid URL:', postImageUrl);
+          console.error('Invalid URL:', mediaImageUrl);
           // Try to fix the URL
-          if (postImageUrl) {
-            const filename = postImageUrl.split('/').pop();
+          if (mediaImageUrl) {
+            const filename = mediaImageUrl.split('/').pop();
             if (filename) {
-              postImageUrl = `http://localhost:8000/media/${filename}`;
-              console.log(`Fixed URL: ${postImageUrl}`);
+              mediaImageUrl = `http://localhost:8000/media/${filename}`;
+              console.log(`Fixed URL: ${mediaImageUrl}`);
             }
           }
         }
@@ -402,25 +419,26 @@ export const PostDetailsPage = () => {
         const userId = user?.profile?.user?.id;
         console.log(`Creating template with user ID: ${userId}`);
         
-        // Create a new template with the post image as background
+        // Create a new template with the media image as background
         const newTemplate = await createTemplate(
           templateName, 
           templateSize, 
-          postImageUrl, // Use the actual image URL directly
+          mediaImageUrl,
           userId,
           false, // isDefault
-          post?.id // Pass the post ID to fetch the post image if needed
+          post?.id, // Pass the post ID to fetch the post image if needed
+          mediaItem.id // Add the mediaId parameter
         );
         
-        if (newTemplate && post?.id) {
-          // Update the post with the template UUID
+        if (newTemplate && mediaItem.id) {
+          // Update the media with the template UUID
           try {
             // Create form data for the request
             const formData = new URLSearchParams();
             formData.append('template_uuid', newTemplate.uuid);
             
-            // Send the request to update the post with the template UUID
-            await fetch(`${baseApiUrl}/posts/${post.id}/update-template/`, {
+            // Send the request to update the post media with the template UUID
+            await fetch(`${baseApiUrl}/post-media/${mediaItem.id}/update-template/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -429,9 +447,9 @@ export const PostDetailsPage = () => {
               credentials: 'include',
             });
             
-            console.log(`Post ${post.id} updated with template ${newTemplate.uuid}`);
+            console.log(`Post media ${mediaItem.id} updated with template ${newTemplate.uuid}`);
           } catch (error) {
-            console.error('Error updating post with template UUID:', error);
+            console.error('Error updating post media with template UUID:', error);
           }
           
           templateUuid = newTemplate.uuid;
@@ -440,8 +458,8 @@ export const PostDetailsPage = () => {
       
       if (templateUuid) {
         // Navigate to the template editor with the template
-        // Pass source=post and postId parameters to identify where we came from
-        let url = `/design/editor/${templateUuid}?source=post&postId=${post?.id}`;
+        // Pass source=postMedia, postId, and mediaId parameters to identify where we came from
+        let url = `/design/editor/${templateUuid}?source=postMedia&postId=${post?.id}&mediaId=${mediaItem.id}`;
         
         // If we have a postQueryId, add it to the URL
         if (postQueryId) {
@@ -451,7 +469,7 @@ export const PostDetailsPage = () => {
         navigate(url);
       }
     } catch (error) {
-      console.error('Error creating template from post image:', error);
+      console.error('Error creating template from media image:', error);
       message.error(t("postDetailsPage.error_creating_template"));
     }
   };
@@ -607,10 +625,10 @@ export const PostDetailsPage = () => {
       let host;
       // if (process.env.NODE_ENV === 'development') {
       //   // For local development, use localhost:8000 directly
-      //   host = '127.0.0.1:8000';
+        host = '127.0.0.1:8000';
       // } else {
         // For production, use the API domain
-      host = 'api.aimmagic.com';
+      // host = 'api.aimmagic.com';
       // }
         
       const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
@@ -716,9 +734,9 @@ export const PostDetailsPage = () => {
           // Determine the correct host based on environment
           let apiHost;
           // if (process.env.NODE_ENV === 'development') {
-          //   apiHost = '127.0.0.1:8000';
+            apiHost = '127.0.0.1:8000';
           // } else {
-          apiHost = 'api.aimmagic.com';
+          // apiHost = 'api.aimmagic.com';
           // }
           
           // Get the current image URL, ensuring it's a full URL for comparison
@@ -801,7 +819,7 @@ export const PostDetailsPage = () => {
                       {postMedias?.map((media) => (
                         <div key={media.id} className={styles.imageWrapper}>
                           <Image
-                            src={media.media}
+                            src={`http://localhost:8000${media.media}`}
                             alt={`Media ${media.id}`}
                             className={styles.sliderImage}
                           />
@@ -830,6 +848,19 @@ export const PostDetailsPage = () => {
                             shape="circle"
                             onClick={handleDownloadImage}
                           />
+                          {user?.profile?.user?.is_staff && (
+                              <Tooltip title={post?.template 
+                                ? t("postDetailsPage.edit_in_designer_with_template") 
+                                : t("postDetailsPage.edit_in_designer")
+                              }>
+                                <Button
+                                  className={`${styles.editInDesignerButton} ${post?.template ? styles.hasTemplate : ''}`}
+                                  icon={<EditOutlined />}
+                                  shape="circle"
+                                  onClick={() => handleOpenInDesigner(media)}
+                                />
+                              </Tooltip>
+                              )}
                         </div>
                       ))}
                     </div>
@@ -947,7 +978,7 @@ export const PostDetailsPage = () => {
                                 shape="circle"
                                 onClick={handleDownloadImage}
                               />
-                              {user?.profile?.user?.is_staff && (
+                              {/* {user?.profile?.user?.is_staff && (
                               <Tooltip title={post?.template 
                                 ? t("postDetailsPage.edit_in_designer_with_template") 
                                 : t("postDetailsPage.edit_in_designer")
@@ -959,7 +990,7 @@ export const PostDetailsPage = () => {
                                   onClick={handleOpenInDesigner}
                                 />
                               </Tooltip>
-                              )}
+                              )} */}
                             </>
                           )}
                         </div>
