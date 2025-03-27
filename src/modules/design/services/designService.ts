@@ -7,7 +7,9 @@ import { Template, ElementType, ImageAsset, TextElement, ShapeElement, UserAsset
 
 // Create the HTTP link
 const httpLink = createHttpLink({
-  uri: graphqlURL || 'http://127.0.0.1:8000/graphql/',
+  uri: graphqlURL || (process.env.NODE_ENV === 'production' 
+    ? 'https://api.aimmagic.com/graphql/' 
+    : 'http://127.0.0.1:8000/graphql/'),
 });
 
 // Add the authorization headers to the request
@@ -527,7 +529,10 @@ export const processImageData = (imageData: string): string => {
     const filename = imageData.split('/').pop();
     
     // If it's a relative path, construct the URL
-    const baseUrl = process.env.REACT_APP_API_URL || baseURL;
+    const baseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' 
+      ? 'https://api.aimmagic.com' 
+      : 'http://localhost:8000');
+
     const mediaUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
     
     // Check if the path already starts with /media/
@@ -542,12 +547,14 @@ export const processImageData = (imageData: string): string => {
       // If the filename contains media path information, extract just the filename
       const cleanFilename = filename.split('/').pop() || filename;
       
-      // Try with direct localhost URL as a fallback
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        const localhostUrl = `http://${window.location.hostname}:8000/media/${cleanFilename}`;
-        console.log(`Constructed localhost URL: ${localhostUrl}`);
-        return localhostUrl;
-      }
+      // Try with direct URL based on environment
+      const hostUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://api.aimmagic.com' 
+        : `http://${window.location.hostname === 'localhost' ? 'localhost' : '127.0.0.1'}:8000`;
+        
+      const mediaPath = `${hostUrl}/media/${cleanFilename}`;
+      console.log(`Constructed environment-specific URL: ${mediaPath}`);
+      return mediaPath;
     }
     
     // Otherwise, assume it's a relative path that needs /media/ prefix
@@ -722,7 +729,10 @@ export const fetchTemplateWithElements = async (uuid: string) => {
 
 // Function to create a template
 export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string, mediaId?: string) => {
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  const API_URL = process.env.REACT_APP_API_URL || 
+    (process.env.NODE_ENV === 'production' ? 'https://api.aimmagic.com' : 'http://localhost:8000');
+    
+  console.log(`Environment: ${process.env.NODE_ENV}, using API URL: ${API_URL}`);
   console.log('Creating template with name:', name);
   console.log('Background image:', backgroundImage);
   console.log('Post ID:', postId);

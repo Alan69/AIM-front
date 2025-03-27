@@ -86,7 +86,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   // Load background image if available
   useEffect(() => {
     const preloadBackgroundImage = async () => {
-      if (template.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
+      if (template?.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
         console.log('Loading background image:', template.backgroundImage);
         
         // Check if we already have this image loaded in our ref
@@ -141,11 +141,14 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 console.log('Extracted filename:', filename);
                 
                 // Base URLs that will be used in our alternative URLs
+                const isProd = process.env.NODE_ENV === 'production';
                 const baseUrls = [
-                  'http://localhost:8000',
-                  'http://127.0.0.1:8000',
-                  process.env.REACT_APP_API_URL || 'http://localhost:8000'
+                  isProd ? 'https://api.aimmagic.com' : 'http://localhost:8000',
+                  isProd ? 'https://api.aimmagic.com' : 'http://127.0.0.1:8000',
+                  process.env.REACT_APP_API_URL || (isProd ? 'https://api.aimmagic.com' : 'http://localhost:8000')
                 ];
+                
+                console.log(`Environment: ${process.env.NODE_ENV}, using base URLs:`, baseUrls);
                 
                 // Extract useful path components
                 const userIdMatch = backgroundImage.match(/user_([a-zA-Z0-9-]+)/);
@@ -156,7 +159,8 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 console.log('URL analysis:', {
                   userId,
                   hasPostsImg,
-                  hasPreviousPostsMedia
+                  hasPreviousPostsMedia,
+                  isProd
                 });
                 
                 // HIGHEST PRIORITY: Directly use the exact user/posts_img pattern (AI-generated image)
