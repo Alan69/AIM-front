@@ -40,6 +40,7 @@ export const GET_ALL_TEMPLATES = gql`
       isDefault
       size
       backgroundImage
+      thumbnail
       like
       createdAt
       user {
@@ -95,6 +96,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
       isDefault
       size
       backgroundImage
+      thumbnail
       like
       createdAt
       user {
@@ -303,6 +305,7 @@ export const UPDATE_TEMPLATE = gql`
     $is_default: Boolean
     $size: String
     $background_image: String
+    $thumbnail: String
     $like: Boolean
   ) {
     updateTemplate(
@@ -311,6 +314,7 @@ export const UPDATE_TEMPLATE = gql`
       isDefault: $is_default
       size: $size
       backgroundImage: $background_image
+      thumbnail: $thumbnail
       like: $like
     ) {
       template {
@@ -319,6 +323,7 @@ export const UPDATE_TEMPLATE = gql`
         isDefault
         size
         backgroundImage
+        thumbnail
         like
         createdAt
       }
@@ -583,6 +588,15 @@ export const fetchAllTemplates = async (size?: string) => {
       if (backgroundImage && backgroundImage !== 'no_image.jpg') {
         backgroundImage = processImageData(backgroundImage);
       }
+      
+      // Process thumbnail if it exists
+      let thumbnail = template.thumbnail;
+      if (thumbnail) {
+        // For thumbnails, we can just directly use them if they are data URLs
+        if (!thumbnail.startsWith('data:')) {
+          thumbnail = processImageData(thumbnail);
+        }
+      }
 
       // Process image assets
       const imageAssets = template.imageAssets?.map((img: any) => ({
@@ -630,6 +644,7 @@ export const fetchAllTemplates = async (size?: string) => {
       return {
         ...template,
         backgroundImage,
+        thumbnail,
         imageAssets,
         textElements,
         shapeElements
@@ -659,6 +674,14 @@ export const fetchTemplateWithElements = async (uuid: string) => {
   // Process background image if it exists and is not the default
   if (processedTemplate.backgroundImage && processedTemplate.backgroundImage !== 'no_image.jpg') {
     processedTemplate.backgroundImage = processImageData(processedTemplate.backgroundImage);
+  }
+  
+  // Process thumbnail if it exists
+  if (processedTemplate.thumbnail) {
+    // For thumbnails, we can just directly use them if they are data URLs
+    if (!processedTemplate.thumbnail.startsWith('data:')) {
+      processedTemplate.thumbnail = processImageData(processedTemplate.thumbnail);
+    }
   }
   
   // Process shapes

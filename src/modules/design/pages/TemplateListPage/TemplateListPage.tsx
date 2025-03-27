@@ -250,6 +250,27 @@ const TemplateListPage: React.FC = () => {
   };
 
   const renderTemplatePreview = (template: Template) => {
+    // Check if the template has a thumbnail
+    if (template.thumbnail) {
+      return (
+        <div className="template-content-preview">
+          <img
+            src={template.thumbnail}
+            alt={template.name}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              position: 'absolute',
+              top: '0',
+              left: '0'
+            }}
+          />
+        </div>
+      );
+    }
+    
+    // If no thumbnail, render the traditional preview
     // Get the first image (if any)
     const firstImage = template.imageAssets && template.imageAssets.length > 0 ? template.imageAssets[0] : null;
     
@@ -563,7 +584,7 @@ const TemplateListPage: React.FC = () => {
                     <div 
                       className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
                     >
-                      {(template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                      {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
                         (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
                         renderTemplatePreview(template)
                       ) : (

@@ -13,6 +13,7 @@ export interface Template {
   size: string;
   createdAt: string;
   backgroundImage?: string;
+  thumbnail?: string;
   like?: boolean;
   user?: {
     id: string;

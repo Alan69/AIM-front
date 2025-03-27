@@ -330,9 +330,36 @@ const TemplateEditorPage: React.FC = () => {
         }
       }
       
-      // Then save the template name
-      console.log(`Saving template name: ${templateName}`);
-      const updatedTemplate = await updateTemplate(uuid, { name: templateName });
+      // Generate thumbnail before saving the template
+      let thumbnailDataURL = '';
+      if (stageRef.current) {
+        console.log('Generating thumbnail for template');
+        const stage = stageRef.current.getStage();
+        if (stage) {
+          // Generate a smaller thumbnail image (e.g., 300x300 max)
+          const [width, height] = template.size.split('x').map(Number) || [1080, 1080];
+          const maxThumbnailSize = 300;
+          const scale = Math.min(maxThumbnailSize / width, maxThumbnailSize / height);
+          const thumbnailWidth = Math.round(width * scale);
+          const thumbnailHeight = Math.round(height * scale);
+          
+          thumbnailDataURL = stage.toDataURL({
+            pixelRatio: 1,
+            mimeType: 'image/png',
+            width: width,
+            height: height,
+            quality: 0.8
+          });
+          console.log(`Generated thumbnail with dimensions: ${thumbnailWidth}x${thumbnailHeight}`);
+        }
+      }
+      
+      // Then save the template name and thumbnail
+      console.log(`Saving template name: ${templateName} and thumbnail`);
+      const updatedTemplate = await updateTemplate(uuid, { 
+        name: templateName,
+        thumbnail: thumbnailDataURL || undefined
+      });
       
       // Merge the updated template with our local copy to ensure all properties are preserved
       updatedTemplateData = {
@@ -340,6 +367,7 @@ const TemplateEditorPage: React.FC = () => {
         name: updatedTemplate.name,
         isDefault: updatedTemplate.isDefault,
         size: updatedTemplate.size,
+        thumbnail: updatedTemplate.thumbnail || updatedTemplateData.thumbnail
       };
       
       // Set the template directly without reloading from server
@@ -1180,6 +1208,25 @@ const TemplateEditorPage: React.FC = () => {
         pixelRatio: 2,  // Higher quality
         mimeType: 'image/png'
       });
+      
+      // Generate a smaller thumbnail for the template
+      const maxThumbnailSize = 300;
+      const scale = Math.min(maxThumbnailSize / canvasWidth, maxThumbnailSize / canvasHeight);
+      const thumbnailWidth = Math.round(canvasWidth * scale);
+      const thumbnailHeight = Math.round(canvasHeight * scale);
+      
+      const thumbnailDataURL = tempStage.toDataURL({
+        pixelRatio: 1,
+        mimeType: 'image/png',
+        width: canvasWidth,
+        height: canvasHeight,
+        quality: 0.8
+      });
+      
+      console.log(`Generated thumbnail with dimensions: ${thumbnailWidth}x${thumbnailHeight}`);
+      
+      // Update the template with the thumbnail
+      await updateTemplate(uuid, { thumbnail: thumbnailDataURL });
       
       // Clean up
       tempStage.destroy();
