@@ -387,6 +387,21 @@
     right: 36px;
     cursor: pointer;
   }
+  
+  &__edit {
+    min-width: auto !important;
+    width: 24px !important;
+    right: 64px;
+    cursor: pointer;
+    
+    &.hasTemplate {
+      background-color: rgba(24, 144, 255, 0.8);
+      
+      &:hover {
+        background-color: rgba(24, 144, 255, 1);
+      }
+    }
+  }
 }
 
 .iconOverlay:hover {

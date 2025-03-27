@@ -849,12 +849,16 @@ export const PostDetailsPage = () => {
                             onClick={handleDownloadImage}
                           />
                           {user?.profile?.user?.is_staff && (
-                              <Tooltip title={post?.template 
+                              <Tooltip title={media?.template 
                                 ? t("postDetailsPage.edit_in_designer_with_template") 
                                 : t("postDetailsPage.edit_in_designer")
                               }>
                                 <Button
-                                  className={`${styles.editInDesignerButton} ${post?.template ? styles.hasTemplate : ''}`}
+                                  className={cn(
+                                    styles.iconOverlay,
+                                    styles.iconOverlay__edit,
+                                    media?.template ? styles.hasTemplate : ''
+                                  )}
                                   icon={<EditOutlined />}
                                   shape="circle"
                                   onClick={() => handleOpenInDesigner(media)}
