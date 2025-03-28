@@ -452,14 +452,49 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     const [movedItem] = newElements.splice(oldIndex, 1);
     newElements.splice(newIndex, 0, movedItem);
 
-    // Update z-index for all elements
+    // Update z-index for all elements while preserving other properties
     const updates = newElements.map((item, index) => {
       const newZIndex = newElements.length - index; // Higher z-index for items at the top
+      
+      // Base properties that all elements have
+      const baseUpdate = {
+        uuid: item.uuid,
+        elementType: item.elementType,
+        zIndex: newZIndex,
+        positionX: Number(item.positionX),
+        positionY: Number(item.positionY),
+        rotation: Number(item.rotation || 0),
+        opacity: Number('opacity' in item ? item.opacity || 1 : 1)
+      };
+
+      let updateData;
+      
+      // Add type-specific properties based on element type
+      if (item.elementType === 'shape' || item.elementType === 'image') {
+        updateData = {
+          ...baseUpdate,
+          width: Number((item as any).width || 100),
+          height: Number((item as any).height || 100),
+          ...(item.elementType === 'shape' ? { color: (item as any).color, shapeType: (item as any).shapeType } : {}),
+          ...(item.elementType === 'image' ? { image: (item as any).image } : {})
+        };
+      } else if (item.elementType === 'text') {
+        updateData = {
+          ...baseUpdate,
+          text: (item as any).text,
+          font: (item as any).font,
+          fontSize: Number((item as any).fontSize || 16),
+          color: (item as any).color
+        };
+      } else {
+        updateData = baseUpdate;
+      }
+
       return updateElementInTemplate(
         template.uuid,
         item.uuid,
         item.elementType as 'image' | 'text' | 'shape',
-        { zIndex: newZIndex }
+        updateData
       );
     });
 
