@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Layout, Table, Modal } from "antd";
+import { Button, Layout, Table } from "antd";
 import type { TableProps } from "antd";
 import cn from "classnames";
 import { useTranslation } from "react-i18next";

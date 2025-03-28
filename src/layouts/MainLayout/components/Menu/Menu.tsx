@@ -5,16 +5,12 @@ import {
   FormOutlined,
   CalendarOutlined,
   CaretLeftOutlined,
-  StockOutlined,
-  WechatOutlined,
-  FundOutlined,
-  RadarChartOutlined,
   BorderOuterOutlined,
   FileDoneOutlined,
   FileTextOutlined,
   LayoutOutlined,
 } from "@ant-design/icons";
-import { Badge, Button, Menu } from "antd";
+import { Button, Menu } from "antd";
 import type { MenuProps } from "antd";
 import cn from "classnames";
 import { authActions } from "modules/auth/redux/slices/auth.slice";

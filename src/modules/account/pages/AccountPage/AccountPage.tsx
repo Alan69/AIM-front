@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useUpdateProfilesMutation } from "../../redux/api";
 import {
@@ -20,8 +20,6 @@ import avatar from "assets/avatar.png";
 import styles from "./AccountPage.module.scss";
 import { useTranslation } from "react-i18next";
 import { ConfirmationChangesModal } from "modules/account/components/ConfirmationChangesModal/ConfirmationChangesModal";
-import _ from "lodash";
-
 import { useNavigate } from "react-router-dom";
 
 type TUpdateProfilesForm = {
@@ -92,7 +90,7 @@ export const AccountPage = () => {
 
   useEffect(() => {
     getAuthUser();
-  }, []);
+  }, [getAuthUser]);
 
   const formValues = watch();
 
@@ -171,7 +169,7 @@ export const AccountPage = () => {
       reset(initialValues);
       setHasChanges(false);
     }
-  }, [user]);
+  }, [user, reset]);
 
   useEffect(() => {
     if (user) {
@@ -198,8 +196,19 @@ export const AccountPage = () => {
   }, [formValues, user]);
 
   useEffect(() => {
-    getAuthUser();
-  }, []);
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasChanges]);
 
   return (
     <>

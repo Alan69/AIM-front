@@ -62,7 +62,7 @@ export const PostQueryCreatePage = () => {
       getProductListByCompanyId(current_company.id);
       setValue("product", "");
     }
-  }, [current_company, getProductListByCompanyId]);
+  }, [current_company, getProductListByCompanyId, setValue]);
 
   const onSubmit = (data: TPostQueryCreateData) => {
     console.log('Form data before submission:', data);

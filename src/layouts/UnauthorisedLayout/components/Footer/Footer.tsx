@@ -15,18 +15,18 @@ export const Footer = () => {
     <footer className={styles.footer}>
       <div className={styles.footerContent}>
         <div className={styles.column}>
-          <a href="#" className={styles.item}>
+          <Link to="/post-query/create" className={styles.item} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             {t("footerLanding.columns.blog")}
-          </a>
-          <a href="#" className={styles.item}>
+          </Link>
+          <Link to="/post-query" className={styles.item} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             {t("footerLanding.columns.latest_generations")}
-          </a>
-          <a href="#" className={styles.item}>
+          </Link>
+          <Link to="/terms-and-conditions" className={styles.item} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             {t("footerLanding.columns.terms_of_use")}
-          </a>
-          <a href="#" className={styles.item}>
+          </Link>
+          <Link to="/home" className={styles.item} onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
             {t("footerLanding.columns.reviews")}
-          </a>
+          </Link>
         </div>
         <div className={styles.column}>
           <div className={styles.item}>

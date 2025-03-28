@@ -190,11 +190,11 @@ export const CompanyDetailsPage = () => {
     refetchSocialMediaList();
     refetchTargetAudience();
     refetchProductList();
-  }, [company]);
+  }, [company, refetchSocialMediaList, refetchTargetAudience, refetchProductList]);
 
   useEffect(() => {
     navigate(`/company/${current_company?.id}`);
-  }, [current_company]);
+  }, [current_company, navigate]);
 
   if (isLoading) return <div>Loading...</div>;
 

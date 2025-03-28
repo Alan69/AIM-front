@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { baseURL, graphqlURL } from 'types/baseUrl';
-import { Template, ElementType, ImageAsset, TextElement, ShapeElement, UserAsset } from '../types';
+import { UserAsset } from '../types';
 
 // Create the HTTP link
 const httpLink = createHttpLink({
@@ -1207,7 +1207,7 @@ export const updateElementInTemplate = async (
     
     if ('shapeType' in updatesToSend) {
       // Update for backward compatibility with front-end naming
-      updatesToSend.shapeType = updatesToSend.shapeType;
+      // updatesToSend.shapeType = updatesToSend.shapeType;
     }
     
     // Special handling for text elements and fontSize

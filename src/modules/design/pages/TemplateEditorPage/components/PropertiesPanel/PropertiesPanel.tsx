@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { Collapse, Input, Slider, Form, Select, Typography, InputNumber, Button, Divider, ColorPicker } from 'antd';
 import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
-import { DesignElement, ElementType } from '../../../../types';
+import { DesignElement } from '../../../../types';
 import './PropertiesPanel.scss';
 
 const { Panel } = Collapse;
 const { Title } = Typography;
-const { Option } = Select;
 
 interface PropertiesPanelProps {
   selectedElement: DesignElement | null;
@@ -33,6 +32,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   const latestElementRef = useRef<DesignElement | null>(null);
   
   // Force re-renders when element changes
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [updateTrigger, setUpdateTrigger] = useState(0);
   
   // Process the selected element to ensure valid values
@@ -70,12 +70,18 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   
   // Create debounced version of update function to prevent rapid updates
   const debouncedUpdate = useCallback(
-    debounce((element: DesignElement) => {
-      console.log("Sending update to parent component:", element);
-      onUpdateElement(element);
-    }, 50), // Short delay to batch updates
+    (element: DesignElement) => {
+      const debounced = debounce((el: DesignElement) => {
+        console.log("Sending update to parent component:", el);
+        onUpdateElement(el);
+      }, 50);
+      debounced(element);
+    },
     [onUpdateElement]
   );
+
+  // Extract the complex expression to a separate variable
+  const processedElementString = processedElement ? JSON.stringify(processedElement) : '';
 
   // Update our ref whenever the selected element changes from the canvas
   useEffect(() => {
@@ -95,7 +101,8 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     processedElement?.rotation,
     processedElement?.uuid,
     // Use a stringified version of the element to detect all changes
-    JSON.stringify(processedElement)
+    processedElementString,
+    processedElement // Add processedElement to the dependency array
   ]);
 
   // Helper function to get current value

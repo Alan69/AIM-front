@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Layout, Table } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { useTypedSelector } from "hooks/useTypedSelector";
 import styles from "./ArticleQueriesListPage.module.scss";
 import {
   TArticleQueriesData,
@@ -16,18 +15,8 @@ const { Content } = Layout;
 export const ArticleQueriesListPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { current_company } = useTypedSelector((state) => state.auth);
   const { data: articleQueriesList, refetch } =
     useGetArticleQueriesListQuery();
-
-  // Sort the data by created_at in descending order
-  const sortedArticleQueriesList = React.useMemo(() => {
-    if (!articleQueriesList) return [];
-    
-    return [...articleQueriesList].sort((a, b) => {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  }, [articleQueriesList]);
 
   useEffect(() => {
     refetch();

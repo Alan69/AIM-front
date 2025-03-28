@@ -1,15 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Stage, Layer, Rect, Circle, Line, Text, Image as KonvaImage, Star, Group, Transformer } from 'react-konva';
+import React, { useState, useEffect, useRef } from 'react';
+import { Stage, Layer, Rect, Circle, Line, Text, Image as KonvaImage, Star, Transformer } from 'react-konva';
 import { Button, Tooltip, Slider } from 'antd';
-import { ZoomInOutlined, ZoomOutOutlined, UndoOutlined, RedoOutlined } from '@ant-design/icons';
-import { Template, DesignElement, ElementType, ImageAsset, TextElement, ShapeElement } from '../../../../types';
-import { v4 as uuidv4 } from 'uuid';
-import { 
-  createImageAsset, 
-  createTextElement, 
-  createShapeElement, 
-  updateElementInTemplate 
-} from '../../../../services/designService';
+import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { Template, DesignElement, ImageAsset, TextElement, ShapeElement } from '../../../../types';
 import './CanvasWorkspace.scss';
 import Konva from 'konva';
 
@@ -72,16 +65,13 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const templateSize = template.size ? template.size.split('x').map(Number) : [1080, 1080];
   const canvasWidth = templateSize[0] || 1080;  // Add fallback values
   const canvasHeight = templateSize[1] || 1080; // Add fallback values
-  
-  // Extract the template ID for API calls
-  const templateId = template.uuid;
 
   // Pass the stageRef to the parent component if onStageRef is provided
   useEffect(() => {
     if (onStageRef && stageRef.current) {
       onStageRef(stageRef.current);
     }
-  }, [onStageRef, stageRef.current]);
+  }, [onStageRef]);
 
   // Load background image if available
   useEffect(() => {
@@ -291,7 +281,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     };
 
     preloadBackgroundImage();
-  }, [template.backgroundImage]);
+  }, [template.backgroundImage, lastBackgroundImageUrl]);
 
   // Store the current background image URL to detect changes
   useEffect(() => {
@@ -438,42 +428,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     // If clicked on the stage background, deselect
     if (e.target === e.currentTarget) {
       onSelectElement(null);
-    }
-  };
-
-  const handleTransformEnd = (element: DesignElement) => {
-    // Create a deep copy of the element to avoid reference issues
-    const updatedElement = { ...element };
-    
-    // Get the element type
-    const elementType = 
-      'text' in element ? 'text' : 
-      'image' in element ? 'image' : 
-      'shapeType' in element ? 'shape' : null;
-    
-    if (elementType) {
-      try {
-        // Create a processed element for saving to backend
-        const processedElement: any = { ...updatedElement };
-        
-        // Ensure all numeric values are properly converted to numbers
-        if ('positionX' in processedElement) processedElement.positionX = Number(processedElement.positionX);
-        if ('positionY' in processedElement) processedElement.positionY = Number(processedElement.positionY);
-        if ('width' in processedElement) processedElement.width = Number(processedElement.width);
-        if ('height' in processedElement) processedElement.height = Number(processedElement.height);
-        if ('zIndex' in processedElement) processedElement.zIndex = Number(processedElement.zIndex);
-        if ('rotation' in processedElement) processedElement.rotation = Number(processedElement.rotation);
-        
-        // Save to backend
-        updateElementInTemplate(
-          template.uuid,
-          updatedElement.uuid,
-          elementType,
-          JSON.stringify(processedElement)
-        );
-      } catch (error) {
-        console.error('Error saving element after transform:', error);
-      }
     }
   };
 
@@ -897,183 +851,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     }
   };
 
-  const addNewElement = async (elementType: ElementType, data: any = {}) => {
-    const templateId = template.uuid;
-    
-    if (!canvasWidth || !canvasHeight) {
-      console.error('Canvas dimensions are not properly defined');
-      return;
-    }
-    
-    try {
-      // Create a copy of the template to preserve the background image
-      const updatedTemplate = { ...template };
-      
-      // Ensure background image is preserved before any operations
-      if (lastBackgroundImageUrl) {
-        updatedTemplate.backgroundImage = lastBackgroundImageUrl;
-      } else if (backgroundImage) {
-        // If we have a background image loaded but no URL cached, use the template's URL
-        updatedTemplate.backgroundImage = template.backgroundImage;
-      }
-      
-      switch (elementType) {
-        case ElementType.TEXT:
-          const fontStyle = data || {};
-          const fontSize = fontStyle.fontSize || 100;
-          const font = fontStyle.fontFamily || 'Arial';
-          const color = fontStyle.color || '#000000';
-          
-          const textElement = await createTextElement(
-            templateId,
-            'New Text',
-            font,
-            fontSize,
-            color,
-            500,  // Fixed X position at 500
-            500   // Fixed Y position at 500
-          ) as TextElement;
-          
-          if (textElement) {
-            updatedTemplate.texts = [...(template.texts || []), textElement];
-            // Double-check background image is preserved
-            if (lastBackgroundImageUrl) {
-              updatedTemplate.backgroundImage = lastBackgroundImageUrl;
-            }
-            
-            // Use the helper function to ensure background image is preserved
-            const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
-            
-            onUpdateElements(finalTemplate);
-            onSelectElement(textElement);
-          }
-          break;
-          
-        case ElementType.IMAGE:
-          const imageUrl = data?.image || '';
-          if (!imageUrl) return;
-          
-          const imageElement = await createImageAsset(
-            templateId,
-            imageUrl,
-            500,  // Fixed X position at 500
-            500,  // Fixed Y position at 500
-            200,
-            200,
-            -1 // zIndex - set to -1 to place behind other elements
-          ) as ImageAsset;
-          
-          if (imageElement) {
-            // Preload the image
-            const img = new window.Image();
-            img.src = imageUrl;
-            img.onload = () => {
-              setImages(prev => ({ ...prev, [imageElement.uuid]: img }));
-              
-              // Double-check background image is preserved
-              if (lastBackgroundImageUrl) {
-                updatedTemplate.backgroundImage = lastBackgroundImageUrl;
-              }
-              updatedTemplate.images = [...(template.images || []), imageElement];
-              
-              // Use the helper function to ensure background image is preserved
-              const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
-              
-              onUpdateElements(finalTemplate);
-              onSelectElement(imageElement);
-            };
-          }
-          break;
-          
-        case ElementType.SHAPE:
-          const shapeType = data?.shapeType || 'rectangle';
-          // Use the provided color or a default based on shape type
-          let shapeColor;
-          switch(shapeType) {
-            case 'rectangle':
-              shapeColor = data?.color || '#4A90E2';
-              break;
-            case 'circle':
-              shapeColor = data?.color || '#7ED321';
-              break;
-            case 'triangle':
-              shapeColor = data?.color || '#F5A623';
-              break;
-            case 'line':
-              shapeColor = data?.color || '#9013FE';
-              break;
-            case 'star':
-              shapeColor = data?.color || '#F8E71C';
-              break;
-            default:
-              shapeColor = data?.color || '#4A90E2';
-          }
-          
-          // Use fixed position for new shapes
-          const posX = 500;
-          const posY = 500;
-          
-          console.log(`Creating shape at position: (${posX}, ${posY})`);
-          
-          try {
-            const shapeElement = await createShapeElement(
-              templateId,
-              shapeType,
-              shapeColor,
-              posX,  // Fixed X position at 500
-              posY,  // Fixed Y position at 500
-              100,      // Width
-              100,      // Height
-              0,        // Z-Index
-              0         // Initial rotation
-            ) as ShapeElement;
-            
-            if (shapeElement) {
-              // Double-check background image is preserved
-              if (lastBackgroundImageUrl) {
-                updatedTemplate.backgroundImage = lastBackgroundImageUrl;
-              }
-              updatedTemplate.shapes = [...(template.shapes || []), shapeElement];
-              
-              // Use the helper function to ensure background image is preserved
-              const finalTemplate = ensureBackgroundImagePreserved(updatedTemplate);
-              
-              onUpdateElements(finalTemplate);
-              onSelectElement(shapeElement);
-              
-              // Immediately update the element to ensure all properties are saved
-              const processedShape = {
-                ...shapeElement,
-                positionX: Number(posX),
-                positionY: Number(posY),
-                width: 100,
-                height: 100,
-                zIndex: 0,
-                rotation: 0
-              };
-              
-              // Save the element properties to ensure they persist
-              try {
-                await updateElementInTemplate(
-                  templateId,
-                  shapeElement.uuid,
-                  'shape',
-                  JSON.stringify(processedShape)
-                );
-              } catch (error) {
-                console.error('Error saving initial shape properties:', error);
-              }
-            }
-          } catch (error) {
-            console.error('Error creating shape element:', error);
-          }
-          break;
-      }
-    } catch (error) {
-      console.error('Error adding new element:', error);
-    }
-  };
-
   // Event handler for transform and drag events
   const handleElementTransform = (e: KonvaEvent, element: DesignElement) => {
     if (!element) return;
@@ -1086,7 +863,6 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     
     // Update position, size, and rotation
     if (node) {
-      const nodeAttrs = node.attrs;
       
       // For positions, directly use node.x() and node.y() which will be accurate
       if ('positionX' in updatedElement) {

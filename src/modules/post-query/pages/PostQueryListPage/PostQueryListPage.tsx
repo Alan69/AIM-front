@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Layout, Table, Spin, Modal } from "antd";
+import { Button, Layout, Table, Spin } from "antd";
 import type { TableProps } from "antd";
 import cn from "classnames";
 import { TPostQueryData, useGetPostQueriesListQuery } from "../../redux/api";

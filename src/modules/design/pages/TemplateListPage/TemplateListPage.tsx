@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message } from 'antd';
 import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
-import { fetchAllTemplates, createTemplate, fetchTemplatesREST, processImageData, updateTemplate, copyTemplate } from '../../services/designService';
+import { fetchAllTemplates, createTemplate, processImageData, updateTemplate, copyTemplate } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
@@ -20,16 +20,6 @@ const TemplateListPage: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<TemplateSizeType>('1080x1080');
   const navigate = useNavigate();
   const { user } = useTypedSelector((state) => state.auth);
-
-  useEffect(() => {
-    loadTemplates();
-  }, [selectedSize]);
-
-  useEffect(() => {
-    if (templates.length > 0) {
-      filterTemplates();
-    }
-  }, [templates, searchQuery, activeTab]);
 
   const loadTemplates = async () => {
     try {
@@ -63,6 +53,10 @@ const TemplateListPage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    loadTemplates();
+  }, [selectedSize]);
+
   const filterTemplates = () => {
     let filtered = [...templates];
     
@@ -93,6 +87,12 @@ const TemplateListPage: React.FC = () => {
     
     setFilteredTemplates(filtered);
   };
+
+  useEffect(() => {
+    if (templates.length > 0) {
+      filterTemplates();
+    }
+  }, [templates, searchQuery, activeTab]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);

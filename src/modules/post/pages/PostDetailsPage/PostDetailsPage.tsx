@@ -15,13 +15,11 @@ import {
   Typography,
   Image,
   Button,
-  Collapse,
   Radio,
   Input,
   message,
   Tooltip,
   Upload,
-  Progress,
 } from "antd";
 import {
   ReloadOutlined,
@@ -33,10 +31,7 @@ import {
   DownOutlined,
   PlusOutlined,
   UploadOutlined,
-  HeartOutlined,
-  HeartFilled,
   EditOutlined,
-  SyncOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -65,13 +60,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
 import { postActions } from "../../redux/slices/post.slice";
 import { WebSocketService } from "services/websocket";
-import { createTemplate, createImageAsset, copyTemplate } from "../../../design/services/designService";
+import { createTemplate } from "../../../design/services/designService";
 const baseApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-const { Panel } = Collapse;
 
 export const PostDetailsPage = () => {
   const { t } = useTranslation();
@@ -589,61 +583,7 @@ export const PostDetailsPage = () => {
       }
     }
   };
-  
-  // Add a function to manually refresh the image
-  const handleRefreshImage = () => {
-    if (post?.picture) {
-      const timestamp = Date.now();
-      
-      // Find the image element and update its src
-      const imgElement = document.querySelector(`.${styles.picture}`) as HTMLImageElement;
-      if (imgElement) {
-        const newSrc = `${post.picture}?t=${timestamp}`;
-        imgElement.src = newSrc;
-      }
-      
-      // Also refetch the post data
-      refetch();
-      refetchPostMedias();
-      
-      message.success(t("postDetailsPage.refresh_image"));
-    }
-  };
 
-  // Initialize WebSocket connection
-  useEffect(() => {
-    if (id) {
-      // Reset generation status when component mounts or ID changes
-      dispatch(postActions.setTextGenerationStatus('pending'));
-      dispatch(postActions.setImageGenerationStatus('pending'));
-      
-      // Create WebSocket connection
-      // Use the correct protocol (ws or wss) based on the current page protocol
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      
-      // Determine the correct host based on environment
-      let host;
-      // if (process.env.NODE_ENV === 'development') {
-      //   // For local development, use localhost:8000 directly
-        host = '127.0.0.1:8000';
-      // } else {
-        // For production, use the API domain
-      // host = 'api.aimmagic.com';
-      // }
-        
-      const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
-      
-      const ws = new WebSocketService(wsUrl, handleWebSocketMessage);
-      
-      ws.connect();
-      setWsService(ws);
-      
-      return () => {
-        ws.disconnect();
-      };
-    }
-  }, [id, dispatch]);
-  
   // Handle WebSocket messages
   const handleWebSocketMessage = (data: any) => {
     // Handle welcome message
@@ -710,6 +650,40 @@ export const PostDetailsPage = () => {
       }
     }
   };
+
+  // Initialize WebSocket connection
+  useEffect(() => {
+    if (id) {
+      // Reset generation status when component mounts or ID changes
+      dispatch(postActions.setTextGenerationStatus('pending'));
+      dispatch(postActions.setImageGenerationStatus('pending'));
+      
+      // Create WebSocket connection
+      // Use the correct protocol (ws or wss) based on the current page protocol
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      
+      // Determine the correct host based on environment
+      let host;
+      // if (process.env.NODE_ENV === 'development') {
+      //   // For local development, use localhost:8000 directly
+        host = '127.0.0.1:8000';
+      // } else {
+        // For production, use the API domain
+      // host = 'api.aimmagic.com';
+      // }
+        
+      const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
+      
+      const ws = new WebSocketService(wsUrl, handleWebSocketMessage);
+      
+      ws.connect();
+      setWsService(ws);
+      
+      return () => {
+        ws.disconnect();
+      };
+    }
+  }, [id, dispatch]);
   
   // Check if the post has an image and update the status accordingly
   useEffect(() => {

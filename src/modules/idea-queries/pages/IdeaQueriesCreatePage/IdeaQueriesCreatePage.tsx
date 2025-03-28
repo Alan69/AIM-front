@@ -64,7 +64,7 @@ export const IdeaQueriesCreatePage = () => {
       getProductListByCompanyId(current_company.id);
       setValue("product", "");
     }
-  }, [current_company, getProductListByCompanyId]);
+  }, [current_company, getProductListByCompanyId, setValue]);
 
   const onSubmit = (data: TIdeaQueriesCreateData) => {
     const updatedData = {

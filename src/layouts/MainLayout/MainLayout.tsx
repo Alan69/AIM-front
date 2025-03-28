@@ -1,11 +1,10 @@
-import React, { memo, Suspense, useState } from "react";
+import { memo, Suspense, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Spin, Typography } from "antd";
 import {
   FacebookOutlined,
   InstagramOutlined,
   LinkedinOutlined,
-  MenuFoldOutlined,
   CaretRightOutlined,
 } from "@ant-design/icons";
 import cn from "classnames";

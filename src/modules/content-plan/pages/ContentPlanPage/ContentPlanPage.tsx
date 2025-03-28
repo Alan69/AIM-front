@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import cn from "classnames";
 import {
   Button,
@@ -7,9 +7,7 @@ import {
   Tabs,
   TabsProps,
   Typography,
-  Image,
   message,
-  Modal,
 } from "antd";
 import {
   CalendarOutlined,
@@ -149,10 +147,8 @@ export const ContentPlanPage = () => {
     useGetSocialMediaListByCurrentCompanyQuery();
   const [addToSchedulers, { isLoading: isAddingToSchedulers }] =
     useAddToSchedulersMutation();
-  const [deteleFromScheduler, { isLoading: isDeletingFromScheduler }] =
-    useDeteleFromSchedulerMutation();
-  const [editPostFromScheduler, { isLoading: isEdtitingPostFromScheduler }] =
-    useEditPostFromSchedulerMutation();
+  const [deteleFromScheduler] = useDeteleFromSchedulerMutation();
+  const [editPostFromScheduler] = useEditPostFromSchedulerMutation();
   const [createPostQuery, { isLoading: isPostCreating }] =
     useCreatePostQueryMutation();
   const [createCustomPost, { isLoading: isCustomPostCreating }] =
@@ -456,12 +452,12 @@ export const ContentPlanPage = () => {
       dispatch(postActions.setIsPostGenerated(false));
       dispatch(postActions.setGeneratedPost(null));
     };
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(contentPlanActions.setSelectedPost(null));
     refetchSocialMediaList();
-  }, [current_company]);
+  }, [current_company, dispatch, refetchSocialMediaList]);
 
   return (
     <>

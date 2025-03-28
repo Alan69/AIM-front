@@ -1,6 +1,6 @@
-import { Modal, Button, Divider, Typography } from "antd";
+import { Modal, Divider, Typography } from "antd";
 
-import React, { useState } from "react";
+import React from "react";
 import "moment/locale/ru";
 import styles from "./ModalImageStylesList.module.scss";
 import { TImgStylesData } from "redux/api/imgStyles/imgStylesApi";

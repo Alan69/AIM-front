@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Button, Input, Spin, message, Tooltip, Modal, notification } from 'antd';
+import { Layout, Button, Input, Spin, message, Tooltip, Modal } from 'antd';
 import { 
   ArrowLeftOutlined, 
   SaveOutlined, 
@@ -24,7 +24,6 @@ import {
   createShapeElement,
   deleteElementFromTemplate,
   updateElementInTemplate,
-  debugElementProperties,
   copyTemplate
 } from '../../services/designService';
 import { Template, ElementType, DesignElement, ImageAsset, TextElement, ShapeElement } from '../../types';
@@ -33,10 +32,8 @@ import ElementsPanel from './components/ElementsPanel';
 import PropertiesPanel from './components/PropertiesPanel';
 import './TemplateEditorPage.scss';
 import debounce from 'lodash/debounce';
-import axios from 'axios';
 import { baseURL } from 'types/baseUrl';
 import Cookies from 'js-cookie';
-import html2canvas from 'html2canvas';
 import Konva from 'konva';
 
 const { Header, Sider, Content } = Layout;
@@ -52,8 +49,6 @@ const TemplateEditorPage: React.FC = () => {
   const sourceType = queryParams.get('source');
   const postId = queryParams.get('postId');
   const mediaId = queryParams.get('mediaId');
-  const isFromPost = sourceType === 'post' && postId;
-  const isFromPostMedia = sourceType === 'postMedia' && postId && mediaId;
   
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,55 +64,6 @@ const TemplateEditorPage: React.FC = () => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const { user } = useTypedSelector((state) => state.auth);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
-
-  // Load template data on mount
-  useEffect(() => {
-    if (uuid) {
-      loadTemplate(uuid);
-    }
-  }, [uuid]);
-
-  // Initialize history and like status when template is loaded
-  useEffect(() => {
-    if (template) {
-      setTemplateName(template.name);
-      // Set like status from template
-      setIsLiked(template.like || false);
-      // Only initialize history if it's empty
-      if (history.length === 0) {
-        setHistory([template]);
-        setHistoryIndex(0);
-      }
-    }
-  }, [template]);
-
-  // Add keyboard event listener for Delete/Backspace
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
-        // Only trigger delete if we're not in an input field
-        if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
-          e.preventDefault();
-          handleDeleteElement();
-        }
-      }
-    };
-    
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [selectedElement]);
-
-  // Monitor template state changes with minimal logging
-  useEffect(() => {
-    if (template && template.shapes && template.shapes.length > 0) {
-      // Only log once when template is loaded, not on every update
-      if (template.shapes.some(shape => shape.positionX === 0 && shape.positionY === 0)) {
-        console.log('Warning: Some shapes have position (0,0) which may indicate a problem');
-      }
-    }
-  }, [template]);
 
   const loadTemplate = async (uuid: string) => {
     try {
@@ -183,6 +129,51 @@ const TemplateEditorPage: React.FC = () => {
       setLoading(false);
     }
   };
+  // Load template data on mount
+  useEffect(() => {
+    if (uuid) {
+      loadTemplate(uuid);
+    }
+  }, [uuid],);
+
+  // Initialize history and like status when template is loaded
+  useEffect(() => {
+    if (template) {
+      setTemplateName(template.name);
+      setIsLiked(template.like || false);
+      if (history.length === 0) {
+        setHistory([template]);
+        setHistoryIndex(0);
+      }
+    }
+  }, [template, history.length]);
+
+  // Add keyboard event listener for Delete/Backspace
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
+        if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+          e.preventDefault();
+          handleDeleteElement();
+        }
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedElement]);
+
+  // Monitor template state changes with minimal logging
+  useEffect(() => {
+    if (template && template.shapes && template.shapes.length > 0) {
+      // Only log once when template is loaded, not on every update
+      if (template.shapes.some(shape => shape.positionX === 0 && shape.positionY === 0)) {
+        console.log('Warning: Some shapes have position (0,0) which may indicate a problem');
+      }
+    }
+  }, [template]);
 
   const handleBack = () => {
     navigate('/design');
@@ -1470,7 +1461,6 @@ const TemplateEditorPage: React.FC = () => {
   const handleElementsOrderChange = useCallback(() => {
     if (!template || !uuid) return;
     
-    // Fetch the latest template data to refresh the canvas
     fetchTemplateWithElements(uuid)
       .then((updatedTemplate) => {
         if (updatedTemplate) {

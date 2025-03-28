@@ -26,7 +26,7 @@ import { TPostData } from "modules/post/redux/api";
 import { TSocialMediaByCurrentCompanyData } from "modules/social-media/redux/api";
 import { TAddToSchedulersRequest } from "modules/content-plan/redux/api";
 import { useTypedSelector } from "hooks/useTypedSelector";
-import { useIsMobile, useIsXlTablet } from "hooks/media";
+import { useIsMobile } from "hooks/media";
 import { useTranslation } from "react-i18next";
 import { TReelData } from "modules/reel/redux/api";
 import { ContentPlanPostingType } from "modules/content-plan/types";
@@ -75,7 +75,6 @@ export const ContentPlanAddPostModal = ({
 }: TProps) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
-  const isXlTablet = useIsXlTablet();
   const { current_company } = useTypedSelector((state) => state.auth);
 
   const [selectedDate, setSelectedDate] = useState<moment.Moment | null>(null);
@@ -343,7 +342,7 @@ export const ContentPlanAddPostModal = ({
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [selectedDate, selectedTime]);
+  }, [t,selectedDate, selectedTime]);
 
   useEffect(() => {
     setSelectedTime(null);

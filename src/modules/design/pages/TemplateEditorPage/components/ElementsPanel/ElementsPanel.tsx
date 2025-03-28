@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { Fragment } from 'react';
-import { Tabs, List, Button, Card, Upload, message, Spin, Empty, Input, Radio, Space } from 'antd';
-import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, FileImageOutlined, ArrowUpOutlined, ArrowDownOutlined, LayoutOutlined, SearchOutlined } from '@ant-design/icons';
+import { Tabs, List, Button, Card, Upload, message, Spin, Empty, Input, Radio } from 'antd';
+import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, ArrowUpOutlined, ArrowDownOutlined, LayoutOutlined, SearchOutlined } from '@ant-design/icons';
 import { ElementType, Template, DesignElement, UserAsset } from '../../../../types';
 import { getUserAssets, createUserAsset, updateElementInTemplate, getTemplates } from '../../../../services/designService';
 import './ElementsPanel.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
-import type { FC } from 'react';
+import { useCallback } from 'react';
 
 const { TabPane } = Tabs;
 const { Dragger } = Upload;
@@ -175,13 +174,8 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     }
   };
 
-  // Load templates
-  React.useEffect(() => {
-    loadTemplates();
-  }, [userId, templateFilter]);
-
-  // Function to load templates
-  const loadTemplates = async () => {
+  // Move loadTemplates into useCallback so it can be safely used in the dependency array
+  const loadTemplates = useCallback(async () => {
     try {
       setLoadingTemplates(true);
       setTemplates([]); // Clear existing templates while loading
@@ -194,7 +188,12 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     } finally {
       setLoadingTemplates(false);
     }
-  };
+  }, [templateFilter]); // Add templateFilter as a dependency
+
+  // Now use the callback in useEffect
+  React.useEffect(() => {
+    loadTemplates();
+  }, [userId, loadTemplates]); // Include loadTemplates in the dependency array
 
   // Filter templates based on search query, size, and exclude current template
   const filteredTemplates = React.useMemo(() => {
