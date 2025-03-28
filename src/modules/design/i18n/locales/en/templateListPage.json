@@ -1,1 +1,23 @@
- 
+{
+  "page_title": "Design Templates",
+  "create_new": "Create New",
+  "search_placeholder": "Search templates",
+  "tab_all": "All Templates",
+  "tab_my": "My Templates",
+  "tab_liked": "Liked Templates",
+  "size_square": "Square 1080×1080",
+  "size_portrait": "Portrait 1080×1920",
+  "create_new_template": "Create New Template",
+  "no_templates": "No templates found. Try adjusting your search or create a new template.",
+  "template_size_indicator": "{size}",
+  "added_to_favorites": "Added to favorites",
+  "removed_from_favorites": "Removed from favorites",
+  "error_toggle_favorite": "Failed to update favorite status",
+  "must_be_logged_in": "You must be logged in to create a template.",
+  "must_be_logged_in_template": "You must be logged in to use this template.",
+  "error_create_template": "Failed to create template. Please try again.",
+  "error_load_templates": "Failed to load templates. Please try again.",
+  "creating_template_copy": "Creating a copy of this template...",
+  "template_copied": "Template copied successfully!",
+  "error_copy_template": "Failed to copy template. Please try again."
+} 

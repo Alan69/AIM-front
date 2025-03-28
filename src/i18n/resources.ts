@@ -142,6 +142,8 @@ import articleQueriesDetailsPageRu from '../modules/article-queries/i18n/locales
 // Design module translations
 import templateEditorPageEn from '../modules/design/i18n/locales/en/templateEditorPage.json';
 import templateEditorPageRu from '../modules/design/i18n/locales/ru/templateEditorPage.json';
+import templateListPageEn from '../modules/design/i18n/locales/en/templateListPage.json';
+import templateListPageRu from '../modules/design/i18n/locales/ru/templateListPage.json';
 
 const resources = {
   en: {
@@ -210,7 +212,8 @@ const resources = {
       articleQueriesDetailsPage: articleQueriesDetailsPageEn,
       
       // MODULE design:
-      templateEditorPage: templateEditorPageEn
+      templateEditorPage: templateEditorPageEn,
+      templateListPage: templateListPageEn
     },
   },
   ru: {
@@ -279,7 +282,8 @@ const resources = {
       articleQueriesDetailsPage: articleQueriesDetailsPageRu,
       
       // MODULE design:
-      templateEditorPage: templateEditorPageRu
+      templateEditorPage: templateEditorPageRu,
+      templateListPage: templateListPageRu
     },
   },
 };

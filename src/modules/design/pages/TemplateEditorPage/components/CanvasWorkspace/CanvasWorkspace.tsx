@@ -5,6 +5,7 @@ import { ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { Template, DesignElement, ImageAsset, TextElement, ShapeElement } from '../../../../types';
 import './CanvasWorkspace.scss';
 import Konva from 'konva';
+import { useTranslation } from 'react-i18next';
 
 // Define the KonvaEvent type
 type KonvaEvent = Konva.KonvaEventObject<Event>;
@@ -24,6 +25,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   onUpdateElements,
   onStageRef,
 }) => {
+  const { t } = useTranslation();
   const stageRef = useRef<any>(null);
   const transformerRef = useRef<any>(null);
   const [scale, setScale] = useState<number>(1);
@@ -965,7 +967,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
     <div className="canvas-workspace">
       <div className="canvas-tools">
         <div className="zoom-controls">
-          <Tooltip title="Zoom Out">
+          <Tooltip title={t('templateEditorPage.zoom_out')}>
             <Button 
               icon={<ZoomOutOutlined />} 
               onClick={handleZoomOut}
@@ -982,7 +984,7 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
             className="zoom-slider"
           />
           
-          <Tooltip title="Zoom In">
+          <Tooltip title={t('templateEditorPage.zoom_in')}>
             <Button 
               icon={<ZoomInOutlined />} 
               onClick={handleZoomIn}

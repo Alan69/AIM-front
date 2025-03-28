@@ -3,6 +3,7 @@ import { Collapse, Input, Slider, Form, Select, Typography, InputNumber, Button,
 import { DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import { DesignElement } from '../../../../types';
 import './PropertiesPanel.scss';
+import { useTranslation } from 'react-i18next';
 
 const { Panel } = Collapse;
 const { Title } = Typography;
@@ -28,6 +29,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   onDeleteElement,
   onDuplicateElement
 }) => {
+  const { t } = useTranslation();
   // Keep track of the latest element state with a ref for immediate access
   const latestElementRef = useRef<DesignElement | null>(null);
   
@@ -121,7 +123,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   if (!processedElement) {
     return (
       <div className="properties-panel empty-panel">
-        <p>Select an element to edit its properties</p>
+        <p>{t('templateEditorPage.select_element_to_edit')}</p>
       </div>
     );
   }
@@ -192,17 +194,17 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   };
 
   const renderCommonProperties = () => (
-    <Panel header="Position and Size" key="position">
+    <Panel header={t('templateEditorPage.position_and_size')} key="position">
       <Form layout="vertical" className="properties-form">
         <div className="form-row">
-          <Form.Item label="X Position" className="form-item-half">
+          <Form.Item label={t('templateEditorPage.x_position')} className="form-item-half">
             <InputNumber
               value={getCurrentValue('positionX', 0)}
               onChange={(value) => handleNumberChange('positionX', value)}
               className="full-width"
             />
           </Form.Item>
-          <Form.Item label="Y Position" className="form-item-half">
+          <Form.Item label={t('templateEditorPage.y_position')} className="form-item-half">
             <InputNumber
               value={getCurrentValue('positionY', 0)}
               onChange={(value) => handleNumberChange('positionY', value)}
@@ -213,7 +215,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
         {'width' in processedElement && 'height' in processedElement && (
           <div className="form-row">
-            <Form.Item label="Width" className="form-item-half">
+            <Form.Item label={t('templateEditorPage.width')} className="form-item-half">
               <InputNumber
                 value={getCurrentValue('width', 100)}
                 onChange={(value) => handleNumberChange('width', value)}
@@ -221,7 +223,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 min={1}
               />
             </Form.Item>
-            <Form.Item label="Height" className="form-item-half">
+            <Form.Item label={t('templateEditorPage.height')} className="form-item-half">
               <InputNumber
                 value={getCurrentValue('height', 100)}
                 onChange={(value) => handleNumberChange('height', value)}
@@ -232,7 +234,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           </div>
         )}
 
-        <Form.Item label="Rotation (degrees)">
+        <Form.Item label={t('templateEditorPage.rotation_degrees')}>
           <Slider
             value={getCurrentValue('rotation', 0)}
             onChange={(value) => handleNumberChange('rotation', value)}
@@ -242,8 +244,8 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         </Form.Item>
 
         <Form.Item 
-          label="Layer (Z-Index)"
-          tooltip="Negative values place elements behind others, positive values place elements in front. Higher values appear on top."
+          label={t('templateEditorPage.layer_z_index')}
+          tooltip={t('templateEditorPage.layer_tooltip')}
         >
           <InputNumber
             value={getCurrentValue('zIndex', 0)}
@@ -254,8 +256,8 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
         </Form.Item>
 
         <Form.Item 
-          label="Opacity"
-          tooltip="Controls the transparency of the element. 0 is completely transparent, 1 is fully opaque."
+          label={t('templateEditorPage.opacity')}
+          tooltip={t('templateEditorPage.opacity_tooltip')}
         >
           <div className="form-row">
             <Slider
@@ -286,8 +288,8 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     if (!processedElement || !('text' in processedElement)) return null;
     
     return (
-      <Collapse.Panel header="Text Properties" key="text">
-        <Form.Item label="Text Content">
+      <Collapse.Panel header={t('templateEditorPage.text_properties')} key="text">
+        <Form.Item label={t('templateEditorPage.text_content')}>
           <Input.TextArea
             value={getCurrentValue('text', '')}
             onChange={(e) => handleTextChange('text', e.target.value)}
@@ -295,7 +297,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           />
         </Form.Item>
         
-        <Form.Item label="Font Family">
+        <Form.Item label={t('templateEditorPage.font_family')}>
           <Select
             value={getCurrentValue('font', 'Arial')}
             onChange={(value) => handleTextChange('font', value)}
@@ -309,7 +311,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           </Select>
         </Form.Item>
         
-        <Form.Item label="Font Size">
+        <Form.Item label={t('templateEditorPage.font_size')}>
           <InputNumber
             value={getCurrentValue('fontSize', 50)}
             onChange={(value) => {
@@ -327,7 +329,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           />
         </Form.Item>
         
-        <Form.Item label="Text Color">
+        <Form.Item label={t('templateEditorPage.text_color')}>
           {renderColorPicker('color', '#000000')}
         </Form.Item>
       </Collapse.Panel>
@@ -338,22 +340,22 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     if (!processedElement || !('shapeType' in processedElement)) return null;
     
     return (
-      <Collapse.Panel header="Shape Properties" key="shape">
-        <Form.Item label="Shape Type">
+      <Collapse.Panel header={t('templateEditorPage.shape_properties')} key="shape">
+        <Form.Item label={t('templateEditorPage.shape_type')}>
           <Select
             value={getCurrentValue('shapeType', 'rectangle')}
             onChange={(value) => handleTextChange('shapeType', value)}
             className="full-width"
           >
-            <Select.Option value="rectangle">Rectangle</Select.Option>
-            <Select.Option value="circle">Circle</Select.Option>
-            <Select.Option value="triangle">Triangle</Select.Option>
-            <Select.Option value="star">Star</Select.Option>
-            <Select.Option value="line">Line</Select.Option>
+            <Select.Option value="rectangle">{t('templateEditorPage.rectangle')}</Select.Option>
+            <Select.Option value="circle">{t('templateEditorPage.circle')}</Select.Option>
+            <Select.Option value="triangle">{t('templateEditorPage.triangle')}</Select.Option>
+            <Select.Option value="star">{t('templateEditorPage.star')}</Select.Option>
+            <Select.Option value="line">{t('templateEditorPage.line')}</Select.Option>
           </Select>
         </Form.Item>
         
-        <Form.Item label="Fill Color">
+        <Form.Item label={t('templateEditorPage.fill_color')}>
           {renderColorPicker('color', '#000000')}
         </Form.Item>
       </Collapse.Panel>
@@ -364,12 +366,12 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     if (!('image' in processedElement)) return null;
     
     return (
-      <Panel header="Image Properties" key="image">
+      <Panel header={t('templateEditorPage.image_properties')} key="image">
         <Form layout="vertical" className="properties-form">
           <div className="image-preview">
             <img 
               src={processedElement.image} 
-              alt="Preview" 
+              alt={t('templateEditorPage.preview')}
               style={{ 
                 borderRadius: `${getCurrentValue('borderRadius', 0)}px`,
                 maxWidth: '100%',
@@ -379,8 +381,8 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           </div>
           
           <Form.Item 
-            label="Border Radius" 
-            tooltip="Adjust the roundness of image corners. Higher values make the image more rounded."
+            label={t('templateEditorPage.border_radius')}
+            tooltip={t('templateEditorPage.border_radius_tooltip')}
           >
             <div className="form-row">
               <Slider
@@ -408,19 +410,19 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
   const renderElementType = () => {
     if ('text' in processedElement) {
-      return 'Text Element';
+      return t('templateEditorPage.text_element');
     } else if ('image' in processedElement) {
-      return 'Image Element';
+      return t('templateEditorPage.image_element');
     } else if ('shapeType' in processedElement) {
-      return 'Shape Element';
+      return t('templateEditorPage.shape_element');
     }
-    return 'Unknown Element';
+    return t('templateEditorPage.unknown_element');
   };
 
   return (
     <div className="properties-panel">
       <div className="panel-header">
-        <Title level={4}>Element Properties</Title>
+        <Title level={4}>{t('templateEditorPage.element_properties')}</Title>
         <div className="element-type">{renderElementType()}</div>
       </div>
 
@@ -430,14 +432,14 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             icon={<CopyOutlined />} 
             onClick={() => onDuplicateElement(processedElement.uuid)}
           >
-            Duplicate
+            {t('templateEditorPage.duplicate')}
           </Button>
           <Button 
             danger 
             icon={<DeleteOutlined />} 
             onClick={() => onDeleteElement(processedElement.uuid)}
           >
-            Delete
+            {t('templateEditorPage.delete')}
           </Button>
         </div>
       )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Button, Input, Spin, message, Tooltip, Modal } from 'antd';
 import { 
@@ -38,8 +38,14 @@ import Konva from 'konva';
 
 const { Header, Sider, Content } = Layout;
 
+export const normalizeNumericProperty = (value: any, defaultValue = 0) => {
+  return value !== null && value !== undefined && !isNaN(Number(value)) 
+    ? Number(value) 
+    : defaultValue;
+};
+
 const TemplateEditorPage: React.FC = () => {
-  const { t } = useTranslation('templateEditorPage');
+  const { t } = useTranslation();
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -366,7 +372,7 @@ const TemplateEditorPage: React.FC = () => {
       console.log('Template saved, using local data with preserved positions');
       setTemplate(updatedTemplateData);
       
-      message.success('Template saved successfully');
+      message.success(t('templateEditorPage.save'));
     } catch (error: any) {
       console.error('Error saving template:', error);
       message.error(`Failed to save template: ${error.message}`);
@@ -381,7 +387,7 @@ const TemplateEditorPage: React.FC = () => {
     try {
       const success = await deleteTemplate(uuid);
       if (success) {
-        message.success('Template deleted successfully');
+        message.success(t('templateEditorPage.delete_template'));
         navigate('/design');
       } else {
         message.error('Failed to delete template');
@@ -807,7 +813,7 @@ const TemplateEditorPage: React.FC = () => {
           // Default image properties
           const image = data?.image || '';
           if (!image) {
-            message.error('No image provided');
+            message.error(t('templateEditorPage.no_image_provided'));
             return;
           }
           updatedTemplate = await createImageAsset(
@@ -880,13 +886,13 @@ const TemplateEditorPage: React.FC = () => {
             }
           } catch (error: any) {
             console.error('Error creating shape element:', error);
-            message.error(`Failed to add shape element: ${error.message || 'Unknown error'}`);
+            message.error(t('templateEditorPage.element_added', { type: elementType }));
             return;
           }
           break;
           
         default:
-          message.error(`Unknown element type: ${elementType}`);
+          message.error(t('templateEditorPage.unknown_element_type', { type: elementType }));
           return;
       }
       
@@ -934,10 +940,10 @@ const TemplateEditorPage: React.FC = () => {
       addElementToHistory(freshTemplate);
       
       // Show success message
-      message.success(`Added ${elementType} element to canvas`);
+      message.success(t('templateEditorPage.element_added', { type: elementType }));
     } catch (error: any) {
       console.error(`Error adding ${elementType} element:`, error);
-      message.error(`Failed to add ${elementType} element: ${error.message || 'Unknown error'}`);
+      message.error(t('templateEditorPage.element_added', { type: elementType }));
     }
   };
 
@@ -996,7 +1002,7 @@ const TemplateEditorPage: React.FC = () => {
       setTemplate(freshTemplate);
       setSelectedElement(null);
       addElementToHistory(freshTemplate);
-      message.success(`${elementType} element deleted`);
+      message.success(t('templateEditorPage.element_deleted', { type: elementType }));
     } catch (error: any) {
       console.error('Error deleting element:', error);
       message.error(`Failed to delete element: ${error.message || 'Unknown error'}`);
@@ -1273,7 +1279,7 @@ const TemplateEditorPage: React.FC = () => {
       console.log('Server response:', responseData);
       
       if (responseData && responseData.success) {
-        message.success(t('save_to_post_success'));
+        message.success(t('templateEditorPage.save_to_post_success'));
         
         // Check if we came from a post query details page
         const postQueryId = queryParams.get('postQueryId');
@@ -1319,14 +1325,14 @@ const TemplateEditorPage: React.FC = () => {
         
         // Check for specific error messages
         if (error.response.data.picture) {
-          message.error(`${t('save_to_post_error')} ${error.response.data.picture[0]}`);
+          message.error(`${t('templateEditorPage.save_to_post_error')} ${error.response.data.picture[0]}`);
         } else if (error.response.data.message) {
-          message.error(`${t('save_to_post_error')} ${error.response.data.message}`);
+          message.error(`${t('templateEditorPage.save_to_post_error')} ${error.response.data.message}`);
         } else {
-          message.error(t('save_to_post_error'));
+          message.error(t('templateEditorPage.save_to_post_error'));
         }
       } else {
-        message.error(t('save_to_post_error'));
+        message.error(t('templateEditorPage.save_to_post_error'));
       }
     } finally {
       setIsSavingToPost(false);
@@ -1353,7 +1359,7 @@ const TemplateEditorPage: React.FC = () => {
       setTemplate(updatedTemplate);
       
       // Show success message
-      message.success(newLikeStatus ? 'Added to favorites' : 'Removed from favorites');
+      message.success(newLikeStatus ? t('templateEditorPage.added_to_favorites') : t('templateEditorPage.removed_from_favorites'));
     } catch (error) {
       console.error('Error toggling like status:', error);
       // Revert UI state if the API call fails
@@ -1376,20 +1382,20 @@ const TemplateEditorPage: React.FC = () => {
       const userId = user?.profile?.user?.id;
       
       if (!userId) {
-        message.error('You must be logged in to copy a template.');
+        message.error(t('templateEditorPage.must_be_logged_in'));
         return;
       }
       
       // Copy the template with all its elements
       const newTemplate = await copyTemplate(uuid, newName, userId);
       
-      message.success('Template copied successfully!');
+      message.success(t('templateEditorPage.template_copied'));
       
       // Navigate to the new template in the editor
       navigate(`/design/editor/${newTemplate.uuid}`);
     } catch (error) {
       console.error('Error copying template:', error);
-      message.error('Failed to copy template. Please try again.');
+      message.error(t('templateEditorPage.copy_error'));
     } finally {
       setIsSaving(false);
     }
@@ -1398,7 +1404,7 @@ const TemplateEditorPage: React.FC = () => {
   // Function to download the template as an image
   const handleDownloadImage = async () => {
     if (!stageRef.current) {
-      message.error('Canvas not ready. Please try again.');
+      message.error(t('templateEditorPage.canvas_not_ready'));
       return;
     }
 
@@ -1410,7 +1416,7 @@ const TemplateEditorPage: React.FC = () => {
       const stage = stageRef.current.getStage();
       if (!stage) {
         console.error('Stage reference is invalid');
-        message.error('Could not access canvas. Please try again.');
+        message.error(t('templateEditorPage.stage_invalid'));
         return;
       }
       
@@ -1431,7 +1437,7 @@ const TemplateEditorPage: React.FC = () => {
       
       if (!dataURL || dataURL.length < 1000) {
         console.error('Generated image is too small or empty');
-        message.error('Failed to generate image. Please try again.');
+        message.error(t('templateEditorPage.download_error'));
         return;
       }
       
@@ -1448,10 +1454,10 @@ const TemplateEditorPage: React.FC = () => {
       document.body.removeChild(link);
       
       console.log('Download triggered successfully');
-      message.success('Template downloaded successfully');
+      message.success(t('templateEditorPage.download_success'));
     } catch (error) {
       console.error('Error downloading template as image:', error);
-      message.error('Failed to download template as image');
+      message.error(t('templateEditorPage.download_error'));
     } finally {
       setIsDownloading(false);
     }
@@ -1469,7 +1475,7 @@ const TemplateEditorPage: React.FC = () => {
       })
       .catch((error) => {
         console.error('Error refreshing template:', error);
-        message.error('Failed to refresh the canvas');
+        message.error(t('templateEditorPage.canvas_refresh_error'));
       });
   }, [template, uuid]);
 
@@ -1484,9 +1490,9 @@ const TemplateEditorPage: React.FC = () => {
   if (!template) {
     return (
       <div className="editor-error">
-        <p>Template not found or failed to load.</p>
+        <p>{t('templateEditorPage.template_not_found')}</p>
         <Button type="primary" onClick={handleBack}>
-          Go Back
+          {t('templateEditorPage.back')}
         </Button>
       </div>
     );
@@ -1500,17 +1506,17 @@ const TemplateEditorPage: React.FC = () => {
             icon={<ArrowLeftOutlined />} 
             onClick={handleBack}
           >
-            Back
+            {t('templateEditorPage.back')}
           </Button>
           <Input
             value={templateName}
             onChange={handleNameChange}
-            placeholder="Template Name"
+            placeholder={t('templateEditorPage.template_name_placeholder')}
             className="template-name-input"
           />
         </div>
         <div className="header-right">
-          <Tooltip title={isLiked ? "Remove from favorites" : "Add to favorites"}>
+          <Tooltip title={isLiked ? t('templateEditorPage.remove_from_favorites') : t('templateEditorPage.add_to_favorites')}>
             <Button
               icon={isLiked ? 
                 <HeartFilled className="heart-icon filled" /> : 
@@ -1522,7 +1528,7 @@ const TemplateEditorPage: React.FC = () => {
           </Tooltip>
           {selectedElement && (
             <>
-              <Tooltip title="Delete Element">
+              <Tooltip title={t('templateEditorPage.delete_element')}>
                 <Button 
                   icon={<DeleteOutlined />} 
                   onClick={handleDeleteElement}
@@ -1532,7 +1538,7 @@ const TemplateEditorPage: React.FC = () => {
               </Tooltip>
             </>
           )}
-          <Tooltip title="Undo">
+          <Tooltip title={t('templateEditorPage.undo')}>
             <Button 
               icon={<UndoOutlined />} 
               disabled={historyIndex <= 0}
@@ -1540,7 +1546,7 @@ const TemplateEditorPage: React.FC = () => {
               className="header-button"
             />
           </Tooltip>
-          <Tooltip title="Redo">
+          <Tooltip title={t('templateEditorPage.redo')}>
             <Button 
               icon={<RedoOutlined />} 
               disabled={historyIndex >= history.length - 1}
@@ -1548,7 +1554,7 @@ const TemplateEditorPage: React.FC = () => {
               className="header-button"
             />
           </Tooltip>
-          <Tooltip title="Delete Template">
+          <Tooltip title={t('templateEditorPage.delete_template')}>
             <Button 
               icon={<DeleteOutlined />} 
               danger
@@ -1556,7 +1562,7 @@ const TemplateEditorPage: React.FC = () => {
               className="header-button"
             />
           </Tooltip>
-          <Tooltip title="Download Template">
+          <Tooltip title={t('templateEditorPage.download_template')}>
             <Button 
               icon={<DownloadOutlined />}
               loading={isDownloading}
@@ -1564,7 +1570,7 @@ const TemplateEditorPage: React.FC = () => {
               className="header-button"
             />
           </Tooltip>
-          <Tooltip title="Copy Template">
+          <Tooltip title={t('templateEditorPage.copy_template')}>
             <Button 
               icon={<CopyOutlined />}
               loading={isSaving}
@@ -1578,7 +1584,7 @@ const TemplateEditorPage: React.FC = () => {
             loading={isSaving}
             onClick={handleSave}
           >
-            Save
+            {t('templateEditorPage.save')}
           </Button>
           
           {/* Show different save buttons based on source */}
@@ -1590,7 +1596,7 @@ const TemplateEditorPage: React.FC = () => {
               onClick={handleSaveToPost}
               className="header-button save-to-post-button"
             >
-              Save to Post
+              {t('templateEditorPage.save_to_post')}
             </Button>
           )}
           
@@ -1602,7 +1608,7 @@ const TemplateEditorPage: React.FC = () => {
               onClick={handleSaveToPost}
               className="header-button save-to-post-button"
             >
-              Save to Post Media
+              {t('templateEditorPage.save_to_post_media')}
             </Button>
           )}
         </div>
@@ -1638,14 +1644,15 @@ const TemplateEditorPage: React.FC = () => {
       </Layout>
 
       <Modal
-        title="Delete Template"
+        title={t('templateEditorPage.confirm_delete_title')}
         open={deleteModalVisible}
         onOk={handleDeleteTemplate}
         onCancel={() => setDeleteModalVisible(false)}
-        okText="Delete"
+        okText={t('templateEditorPage.confirm')}
+        cancelText={t('templateEditorPage.cancel')}
         okButtonProps={{ danger: true }}
       >
-        <p>Are you sure you want to delete this template? This action cannot be undone.</p>
+        <p>{t('templateEditorPage.confirm_delete_message')}</p>
       </Modal>
     </Layout>
   );

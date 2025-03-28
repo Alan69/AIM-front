@@ -6,12 +6,14 @@ import { fetchAllTemplates, createTemplate, processImageData, updateTemplate, co
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
+import { useTranslation } from 'react-i18next';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
 const { Option } = Select;
 
 const TemplateListPage: React.FC = () => {
+  const { t } = useTranslation();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,7 +49,7 @@ const TemplateListPage: React.FC = () => {
       setFilteredTemplates(processedTemplates);
     } catch (error) {
       console.error('Error fetching templates:', error);
-      message.error('Failed to load templates. Please try again.');
+      message.error(t('templateListPage.error_load_templates'));
     } finally {
       setLoading(false);
     }
@@ -112,7 +114,7 @@ const TemplateListPage: React.FC = () => {
       const userId = user?.profile?.user?.id;
       
       if (!userId) {
-        message.error('You must be logged in to create a template.');
+        message.error(t('templateListPage.must_be_logged_in'));
         return;
       }
       
@@ -127,7 +129,7 @@ const TemplateListPage: React.FC = () => {
       navigate(`/design/editor/${newTemplate.uuid}`);
     } catch (error) {
       console.error('Error creating template:', error);
-      message.error('Failed to create template. Please try again.');
+      message.error(t('templateListPage.error_create_template'));
     }
   };
 
@@ -149,7 +151,7 @@ const TemplateListPage: React.FC = () => {
         const userId = user?.profile?.user?.id;
         
         if (!userId) {
-          message.error('You must be logged in to use this template.');
+          message.error(t('templateListPage.must_be_logged_in_template'));
           return;
         }
         
@@ -158,7 +160,7 @@ const TemplateListPage: React.FC = () => {
         console.log(`Creating copy of template: ${template.name} with size: ${templateSize}`);
         
         message.loading({
-          content: 'Creating a copy of this template...',
+          content: t('templateListPage.creating_template_copy'),
           key: 'templateCopy',
           duration: 0,
         });
@@ -183,7 +185,7 @@ const TemplateListPage: React.FC = () => {
         
         // Navigate to the new template in the editor
         message.success({
-          content: 'Template copied successfully!',
+          content: t('templateListPage.template_copied'),
           key: 'templateCopy',
           duration: 2,
         });
@@ -196,7 +198,7 @@ const TemplateListPage: React.FC = () => {
       } catch (error) {
         console.error('Error copying template:', error);
         message.error({
-          content: 'Failed to copy template. Please try again.',
+          content: t('templateListPage.error_copy_template'),
           key: 'templateCopy',
         });
         setLoading(false);
@@ -229,7 +231,7 @@ const TemplateListPage: React.FC = () => {
       await updateTemplate(template.uuid, { like: newLikeStatus });
       
       // Show success message
-      message.success(newLikeStatus ? 'Added to favorites' : 'Removed from favorites');
+      message.success(newLikeStatus ? t('templateListPage.added_to_favorites') : t('templateListPage.removed_from_favorites'));
     } catch (error) {
       console.error('Error toggling like status:', error);
       
@@ -245,7 +247,7 @@ const TemplateListPage: React.FC = () => {
       );
       setFilteredTemplates(revertedFilteredTemplates);
       
-      message.error('Failed to update favorite status');
+      message.error(t('templateListPage.error_toggle_favorite'));
     }
   };
 
@@ -518,19 +520,19 @@ const TemplateListPage: React.FC = () => {
   return (
     <div className="template-list-page">
       <div className="template-list-header">
-        <Title level={2}>Design Templates</Title>
+        <Title level={2}>{t('templateListPage.page_title')}</Title>
         <div className="template-actions">
           <Select 
             value={selectedSize} 
             onChange={handleSizeChange}
             style={{ width: 170, marginRight: 16 }}
           >
-            <Option value="1080x1080">Square 1080×1080</Option>
-            <Option value="1080x1920">Portrait 1080×1920</Option>
+            <Option value="1080x1080">{t('templateListPage.size_square')}</Option>
+            <Option value="1080x1920">{t('templateListPage.size_portrait')}</Option>
           </Select>
           
           <Input
-            placeholder="Search templates"
+            placeholder={t('templateListPage.search_placeholder')}
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={handleSearchChange}
@@ -542,15 +544,15 @@ const TemplateListPage: React.FC = () => {
             icon={<PlusOutlined />} 
             onClick={handleCreateTemplate}
           >
-            Create New
+            {t('templateListPage.create_new')}
           </Button>
         </div>
       </div>
 
       <Tabs activeKey={activeTab} onChange={handleTabChange} className="template-tabs">
-        <TabPane tab="All Templates" key="all" />
-        <TabPane tab="My Templates" key="my" />
-        <TabPane tab="Liked Templates" key="liked" />
+        <TabPane tab={t('templateListPage.tab_all')} key="all" />
+        <TabPane tab={t('templateListPage.tab_my')} key="my" />
+        <TabPane tab={t('templateListPage.tab_liked')} key="liked" />
       </Tabs>
 
       {loading ? (
@@ -591,7 +593,7 @@ const TemplateListPage: React.FC = () => {
                         <div className="template-placeholder">
                           <PictureOutlined style={{ fontSize: '32px', opacity: 0.5, marginBottom: '8px' }} />
                           <div>{template.name}</div>
-                          <div className="template-size-indicator">{template.size}</div>
+                          <div className="template-size-indicator">{t('templateListPage.template_size_indicator', { size: template.size })}</div>
                         </div>
                       )}
                     </div>
@@ -610,9 +612,9 @@ const TemplateListPage: React.FC = () => {
             ))
           ) : (
             <Col span={24} className="no-templates">
-              <p>No templates found. Try adjusting your search or create a new template.</p>
+              <p>{t('templateListPage.no_templates')}</p>
               <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateTemplate}>
-                Create New Template
+                {t('templateListPage.create_new_template')}
               </Button>
             </Col>
           )}

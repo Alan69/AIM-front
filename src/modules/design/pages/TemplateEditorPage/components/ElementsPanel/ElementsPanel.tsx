@@ -7,6 +7,7 @@ import './ElementsPanel.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const { TabPane } = Tabs;
 const { Dragger } = Upload;
@@ -121,6 +122,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   onSelectElement,
   onElementsOrderChange
 }) => {
+  const { t } = useTranslation();
   const [userAssets, setUserAssets] = React.useState<UserAsset[]>([]);
   const [loadingAssets, setLoadingAssets] = React.useState(false);
   const [templates, setTemplates] = React.useState<Template[]>([]);
@@ -165,9 +167,9 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       
       // Show a more user-friendly error message based on the error type
       if (error instanceof Error && error.message === 'User not authenticated') {
-        message.error('Please log in to view your saved images');
+        message.error(t('templateEditorPage.please_login_to_view_images'));
       } else {
-        message.error('Failed to load your saved images');
+        message.error(t('templateEditorPage.failed_to_load_images'));
       }
     } finally {
       setLoadingAssets(false);
@@ -183,12 +185,12 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       setTemplates(fetchedTemplates || []);
     } catch (error) {
       console.error('Error loading templates:', error);
-      message.error('Failed to load templates');
+      message.error(t('templateEditorPage.failed_to_load_templates'));
       setTemplates([]); // Ensure templates is empty if there was an error
     } finally {
       setLoadingTemplates(false);
     }
-  }, [templateFilter]); // Add templateFilter as a dependency
+  }, [templateFilter, t]); // Add templateFilter and t as dependencies
 
   // Now use the callback in useEffect
   React.useEffect(() => {
@@ -224,9 +226,9 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     if (!template || !selectedTemplate) return;
     
     // Display confirmation before applying template elements
-    if (window.confirm(`Do you want to add elements from template "${selectedTemplate.name}" to your current canvas?`)) {
+    if (window.confirm(t('templateEditorPage.confirm_add_elements', { name: selectedTemplate.name }))) {
       try {
-        message.loading(`Adding elements from "${selectedTemplate.name}"...`, 1.5);
+        message.loading(t('templateEditorPage.adding_elements', { name: selectedTemplate.name }), 1.5);
 
         // Add text elements
         if (selectedTemplate.texts) {
@@ -258,30 +260,30 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
           }
         }
 
-        message.success(`Elements from "${selectedTemplate.name}" added to canvas`);
+        message.success(t('templateEditorPage.elements_added_from_template', { name: selectedTemplate.name }));
       } catch (error) {
         console.error('Error adding template elements:', error);
-        message.error('Failed to add template elements');
+        message.error(t('templateEditorPage.failed_to_add_template_elements'));
       }
     }
   };
 
   // Sample text elements
   const textElements = [
-    { name: 'Heading', style: { fontSize: 32, fontWeight: 'bold' } },
-    { name: 'Subheading', style: { fontSize: 24, fontWeight: 'bold' } },
-    { name: 'Body Text', style: { fontSize: 16 } },
-    { name: 'Caption', style: { fontSize: 12, color: '#888' } },
-    { name: 'Quote', style: { fontSize: 18, fontStyle: 'italic' } },
+    { name: t('templateEditorPage.heading'), style: { fontSize: 32, fontWeight: 'bold' } },
+    { name: t('templateEditorPage.subheading'), style: { fontSize: 24, fontWeight: 'bold' } },
+    { name: t('templateEditorPage.body_text'), style: { fontSize: 16 } },
+    { name: t('templateEditorPage.caption'), style: { fontSize: 12, color: '#888' } },
+    { name: t('templateEditorPage.quote'), style: { fontSize: 18, fontStyle: 'italic' } },
   ];
 
   // Sample shape elements
   const shapeElements = [
-    { name: 'Rectangle', type: 'rectangle', color: '#4A90E2' },
-    { name: 'Circle', type: 'circle', color: '#7ED321' },
-    { name: 'Triangle', type: 'triangle', color: '#F5A623' },
-    { name: 'Line', type: 'line', color: '#9013FE' },
-    { name: 'Star', type: 'star', color: '#F8E71C' },
+    { name: t('templateEditorPage.rectangle'), type: 'rectangle', color: '#4A90E2' },
+    { name: t('templateEditorPage.circle'), type: 'circle', color: '#7ED321' },
+    { name: t('templateEditorPage.triangle'), type: 'triangle', color: '#F5A623' },
+    { name: t('templateEditorPage.line'), type: 'line', color: '#9013FE' },
+    { name: t('templateEditorPage.star'), type: 'star', color: '#F8E71C' },
   ];
 
   const uploadProps = {
@@ -294,7 +296,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       // Make sure it's a valid image file
       const isImage = file.type.startsWith('image/');
       if (!isImage) {
-        message.error('You can only upload image files!');
+        message.error(t('templateEditorPage.only_upload_images'));
         return false;
       }
 
@@ -316,21 +318,21 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
             
           // Only add the element when we have a valid image URL
             onAddElement(ElementType.IMAGE, { image: imageUrl });
-            message.success(`${file.name} added to canvas and saved to your assets`);
+            message.success(t('templateEditorPage.image_added_to_canvas_and_saved', { name: file.name }));
           } catch (error) {
             console.error('Error saving image asset:', error);
             // Still add the image to the canvas even if saving as asset failed
           onAddElement(ElementType.IMAGE, { image: imageUrl });
-          message.success(`${file.name} added to canvas`);
-            message.error('Failed to save image to your assets');
+          message.success(t('templateEditorPage.image_added_to_canvas', { name: file.name }));
+            message.error(t('templateEditorPage.failed_to_save_image_asset'));
           }
         } else {
-          message.error(`Failed to load image: ${file.name}`);
+          message.error(t('templateEditorPage.failed_to_load_image', { name: file.name }));
         }
       };
       
       reader.onerror = () => {
-        message.error(`Failed to read file: ${file.name}`);
+        message.error(t('templateEditorPage.failed_to_read_file', { name: file.name }));
       };
       
       // Start reading the file
@@ -342,7 +344,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     onChange(info: any) {
       // We're handling the file in beforeUpload, so this is just for feedback
       if (info.file.status === 'error') {
-        message.error(`${info.file.name} file upload failed.`);
+        message.error(t('templateEditorPage.file_upload_failed', { name: info.file.name }));
       }
     },
   };
@@ -374,7 +376,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   // Handle adding an image from user assets
   const handleAddUserAsset = (asset: UserAsset) => {
     onAddElement(ElementType.IMAGE, { image: asset.image });
-    message.success(`Image added to canvas`);
+    message.success(t('templateEditorPage.image_added_to_canvas'));
   };
 
   // Get all elements for the Elements List
@@ -415,13 +417,13 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   // Get element display name
   const getElementName = (element: DesignElement & { elementType: string }) => {
     if (element.elementType === 'text') {
-      return `Text: ${(element as any).text || 'Text'}`;
+      return `${t('templateEditorPage.text')}: ${(element as any).text || t('templateEditorPage.text')}`;
     } else if (element.elementType === 'image') {
-      return `Image ${element.uuid.slice(0, 6)}`;
+      return `${t('templateEditorPage.image')} ${element.uuid.slice(0, 6)}`;
     } else if (element.elementType === 'shape') {
-      return `Shape: ${(element as any).shapeType || 'Shape'}`;
+      return `${t('templateEditorPage.shape')}: ${(element as any).shapeType || t('templateEditorPage.shape')}`;
     }
-    return `Element ${element.uuid.slice(0, 6)}`;
+    return `${t('templateEditorPage.element')} ${element.uuid.slice(0, 6)}`;
   };
 
   // Get element icon/preview
@@ -463,12 +465,12 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
 
     try {
       await Promise.all(updates);
-      message.success('Element order updated');
+      message.success(t('templateEditorPage.element_order_updated'));
       // Notify parent component about the order change
       onElementsOrderChange?.();
     } catch (error) {
       console.error('Error updating element order:', error);
-      message.error('Failed to update element order');
+      message.error(t('templateEditorPage.failed_update_element_order'));
     }
   };
 
@@ -476,13 +478,13 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     <div className="elements-panel">
       <Tabs defaultActiveKey="images" tabPosition="top" className="elements-tabs">
         <TabPane 
-          tab={<><LayoutOutlined /> Templates</>} 
+          tab={<><LayoutOutlined /> {t('templateEditorPage.templates')}</>} 
           key="templates"
         >
           <div className="tab-content">
             <div className="template-search">
               <Input 
-                placeholder="Search Mobile Video templates" 
+                placeholder={t('templateEditorPage.search_templates')}
                 suffix={<SearchOutlined />}
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
@@ -497,16 +499,16 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 buttonStyle="solid"
                 size="small"
               >
-                <Radio.Button value="default">Default</Radio.Button>
-                <Radio.Button value="my">My Templates</Radio.Button>
-                <Radio.Button value="liked">Liked</Radio.Button>
+                <Radio.Button value="default">{t('templateEditorPage.default')}</Radio.Button>
+                <Radio.Button value="my">{t('templateEditorPage.my_templates')}</Radio.Button>
+                <Radio.Button value="liked">{t('templateEditorPage.liked')}</Radio.Button>
               </Radio.Group>
             </div>
             
             <div className="templates-container">
               {loadingTemplates ? (
                 <div className="templates-loading">
-                  <Spin tip="Loading templates..." />
+                  <Spin tip={t('templateEditorPage.loading_templates')} />
                 </div>
               ) : filteredTemplates.length > 0 ? (
                 <List
@@ -595,14 +597,14 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 <Empty 
                   description={
                     searchQuery 
-                      ? "No templates match your search" 
+                      ? t('templateEditorPage.no_templates_match_search')
                       : templateFilter === "my" 
-                        ? "You haven't created any templates yet" 
+                        ? t('templateEditorPage.no_created_templates')
                         : templateFilter === "liked" 
-                          ? "You haven't liked any templates yet"
+                          ? t('templateEditorPage.no_liked_templates')
                           : template?.size
-                            ? `No templates available with size ${template.size}`
-                            : "No templates available"
+                            ? t('templateEditorPage.no_templates_with_size', { size: template.size })
+                            : t('templateEditorPage.no_templates_available')
                   } 
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
@@ -612,7 +614,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
         </TabPane>
         
         <TabPane 
-          tab={<><PictureOutlined /> Images</>} 
+          tab={<><PictureOutlined /> {t('templateEditorPage.images')}</>} 
           key="images"
         >
           <div className="tab-content">
@@ -620,17 +622,17 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
               <p className="ant-upload-drag-icon">
                 <UploadOutlined />
               </p>
-              <p className="ant-upload-text">Click or drag an image to upload</p>
+              <p className="ant-upload-text">{t('templateEditorPage.click_drag_upload')}</p>
               <p className="ant-upload-hint">
-                Supports JPG, PNG, SVG, and GIF
+                {t('templateEditorPage.supported_formats')}
               </p>
             </Dragger>
 
             <div className="my-assets-section">
-              <div className="section-title">My Assets</div>
+              <div className="section-title">{t('templateEditorPage.my_assets')}</div>
               {loadingAssets ? (
                 <div className="assets-loading">
-                  <Spin tip="Loading your images..." />
+                  <Spin tip={t('templateEditorPage.loading_images')} />
                 </div>
               ) : userAssets.length > 0 ? (
                 <List
@@ -661,7 +663,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 />
               ) : (
                 <Empty 
-                  description="No saved images yet" 
+                  description={t('templateEditorPage.no_saved_images')}
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
               )}
@@ -671,7 +673,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                   onClick={loadUserAssets}
                   disabled={loadingAssets}
                 >
-                  Refresh
+                  {t('templateEditorPage.refresh')}
                 </Button>
               </div>
             </div>
@@ -679,7 +681,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
         </TabPane>
         
         <TabPane 
-          tab={<><FontSizeOutlined /> Text</>} 
+          tab={<><FontSizeOutlined /> {t('templateEditorPage.text')}</>} 
           key="text"
         >
           <div className="tab-content">
@@ -702,7 +704,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
         </TabPane>
         
         <TabPane 
-          tab={<><BorderOutlined /> Shapes</>} 
+          tab={<><BorderOutlined /> {t('templateEditorPage.shapes')}</>} 
           key="shapes"
         >
           <div className="tab-content">
@@ -729,7 +731,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       {/* Elements List Panel */}
       <div className="elements-list-panel">
         <div className="elements-list-header">
-          <UnorderedListOutlined /> Elements
+          <UnorderedListOutlined /> {t('templateEditorPage.elements')}
         </div>
         {template && (
           <ElementsList
