@@ -922,6 +922,11 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
         updatedElement.rotation = 0;
       if ('opacity' in updatedElement && (updatedElement.opacity === null || isNaN(updatedElement.opacity))) 
         updatedElement.opacity = 1.0;
+      if ('borderRadius' in updatedElement) {
+        const borderRadius = Number(updatedElement.borderRadius);
+        if (isNaN(borderRadius) || borderRadius === null)
+          updatedElement.borderRadius = 0;
+      }
     }
     
     // Update the element in the template

@@ -14,6 +14,7 @@ const { Dragger } = Upload;
 
 interface ElementsPanelProps {
   onAddElement: (elementType: ElementType, data?: any) => void;
+  onAddBatchElements?: (elements: Array<{type: string, data: any}>) => void;
   template?: Template;
   selectedElement?: DesignElement | null;
   onSelectElement?: (element: DesignElement | null) => void;
@@ -117,6 +118,7 @@ ElementsList.displayName = 'ElementsList';
 
 const ElementsPanel: React.FC<ElementsPanelProps> = ({ 
   onAddElement,
+  onAddBatchElements,
   template,
   selectedElement,
   onSelectElement,
@@ -228,40 +230,97 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     // Display confirmation before applying template elements
     if (window.confirm(t('templateEditorPage.confirm_add_elements', { name: selectedTemplate.name }))) {
       try {
-        message.loading(t('templateEditorPage.adding_elements', { name: selectedTemplate.name }), 1.5);
+        // Store the message reference so we can close it later
+        const loadingMessage = message.loading(t('templateEditorPage.adding_elements', { name: selectedTemplate.name }), 0);
 
-        // Add text elements
-        if (selectedTemplate.texts) {
-          for (const text of selectedTemplate.texts) {
-            onAddElement(ElementType.TEXT, {
-              ...text,
-              uuid: undefined // Let the server generate a new UUID
+        // Add all elements in z-index order to maintain the layering
+        const allElements = [
+          ...(selectedTemplate.shapes || []).map(el => ({ ...el, type: 'shape' })),
+          ...(selectedTemplate.images || []).map(el => ({ ...el, type: 'image' })),
+          ...(selectedTemplate.texts || []).map(el => ({ ...el, type: 'text' }))
+        ].sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0));
+
+        // Prepare all elements for batch addition
+        const batchElements = allElements.map(element => {
+          // Create a deep clone of the element
+          const elementCopy = JSON.parse(JSON.stringify(element));
+          // Only remove the UUID to get a new one
+          delete elementCopy.uuid;
+          
+          // Ensure all properties are preserved exactly as numbers
+          const numericProps = [
+            'positionX', 'positionY', 'width', 'height', 
+            'rotation', 'zIndex', 'opacity', 'borderRadius', 
+            'fontSize'
+          ];
+          
+          numericProps.forEach(prop => {
+            if (prop in elementCopy) {
+              elementCopy[prop] = Number(elementCopy[prop]);
+              
+              // Ensure default values for critical properties if they're invalid
+              if (prop === 'opacity' && (isNaN(elementCopy[prop]) || elementCopy[prop] === null)) {
+                elementCopy[prop] = 1.0;
+              }
+              if (prop === 'zIndex' && (isNaN(elementCopy[prop]) || elementCopy[prop] === null)) {
+                elementCopy[prop] = 1;
+              }
+              if (prop === 'borderRadius' && (isNaN(elementCopy[prop]) || elementCopy[prop] === null)) {
+                elementCopy[prop] = 0;
+              }
+            }
+          });
+          
+          return {
+            type: element.type,
+            data: elementCopy
+          };
+        });
+        
+        // Use the batch add function if available, otherwise fall back to sequential
+        if (onAddBatchElements) {
+          // Use the batch function for better performance
+          await onAddBatchElements(batchElements);
+        } else {
+          // Fallback to sequential addition if batch function not available
+          const elementPromises = batchElements.map(element => {
+            return new Promise<void>((resolve) => {
+              // Add the element based on its type
+              switch (element.type) {
+                case 'shape':
+                  onAddElement(ElementType.SHAPE, element.data);
+                  break;
+                case 'image':
+                  onAddElement(ElementType.IMAGE, element.data);
+                  break;
+                case 'text':
+                  onAddElement(ElementType.TEXT, element.data);
+                  break;
+              }
+              
+              // Short timeout to ensure the element is processed before adding the next
+              setTimeout(resolve, 100);
             });
-          }
+          });
+          
+          // Wait for all elements to be added
+          await Promise.all(elementPromises);
         }
 
-        // Add image elements
-        if (selectedTemplate.images) {
-          for (const image of selectedTemplate.images) {
-            onAddElement(ElementType.IMAGE, {
-              ...image,
-              uuid: undefined // Let the server generate a new UUID
-            });
-          }
-        }
-
-        // Add shape elements
-        if (selectedTemplate.shapes) {
-          for (const shape of selectedTemplate.shapes) {
-            onAddElement(ElementType.SHAPE, {
-              ...shape,
-              uuid: undefined // Let the server generate a new UUID
-            });
-          }
-        }
-
+        // Close the loading message
+        loadingMessage();
+        
+        // Show success message
         message.success(t('templateEditorPage.elements_added_from_template', { name: selectedTemplate.name }));
+        
+        // Force a refresh of the template to ensure all elements are properly loaded
+        if (onElementsOrderChange) {
+          onElementsOrderChange();
+        }
       } catch (error) {
+        // Make sure to close the loading message even if there's an error
+        message.destroy();
+        
         console.error('Error adding template elements:', error);
         message.error(t('templateEditorPage.failed_to_add_template_elements'));
       }
@@ -560,63 +619,10 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                             <div className="template-preview-container">
                               <img 
                                 alt={item.name} 
-                                src={item.backgroundImage === 'no_image.jpg' ? '/default-template-icon.png' : item.backgroundImage} 
+                                src={item.thumbnail || (item.backgroundImage === 'no_image.jpg' ? '/default-template-icon.png' : item.backgroundImage)} 
                                 className="template-background"
                               />
-                              {/* Overlay template elements as thumbnails */}
-                              {item.texts && item.texts.map((text, index) => (
-                                <div 
-                                  key={`text-${index}`}
-                                  className="template-element text-element"
-                                  style={{
-                                    left: `${text.positionX / 10.8}%`,
-                                    top: `${text.positionY / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
-                                    color: text.color,
-                                    fontSize: `${text.fontSize / 10}px`,
-                                    zIndex: text.zIndex
-                                  }}
-                                >
-                                  {text.text.substring(0, 5)}
-                                </div>
-                              ))}
-                              {item.images && item.images.map((image, index) => (
-                                <div 
-                                  key={`image-${index}`}
-                                  className="template-element image-element"
-                                  style={{
-                                    left: `${image.positionX / 10.8}%`,
-                                    top: `${image.positionY / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
-                                    width: `${image.width / 10.8}%`,
-                                    height: `${image.height / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
-                                    zIndex: image.zIndex
-                                  }}
-                                >
-                                  <img 
-                                    src={image.image} 
-                                    alt=""
-                                    style={{
-                                      width: '100%',
-                                      height: '100%',
-                                      objectFit: 'cover',
-                                      borderRadius: `${image.borderRadius || 0}px`
-                                    }}
-                                  />
-                                </div>
-                              ))}
-                              {item.shapes && item.shapes.map((shape, index) => (
-                                <div 
-                                  key={`shape-${index}`}
-                                  className={`template-element shape-element shape-${shape.shapeType}`}
-                                  style={{
-                                    left: `${shape.positionX / 10.8}%`,
-                                    top: `${shape.positionY / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
-                                    width: `${shape.width / 10.8}%`,
-                                    height: `${shape.height / (item.size === '1080x1920' ? 19.2 : 10.8)}%`,
-                                    backgroundColor: shape.color,
-                                    zIndex: shape.zIndex
-                                  }}
-                                />
-                              ))}
+                              {/* Removed overlay template elements as per request */}
                             </div>
                           </div>
                         }

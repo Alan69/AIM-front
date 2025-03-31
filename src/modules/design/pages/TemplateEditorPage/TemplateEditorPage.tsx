@@ -190,7 +190,7 @@ const TemplateEditorPage: React.FC = () => {
   };
 
   const processElementForSaving = (element: any, elementType: 'text' | 'image' | 'shape') => {
-    // Create a new object with explicitly converted numeric properties
+    // Create a new object for the processed element
     const processedElement: any = {};
     
     // Copy all properties from the original element
@@ -198,7 +198,7 @@ const TemplateEditorPage: React.FC = () => {
       const value = element[key];
       
       // Convert numeric properties to numbers
-      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'opacity'].includes(key)) {
+      if (['positionX', 'positionY', 'width', 'height', 'rotation', 'opacity', 'borderRadius'].includes(key)) {
         processedElement[key] = value !== null && value !== undefined ? Number(value) : 
           (key === 'opacity' ? 1.0 : 0);
       } else if (key === 'fontSize') {
@@ -229,47 +229,12 @@ const TemplateEditorPage: React.FC = () => {
     processedElement.zIndex = element.zIndex !== null ? parseInt(String(element.zIndex)) : 0;
     processedElement.rotation = element.rotation !== null ? Number(element.rotation) : 0;
     
-    // Ensure opacity is always set with a reasonable default
-    processedElement.opacity = element.opacity !== null && element.opacity !== undefined ? 
-      Number(element.opacity) : 1.0;
-    
-    // Additional properties based on element type
-    if (elementType === 'text') {
-      // Ensure fontSize is properly set for text elements
-      if (!('fontSize' in processedElement) || 
-          processedElement.fontSize === null || 
-          processedElement.fontSize === 0 || 
-          isNaN(processedElement.fontSize)) {
-        processedElement.fontSize = 50;
-        console.log(`Ensuring text element ${element.uuid} has proper fontSize: 50`);
-      }
-      
-      // Double check the fontSize is at least 10
-      if (processedElement.fontSize < 10) {
-        processedElement.fontSize = 10;
-        console.log(`Final check: Corrected fontSize to minimum of 10 for text element ${element.uuid}`);
-      }
-      
-      console.log(`Final fontSize for text element ${element.uuid}: ${processedElement.fontSize}`);
+    // Add type-specific properties
+    if (elementType === 'image') {
+      // Add image-specific properties
+      processedElement.opacity = element.opacity !== null ? Number(element.opacity) : 1.0;
+      processedElement.borderRadius = element.borderRadius !== null ? Number(element.borderRadius) : 0;
     }
-    
-    if (elementType === 'image' || elementType === 'shape') {
-      processedElement.width = element.width !== null ? Number(element.width) : 100;
-      processedElement.height = element.height !== null ? Number(element.height) : 100;
-    }
-    
-    // Ensure shape_type is preserved for shape elements
-    if (elementType === 'shape') {
-      // If shapeType is null or empty, set it to 'rectangle'
-      if (!element.shapeType) {
-        console.warn('Shape type is null or empty, defaulting to rectangle');
-        processedElement.shapeType = 'rectangle';
-      } else {
-        processedElement.shapeType = element.shapeType;
-      }
-    }
-    
-    console.log(`Processed ${elementType} element for saving:`, processedElement);
     
     return processedElement;
   };
@@ -603,22 +568,31 @@ const TemplateEditorPage: React.FC = () => {
       mergedTemplate.texts = Array.from(textMap.values());
     }
     
-    // Process images - similar approach as with shapes and texts
+    // Process images if they exist in the updated template
     if (updatedTemplate.images && updatedTemplate.images.length > 0) {
-      // Create a map of existing images by UUID for efficient lookup
-      const imageMap = new Map(
-        (mergedTemplate.images || []).map((image: ImageAsset) => [image.uuid, image])
-      );
+      // Create a map of existing images for quick lookup
+      const imageMap = new Map<string, ImageAsset>();
       
-      // Process each image in the updated template
+      // Add the existing images to the map
+      if (template && template.images) {
+        template.images.forEach((image: ImageAsset) => {
+          imageMap.set(image.uuid, { ...image }); // Make a copy to avoid reference issues
+        });
+      }
+      
+      // Update with new images from the updated template
       updatedTemplate.images.forEach((image: ImageAsset) => {
         // Get existing image if it exists and properly cast the type
-        const existingImage = imageMap.get(image.uuid) as ImageAsset | undefined;
+        const existingImage = template?.images?.find((i: ImageAsset) => i.uuid === image.uuid) as ImageAsset | undefined;
         
-        // Normalize numeric values and ensure they are valid
+        // Create a processed image with all properties correctly handled
         const processedImage = {
           ...(existingImage || {}), // Start with existing properties if available
-          ...image, // Then apply updated properties
+          
+          // Explicitly handle all numeric properties, using the updated value if valid
+          // otherwise use the existing value, or a default if neither exists
+          uuid: image.uuid,
+          image: image.image || existingImage?.image || '',
           positionX: image.positionX !== null && image.positionX !== undefined && !isNaN(Number(image.positionX)) 
             ? Number(image.positionX) 
             : existingImage?.positionX !== null && existingImage?.positionX !== undefined && !isNaN(Number(existingImage?.positionX))
@@ -649,7 +623,16 @@ const TemplateEditorPage: React.FC = () => {
             : existingImage?.rotation !== null && existingImage?.rotation !== undefined && !isNaN(Number(existingImage?.rotation))
               ? Number(existingImage.rotation)
               : 0,
-          image: image.image || existingImage?.image || ''
+          opacity: image.opacity !== null && image.opacity !== undefined && !isNaN(Number(image.opacity)) 
+            ? Number(image.opacity) 
+            : existingImage?.opacity !== null && existingImage?.opacity !== undefined && !isNaN(Number(existingImage?.opacity))
+              ? Number(existingImage.opacity)
+              : 1.0,
+          borderRadius: image.borderRadius !== null && image.borderRadius !== undefined && !isNaN(Number(image.borderRadius)) 
+            ? Number(image.borderRadius) 
+            : existingImage?.borderRadius !== null && existingImage?.borderRadius !== undefined && !isNaN(Number(existingImage?.borderRadius))
+              ? Number(existingImage.borderRadius)
+              : 0
         };
         
         // Update the image in our map
@@ -798,7 +781,10 @@ const TemplateEditorPage: React.FC = () => {
             fontSize,
             color,
             data?.positionX || 500,
-            data?.positionY || 500
+            data?.positionY || 500,
+            data?.zIndex !== undefined ? Number(data.zIndex) : 0,
+            data?.rotation !== undefined ? Number(data.rotation) : 0,
+            data?.opacity !== undefined ? Number(data.opacity) : 1.0
           );
           
           // Immediately save the element properties
@@ -816,6 +802,12 @@ const TemplateEditorPage: React.FC = () => {
             message.error(t('templateEditorPage.no_image_provided'));
             return;
           }
+          
+          // Use the provided zIndex if available, otherwise default to 0
+          const imageZIndex = data?.zIndex !== undefined ? Number(data.zIndex) : 0;
+          const opacity = data?.opacity !== undefined ? Number(data.opacity) : 1.0;
+          const borderRadius = data?.borderRadius !== undefined ? Number(data.borderRadius) : 0;
+          
           updatedTemplate = await createImageAsset(
             uuid,
             image,
@@ -823,13 +815,25 @@ const TemplateEditorPage: React.FC = () => {
             data?.positionY || 500,
             data?.width || 200,
             data?.height || 200,
-            -1 // zIndex - set to -1 to place behind other elements
+            imageZIndex,
+            data?.rotation || 0,
+            opacity,
+            borderRadius
           );
           
           // Immediately save the element properties
           if (updatedTemplate.images && updatedTemplate.images.length > 0) {
             const newImage = updatedTemplate.images[updatedTemplate.images.length - 1];
             const processedImage = processElementForSaving(newImage, 'image');
+            
+            // Add any additional properties from the original data
+            if (data?.borderRadius !== undefined) {
+              processedImage.borderRadius = Number(data.borderRadius);
+            }
+            if (data?.opacity !== undefined) {
+              processedImage.opacity = Number(data.opacity);
+            }
+            
             await updateElementInTemplate(uuid, newImage.uuid, 'image', processedImage);
           }
           break;
@@ -838,8 +842,6 @@ const TemplateEditorPage: React.FC = () => {
           // Default shape properties
           // Use the shapeType from data, or default to 'rectangle' if not provided
           const shapeType = data?.shapeType || 'rectangle';
-          console.log('Creating shape element with type:', shapeType);
-          console.log('Full shape data received:', data);
           
           // Ensure position values are valid numbers
           const shapePositionX = data?.positionX !== null && 
@@ -853,20 +855,22 @@ const TemplateEditorPage: React.FC = () => {
                                   !isNaN(Number(data?.positionY)) 
                                 ? Number(data?.positionY) 
                                 : centerY;
-          
-          console.log(`Using validated position: (${shapePositionX}, ${shapePositionY}) for new shape`);
+                                
+          // Use provided opacity or default to 1
+          const shapeOpacity = data?.opacity !== undefined ? Number(data.opacity) : 1.0;
           
           try {
             updatedTemplate = await createShapeElement(
               uuid,
               shapeType,  // Use the provided shapeType
               data?.color || '#000000',
-              shapePositionX || 500, // Use validated position X or 500
-              shapePositionY || 500, // Use validated position Y or 500
+              shapePositionX, // Use validated position X
+              shapePositionY, // Use validated position Y
               data?.width || 100,
               data?.height || 100,
-              data?.zIndex || 0,
-              data?.rotation || 0
+              data?.zIndex !== undefined ? Number(data.zIndex) : 0,
+              data?.rotation || 0,
+              shapeOpacity
             );
             
             // Immediately save the element properties
@@ -880,7 +884,8 @@ const TemplateEditorPage: React.FC = () => {
                 width: data?.width || 100,
                 height: data?.height || 100,
                 zIndex: data?.zIndex || 0,
-                rotation: data?.rotation || 0
+                rotation: data?.rotation || 0,
+                opacity: shapeOpacity
               };
               await updateElementInTemplate(uuid, newShape.uuid, 'shape', processedShape);
             }
@@ -944,6 +949,149 @@ const TemplateEditorPage: React.FC = () => {
     } catch (error: any) {
       console.error(`Error adding ${elementType} element:`, error);
       message.error(t('templateEditorPage.element_added', { type: elementType }));
+    }
+  };
+
+  // Handle batch adding elements (for template assignment)
+  const handleAddBatchElements = async (elements: any[]) => {
+    if (!template || !uuid) return;
+    
+    try {
+      // Store a deep clone of the current template state
+      const currentTemplate = JSON.parse(JSON.stringify(template));
+      
+      // Create a new template object to collect all the new elements
+      const batchTemplate = {
+        ...currentTemplate,
+        texts: [...(currentTemplate.texts || [])],
+        images: [...(currentTemplate.images || [])],
+        shapes: [...(currentTemplate.shapes || [])]
+      };
+      
+      let hasChanges = false;
+      
+      // Process all elements in parallel
+      await Promise.all(elements.map(async (elementData) => {
+        const elementType = elementData.type;
+        const data = elementData.data;
+        
+        // Skip elements with missing required data
+        if (!elementType || !data) return;
+        
+        // Process based on element type
+        switch (elementType) {
+          case 'text': {
+            const result = await createTextElement(
+              uuid,
+              data.text || 'New Text',
+              data.font || 'Arial',
+              data.fontSize || 100,
+              data.color || '#000000',
+              data.positionX !== undefined ? Number(data.positionX) : 500,
+              data.positionY !== undefined ? Number(data.positionY) : 500,
+              data.zIndex !== undefined ? Number(data.zIndex) : 0,
+              data.rotation !== undefined ? Number(data.rotation) : 0,
+              data.opacity !== undefined ? Number(data.opacity) : 1.0
+            );
+            
+            if (result.texts && result.texts.length > 0) {
+              const newText = result.texts[result.texts.length - 1];
+              const processedText = processElementForSaving(newText, 'text');
+              
+              // Update in the backend
+              await updateElementInTemplate(uuid, newText.uuid, 'text', processedText);
+              
+              // Add to our batch template
+              batchTemplate.texts.push(processedText);
+              hasChanges = true;
+            }
+            break;
+          }
+            
+          case 'image': {
+            const image = data.image;
+            if (!image) return;
+            
+            const result = await createImageAsset(
+              uuid,
+              image,
+              data.positionX !== undefined ? Number(data.positionX) : 500,
+              data.positionY !== undefined ? Number(data.positionY) : 500,
+              data.width !== undefined ? Number(data.width) : 200,
+              data.height !== undefined ? Number(data.height) : 200,
+              data.zIndex !== undefined ? Number(data.zIndex) : 0,
+              data.rotation !== undefined ? Number(data.rotation) : 0,
+              data.opacity !== undefined ? Number(data.opacity) : 1.0,
+              data.borderRadius !== undefined ? Number(data.borderRadius) : 0
+            );
+            
+            if (result.images && result.images.length > 0) {
+              const newImage = result.images[result.images.length - 1];
+              const processedImage = processElementForSaving(newImage, 'image');
+              
+              // Add any additional properties
+              if (data.borderRadius !== undefined) {
+                processedImage.borderRadius = Number(data.borderRadius);
+              }
+              if (data.opacity !== undefined) {
+                processedImage.opacity = Number(data.opacity);
+              }
+              
+              // Update in the backend
+              await updateElementInTemplate(uuid, newImage.uuid, 'image', processedImage);
+              
+              // Add to our batch template
+              batchTemplate.images.push(processedImage);
+              hasChanges = true;
+            }
+            break;
+          }
+            
+          case 'shape': {
+            const shapeType = data.shapeType || 'rectangle';
+            
+            const result = await createShapeElement(
+              uuid,
+              shapeType,
+              data.color || '#000000',
+              data.positionX !== undefined ? Number(data.positionX) : 500,
+              data.positionY !== undefined ? Number(data.positionY) : 500,
+              data.width !== undefined ? Number(data.width) : 100,
+              data.height !== undefined ? Number(data.height) : 100,
+              data.zIndex !== undefined ? Number(data.zIndex) : 0,
+              data.rotation !== undefined ? Number(data.rotation) : 0,
+              data.opacity !== undefined ? Number(data.opacity) : 1.0
+            );
+            
+            if (result.shapes && result.shapes.length > 0) {
+              const newShape = result.shapes[result.shapes.length - 1];
+              const processedShape = processElementForSaving(newShape, 'shape');
+              
+              // Update in the backend
+              await updateElementInTemplate(uuid, newShape.uuid, 'shape', processedShape);
+              
+              // Add to our batch template
+              batchTemplate.shapes.push(processedShape);
+              hasChanges = true;
+            }
+            break;
+          }
+        }
+      }));
+      
+      if (hasChanges) {
+        // Update the template in state
+        console.log('Updated template after batch adding elements:', batchTemplate);
+        
+        // Set the processed template
+        setTemplate(batchTemplate);
+        
+        // Add to history
+        addElementToHistory(batchTemplate);
+      }
+    } catch (error: any) {
+      console.error(`Error batch adding elements:`, error);
+      message.error(t('templateEditorPage.failed_to_add_elements'));
     }
   };
 
@@ -1618,6 +1766,7 @@ const TemplateEditorPage: React.FC = () => {
         <Sider width={250} className="editor-sider left-sider">
           <ElementsPanel 
             onAddElement={handleAddElement}
+            onAddBatchElements={handleAddBatchElements}
             template={template}
             selectedElement={selectedElement}
             onSelectElement={handleSelectElement}

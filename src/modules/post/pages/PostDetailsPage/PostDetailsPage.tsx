@@ -793,7 +793,7 @@ export const PostDetailsPage = () => {
                       {postMedias?.map((media) => (
                         <div key={media.id} className={styles.imageWrapper}>
                           <Image
-                            src={media.media}
+                            src={`http://localhost:8000${media.media}`}
                             alt={`Media ${media.id}`}
                             className={styles.sliderImage}
                           />
