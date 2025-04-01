@@ -9,6 +9,7 @@ import {
   useRecreatePostTextMutation,
   TPostMediaData,
   useUpdatePostMutation,
+  useUpdatePostMediaTemplateMutation,
 } from "../../redux/api";
 import {
   Layout,
@@ -20,6 +21,11 @@ import {
   message,
   Tooltip,
   Upload,
+  Modal,
+  Row,
+  Col,
+  Card,
+  Spin,
 } from "antd";
 import {
   ReloadOutlined,
@@ -32,6 +38,7 @@ import {
   PlusOutlined,
   UploadOutlined,
   EditOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -60,7 +67,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "redux/store";
 import { postActions } from "../../redux/slices/post.slice";
 import { WebSocketService } from "services/websocket";
-import { createTemplate } from "../../../design/services/designService";
+import { createTemplate, fetchAllTemplates, copyTemplate } from "../../../design/services/designService";
+import { Template } from "../../../design/types";
 const baseApiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const { Content } = Layout;
@@ -97,6 +105,7 @@ export const PostDetailsPage = () => {
   const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
   const [createPostImage, { isLoading: isCreating }] =
     useCreatePostImageMutation();
+  const [updatePostMediaTemplate] = useUpdatePostMediaTemplateMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
   
@@ -127,6 +136,12 @@ export const PostDetailsPage = () => {
   const [selectedMedias, setSelectedMedias] = useState<string[]>([]);
   const [fileList, setFileList] = useState<File[]>([]);
 
+  // New state for template selector
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
     : avatar;
@@ -143,6 +158,122 @@ export const PostDetailsPage = () => {
   const formValues = watch();
   const imageOption = watch("imageOption");
   const textOption = watch("textOption");
+
+  // Function to load non-assignable templates
+  const loadNonAssignableTemplates = async () => {
+    try {
+      setLoadingTemplates(true);
+      const allTemplates = await fetchAllTemplates();
+      // Filter out templates where assignable is true
+      const nonAssignableTemplates = allTemplates.filter(
+        (template: Template) => !template.assignable
+      );
+      setTemplates(nonAssignableTemplates);
+      setLoadingTemplates(false);
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      message.error('Failed to load templates');
+      setLoadingTemplates(false);
+    }
+  };
+
+  // Function to show template selection modal
+  const showTemplateModal = () => {
+    loadNonAssignableTemplates();
+    setIsTemplateModalOpen(true);
+  };
+
+  // Function to handle template selection
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template);
+  };
+
+  // Function to apply the selected template
+  const applySelectedTemplate = async () => {
+    if (!selectedTemplate || !id || !user?.profile?.user?.id) {
+      message.error('Please select a template first');
+      return;
+    }
+
+    try {
+      // 1. Create a copy of the template
+      const newTemplateName = `Template for Post ${id}`;
+      const userId = user.profile.user.id;
+      
+      message.loading({
+        content: t('postDetailsPage.creating_template'),
+        key: 'templateCreation',
+      });
+      
+      // Copy the template with all its elements
+      const newTemplate = await copyTemplate(
+        selectedTemplate.uuid, 
+        newTemplateName, 
+        userId
+      );
+      
+      // 2. Render the template as an image
+      // We'll use the template's thumbnail as the image
+      const templateImageUrl = selectedTemplate.thumbnail || '';
+      
+      if (!templateImageUrl) {
+        message.error(t('postDetailsPage.template_apply_error'));
+        return;
+      }
+      
+      // 3. Create a File object from the image URL
+      try {
+        const response = await fetch(templateImageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `template_${selectedTemplate.uuid}.png`, { type: 'image/png' });
+        
+        // 4. Upload the image to the post media
+        const result = await createPostImage({
+          post: id,
+          media: [file],
+        }).unwrap();
+        
+        // 5. Now link the newly created media with the template
+        if (result && result.id) {
+          await updatePostMediaTemplate({
+            id: result.id,
+            template_uuid: newTemplate.uuid
+          }).unwrap();
+          
+          message.success(t('postDetailsPage.template_applied'), 3);
+        } else {
+          // If we don't get a result with an ID, we need to refresh and try to find the latest media
+          await refetchPostMedias();
+          const medias = postMedias || [];
+          if (medias.length > 0) {
+            const latestMedia = medias[medias.length - 1];
+            await updatePostMediaTemplate({
+              id: latestMedia.id,
+              template_uuid: newTemplate.uuid
+            }).unwrap();
+            
+            message.success(t('postDetailsPage.template_applied'), 3);
+          } else {
+            throw new Error('Could not find the newly created post media');
+          }
+        }
+        
+        // Refresh media list
+        refetchPostMedias();
+        setIsTemplateModalOpen(false);
+        setSelectedTemplate(null);
+        
+      } catch (error) {
+        console.error('Error processing template image:', error);
+        message.error(t('postDetailsPage.template_apply_error'));
+      }
+    } catch (error) {
+      console.error('Error applying template:', error);
+      message.error(t('postDetailsPage.template_apply_error'));
+    } finally {
+      message.destroy('templateCreation');
+    }
+  };
 
   const formatText = (text: string) => {
     return text
@@ -754,6 +885,87 @@ export const PostDetailsPage = () => {
     }
   }, [post, setValue]);
 
+  // Add template selection modal
+  const renderTemplateModal = () => {
+    return (
+      <Modal
+        title={t('postDetailsPage.select_template')}
+        open={isTemplateModalOpen}
+        onCancel={() => setIsTemplateModalOpen(false)}
+        width={800}
+        footer={[
+          <Button key="cancel" onClick={() => setIsTemplateModalOpen(false)}>
+            {t('postDetailsPage.cancel')}
+          </Button>,
+          <Button
+            key="apply"
+            type="primary"
+            disabled={!selectedTemplate}
+            onClick={applySelectedTemplate}
+          >
+            {t('postDetailsPage.apply_template')}
+          </Button>,
+        ]}
+      >
+        {loadingTemplates ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" />
+            <div style={{ marginTop: '16px' }}>{t('postDetailsPage.loading_templates')}</div>
+          </div>
+        ) : (
+          <div>
+            <div style={{ marginBottom: '16px' }}>
+              <Text>{t('postDetailsPage.select_banner_template')}</Text>
+            </div>
+            <Row gutter={[16, 16]}>
+              {templates.length > 0 ? (
+                templates.map((template) => (
+                  <Col xs={24} sm={12} md={8} key={template.uuid}>
+                    <Card
+                      hoverable
+                      style={{
+                        height: '100%',
+                        border: selectedTemplate?.uuid === template.uuid ? '2px solid #1890ff' : undefined,
+                      }}
+                      onClick={() => handleTemplateSelect(template)}
+                      cover={
+                        template.thumbnail ? (
+                          <div style={{ height: 150, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '8px', background: '#f5f5f5' }}>
+                            <img
+                              alt={template.name}
+                              src={template.thumbnail}
+                              style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain' }}
+                            />
+                          </div>
+                        ) : (
+                          <div style={{ height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '16px', background: '#f5f5f5' }}>
+                            <PictureOutlined style={{ fontSize: 32, opacity: 0.5 }} />
+                            <div style={{ marginTop: '8px' }}>{t('postDetailsPage.no_preview')}</div>
+                          </div>
+                        )
+                      }
+                    >
+                      <Card.Meta
+                        title={template.name}
+                        description={template.size}
+                      />
+                    </Card>
+                  </Col>
+                ))
+              ) : (
+                <Col span={24}>
+                  <div style={{ textAlign: 'center', padding: '40px' }}>
+                    <Text>{t('postDetailsPage.no_banner_templates')}</Text>
+                  </div>
+                </Col>
+              )}
+            </Row>
+          </div>
+        )}
+      </Modal>
+    );
+  };
+
   if (isLoading)
     return (
       <div className={styles.postDescr}>
@@ -1052,6 +1264,15 @@ export const PostDetailsPage = () => {
                         >
                           {t("postDetailsPage.edit")}
                         </Button>
+                        {user?.profile?.user?.is_staff && (
+                          <Button
+                            type="primary"
+                            onClick={showTemplateModal}
+                            icon={<PictureOutlined />}
+                          >
+                            {t("postDetailsPage.add_banner")}
+                          </Button>
+                        )}
                         <Button
                           type="primary"
                           onClick={handleShowContentPlanSocialMediaListModal}
@@ -1253,6 +1474,7 @@ export const PostDetailsPage = () => {
           </Layout>
         </Content>
       </Layout>
+      {renderTemplateModal()}
       <ModalImageStylesList
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}

@@ -37,5 +37,16 @@
   "view_direct": "View direct image",
   "refresh_image": "Refresh image",
   "image_updated_from_editor": "Image has been updated from the designer",
-  "image_preview": "Preview of the updated image"
+  "image_preview": "Preview of the updated image",
+  
+  "add_banner": "Add Banner",
+  "select_template": "Select Template",
+  "apply_template": "Apply Template",
+  "select_banner_template": "Select a banner template to apply to your post:",
+  "no_banner_templates": "No banner templates available",
+  "loading_templates": "Loading templates...",
+  "template_applied": "Template applied to post successfully",
+  "template_apply_error": "Failed to apply template to post",
+  "creating_template": "Creating template...",
+  "no_preview": "No Preview"
 }

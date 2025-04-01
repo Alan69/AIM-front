@@ -37,5 +37,16 @@
   "view_direct": "Просмотреть прямую ссылку",
   "refresh_image": "Обновить изображение",
   "image_updated_from_editor": "Изображение было обновлено из дизайнера",
-  "image_preview": "Предпросмотр обновленного изображения"
+  "image_preview": "Предпросмотр обновленного изображения",
+  
+  "add_banner": "Добавить баннер",
+  "select_template": "Выбрать шаблон",
+  "apply_template": "Применить шаблон",
+  "select_banner_template": "Выберите шаблон баннера для вашего поста:",
+  "no_banner_templates": "Доступных шаблонов баннера нет",
+  "loading_templates": "Загрузка шаблонов...",
+  "template_applied": "Шаблон успешно применен к посту",
+  "template_apply_error": "Не удалось применить шаблон к посту",
+  "creating_template": "Создание шаблона...",
+  "no_preview": "Нет превью"
 }

@@ -2,6 +2,7 @@ import { TPostQueryData } from 'modules/post-query/redux/api';
 import baseApi from '../../../../redux/api';
 import { TUserData } from 'modules/account/redux/api';
 import { TImgStylesData } from 'redux/api/imgStyles/imgStylesApi';
+import { Template } from '../../../design/types';
 
 export type TPreviousPostImage = {
   id: string;
@@ -105,6 +106,11 @@ export type TCreateCustomPost = {
   media_files?: File[];
   like?: boolean;
 }
+
+export type TUpdatePostMediaTemplate = {
+  id: string;
+  template_uuid: string;
+};
 
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -272,6 +278,13 @@ export const postApi = baseApi.injectEndpoints({
       transformResponse: (response: TCreatePostImageResponse) => response,
       extraOptions: { showErrors: false },
     }),
+    updatePostMediaTemplate: build.mutation<any, TUpdatePostMediaTemplate>({
+      query: (data) => ({
+        url: `/post-media/${data.id}/update-template/`,
+        method: 'POST',
+        body: { template_uuid: data.template_uuid },
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -289,5 +302,6 @@ export const {
   useDeletePostMutation,
   usePostNowMutation,
   useGetPostMediasByIdQuery,
-  useCreatePostImageMutation
+  useCreatePostImageMutation,
+  useUpdatePostMediaTemplateMutation
 } = postApi;
