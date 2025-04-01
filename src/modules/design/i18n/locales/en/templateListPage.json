@@ -19,5 +19,7 @@
   "error_load_templates": "Failed to load templates. Please try again.",
   "creating_template_copy": "Creating a copy of this template...",
   "template_copied": "Template copied successfully!",
-  "error_copy_template": "Failed to copy template. Please try again."
+  "error_copy_template": "Failed to copy template. Please try again.",
+  "assignable_tooltip": "Assignable to posts",
+  "assignable_label": "Assignable"
 } 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Button, Input, Spin, message, Tooltip, Modal } from 'antd';
+import { Layout, Button, Input, Spin, message, Tooltip, Modal, Checkbox } from 'antd';
 import { 
   ArrowLeftOutlined, 
   SaveOutlined, 
@@ -70,6 +70,7 @@ const TemplateEditorPage: React.FC = () => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const { user } = useTypedSelector((state) => state.auth);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const [isAssignable, setIsAssignable] = useState<boolean>(false);
 
   const loadTemplate = async (uuid: string) => {
     try {
@@ -147,6 +148,7 @@ const TemplateEditorPage: React.FC = () => {
     if (template) {
       setTemplateName(template.name);
       setIsLiked(template.like || false);
+      setIsAssignable(template.assignable || false);
       if (history.length === 0) {
         setHistory([template]);
         setHistoryIndex(0);
@@ -316,11 +318,12 @@ const TemplateEditorPage: React.FC = () => {
         }
       }
       
-      // Then save the template name and thumbnail
-      console.log(`Saving template name: ${templateName} and thumbnail`);
+      // Then save the template name, thumbnail, and assignable status
+      console.log(`Saving template name: ${templateName}, assignable: ${isAssignable}, and thumbnail`);
       const updatedTemplate = await updateTemplate(uuid, { 
         name: templateName,
-        thumbnail: thumbnailDataURL || undefined
+        thumbnail: thumbnailDataURL || undefined,
+        assignable: isAssignable
       });
       
       // Merge the updated template with our local copy to ensure all properties are preserved
@@ -329,7 +332,8 @@ const TemplateEditorPage: React.FC = () => {
         name: updatedTemplate.name,
         isDefault: updatedTemplate.isDefault,
         size: updatedTemplate.size,
-        thumbnail: updatedTemplate.thumbnail || updatedTemplateData.thumbnail
+        thumbnail: updatedTemplate.thumbnail || updatedTemplateData.thumbnail,
+        assignable: updatedTemplate.assignable
       };
       
       // Set the template directly without reloading from server
@@ -1664,6 +1668,15 @@ const TemplateEditorPage: React.FC = () => {
           />
         </div>
         <div className="header-right">
+          <Tooltip title={t('templateEditorPage.assignable_tooltip')}>
+            <Checkbox
+              checked={isAssignable}
+              onChange={(e) => setIsAssignable(e.target.checked)}
+              className="assignable-checkbox"
+            >
+              {t('templateEditorPage.assignable')}
+            </Checkbox>
+          </Tooltip>
           <Tooltip title={isLiked ? t('templateEditorPage.remove_from_favorites') : t('templateEditorPage.add_to_favorites')}>
             <Button
               icon={isLiked ? 

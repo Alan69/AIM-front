@@ -41,6 +41,8 @@
   "template_not_found": "Template not found or failed to load.",
   "confirm_delete_title": "Delete Template",
   "confirm_delete_message": "Are you sure you want to delete this template? This action cannot be undone.",
+  "assignable": "Assignable",
+  "assignable_tooltip": "When enabled, this template can be assigned to posts",
   
   "select_element_to_edit": "Select an element to edit its properties",
   "position_and_size": "Position and Size",

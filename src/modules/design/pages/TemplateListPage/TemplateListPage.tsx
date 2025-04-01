@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message } from 'antd';
-import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
+import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message, Tooltip, Tag } from 'antd';
+import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled, CheckCircleOutlined } from '@ant-design/icons';
 import { fetchAllTemplates, createTemplate, processImageData, updateTemplate, copyTemplate } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
@@ -624,6 +624,13 @@ const TemplateListPage: React.FC = () => {
                                 {template.isDefault && (
                                   <span className="template-default-badge"></span>
                                 )}
+                                {template.assignable && (
+                                  <Tooltip title={t('templateListPage.assignable_tooltip')}>
+                                    <Tag color="green" className="assignable-tag">
+                                      <CheckCircleOutlined /> {t('templateListPage.assignable_label')}
+                                    </Tag>
+                                  </Tooltip>
+                                )}
                               </div>
                             </div>
                           </Card>
@@ -684,6 +691,13 @@ const TemplateListPage: React.FC = () => {
                                 {template.size}
                                 {template.isDefault && (
                                   <span className="template-default-badge"></span>
+                                )}
+                                {template.assignable && (
+                                  <Tooltip title={t('templateListPage.assignable_tooltip')}>
+                                    <Tag color="green" className="assignable-tag">
+                                      <CheckCircleOutlined /> {t('templateListPage.assignable_label')}
+                                    </Tag>
+                                  </Tooltip>
                                 )}
                               </div>
                             </div>
@@ -749,6 +763,13 @@ const TemplateListPage: React.FC = () => {
                           {template.size}
                           {template.isDefault && (
                             <span className="template-default-badge"></span>
+                          )}
+                          {template.assignable && (
+                            <Tooltip title={t('templateListPage.assignable_tooltip')}>
+                              <Tag color="green" className="assignable-tag">
+                                <CheckCircleOutlined /> {t('templateListPage.assignable_label')}
+                              </Tag>
+                            </Tooltip>
                           )}
                         </div>
                       </div>
