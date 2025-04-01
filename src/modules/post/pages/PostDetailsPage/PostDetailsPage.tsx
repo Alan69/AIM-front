@@ -164,15 +164,15 @@ export const PostDetailsPage = () => {
     try {
       setLoadingTemplates(true);
       const allTemplates = await fetchAllTemplates();
-      // Filter out templates where assignable is true
-      const nonAssignableTemplates = allTemplates.filter(
-        (template: Template) => !template.assignable
+      // Filter templates to only include those where isDefault is true and assignable is false
+      const filteredTemplates = allTemplates.filter(
+        (template: Template) => template.isDefault === true && !template.assignable
       );
-      setTemplates(nonAssignableTemplates);
+      setTemplates(filteredTemplates);
       setLoadingTemplates(false);
     } catch (error) {
       console.error('Error loading templates:', error);
-      message.error('Failed to load templates');
+      message.error(t('postDetailsPage.template_apply_error'));
       setLoadingTemplates(false);
     }
   };
@@ -1005,7 +1005,7 @@ export const PostDetailsPage = () => {
                       {postMedias?.map((media) => (
                         <div key={media.id} className={styles.imageWrapper}>
                           <Image
-                            src={media.media}
+                            src={`http://localhost:8000${media.media}`}
                             alt={`Media ${media.id}`}
                             className={styles.sliderImage}
                           />
@@ -1092,6 +1092,17 @@ export const PostDetailsPage = () => {
                         {t("postDetailsPage.select_file")}
                       </Button>
                     </Upload>
+
+                    {user?.profile?.user?.is_staff && (
+                      <Button
+                        className={styles.uploadBanner}
+                        type="primary"
+                        onClick={showTemplateModal}
+                        icon={<PictureOutlined />}
+                      >
+                        {t("postDetailsPage.add_banner")}
+                      </Button>
+                    )}
 
                     {fileList.length ? (
                       <Button
@@ -1264,15 +1275,6 @@ export const PostDetailsPage = () => {
                         >
                           {t("postDetailsPage.edit")}
                         </Button>
-                        {user?.profile?.user?.is_staff && (
-                          <Button
-                            type="primary"
-                            onClick={showTemplateModal}
-                            icon={<PictureOutlined />}
-                          >
-                            {t("postDetailsPage.add_banner")}
-                          </Button>
-                        )}
                         <Button
                           type="primary"
                           onClick={handleShowContentPlanSocialMediaListModal}
