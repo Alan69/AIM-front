@@ -75,6 +75,14 @@ const TemplateListPage: React.FC = () => {
       filtered = filtered.filter(template => 
         template.isDefault
       );
+      
+      // Separate assignable and non-assignable templates
+      // Use !! to convert undefined to boolean, defaulting to false if undefined
+      const assignableTemplates = filtered.filter(template => !!template.assignable);
+      const nonAssignableTemplates = filtered.filter(template => !template.assignable);
+      
+      // Sort assignable templates first
+      filtered = [...assignableTemplates, ...nonAssignableTemplates];
     } else if (activeTab === 'my') {
       // Show only user-created templates (not default templates)
       filtered = filtered.filter(template => 
@@ -560,65 +568,204 @@ const TemplateListPage: React.FC = () => {
           <Spin size="large" />
         </div>
       ) : (
-        <Row gutter={[24, 24]} className="templates-grid">
-          {filteredTemplates.length > 0 ? (
-            filteredTemplates.map(template => (
-              <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
-                <Card
-                  hoverable
-                  className="template-card"
-                  onClick={() => handleTemplateClick(template.uuid)}
-                  actions={[
-                    template.like ? 
-                      <HeartFilled 
-                        key="like" 
-                        className="heart-icon filled" 
-                        onClick={(e) => handleToggleLike(e, template)} 
-                      /> : 
-                      <HeartOutlined 
-                        key="like" 
-                        className="heart-icon" 
-                        onClick={(e) => handleToggleLike(e, template)} 
-                      />
-                  ]}
-                >
-                  <div className="template-preview">
-                    <div 
-                      className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
-                    >
-                      {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
-                        (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
-                        renderTemplatePreview(template)
-                      ) : (
-                        <div className="template-placeholder">
-                          <PictureOutlined style={{ fontSize: '32px', opacity: 0.5, marginBottom: '8px' }} />
-                          <div>{template.name}</div>
-                          <div className="template-size-indicator">{t('templateListPage.template_size_indicator', { size: template.size })}</div>
-                        </div>
-                      )}
-                    </div>
+        <>
+          {activeTab === 'all' ? (
+            // Separate sections for assignable and non-assignable templates in "all" tab
+            <>
+              {/* Assignable Templates Section */}
+              {filteredTemplates.filter(template => !!template.assignable).length > 0 && (
+                <>
+                  <div className="templates-section-header">
+                    <Title level={4}>Шаблоны</Title>
                   </div>
-                  <div className="template-info">
-                    <div className="template-name">{template.name}</div>
-                    <div className="template-size">
-                      {template.size}
-                      {template.isDefault && (
-                        <span className="template-default-badge"></span>
-                      )}
-                    </div>
+                  <Row gutter={[24, 24]} className="templates-grid">
+                    {filteredTemplates
+                      .filter(template => !!template.assignable)
+                      .map(template => (
+                        <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
+                          <Card
+                            hoverable
+                            className="template-card"
+                            onClick={() => handleTemplateClick(template.uuid)}
+                            actions={[
+                              template.like ? 
+                                <HeartFilled 
+                                  key="like" 
+                                  className="heart-icon filled" 
+                                  onClick={(e) => handleToggleLike(e, template)} 
+                                /> : 
+                                <HeartOutlined 
+                                  key="like" 
+                                  className="heart-icon" 
+                                  onClick={(e) => handleToggleLike(e, template)} 
+                                />
+                            ]}
+                          >
+                            <div className="template-preview">
+                              <div 
+                                className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
+                              >
+                                {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                                  (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
+                                  renderTemplatePreview(template)
+                                ) : (
+                                  <div className="template-placeholder">
+                                    <PictureOutlined style={{ fontSize: '32px', opacity: 0.5, marginBottom: '8px' }} />
+                                    <div>{template.name}</div>
+                                    <div className="template-size-indicator">{t('templateListPage.template_size_indicator', { size: template.size })}</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="template-info">
+                              <div className="template-name">{template.name}</div>
+                              <div className="template-size">
+                                {template.size}
+                                {template.isDefault && (
+                                  <span className="template-default-badge"></span>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        </Col>
+                      ))}
+                  </Row>
+                </>
+              )}
+
+              {/* Non-Assignable Templates Section */}
+              {filteredTemplates.filter(template => !template.assignable).length > 0 && (
+                <>
+                  <div className="templates-section-header">
+                    <Title level={4}>Баннер</Title>
                   </div>
-                </Card>
-              </Col>
-            ))
+                  <Row gutter={[24, 24]} className="templates-grid">
+                    {filteredTemplates
+                      .filter(template => !template.assignable)
+                      .map(template => (
+                        <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
+                          <Card
+                            hoverable
+                            className="template-card"
+                            onClick={() => handleTemplateClick(template.uuid)}
+                            actions={[
+                              template.like ? 
+                                <HeartFilled 
+                                  key="like" 
+                                  className="heart-icon filled" 
+                                  onClick={(e) => handleToggleLike(e, template)} 
+                                /> : 
+                                <HeartOutlined 
+                                  key="like" 
+                                  className="heart-icon" 
+                                  onClick={(e) => handleToggleLike(e, template)} 
+                                />
+                            ]}
+                          >
+                            <div className="template-preview">
+                              <div 
+                                className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
+                              >
+                                {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                                  (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
+                                  renderTemplatePreview(template)
+                                ) : (
+                                  <div className="template-placeholder">
+                                    <PictureOutlined style={{ fontSize: '32px', opacity: 0.5, marginBottom: '8px' }} />
+                                    <div>{template.name}</div>
+                                    <div className="template-size-indicator">{t('templateListPage.template_size_indicator', { size: template.size })}</div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="template-info">
+                              <div className="template-name">{template.name}</div>
+                              <div className="template-size">
+                                {template.size}
+                                {template.isDefault && (
+                                  <span className="template-default-badge"></span>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        </Col>
+                      ))}
+                  </Row>
+                </>
+              )}
+
+              {filteredTemplates.length === 0 && (
+                <Col span={24} className="no-templates">
+                  <p>{t('templateListPage.no_templates')}</p>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateTemplate}>
+                    {t('templateListPage.create_new_template')}
+                  </Button>
+                </Col>
+              )}
+            </>
           ) : (
-            <Col span={24} className="no-templates">
-              <p>{t('templateListPage.no_templates')}</p>
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateTemplate}>
-                {t('templateListPage.create_new_template')}
-              </Button>
-            </Col>
+            // Original template list for 'my' and 'liked' tabs
+            <Row gutter={[24, 24]} className="templates-grid">
+              {filteredTemplates.length > 0 ? (
+                filteredTemplates.map(template => (
+                  <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
+                    <Card
+                      hoverable
+                      className="template-card"
+                      onClick={() => handleTemplateClick(template.uuid)}
+                      actions={[
+                        template.like ? 
+                          <HeartFilled 
+                            key="like" 
+                            className="heart-icon filled" 
+                            onClick={(e) => handleToggleLike(e, template)} 
+                          /> : 
+                          <HeartOutlined 
+                            key="like" 
+                            className="heart-icon" 
+                            onClick={(e) => handleToggleLike(e, template)} 
+                          />
+                      ]}
+                    >
+                      <div className="template-preview">
+                        <div 
+                          className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
+                        >
+                          {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                            (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
+                            renderTemplatePreview(template)
+                          ) : (
+                            <div className="template-placeholder">
+                              <PictureOutlined style={{ fontSize: '32px', opacity: 0.5, marginBottom: '8px' }} />
+                              <div>{template.name}</div>
+                              <div className="template-size-indicator">{t('templateListPage.template_size_indicator', { size: template.size })}</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="template-info">
+                        <div className="template-name">{template.name}</div>
+                        <div className="template-size">
+                          {template.size}
+                          {template.isDefault && (
+                            <span className="template-default-badge"></span>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+                ))
+              ) : (
+                <Col span={24} className="no-templates">
+                  <p>{t('templateListPage.no_templates')}</p>
+                  <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateTemplate}>
+                    {t('templateListPage.create_new_template')}
+                  </Button>
+                </Col>
+              )}
+            </Row>
           )}
-        </Row>
+        </>
       )}
     </div>
   );

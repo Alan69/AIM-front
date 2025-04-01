@@ -42,6 +42,7 @@ export const GET_ALL_TEMPLATES = gql`
       backgroundImage
       thumbnail
       like
+      assignable
       createdAt
       user {
         id
@@ -98,6 +99,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
       backgroundImage
       thumbnail
       like
+      assignable
       createdAt
       user {
         id
@@ -145,14 +147,15 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
 
 // Mutation to create a template
 export const CREATE_TEMPLATE = gql`
-  mutation CreateTemplate($name: String!, $size: String!, $userId: UUID!, $isDefault: Boolean, $backgroundImage: String) {
-    createTemplate(name: $name, size: $size, userId: $userId, isDefault: $isDefault, backgroundImage: $backgroundImage) {
+  mutation CreateTemplate($name: String!, $size: String!, $userId: UUID!, $isDefault: Boolean, $backgroundImage: String, $assignable: Boolean) {
+    createTemplate(name: $name, size: $size, userId: $userId, isDefault: $isDefault, backgroundImage: $backgroundImage, assignable: $assignable) {
       template {
         uuid
         name
         isDefault
         size
         backgroundImage
+        assignable
         createdAt
       }
     }
@@ -307,6 +310,7 @@ export const UPDATE_TEMPLATE = gql`
     $background_image: String
     $thumbnail: String
     $like: Boolean
+    $assignable: Boolean
   ) {
     updateTemplate(
       uuid: $uuid
@@ -316,6 +320,7 @@ export const UPDATE_TEMPLATE = gql`
       backgroundImage: $background_image
       thumbnail: $thumbnail
       like: $like
+      assignable: $assignable
     ) {
       template {
         uuid
@@ -325,6 +330,7 @@ export const UPDATE_TEMPLATE = gql`
         backgroundImage
         thumbnail
         like
+        assignable
         createdAt
       }
     }
@@ -1870,9 +1876,9 @@ export const getTemplates = async (filterType: string = 'my') => {
           template.user && template.user.id === userId
         );
       } else if (filterType === 'default') {
-        // Filter by default templates
+        // Filter by default templates that are also assignable
         filteredTemplates = data.templates.filter((template: any) => 
-          template.isDefault === true
+          template.isDefault === true && template.assignable === true
         );
       } else if (filterType === 'liked') {
         // Filter by templates the user has liked

@@ -203,6 +203,12 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   const filteredTemplates = React.useMemo(() => {
     let filtered = templates;
     
+    // First apply template filter (default, my, liked)
+    if (templateFilter === 'default') {
+      // For default tab, only show templates that are both default AND assignable
+      filtered = filtered.filter(t => t.isDefault && !!t.assignable);
+    }
+    
     // Filter out templates with different sizes than the current template
     if (template?.size) {
       filtered = filtered.filter(t => t.size === template.size);
@@ -221,7 +227,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     }
     
     return filtered;
-  }, [templates, searchQuery, template?.uuid, template?.size]);
+  }, [templates, searchQuery, template?.uuid, template?.size, templateFilter]);
 
   // Handle template selection
   const handleTemplateSelect = async (selectedTemplate: Template) => {

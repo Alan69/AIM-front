@@ -15,6 +15,7 @@ export interface Template {
   backgroundImage?: string;
   thumbnail?: string;
   like?: boolean;
+  assignable?: boolean;
   user?: {
     id: string;
     username?: string;
