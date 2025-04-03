@@ -242,7 +242,8 @@ export const PostDetailsPage = () => {
           media: [file],
         }).unwrap();
         
-        console.log('Image upload result:', result);
+        // Log the entire result structure to debug
+        console.log('Full image upload result:', JSON.stringify(result, null, 2));
         
         // Wait longer for the media to be fully processed in the backend
         message.loading({
@@ -253,15 +254,40 @@ export const PostDetailsPage = () => {
         // Increase wait time to 5 seconds
         await new Promise(resolve => setTimeout(resolve, 5000));
         
-        // Important: Use the result from createPostImage directly
-        // This ensures we're updating the correct media that was just created
-        const newMediaId = result.id;
+        // Extract the media ID using different possible paths in the result object
+        let newMediaId;
         
+        // Check different possible structures of the result object
+        if (result && result.id) {
+          // Direct ID property
+          newMediaId = result.id;
+        } else if (result && Array.isArray(result.media) && result.media.length > 0) {
+          // Media array with first item having ID
+          newMediaId = result.media[0].id;
+        } else if (result && (result as any).data && (result as any).data.id) {
+          // Nested in data property - use type assertion for potentially unknown structure
+          newMediaId = (result as any).data.id;
+        } else {
+          // If ID still not found, try to refresh media list and get the latest
+          console.log('Could not find ID in result, trying to get the latest media');
+          const mediaResponse = await refetchPostMedias();
+          
+          if (mediaResponse.data && mediaResponse.data.length > 0) {
+            const latestMedia = mediaResponse.data[mediaResponse.data.length - 1];
+            if (latestMedia && latestMedia.id) {
+              newMediaId = latestMedia.id;
+              console.log('Using latest media ID as fallback:', newMediaId);
+            }
+          }
+        }
+        
+        // If still no ID, throw error
         if (!newMediaId) {
+          console.error('Could not find media ID in result:', result);
           throw new Error('Created media does not have an ID');
         }
         
-        console.log('New media ID from creation result:', newMediaId);
+        console.log('Extracted media ID for update:', newMediaId);
         
         // 5. Now link the newly created media with the template
         try {
