@@ -216,6 +216,8 @@ export const PostDetailsPage = () => {
         throw new Error('Failed to create template copy');
       }
       
+      console.log('Created template copy:', newTemplate);
+      
       // 2. Render the template as an image
       const templateImageUrl = selectedTemplate.thumbnail || '';
       
@@ -224,11 +226,15 @@ export const PostDetailsPage = () => {
         return;
       }
       
+      console.log('Using template thumbnail:', templateImageUrl);
+      
       // 3. Create a File object from the image URL
       try {
         const response = await fetch(templateImageUrl);
         const blob = await response.blob();
         const file = new File([blob], `template_${selectedTemplate.uuid}.png`, { type: 'image/png' });
+        
+        console.log('Created file from template thumbnail');
         
         // 4. Upload the image to the post media and wait for it to complete
         const result = await createPostImage({
@@ -236,70 +242,132 @@ export const PostDetailsPage = () => {
           media: [file],
         }).unwrap();
         
-        // Wait a moment for the media to be fully processed
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log('Image upload result:', result);
+        
+        // Wait longer for the media to be fully processed in the backend
+        message.loading({
+          content: t('postDetailsPage.processing_image'),
+          key: 'processingImage',
+        });
+        
+        // Increase wait time to 5 seconds
+        await new Promise(resolve => setTimeout(resolve, 5000));
         
         // Refresh the media list to ensure we have the latest data
         const mediaResponse = await refetchPostMedias();
         
-        if (!mediaResponse.data) {
-          throw new Error('Failed to fetch updated media list');
+        if (!mediaResponse.data || mediaResponse.data.length === 0) {
+          throw new Error('Failed to fetch updated media list or no media found');
         }
         
-        // Find the newly created media
+        // Find the newly created media - it should be the last one in the list
         const medias = mediaResponse.data;
-            const latestMedia = medias[medias.length - 1];
-            
-        if (!latestMedia) {
-          throw new Error('Could not find the newly created post media');
+        const latestMedia = medias[medias.length - 1];
+        
+        if (!latestMedia || !latestMedia.id) {
+          throw new Error('Could not find the newly created post media or media ID is missing');
         }
         
         console.log('Latest media:', latestMedia);
+        console.log('Media ID for template update:', latestMedia.id);
         
         // 5. Now link the newly created media with the template
         try {
-            // Create form data for the request
-            const formData = new URLSearchParams();
-            formData.append('template_uuid', newTemplate.uuid);
+          // Create form data for the request
+          const formData = new URLSearchParams();
+          formData.append('template_uuid', newTemplate.uuid);
           
           // Construct the correct API endpoint
-          const updateTemplateUrl = `${baseApiUrl}/post-media/${latestMedia.id}/update-template/`;
+          let updateTemplateUrl = `${baseApiUrl}/post-media/${latestMedia.id}/update-template/`;
+          
+          // Remove any trailing slash from baseApiUrl if it exists
+          if (baseApiUrl.endsWith('/') && updateTemplateUrl.includes('//')) {
+            updateTemplateUrl = updateTemplateUrl.replace('//', '/');
+          }
+          
           console.log('Updating template at URL:', updateTemplateUrl);
-            
-            // Send the request to update the post media with the template UUID
+          console.log('Template UUID being sent:', newTemplate.uuid);
+          
+          // Send the request to update the post media with the template UUID
           const updateResponse = await fetch(updateTemplateUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json',
+            },
+            body: formData,
+            credentials: 'include',
+          });
+          
+          // Log the raw response first
+          console.log('Template update response status:', updateResponse.status);
+          console.log('Template update response statusText:', updateResponse.statusText);
+          
+          let responseData;
+          try {
+            // Try to parse the response as JSON
+            responseData = await updateResponse.json();
+            console.log('Template update response data:', responseData);
+          } catch (jsonError) {
+            // If parsing as JSON fails, get the text
+            const textResponse = await updateResponse.text();
+            console.log('Template update raw response:', textResponse);
+            responseData = { text: textResponse };
+          }
+          
+          if (!updateResponse.ok) {
+            // Try a direct approach with fetch to get media details first
+            try {
+              const mediaDetailResponse = await fetch(`${baseApiUrl}/post-media/${latestMedia.id}/`, {
+                method: 'GET',
+                credentials: 'include',
+              });
+              
+              if (mediaDetailResponse.ok) {
+                const mediaDetails = await mediaDetailResponse.json();
+                console.log('Media details before update:', mediaDetails);
+              } else {
+                console.log('Failed to get media details:', mediaDetailResponse.status);
+              }
+            } catch (detailError) {
+              console.error('Error fetching media details:', detailError);
+            }
+            
+            // Try again with a slight delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            const retryResponse = await fetch(updateTemplateUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json',
+                'Accept': 'application/json',
               },
               body: formData,
               credentials: 'include',
             });
             
-          if (!updateResponse.ok) {
-            const errorData = await updateResponse.json().catch(() => ({}));
-            console.error('Template update error:', {
-              status: updateResponse.status,
-              statusText: updateResponse.statusText,
-              errorData,
-            });
-            throw new Error(`Failed to update post media with template: ${updateResponse.statusText}`);
+            if (!retryResponse.ok) {
+              console.error('Template update retry failed:', retryResponse.status, retryResponse.statusText);
+              throw new Error(`Failed to update post media with template: ${updateResponse.statusText}`);
+            } else {
+              console.log('Template update retry succeeded!');
+              const retryData = await retryResponse.json();
+              console.log('Template update retry response:', retryData);
             }
-            
-          const updateData = await updateResponse.json();
-            console.log('Template update response:', updateData);
-            
+          }
+          
           // Final refresh to get the updated media
           await refetchPostMedias();
           
-            message.success(t('postDetailsPage.template_applied'), 3);
-        setIsTemplateModalOpen(false);
-        setSelectedTemplate(null);
+          message.success(t('postDetailsPage.template_applied'), 3);
+          setIsTemplateModalOpen(false);
+          setSelectedTemplate(null);
         } catch (error: unknown) {
           console.error('Error updating template:', error);
           const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
           message.error(`${t('postDetailsPage.template_update_error')}: ${errorMessage}`);
+        } finally {
+          message.destroy('processingImage');
         }
       } catch (error: unknown) {
         console.error('Error processing template image:', error);
@@ -1045,7 +1113,7 @@ export const PostDetailsPage = () => {
                       {postMedias?.map((media) => (
                         <div key={media.id} className={styles.imageWrapper}>
                           <Image
-                            src={media.media}
+                            src={`http://localhost:8000${media.media}`}
                             alt={`Media ${media.id}`}
                             className={styles.sliderImage}
                           />
