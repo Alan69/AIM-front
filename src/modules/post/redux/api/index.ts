@@ -112,6 +112,10 @@ export type TUpdatePostMediaTemplate = {
   template_uuid: string;
 };
 
+export type TDeletePostMediaResponse = {
+  detail: string;
+}
+
 export const postApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getPostList: build.query<TPostData[], string>({
@@ -285,6 +289,12 @@ export const postApi = baseApi.injectEndpoints({
         body: { template_uuid: data.template_uuid },
       }),
     }),
+    deletePostMedia: build.mutation<TDeletePostMediaResponse, string>({
+      query: (mediaId) => ({
+        url: `/previous-post-image/${mediaId}/delete/`,
+        method: 'DELETE',
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -303,5 +313,6 @@ export const {
   usePostNowMutation,
   useGetPostMediasByIdQuery,
   useCreatePostImageMutation,
-  useUpdatePostMediaTemplateMutation
+  useUpdatePostMediaTemplateMutation,
+  useDeletePostMediaMutation
 } = postApi;

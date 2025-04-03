@@ -48,5 +48,11 @@
   "template_applied": "Шаблон успешно применен к посту",
   "template_apply_error": "Не удалось применить шаблон к посту",
   "creating_template": "Создание шаблона...",
-  "no_preview": "Нет превью"
+  "no_preview": "Нет превью",
+  
+  "media_deleted_success": "Медиа успешно удалено",
+  "media_deleted_error": "Ошибка при удалении медиа",
+  "confirm_delete_media": "Вы уверены, что хотите удалить это медиа?",
+  "yes": "Да",
+  "no": "Нет"
 }

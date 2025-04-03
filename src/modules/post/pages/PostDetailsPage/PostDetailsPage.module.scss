@@ -412,3 +412,17 @@
 .iconOverlay.selected {
   background: #1890ff;
 }
+
+.iconOverlay__delete {
+  top: 8px;
+  right: 90px;
+  background-color: #ff4d4f;
+  color: white;
+  border-color: #ff4d4f;
+  
+  &:hover, &:focus {
+    background-color: #ff7875;
+    color: white;
+    border-color: #ff7875;
+  }
+}

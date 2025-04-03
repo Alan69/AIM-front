@@ -10,6 +10,7 @@ import {
   TPostMediaData,
   useUpdatePostMutation,
   useUpdatePostMediaTemplateMutation,
+  useDeletePostMediaMutation,
 } from "../../redux/api";
 import {
   Layout,
@@ -26,6 +27,7 @@ import {
   Col,
   Card,
   Spin,
+  Popconfirm,
 } from "antd";
 import {
   ReloadOutlined,
@@ -39,6 +41,7 @@ import {
   UploadOutlined,
   EditOutlined,
   PictureOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 
 import cn from "classnames";
@@ -106,6 +109,7 @@ export const PostDetailsPage = () => {
   const [createPostImage, { isLoading: isCreating }] =
     useCreatePostImageMutation();
   const [updatePostMediaTemplate] = useUpdatePostMediaTemplateMutation();
+  const [deletePostMedia, { isLoading: isDeleting }] = useDeletePostMediaMutation();
 
   const { user } = useTypedSelector((state) => state.auth);
   
@@ -1195,6 +1199,18 @@ export const PostDetailsPage = () => {
     );
   };
 
+  // Add a handler for deleting post media
+  const handleDeleteMedia = async (mediaId: string) => {
+    try {
+      await deletePostMedia(mediaId).unwrap();
+      message.success(t('postDetailsPage.media_deleted_success'));
+      refetchPostMedias();
+    } catch (error) {
+      console.error('Error deleting media:', error);
+      message.error(t('postDetailsPage.media_deleted_error'));
+    }
+  };
+
   if (isLoading)
     return (
       <div className={styles.postDescr}>
@@ -1263,7 +1279,24 @@ export const PostDetailsPage = () => {
                             shape="circle"
                             onClick={handleDownloadImage}
                           />
-                          {user?.profile?.user?.is_staff && (
+                          {(
+                            <>
+                              <Popconfirm
+                                title={t("postDetailsPage.confirm_delete_media")}
+                                onConfirm={() => handleDeleteMedia(media.id)}
+                                okText={t("postDetailsPage.yes")}
+                                cancelText={t("postDetailsPage.no")}
+                              >
+                                <Button
+                                  className={cn(
+                                    styles.iconOverlay,
+                                    styles.iconOverlay__delete
+                                  )}
+                                  icon={<DeleteOutlined />}
+                                  shape="circle"
+                                  loading={isDeleting}
+                                />
+                              </Popconfirm>
                               <Tooltip title={media?.template 
                                 ? t("postDetailsPage.edit_in_designer_with_template") 
                                 : t("postDetailsPage.edit_in_designer")
@@ -1279,7 +1312,8 @@ export const PostDetailsPage = () => {
                                   onClick={() => handleOpenInDesigner(media)}
                                 />
                               </Tooltip>
-                              )}
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>
