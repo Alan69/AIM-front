@@ -230,11 +230,25 @@ export const PostDetailsPage = () => {
       
       // 3. Create a File object from the image URL
       try {
+        // Get current media list before adding new one
+        const beforeMediaResponse = await refetchPostMedias();
+        const existingMediaIds = beforeMediaResponse.data ? 
+          beforeMediaResponse.data.map(media => media.id) : [];
+        
+        console.log('Existing media IDs before creating new media:', existingMediaIds);
+        
         const response = await fetch(templateImageUrl);
         const blob = await response.blob();
-        const file = new File([blob], `template_${selectedTemplate.uuid}.png`, { type: 'image/png' });
         
-        console.log('Created file from template thumbnail');
+        // Add a timestamp to the filename to make it unique
+        const timestamp = new Date().getTime();
+        const file = new File(
+          [blob], 
+          `template_${selectedTemplate.uuid}_${timestamp}.png`, 
+          { type: 'image/png' }
+        );
+        
+        console.log('Created file from template thumbnail:', file.name);
         
         // 4. Upload the image to the post media and wait for it to complete
         const result = await createPostImage({
@@ -254,40 +268,35 @@ export const PostDetailsPage = () => {
         // Increase wait time to 5 seconds
         await new Promise(resolve => setTimeout(resolve, 5000));
         
-        // Extract the media ID using different possible paths in the result object
-        let newMediaId;
+        // Get updated media list after adding new one
+        const afterMediaResponse = await refetchPostMedias();
         
-        // Check different possible structures of the result object
-        if (result && result.id) {
-          // Direct ID property
-          newMediaId = result.id;
-        } else if (result && Array.isArray(result.media) && result.media.length > 0) {
-          // Media array with first item having ID
-          newMediaId = result.media[0].id;
-        } else if (result && (result as any).data && (result as any).data.id) {
-          // Nested in data property - use type assertion for potentially unknown structure
-          newMediaId = (result as any).data.id;
-        } else {
-          // If ID still not found, try to refresh media list and get the latest
-          console.log('Could not find ID in result, trying to get the latest media');
-          const mediaResponse = await refetchPostMedias();
-          
-          if (mediaResponse.data && mediaResponse.data.length > 0) {
-            const latestMedia = mediaResponse.data[mediaResponse.data.length - 1];
-            if (latestMedia && latestMedia.id) {
-              newMediaId = latestMedia.id;
-              console.log('Using latest media ID as fallback:', newMediaId);
-            }
-          }
+        if (!afterMediaResponse.data || afterMediaResponse.data.length === 0) {
+          throw new Error('Failed to fetch updated media list or no media found');
         }
         
-        // If still no ID, throw error
+        // Find the newly created media by comparing before and after lists
+        const newMediaItems = afterMediaResponse.data.filter(
+          media => !existingMediaIds.includes(media.id)
+        );
+        
+        console.log('New media items detected:', newMediaItems);
+        
+        if (newMediaItems.length === 0) {
+          throw new Error('Could not identify newly created media');
+        }
+        
+        // Use the most recently created media (should be just one, but take the last to be safe)
+        const newMedia = newMediaItems[newMediaItems.length - 1];
+        const newMediaId = newMedia.id;
+        
+        console.log('Selected new media for template update:', newMedia);
+        console.log('New media ID for template update:', newMediaId);
+        
         if (!newMediaId) {
-          console.error('Could not find media ID in result:', result);
-          throw new Error('Created media does not have an ID');
+          console.error('New media does not have an ID:', newMedia);
+          throw new Error('New media does not have an ID');
         }
-        
-        console.log('Extracted media ID for update:', newMediaId);
         
         // 5. Now link the newly created media with the template
         try {
@@ -299,7 +308,7 @@ export const PostDetailsPage = () => {
           const urlParts = baseApiUrl.split('/');
           const domain = urlParts[0] + '//' + urlParts[2]; // e.g., https://api.aimmagic.com
           
-          // Force the correct endpoint with /api/ and use the ID from the creation result
+          // Force the correct endpoint with /api/ and use the ID from the new media
           const updateTemplateUrl = `${domain}/api/post-media/${newMediaId}/update-template/`;
           
           console.log('Base API URL:', baseApiUrl);
@@ -323,7 +332,7 @@ export const PostDetailsPage = () => {
           
           // First, try to use the RTK mutation to leverage its built-in CSRF handling
           try {
-            // Update the post media with the template UUID - use the ID from creation result
+            // Update the post media with the template UUID - use the ID from the new media
             const updateResult = await updatePostMediaTemplate({
               id: newMediaId,
               template_uuid: newTemplate.uuid,
