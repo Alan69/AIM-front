@@ -253,23 +253,15 @@ export const PostDetailsPage = () => {
         // Increase wait time to 5 seconds
         await new Promise(resolve => setTimeout(resolve, 5000));
         
-        // Refresh the media list to ensure we have the latest data
-        const mediaResponse = await refetchPostMedias();
+        // Important: Use the result from createPostImage directly
+        // This ensures we're updating the correct media that was just created
+        const newMediaId = result.id;
         
-        if (!mediaResponse.data || mediaResponse.data.length === 0) {
-          throw new Error('Failed to fetch updated media list or no media found');
+        if (!newMediaId) {
+          throw new Error('Created media does not have an ID');
         }
         
-        // Find the newly created media - it should be the last one in the list
-        const medias = mediaResponse.data;
-        const latestMedia = medias[medias.length - 1];
-        
-        if (!latestMedia || !latestMedia.id) {
-          throw new Error('Could not find the newly created post media or media ID is missing');
-        }
-        
-        console.log('Latest media:', latestMedia);
-        console.log('Media ID for template update:', latestMedia.id);
+        console.log('New media ID from creation result:', newMediaId);
         
         // 5. Now link the newly created media with the template
         try {
@@ -281,8 +273,8 @@ export const PostDetailsPage = () => {
           const urlParts = baseApiUrl.split('/');
           const domain = urlParts[0] + '//' + urlParts[2]; // e.g., https://api.aimmagic.com
           
-          // Force the correct endpoint with /api/
-          const updateTemplateUrl = `${domain}/api/post-media/${latestMedia.id}/update-template/`;
+          // Force the correct endpoint with /api/ and use the ID from the creation result
+          const updateTemplateUrl = `${domain}/api/post-media/${newMediaId}/update-template/`;
           
           console.log('Base API URL:', baseApiUrl);
           console.log('Extracted domain:', domain);
@@ -305,9 +297,9 @@ export const PostDetailsPage = () => {
           
           // First, try to use the RTK mutation to leverage its built-in CSRF handling
           try {
-            // Update the post media with the template UUID
+            // Update the post media with the template UUID - use the ID from creation result
             const updateResult = await updatePostMediaTemplate({
-              id: latestMedia.id,
+              id: newMediaId,
               template_uuid: newTemplate.uuid,
             }).unwrap();
             
@@ -360,7 +352,7 @@ export const PostDetailsPage = () => {
             // Try a different approach using the Django REST API endpoint directly
             try {
               // Use the API endpoint without the api/ prefix as a fallback
-              const alternateUrl = `${domain}/post-media/${latestMedia.id}/update-template/`;
+              const alternateUrl = `${domain}/post-media/${newMediaId}/update-template/`;
               console.log('Trying alternate URL:', alternateUrl);
               
               const alternateResponse = await fetch(alternateUrl, {
@@ -420,7 +412,7 @@ export const PostDetailsPage = () => {
                     }
                   `,
                   variables: {
-                    id: latestMedia.id,
+                    id: newMediaId,
                     templateUuid: newTemplate.uuid
                   }
                 }),
