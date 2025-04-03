@@ -166,7 +166,7 @@ export const PostDetailsPage = () => {
       const allTemplates = await fetchAllTemplates();
       // Filter templates to only include those where isDefault is true and assignable is false
       const filteredTemplates = allTemplates.filter(
-        (template: Template) => template.isDefault === true && !template.assignable
+        (template: Template) => !template.assignable
       );
       setTemplates(filteredTemplates);
       setLoadingTemplates(false);
@@ -212,6 +212,10 @@ export const PostDetailsPage = () => {
         userId
       );
       
+      if (!newTemplate || !newTemplate.uuid) {
+        throw new Error('Failed to create template copy');
+      }
+      
       // 2. Render the template as an image
       // We'll use the template's thumbnail as the image
       const templateImageUrl = selectedTemplate.thumbnail || '';
@@ -235,10 +239,26 @@ export const PostDetailsPage = () => {
         
         // 5. Now link the newly created media with the template
         if (result && result.id) {
-          await updatePostMediaTemplate({
-            id: result.id,
-            template_uuid: newTemplate.uuid
-          }).unwrap();
+          // Create form data for the request
+          const formData = new URLSearchParams();
+          formData.append('template_uuid', newTemplate.uuid);
+          
+          // Send the request to update the post media with the template UUID
+          const response = await fetch(`${baseApiUrl}/post-media/${result.id}/update-template/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData,
+            credentials: 'include',
+          });
+          
+          if (!response.ok) {
+            throw new Error('Failed to update post media with template');
+          }
+          
+          const updateData = await response.json();
+          console.log('Template update response:', updateData);
           
           message.success(t('postDetailsPage.template_applied'), 3);
         } else {
@@ -247,10 +267,27 @@ export const PostDetailsPage = () => {
           const medias = postMedias || [];
           if (medias.length > 0) {
             const latestMedia = medias[medias.length - 1];
-            await updatePostMediaTemplate({
-              id: latestMedia.id,
-              template_uuid: newTemplate.uuid
-            }).unwrap();
+            
+            // Create form data for the request
+            const formData = new URLSearchParams();
+            formData.append('template_uuid', newTemplate.uuid);
+            
+            // Send the request to update the post media with the template UUID
+            const response = await fetch(`${baseApiUrl}/post-media/${latestMedia.id}/update-template/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: formData,
+              credentials: 'include',
+            });
+            
+            if (!response.ok) {
+              throw new Error('Failed to update post media with template');
+            }
+            
+            const updateData = await response.json();
+            console.log('Template update response:', updateData);
             
             message.success(t('postDetailsPage.template_applied'), 3);
           } else {
