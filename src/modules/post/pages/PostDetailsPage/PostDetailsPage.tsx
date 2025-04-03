@@ -217,7 +217,6 @@ export const PostDetailsPage = () => {
       }
       
       // 2. Render the template as an image
-      // We'll use the template's thumbnail as the image
       const templateImageUrl = selectedTemplate.thumbnail || '';
       
       if (!templateImageUrl) {
@@ -238,42 +237,57 @@ export const PostDetailsPage = () => {
         }).unwrap();
         
         // Wait a moment for the media to be fully processed
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
         // Refresh the media list to ensure we have the latest data
-          await refetchPostMedias();
+        const mediaResponse = await refetchPostMedias();
+        
+        if (!mediaResponse.data) {
+          throw new Error('Failed to fetch updated media list');
+        }
         
         // Find the newly created media
-          const medias = postMedias || [];
+        const medias = mediaResponse.data;
             const latestMedia = medias[medias.length - 1];
             
         if (!latestMedia) {
           throw new Error('Could not find the newly created post media');
         }
         
+        console.log('Latest media:', latestMedia);
+        
         // 5. Now link the newly created media with the template
         try {
             // Create form data for the request
             const formData = new URLSearchParams();
             formData.append('template_uuid', newTemplate.uuid);
+          
+          // Construct the correct API endpoint
+          const updateTemplateUrl = `${baseApiUrl}/post-media/${latestMedia.id}/update-template/`;
+          console.log('Updating template at URL:', updateTemplateUrl);
             
             // Send the request to update the post media with the template UUID
-            const response = await fetch(`${baseApiUrl}/post-media/${latestMedia.id}/update-template/`, {
+          const updateResponse = await fetch(updateTemplateUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json',
               },
               body: formData,
               credentials: 'include',
             });
             
-            if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Template update error:', errorData);
-            throw new Error(`Failed to update post media with template: ${errorData.message || response.statusText}`);
+          if (!updateResponse.ok) {
+            const errorData = await updateResponse.json().catch(() => ({}));
+            console.error('Template update error:', {
+              status: updateResponse.status,
+              statusText: updateResponse.statusText,
+              errorData,
+            });
+            throw new Error(`Failed to update post media with template: ${updateResponse.statusText}`);
             }
             
-            const updateData = await response.json();
+          const updateData = await updateResponse.json();
             console.log('Template update response:', updateData);
             
           // Final refresh to get the updated media
@@ -282,17 +296,20 @@ export const PostDetailsPage = () => {
             message.success(t('postDetailsPage.template_applied'), 3);
         setIsTemplateModalOpen(false);
         setSelectedTemplate(null);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error updating template:', error);
-          message.error(t('postDetailsPage.template_update_error'));
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+          message.error(`${t('postDetailsPage.template_update_error')}: ${errorMessage}`);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error processing template image:', error);
-        message.error(t('postDetailsPage.template_apply_error'));
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        message.error(`${t('postDetailsPage.template_apply_error')}: ${errorMessage}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error applying template:', error);
-      message.error(t('postDetailsPage.template_apply_error'));
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      message.error(`${t('postDetailsPage.template_apply_error')}: ${errorMessage}`);
     } finally {
       message.destroy('templateCreation');
     }
