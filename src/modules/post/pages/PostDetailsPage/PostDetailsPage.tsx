@@ -164,9 +164,14 @@ export const PostDetailsPage = () => {
     try {
       setLoadingTemplates(true);
       const allTemplates = await fetchAllTemplates();
-      // Filter templates to only include those where isDefault is true and assignable is false
+      // Filter templates to include:
+      // 1. Non-assignable default templates (system templates)
+      // 2. User's own assignable templates
       const filteredTemplates = allTemplates.filter(
-        (template: Template) => !template.assignable && template.isDefault
+        (template: Template) => (
+          (!template.assignable && template.isDefault) || 
+          (template.assignable && template.user === user?.profile.user.id)
+        )
       );
       setTemplates(filteredTemplates);
       setLoadingTemplates(false);
