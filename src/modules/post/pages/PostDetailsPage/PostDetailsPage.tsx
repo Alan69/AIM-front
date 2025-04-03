@@ -170,7 +170,7 @@ export const PostDetailsPage = () => {
       const filteredTemplates = allTemplates.filter(
         (template: Template) => (
           (!template.assignable && template.isDefault) || 
-          (template.assignable && template.user === user?.profile.user.id)
+          (!template.assignable && template.user === user?.profile.user.id)
         )
       );
       setTemplates(filteredTemplates);
