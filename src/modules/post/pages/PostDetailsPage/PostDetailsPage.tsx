@@ -166,7 +166,7 @@ export const PostDetailsPage = () => {
       const allTemplates = await fetchAllTemplates();
       // Filter templates to only include those where isDefault is true and assignable is false
       const filteredTemplates = allTemplates.filter(
-        (template: Template) => !template.assignable
+        (template: Template) => !template.assignable && template.user === user?.profile.user.id
       );
       setTemplates(filteredTemplates);
       setLoadingTemplates(false);
@@ -231,43 +231,28 @@ export const PostDetailsPage = () => {
         const blob = await response.blob();
         const file = new File([blob], `template_${selectedTemplate.uuid}.png`, { type: 'image/png' });
         
-        // 4. Upload the image to the post media
+        // 4. Upload the image to the post media and wait for it to complete
         const result = await createPostImage({
           post: id,
           media: [file],
         }).unwrap();
         
-        // 5. Now link the newly created media with the template
-        if (result && result.id) {
-          // Create form data for the request
-          const formData = new URLSearchParams();
-          formData.append('template_uuid', newTemplate.uuid);
-          
-          // Send the request to update the post media with the template UUID
-          const response = await fetch(`${baseApiUrl}/post-media/${result.id}/update-template/`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData,
-            credentials: 'include',
-          });
-          
-          if (!response.ok) {
-            throw new Error('Failed to update post media with template');
-          }
-          
-          const updateData = await response.json();
-          console.log('Template update response:', updateData);
-          
-          message.success(t('postDetailsPage.template_applied'), 3);
-        } else {
-          // If we don't get a result with an ID, we need to refresh and try to find the latest media
+        // Wait a moment for the media to be fully processed
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Refresh the media list to ensure we have the latest data
           await refetchPostMedias();
+        
+        // Find the newly created media
           const medias = postMedias || [];
-          if (medias.length > 0) {
             const latestMedia = medias[medias.length - 1];
             
+        if (!latestMedia) {
+          throw new Error('Could not find the newly created post media');
+        }
+        
+        // 5. Now link the newly created media with the template
+        try {
             // Create form data for the request
             const formData = new URLSearchParams();
             formData.append('template_uuid', newTemplate.uuid);
@@ -283,23 +268,24 @@ export const PostDetailsPage = () => {
             });
             
             if (!response.ok) {
-              throw new Error('Failed to update post media with template');
+            const errorData = await response.json();
+            console.error('Template update error:', errorData);
+            throw new Error(`Failed to update post media with template: ${errorData.message || response.statusText}`);
             }
             
             const updateData = await response.json();
             console.log('Template update response:', updateData);
             
+          // Final refresh to get the updated media
+          await refetchPostMedias();
+          
             message.success(t('postDetailsPage.template_applied'), 3);
-          } else {
-            throw new Error('Could not find the newly created post media');
-          }
-        }
-        
-        // Refresh media list
-        refetchPostMedias();
         setIsTemplateModalOpen(false);
         setSelectedTemplate(null);
-        
+        } catch (error) {
+          console.error('Error updating template:', error);
+          message.error(t('postDetailsPage.template_update_error'));
+        }
       } catch (error) {
         console.error('Error processing template image:', error);
         message.error(t('postDetailsPage.template_apply_error'));
