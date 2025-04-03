@@ -277,13 +277,18 @@ export const PostDetailsPage = () => {
           const formData = new URLSearchParams();
           formData.append('template_uuid', newTemplate.uuid);
           
-          // Construct the correct API endpoint
-          let updateTemplateUrl = `${baseApiUrl}/post-media/${latestMedia.id}/update-template/`;
-          
-          // Remove any trailing slash from baseApiUrl if it exists
-          if (baseApiUrl.endsWith('/') && updateTemplateUrl.includes('//')) {
-            updateTemplateUrl = updateTemplateUrl.replace('//', '/');
+          // Construct the correct API endpoint with /api/ in the path
+          // Fix: Ensure the URL includes /api/ in the path
+          let apiUrl;
+          if (baseApiUrl.includes('/api')) {
+            // If baseApiUrl already contains /api, use it as is
+            apiUrl = baseApiUrl;
+          } else {
+            // Otherwise, add /api to the path
+            apiUrl = baseApiUrl.endsWith('/') ? `${baseApiUrl}api` : `${baseApiUrl}/api`;
           }
+          
+          const updateTemplateUrl = `${apiUrl}/post-media/${latestMedia.id}/update-template/`;
           
           console.log('Updating template at URL:', updateTemplateUrl);
           console.log('Template UUID being sent:', newTemplate.uuid);
@@ -318,7 +323,7 @@ export const PostDetailsPage = () => {
           if (!updateResponse.ok) {
             // Try a direct approach with fetch to get media details first
             try {
-              const mediaDetailResponse = await fetch(`${baseApiUrl}/post-media/${latestMedia.id}/`, {
+              const mediaDetailResponse = await fetch(`${apiUrl}/post-media/${latestMedia.id}/`, {
                 method: 'GET',
                 credentials: 'include',
               });
