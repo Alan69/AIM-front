@@ -277,7 +277,6 @@ export const PostDetailsPage = () => {
           const formData = new URLSearchParams();
           formData.append('template_uuid', newTemplate.uuid);
           
-          // Explicitly construct the correct API URL with /api/post-media path
           // Extract the base domain without any path
           const urlParts = baseApiUrl.split('/');
           const domain = urlParts[0] + '//' + urlParts[2]; // e.g., https://api.aimmagic.com
@@ -290,15 +289,55 @@ export const PostDetailsPage = () => {
           console.log('Updating template at URL:', updateTemplateUrl);
           console.log('Template UUID being sent:', newTemplate.uuid);
           
+          // Get CSRF token from cookies
+          const getCookie = (name: string): string | null => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+              return parts.pop()?.split(';').shift() || null;
+            }
+            return null;
+          };
+          
+          // Get the csrftoken
+          const csrfToken = getCookie('csrftoken');
+          console.log('CSRF Token:', csrfToken);
+          
+          // First, try to use the RTK mutation to leverage its built-in CSRF handling
+          try {
+            // Update the post media with the template UUID
+            const updateResult = await updatePostMediaTemplate({
+              id: latestMedia.id,
+              template_uuid: newTemplate.uuid,
+            }).unwrap();
+            
+            console.log('Template update response (RTK):', updateResult);
+            
+            // Final refresh to get the updated media
+            await refetchPostMedias();
+            
+            message.success(t('postDetailsPage.template_applied'), 3);
+            setIsTemplateModalOpen(false);
+            setSelectedTemplate(null);
+            return;
+          } catch (rtkError) {
+            console.error('Failed to update template using RTK mutation:', rtkError);
+            // Continue with manual fetch as fallback
+          }
+          
           // Send the request to update the post media with the template UUID
           const updateResponse = await fetch(updateTemplateUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               'Accept': 'application/json',
+              'X-CSRFToken': csrfToken || '',
+              'X-Requested-With': 'XMLHttpRequest',
+              'Referer': window.location.href
             },
             body: formData,
             credentials: 'include',
+            mode: 'cors'
           });
           
           // Log the raw response first
@@ -318,48 +357,92 @@ export const PostDetailsPage = () => {
           }
           
           if (!updateResponse.ok) {
-            // Try a direct approach with fetch to get media details first
+            // Try a different approach using the Django REST API endpoint directly
             try {
-              // Also use the explicit URL for media details
-              const mediaDetailUrl = `${domain}/api/post-media/${latestMedia.id}/`;
-              console.log('Fetching media details from:', mediaDetailUrl);
+              // Use the API endpoint without the api/ prefix as a fallback
+              const alternateUrl = `${domain}/post-media/${latestMedia.id}/update-template/`;
+              console.log('Trying alternate URL:', alternateUrl);
               
-              const mediaDetailResponse = await fetch(mediaDetailUrl, {
-                method: 'GET',
+              const alternateResponse = await fetch(alternateUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Accept': 'application/json',
+                  'X-CSRFToken': csrfToken || '',
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'Referer': window.location.href
+                },
+                body: formData,
                 credentials: 'include',
+                mode: 'cors'
               });
               
-              if (mediaDetailResponse.ok) {
-                const mediaDetails = await mediaDetailResponse.json();
-                console.log('Media details before update:', mediaDetails);
+              console.log('Alternate response status:', alternateResponse.status);
+              
+              if (alternateResponse.ok) {
+                const alternateData = await alternateResponse.json();
+                console.log('Alternate update succeeded:', alternateData);
+                
+                // Final refresh to get the updated media
+                await refetchPostMedias();
+                
+                message.success(t('postDetailsPage.template_applied'), 3);
+                setIsTemplateModalOpen(false);
+                setSelectedTemplate(null);
+                return;
               } else {
-                console.log('Failed to get media details:', mediaDetailResponse.status);
+                console.error('Alternate update failed');
               }
-            } catch (detailError) {
-              console.error('Error fetching media details:', detailError);
+            } catch (alternateError) {
+              console.error('Error with alternate approach:', alternateError);
             }
             
-            // Try again with a slight delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            const retryResponse = await fetch(updateTemplateUrl, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json',
-              },
-              body: formData,
-              credentials: 'include',
-            });
-            
-            if (!retryResponse.ok) {
-              console.error('Template update retry failed:', retryResponse.status, retryResponse.statusText);
-              throw new Error(`Failed to update post media with template: ${updateResponse.statusText}`);
-            } else {
-              console.log('Template update retry succeeded!');
-              const retryData = await retryResponse.json();
-              console.log('Template update retry response:', retryData);
+            // If still failed, try to use the API directly
+            try {
+              const apiResponse = await fetch(`${domain}/graphql/`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrfToken || '',
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'Referer': window.location.href
+                },
+                body: JSON.stringify({
+                  query: `
+                    mutation UpdatePostMediaTemplate($id: ID!, $templateUuid: String!) {
+                      updatePostMediaTemplate(id: $id, templateUuid: $templateUuid) {
+                        success
+                        media {
+                          id
+                          template
+                        }
+                      }
+                    }
+                  `,
+                  variables: {
+                    id: latestMedia.id,
+                    templateUuid: newTemplate.uuid
+                  }
+                }),
+                credentials: 'include',
+                mode: 'cors'
+              });
+              
+              const apiData = await apiResponse.json();
+              console.log('GraphQL API response:', apiData);
+              
+              if (apiData.data?.updatePostMediaTemplate?.success) {
+                message.success(t('postDetailsPage.template_applied'), 3);
+                await refetchPostMedias();
+                setIsTemplateModalOpen(false);
+                setSelectedTemplate(null);
+                return;
+              }
+            } catch (apiError) {
+              console.error('GraphQL API error:', apiError);
             }
+            
+            throw new Error(`Failed to update post media with template: ${updateResponse.statusText}`);
           }
           
           // Final refresh to get the updated media
