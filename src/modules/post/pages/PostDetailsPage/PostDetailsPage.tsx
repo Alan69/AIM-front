@@ -277,19 +277,16 @@ export const PostDetailsPage = () => {
           const formData = new URLSearchParams();
           formData.append('template_uuid', newTemplate.uuid);
           
-          // Construct the correct API endpoint with /api/ in the path
-          // Fix: Ensure the URL includes /api/ in the path
-          let apiUrl;
-          if (baseApiUrl.includes('/api')) {
-            // If baseApiUrl already contains /api, use it as is
-            apiUrl = baseApiUrl;
-          } else {
-            // Otherwise, add /api to the path
-            apiUrl = baseApiUrl.endsWith('/') ? `${baseApiUrl}api` : `${baseApiUrl}/api`;
-          }
+          // Explicitly construct the correct API URL with /api/post-media path
+          // Extract the base domain without any path
+          const urlParts = baseApiUrl.split('/');
+          const domain = urlParts[0] + '//' + urlParts[2]; // e.g., https://api.aimmagic.com
           
-          const updateTemplateUrl = `${apiUrl}/post-media/${latestMedia.id}/update-template/`;
+          // Force the correct endpoint with /api/
+          const updateTemplateUrl = `${domain}/api/post-media/${latestMedia.id}/update-template/`;
           
+          console.log('Base API URL:', baseApiUrl);
+          console.log('Extracted domain:', domain);
           console.log('Updating template at URL:', updateTemplateUrl);
           console.log('Template UUID being sent:', newTemplate.uuid);
           
@@ -323,7 +320,11 @@ export const PostDetailsPage = () => {
           if (!updateResponse.ok) {
             // Try a direct approach with fetch to get media details first
             try {
-              const mediaDetailResponse = await fetch(`${apiUrl}/post-media/${latestMedia.id}/`, {
+              // Also use the explicit URL for media details
+              const mediaDetailUrl = `${domain}/api/post-media/${latestMedia.id}/`;
+              console.log('Fetching media details from:', mediaDetailUrl);
+              
+              const mediaDetailResponse = await fetch(mediaDetailUrl, {
                 method: 'GET',
                 credentials: 'include',
               });
