@@ -1340,7 +1340,7 @@ export const VideoDetailsPage = () => {
                       {videoMedias?.map((media) => (
                         <div key={media.id} className={styles.imageWrapper}>
                           <Image
-                            src={`http://localhost:8000${media.media}`}
+                            src={media.media}
                             alt={`Media ${media.id}`}
                             className={styles.sliderImage}
                           />
