@@ -1446,7 +1446,6 @@ export const VideoDetailsPage = () => {
                       </Button>
                     </Upload>
 
-                    {user?.profile?.user?.is_staff && (
                       <Button
                         className={styles.uploadBanner}
                         type="primary"
@@ -1455,7 +1454,6 @@ export const VideoDetailsPage = () => {
                       >
                         {t("videoDetailsPage.add_banner")}
                       </Button>
-                    )}
 
                     {fileList.length ? (
                       <Button

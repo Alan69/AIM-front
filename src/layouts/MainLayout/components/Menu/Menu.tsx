@@ -114,6 +114,15 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       ),
     },
     {
+      key: "9",
+      icon: <LayoutOutlined />,
+      label: (
+        <Link to="/design" onClick={handleSwitchMenu}>
+          {t("menuMain.items.design")}
+        </Link>
+      ),
+    },
+    {
       key: "10",
       icon: <CalendarOutlined />,
       label: (
@@ -135,18 +144,6 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       ),
     },
   ];
-
-  if (user?.profile?.user?.is_staff) {
-    items.splice(8, 0, {
-      key: "9",
-      icon: <LayoutOutlined />,
-      label: (
-        <Link to="/design" onClick={handleSwitchMenu}>
-          {t("menuMain.items.design")}
-        </Link>
-      ),
-    });
-  }
 
   return (
     <div
