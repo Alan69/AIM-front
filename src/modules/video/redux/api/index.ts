@@ -24,7 +24,7 @@ export type TVideoData = {
   img_style?: TImgStylesData;
   video_query: TVideoQueryData;
   author: TUserData;
-  video?: string;
+  media?: string;
   image_id: {
     id: string
   }

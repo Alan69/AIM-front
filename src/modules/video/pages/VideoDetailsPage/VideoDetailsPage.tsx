@@ -1232,17 +1232,17 @@ export const VideoDetailsPage = () => {
     try {
       // Show loading message
       const loadingMsg = message.loading({
-        content: video?.video 
+        content: video?.media 
           ? t("videoDetailsPage.updating_video") 
           : t("videoDetailsPage.uploading_video"),
         key: 'videoUpload',
         duration: 0,
       });
       
-      console.log(`Starting video ${video?.video ? 'update' : 'upload'} for file:`, videoFile.name);
+      console.log(`Starting video ${video?.media ? 'update' : 'upload'} for file:`, videoFile.name);
       
       // Use different API calls based on whether we're updating an existing video or uploading a new one
-      const apiCall = video?.video 
+      const apiCall = video?.media 
         ? patchVideoFile({ video_id: id, video_file: videoFile }) 
         : uploadVideoFile({ video_id: id, video_file: videoFile });
       
@@ -1529,10 +1529,10 @@ export const VideoDetailsPage = () => {
                       {/* Video Panel - Add below the picture block */}
                       <div className={styles.videoPanel}>
                         <Title level={5}>{t("videoDetailsPage.video_file")}</Title>
-                        {video?.video ? (
+                        {video?.media ? (
                           <div className={styles.videoContainer}>
                             <video 
-                              src={getVideoUrl(video.video)} 
+                              src={getVideoUrl(video.media)} 
                               controls 
                               className={`${styles.videoPlayer} videoPlayer`}
                               // poster={video.cover}
