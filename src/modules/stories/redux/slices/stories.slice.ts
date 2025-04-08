@@ -12,7 +12,7 @@ const initialState: StoriesState = {
 };
 
 const storiesSlice = createSlice({
-  name: 'storie',
+  name: 'stories',
   initialState,
   reducers: {
     setIsCustomStoriesCreated: (state, { payload }: PayloadAction<boolean>) => {

@@ -19,7 +19,7 @@ export const StoriesCreateForm = ({
   isCustomStoriesCreating,
   handleCreateCustomStories,
 }: TProps) => {
-  const { isCustomStoriesCreated } = useTypedSelector((state) => state.storie);
+  const { isCustomStoriesCreated } = useTypedSelector((state) => state.stories);
   const { t } = useTranslation();
 
   const [file, setFile] = useState<File | null>(null);

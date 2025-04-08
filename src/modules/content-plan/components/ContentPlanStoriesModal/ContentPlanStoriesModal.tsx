@@ -32,7 +32,7 @@ export const ContentPlanStoriesModal = ({
 }: TProps) => {
   const { t } = useTranslation();
 
-  const { createdCustomStories } = useTypedSelector((state) => state.storie);
+  const { createdCustomStories } = useTypedSelector((state) => state.stories);
 
   return (
     <Modal
