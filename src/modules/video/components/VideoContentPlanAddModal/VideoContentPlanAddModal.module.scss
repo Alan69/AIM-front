@@ -1,0 +1,99 @@
+.addBtn {
+  border-radius: 16px;
+  margin-bottom: 8px;
+
+  &__isActive {
+    background-color: #1677ff;
+    color: #fff;
+  }
+}
+
+.videoActions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.addBtns {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.selectNewVideo {
+  max-width: 500px;
+
+  &__isActive {
+    padding-right: 16px;
+    padding-left: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: rgba(169, 169, 169, 0.133);
+    border-radius: 16px;
+  }
+}
+
+.socialMediaAddBtn {
+  width: 100% !important;
+  padding: 8px;
+  border-radius: 16px;
+  margin-block: 16px;
+}
+
+.itemList {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.selectNewSocialMedia {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background-color: rgba(169, 169, 169, 0.133);
+  border-radius: 16px;
+  padding: 5px;
+  width: fit-content;
+
+  &__isActive {
+    background-color: rgba(169, 169, 169, 0.133);
+  }
+
+  &:hover {
+    background-color: rgba(169, 169, 169, 0.133);
+  }
+}
+
+.username {
+  margin-block: 0 !important;
+  margin-inline: 4px !important;
+}
+
+.dateTimeBlock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.datePicker {
+  width: 100%;
+  border-radius: 16px;
+}
+
+.timePicker {
+  width: 100%;
+  border-radius: 16px;
+}
+
+.text {
+  margin-block: 16px;
+}
+
+.expandBtn {
+  margin-bottom: 8px;
+} 

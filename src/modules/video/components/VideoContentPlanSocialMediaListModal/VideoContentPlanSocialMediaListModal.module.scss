@@ -1,0 +1,59 @@
+.itemList {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.item {
+  display: flex;
+  width: 48%;
+  align-items: center;
+  gap: 2px;
+  background-color: rgba(169, 169, 169, 0.133);
+  border-radius: 16px;
+  padding: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+
+  &__isActive {
+    background-color: #1677ff;
+    color: #fff;
+  }
+
+  &:hover {
+    background-color: #1677ff14;
+  }
+
+  @media (max-width: 576px) {
+    width: 100%;
+  }
+}
+
+.username {
+  margin-block: 0 !important;
+  margin-inline: 4px !important;
+  color: inherit;
+}
+
+.noContent {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+
+  &__text {
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  &__link {
+    color: rgba(0, 0, 0, 0.45);
+    text-decoration: underline;
+
+    &:hover {
+      color: #1677ff;
+    }
+  }
+} 

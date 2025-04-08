@@ -1,0 +1,23 @@
+{
+  "fields": {
+    "video_type": "Video Type",
+    "text_style": "Text Style",
+    "lang": "Language",
+    "content": "Content"
+  },
+  "table": {
+    "title": "Title",
+    "favorite": "Favorite",
+    "created_date": "Created Date",
+    "actions": "Actions"
+  },
+  "buttons": {
+    "recreate_request": "Generate New Video"
+  },
+  "videos_title": "Generated Videos",
+  "errors": {
+    "no_videos": "No videos found for this query",
+    "invalid_date": "Invalid date"
+  },
+  "loading": "Loading..."
+} 

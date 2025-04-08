@@ -25,9 +25,13 @@ import { ProductDeletePage } from "modules/product/pages/ProductDeletePage/Produ
 import { PostQueryListPage } from "modules/post-query/pages/PostQueryListPage/PostQueryListPage";
 import { PostQueryCreatePage } from "modules/post-query/pages/PostQueryCreatePage/PostQueryCreatePage";
 import { PostQueryDetailsPage } from "modules/post-query/pages/PostQueryDetailsPage/PostQueryDetailsPage";
+import { VideoQueryListPage } from "modules/video-query/pages/VideoQueryListPage/VideoQueryListPage";
+import { VideoQueryCreatePage } from "modules/video-query/pages/VideoQueryCreatePage/VideoQueryCreatePage";
+import { VideoQueryDetailsPage } from "modules/video-query/pages/VideoQueryDetailsPage/VideoQueryDetailsPage";
 import { PostUpdatePage } from "modules/post/pages/PostUpdatePage/PostUpdatePage";
 import { PostDeletePage } from "modules/post/pages/PostDeletePage/PostDeletePage";
 import { PostDetailsPage } from "modules/post/pages/PostDetailsPage/PostDetailsPage";
+import { VideoDetailsPage } from "modules/video/pages/VideoDetailsPage/VideoDetailsPage";
 import { ContentPlanPage } from "modules/content-plan/pages/ContentPlanPage/ContentPlanPage";
 import { SocialMediaAddPage } from "modules/social-media/pages/SocialMediaAddPage/SocialMediaAddPage";
 import { TariffListPage } from "modules/tariff/pages/TariffListPage/TariffListPage";
@@ -50,6 +54,8 @@ import { ArticleQueriesCreatePage } from "modules/article-queries/pages/ArticleQ
 import { ArticleQueriesDetailsPage } from "modules/article-queries/pages/ArticleQueriesDetailsPage/ArticleQueriesDetailsPage";
 import TemplateListPage from "modules/design/pages/TemplateListPage";
 import TemplateEditorPage from "modules/design/pages/TemplateEditorPage";
+import { VideoUpdatePage } from "modules/video/pages/VideoUpdatePage/VideoUpdatePage";
+import { VideoDeletePage } from "modules/video/pages/VideoDeletePage/VideoDeletePage";
 
 const AppRoutes: FC = () => {
   const location = useLocation();
@@ -104,6 +110,10 @@ const AppRoutes: FC = () => {
         <Route path="/post-query/list" element={<PostQueryListPage />} />
         <Route path="/post-query/create" element={<PostQueryCreatePage />} />
         <Route path="/post-query/:id" element={<PostQueryDetailsPage />} />
+        <Route path="/video-query" element={<VideoQueryListPage />} />
+        <Route path="/video-query/list" element={<VideoQueryListPage />} />
+        <Route path="/video-query/create" element={<VideoQueryCreatePage />} />
+        <Route path="/video-query/:id" element={<VideoQueryDetailsPage />} />
         <Route path="/company/create" element={<CompanyCreatePage />} />
         <Route path="/company/:id" element={<CompanyDetailsPage />} />
         <Route path="/company/:id/update" element={<CompanyUpdatePage />} />
@@ -130,6 +140,10 @@ const AppRoutes: FC = () => {
           path="/post/:postQueryId/:id/delete"
           element={<PostDeletePage />}
         />
+        <Route path="/video/:id" element={<VideoDetailsPage />} />
+        <Route path="/video/:videoQueryId/:id" element={<VideoDetailsPage />} />
+        <Route path="/video/:videoQueryId/:id/update" element={<VideoUpdatePage />} />
+        <Route path="/video/:videoQueryId/:id/delete" element={<VideoDeletePage />} />
         <Route path="/content-plan" element={<ContentPlanPage />} />
         <Route
           path="/social-media/:companyId/add"

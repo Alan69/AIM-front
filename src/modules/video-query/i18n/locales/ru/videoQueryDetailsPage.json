@@ -1,0 +1,23 @@
+{
+  "fields": {
+    "video_type": "Тип видео",
+    "text_style": "Стиль текста",
+    "lang": "Язык",
+    "content": "Контент"
+  },
+  "table": {
+    "title": "Название",
+    "favorite": "Избранное",
+    "created_date": "Дата создания",
+    "actions": "Действия"
+  },
+  "buttons": {
+    "recreate_request": "Сгенерировать новое видео"
+  },
+  "videos_title": "Сгенерированные видео",
+  "errors": {
+    "no_videos": "Для этого запроса не найдено видео",
+    "invalid_date": "Недействительная дата"
+  },
+  "loading": "Загрузка..."
+} 

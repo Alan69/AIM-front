@@ -1,0 +1,12 @@
+{
+  "title": "Video Queries List",
+  "create_button": "Create New Video Query",
+  "fields": {
+    "product": "Product",
+    "video_type": "Video Type",
+    "text_style": "Text Style",
+    "date": "Creation Date"
+  },
+  "no_queries": "No video queries found",
+  "loading": "Loading video queries..."
+} 

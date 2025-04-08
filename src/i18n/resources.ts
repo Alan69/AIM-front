@@ -139,6 +139,16 @@ import articleQueriesCreatePageRu from '../modules/article-queries/i18n/locales/
 import articleQueriesDetailsPageEn from '../modules/article-queries/i18n/locales/en/articleQueriesDetailsPage.json';
 import articleQueriesDetailsPageRu from '../modules/article-queries/i18n/locales/ru/articleQueriesDetailsPage.json';
 
+// Video query module translations
+import videoQueriesListPageEn from '../modules/video-query/i18n/locales/en/videoQueriesListPage.json';
+import videoQueriesListPageRu from '../modules/video-query/i18n/locales/ru/videoQueriesListPage.json';
+import videoQueryCreatePageEn from '../modules/video-query/i18n/locales/en/videoQueryCreatePage.json';
+import videoQueryCreatePageRu from '../modules/video-query/i18n/locales/ru/videoQueryCreatePage.json';
+import videoQueryDetailsPageEn from '../modules/video-query/i18n/locales/en/videoQueryDetailsPage.json';
+import videoQueryDetailsPageRu from '../modules/video-query/i18n/locales/ru/videoQueryDetailsPage.json';
+import videoDetailsPageEn from '../modules/video/i18n/locales/en/videoDetailsPage.json';
+import videoDetailsPageRu from '../modules/video/i18n/locales/ru/videoDetailsPage.json';
+
 // Design module translations
 import templateEditorPageEn from '../modules/design/i18n/locales/en/templateEditorPage.json';
 import templateEditorPageRu from '../modules/design/i18n/locales/ru/templateEditorPage.json';
@@ -211,6 +221,12 @@ const resources = {
       articleQueriesCreatePage: articleQueriesCreatePageEn,
       articleQueriesDetailsPage: articleQueriesDetailsPageEn,
       
+      // MODULE video-query:
+      videoQueriesListPage: videoQueriesListPageEn,
+      videoQueryCreatePage: videoQueryCreatePageEn,
+      videoQueryDetailsPage: videoQueryDetailsPageEn,
+      videoDetailsPage: videoDetailsPageEn,
+      
       // MODULE design:
       templateEditorPage: templateEditorPageEn,
       templateListPage: templateListPageEn
@@ -280,6 +296,12 @@ const resources = {
       articleQueriesListPage: articleQueriesListPageRu,
       articleQueriesCreatePage: articleQueriesCreatePageRu,
       articleQueriesDetailsPage: articleQueriesDetailsPageRu,
+      
+      // MODULE video-query:
+      videoQueriesListPage: videoQueriesListPageRu,
+      videoQueryCreatePage: videoQueryCreatePageRu,
+      videoQueryDetailsPage: videoQueryDetailsPageRu,
+      videoDetailsPage: videoDetailsPageRu,
       
       // MODULE design:
       templateEditorPage: templateEditorPageRu,

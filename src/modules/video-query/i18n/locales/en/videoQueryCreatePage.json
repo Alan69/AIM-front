@@ -1,0 +1,20 @@
+{
+  "title": "Create Video Query",
+  "submit_button": "Create Video",
+  "no_company": "No company selected",
+  "fields": {
+    "company": "Company",
+    "product": "Product",
+    "video_type": "Video Type",
+    "text_style": "Text Style",
+    "lang": "Language",
+    "content": "Content Description"
+  },
+  "errors": {
+    "required": "This field is required"
+  },
+  "with_thumbnail": {
+    "label": "Generate Thumbnail",
+    "tooltip": "Enable/disable thumbnail generation"
+  }
+} 

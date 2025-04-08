@@ -87,6 +87,15 @@ const MenuNav = ({ isOpen, handleSwitchMenu }: TProps) => {
       ),
     },
     {
+      key: "11",
+      icon: <FormOutlined />,
+      label: (
+        <Link to="/video-query" onClick={handleSwitchMenu}>
+          {t("menuMain.items.videos")}
+        </Link>
+      ),
+    },
+    {
       key: "7",
       icon: <FileDoneOutlined />,
       label: (

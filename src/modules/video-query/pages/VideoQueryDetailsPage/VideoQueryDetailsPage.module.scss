@@ -1,0 +1,29 @@
+.videoQueryDescr {
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  &__title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+  &__icons {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+  }
+}
+
+.product__title {
+  font-size: 24px;
+  margin-top: 1rem;
+}
+
+.iconHeart {
+  cursor: pointer;
+  font-size: 24px;
+
+  &__active {
+    color: #eb2f96;
+  }
+} 

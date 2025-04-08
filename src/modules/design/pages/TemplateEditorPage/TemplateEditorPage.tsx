@@ -55,6 +55,7 @@ const TemplateEditorPage: React.FC = () => {
   const sourceType = queryParams.get('source');
   const postId = queryParams.get('postId');
   const mediaId = queryParams.get('mediaId');
+  const videoId = queryParams.get('videoId');
   
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -1167,12 +1168,14 @@ const TemplateEditorPage: React.FC = () => {
     const sourceType = queryParams.get('source');
     const postId = queryParams.get('postId');
     const mediaId = queryParams.get('mediaId');
+    const videoId = queryParams.get('videoId');
     
-    // Handle both cases: coming from post or from post media
+    // Handle all cases: coming from post, post media, or video media
     const isFromPost = sourceType === 'post' && postId;
     const isFromPostMedia = sourceType === 'postMedia' && postId && mediaId;
+    const isFromVideoMedia = sourceType === 'videoMedia' && videoId && mediaId;
     
-    if (!uuid || !(isFromPost || isFromPostMedia)) return;
+    if (!uuid || !(isFromPost || isFromPostMedia || isFromVideoMedia)) return;
     
     try {
       setIsSavingToPost(true);
@@ -1185,9 +1188,13 @@ const TemplateEditorPage: React.FC = () => {
       
       console.log('Preparing to capture canvas and send to server...');
       console.log('Template UUID:', uuid);
-      console.log('Post ID:', postId);
-      if (isFromPostMedia) {
-        console.log('Media ID:', mediaId);
+      
+      if (isFromPost) {
+        console.log('Post ID:', postId);
+      } else if (isFromPostMedia) {
+        console.log('Post ID:', postId, 'Media ID:', mediaId);
+      } else if (isFromVideoMedia) {
+        console.log('Video ID:', videoId, 'Media ID:', mediaId);
       }
       
       // Skip updating with the template UUID if it's already set to this template
@@ -1195,7 +1202,7 @@ const TemplateEditorPage: React.FC = () => {
       
       try {
         if (isFromPostMedia && mediaId) {
-          // Check if the media already has this template
+          // Check if the post media already has this template
           const mediaResponse = await fetch(`${baseURL}post-media/${mediaId}/`, {
             method: 'GET',
             headers: {
@@ -1208,6 +1215,23 @@ const TemplateEditorPage: React.FC = () => {
             const mediaData = await mediaResponse.json();
             if (mediaData.template === uuid) {
               console.log(`Post media ${mediaId} already has template ${uuid}, skipping update`);
+              shouldUpdateTemplate = false;
+            }
+          }
+        } else if (isFromVideoMedia && mediaId) {
+          // Check if the video media already has this template
+          const mediaResponse = await fetch(`${baseURL}video-media/${mediaId}/`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            credentials: 'include',
+          });
+          
+          if (mediaResponse.ok) {
+            const mediaData = await mediaResponse.json();
+            if (mediaData.template === uuid) {
+              console.log(`Video media ${mediaId} already has template ${uuid}, skipping update`);
               shouldUpdateTemplate = false;
             }
           }
@@ -1252,6 +1276,19 @@ const TemplateEditorPage: React.FC = () => {
             });
             
             console.log(`Post media ${mediaId} updated with template ${uuid}`);
+          } else if (isFromVideoMedia && mediaId) {
+            // Send the request to update the video media with the template UUID
+            await fetch(`${baseURL}video-media/${mediaId}/update-template/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: formData,
+              credentials: 'include',
+            });
+            
+            console.log(`Video media ${mediaId} updated with template ${uuid}`);
           } else if (isFromPost) {
             // Send the request to update the post with the template UUID
             await fetch(`${baseURL}posts/${postId}/update-template/`, {
@@ -1400,28 +1437,48 @@ const TemplateEditorPage: React.FC = () => {
       // Create a FormData object
       const formData = new FormData();
       formData.append('template_uuid', uuid);
-      formData.append('post_id', postId);
       
-      if (isFromPostMedia && mediaId) {
+      if (isFromPostMedia && mediaId && postId) {
         // If coming from post media, update the existing media instead of creating a new one
+        formData.append('post_id', postId);
         formData.append('media_id', mediaId);
         formData.append('operation', 'update_post_media');
-      } else {
+      } else if (isFromVideoMedia && mediaId && videoId) {
+        // If coming from video media, update the existing video media
+        formData.append('video_id', videoId);
+        formData.append('media_id', mediaId);
+        formData.append('operation', 'update_video_media');
+      } else if (isFromPost) {
         // If coming from post directly, update the post image
+        formData.append('post_id', postId);
         formData.append('operation', 'update_post_image');
       }
       
       formData.append('image', blob, 'canvas_capture.png');
       
       // Send the form data to the server
-      const response = await fetch(`${baseURL}designs/template-to-post/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-        credentials: 'include',
-      });
+      let response;
+      if (isFromVideoMedia) {
+        // Use the new video-specific endpoint
+        response = await fetch(`${baseURL}designs/template-to-video/`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+          credentials: 'include',
+        });
+      } else {
+        // Use the existing post endpoint for other cases
+        response = await fetch(`${baseURL}designs/template-to-post/`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+          credentials: 'include',
+        });
+      }
       
       if (!response.ok) {
         throw new Error(`Server responded with status: ${response.status}`);
@@ -1433,8 +1490,9 @@ const TemplateEditorPage: React.FC = () => {
       if (responseData && responseData.success) {
         message.success(t('templateEditorPage.save_to_post_success'));
         
-        // Check if we came from a post query details page
+        // Check for query parameters
         const postQueryId = queryParams.get('postQueryId');
+        const videoQueryId = queryParams.get('videoQueryId');
         
         // Get the new image URL from the response
         const newImageUrl = responseData.picture_url || responseData.media_url;
@@ -1446,27 +1504,51 @@ const TemplateEditorPage: React.FC = () => {
         // Add a timestamp to force a refresh of the page
         const timestamp = Date.now();
         
-        // Store the new image URL in localStorage to help the PostDetailsPage
-        // identify that the image has been updated
-        localStorage.setItem(`post_${postId}_image_updated`, 'true');
-        localStorage.setItem(`post_${postId}_new_image_url`, newImageUrl);
-        localStorage.setItem(`post_${postId}_old_image_url`, oldImageUrl || '');
-        localStorage.setItem(`post_${postId}_update_timestamp`, timestamp.toString());
-        
-        // Navigate back to the post details page with the correct URL format
-        setTimeout(() => {
-          if (postQueryId) {
-            // If we have a post query ID, use the format with post query ID
-            const url = `/post/${postQueryId}/${postId}?refresh=${timestamp}`;
-            console.log('Navigating to:', url);
-            navigate(url, { replace: true });
-          } else {
-            // Otherwise use the simple format
-            const url = `/post/${postId}?refresh=${timestamp}`;
-            console.log('Navigating to:', url);
-            navigate(url, { replace: true });
-          }
-        }, 1000); // Add a longer delay to ensure the notification is shown
+        if (isFromVideoMedia) {
+          // Store the new image URL in localStorage to help the VideoDetailsPage
+          // identify that the image has been updated
+          localStorage.setItem(`video_${videoId}_image_updated`, 'true');
+          localStorage.setItem(`video_${videoId}_new_image_url`, newImageUrl);
+          localStorage.setItem(`video_${videoId}_old_image_url`, oldImageUrl || '');
+          localStorage.setItem(`video_${videoId}_update_timestamp`, timestamp.toString());
+          
+          // Navigate back to the video details page with the correct URL format
+          setTimeout(() => {
+            if (videoQueryId) {
+              // If we have a video query ID, use the format with video query ID
+              const url = `/video/${videoQueryId}/${videoId}?refresh=${timestamp}`;
+              console.log('Navigating to:', url);
+              navigate(url, { replace: true });
+            } else {
+              // Otherwise use the simple format
+              const url = `/video/${videoId}?refresh=${timestamp}`;
+              console.log('Navigating to:', url);
+              navigate(url, { replace: true });
+            }
+          }, 1000);
+        } else {
+          // Store the new image URL in localStorage to help the PostDetailsPage
+          // identify that the image has been updated
+          localStorage.setItem(`post_${postId}_image_updated`, 'true');
+          localStorage.setItem(`post_${postId}_new_image_url`, newImageUrl);
+          localStorage.setItem(`post_${postId}_old_image_url`, oldImageUrl || '');
+          localStorage.setItem(`post_${postId}_update_timestamp`, timestamp.toString());
+          
+          // Navigate back to the post details page with the correct URL format
+          setTimeout(() => {
+            if (postQueryId) {
+              // If we have a post query ID, use the format with post query ID
+              const url = `/post/${postQueryId}/${postId}?refresh=${timestamp}`;
+              console.log('Navigating to:', url);
+              navigate(url, { replace: true });
+            } else {
+              // Otherwise use the simple format
+              const url = `/post/${postId}?refresh=${timestamp}`;
+              console.log('Navigating to:', url);
+              navigate(url, { replace: true });
+            }
+          }, 1000); // Add a longer delay to ensure the notification is shown
+        }
       } else {
         throw new Error(responseData.message || 'Failed to update post image');
       }
@@ -1770,6 +1852,18 @@ const TemplateEditorPage: React.FC = () => {
               className="header-button save-to-post-button"
             >
               {t('templateEditorPage.save_to_post_media')}
+            </Button>
+          )}
+          
+          {sourceType === 'videoMedia' && videoId && mediaId && (
+            <Button 
+              type="primary" 
+              icon={<CloudUploadOutlined />} 
+              loading={isSavingToPost}
+              onClick={handleSaveToPost}
+              className="header-button save-to-post-button"
+            >
+              {t('templateEditorPage.save_to_video_media')}
             </Button>
           )}
         </div>
