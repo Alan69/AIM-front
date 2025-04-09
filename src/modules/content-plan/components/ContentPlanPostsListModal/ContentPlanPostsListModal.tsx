@@ -4,7 +4,6 @@ import { AppstoreAddOutlined, UnorderedListOutlined } from "@ant-design/icons";
 
 import "moment/locale/ru";
 import { TCreatePost, TPostData } from "modules/post/redux/api";
-import { PostQueryGenerateForm } from "../PostQueryGenerateForm/PostQueryGenerateForm";
 import { PostCreateForm } from "../PostCreateForm/PostCreateForm";
 import { useTypedSelector } from "hooks/useTypedSelector";
 import { TPostQueryCreateData } from "modules/post-query/redux/api";
@@ -79,20 +78,6 @@ export const ContentPlanPostsListModal = ({
     },
     {
       key: "2",
-      label: t("contentPlanPage.content_plan_posts_list_modal.generate_post"),
-      children: (
-        <PostQueryGenerateForm
-          post={post}
-          isPostCreating={isPostCreating}
-          handleGeneratePost={handleGeneratePost}
-          handleGetPostById={handleGetPostById}
-        />
-      ),
-      icon: <AppstoreAddOutlined />,
-      disabled: isPostCreating,
-    },
-    {
-      key: "3",
       label: t("contentPlanPage.content_plan_posts_list_modal.favorite_posts"),
       children: (
         <ContentPlanPostList

@@ -388,7 +388,7 @@ export const ContentPlanAddPostModal = ({
               style={{
                 borderRadius: isMobile ? "20px" : "20px 0 0 20px",
                 borderRight: "1px solid #d9d9d9",
-                width: isMobile ? "100%" : "33.33%",
+                width: isMobile ? "100%" : "50%",
               }}
               disabled={!selectNewPost || selectedNewSocialMedias.length === 0}
               loading={
@@ -405,13 +405,9 @@ export const ContentPlanAddPostModal = ({
             type="default"
             onClick={handleSubmit}
             style={{
-              borderRight: isPostPage
-                ? "none"
-                : isMobile
-                  ? "none"
-                  : "1px solid #d9d9d9",
-              borderRadius: isPostPage ? "20px" : isMobile ? "20px" : "0",
-              width: isPostPage ? "100%" : isMobile ? "100%" : "33.33%",
+              borderRight: isPostPage ? "none" : isMobile ? "none" : "1px solid #d9d9d9",
+              borderRadius: isPostPage ? "20px" : isMobile ? "20px" : "0 20px 20px 0",
+              width: isPostPage ? "100%" : isMobile ? "100%" : "50%",
             }}
             disabled={
               !selectedDate ||
@@ -423,21 +419,6 @@ export const ContentPlanAddPostModal = ({
           >
             {t("contentPlanPage.content_plan_add_post_modal.add_to_scheduler")}
           </Button>
-          {isPostPage ? (
-            ""
-          ) : (
-            <Button
-              key="draft"
-              type="default"
-              onClick={() => setIsModalOpen(false)}
-              style={{
-                borderRadius: isMobile ? "20px" : "0 20px 20px 0",
-                width: isMobile ? "100%" : "33.33%",
-              }}
-            >
-              {t("contentPlanPage.content_plan_add_post_modal.draft")}
-            </Button>
-          )}
         </Button.Group>,
       ]}
     >

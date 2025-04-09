@@ -58,12 +58,10 @@ import {
   TImgStylesData,
   useGetImgStylesListQuery,
 } from "../../../../redux/api/imgStyles/imgStylesApi";
-import { ContentPlanSocialMediaListModal } from "modules/content-plan/components/ContentPlanSocialMediaListModal/ContentPlanSocialMediaListModal";
 import {
   useGetSocialMediaListByCurrentCompanyQuery,
   TSocialMediaByCurrentCompanyData,
 } from "modules/social-media/redux/api";
-import { ContentPlanAddPostModal } from "modules/content-plan/components/ContentPlanAddPostModal/ContentPlanAddPostModal";
 import {
   TAddToSchedulersRequest,
   useAddToSchedulersMutation,
