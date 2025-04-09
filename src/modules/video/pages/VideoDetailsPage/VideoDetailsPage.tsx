@@ -746,9 +746,10 @@ export const VideoDetailsPage = () => {
         navigate(url);
         return; // Exit early since we're using the existing template
       } else {
-        // Create a new template with the media image
+        // Create a new template with the media image as background
         const templateName = `Edit from Video ${video?.id || ''} Media ${mediaItem.id}`;
-        const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
+        const templateSize = '1080x1920'; // Explicitly use 1080x1920 for vertical format
+        console.log(`Using template size: ${templateSize} for new template`);
         
         // Get the media image URL
         let mediaImageUrl = mediaItem?.media || '';
