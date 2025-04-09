@@ -3,8 +3,9 @@
   margin-bottom: 8px;
 
   &__isActive {
-    background-color: #1677ff;
-    color: #fff;
+    color: #4096ff;
+    border-color: #4096ff;
+    background: #ffffff;
   }
 }
 
@@ -17,83 +18,88 @@
 
 .addBtns {
   display: flex;
+  align-items: center;
   gap: 8px;
-  width: 100%;
-  flex-wrap: wrap;
 }
 
 .selectNewVideo {
-  max-width: 500px;
+  display: flex;
+  gap: 16px;
+}
 
+.selectNewVideo {
+  margin: 8px 0;
+  padding: 8px !important;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: 0.3s all;
+  &:hover,
   &__isActive {
-    padding-right: 16px;
-    padding-left: 16px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    background-color: rgba(169, 169, 169, 0.133);
-    border-radius: 16px;
+    border: 1px solid #1890ff;
+    border-block-end: 1px solid #1890ff !important;
+    transition: 0.3s all;
   }
 }
 
-.socialMediaAddBtn {
-  width: 100% !important;
-  padding: 8px;
-  border-radius: 16px;
-  margin-block: 16px;
+.expandBtn {
+  display: flex;
+  justify-content: flex-end;
+  button {
+    padding: 4px !important;
+    height: 24px !important;
+    outline: none !important;
+  }
+}
+
+.selectNewSocialMedia {
+  width: calc(25% - 8px);
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  padding: 8px !important;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: 0.3s all;
+  cursor: pointer;
+  &:hover,
+  &__isActive {
+    border: 1px solid #1890ff;
+    border-block-end: 1px solid #1890ff !important;
+    transition: 0.3s all;
+  }
 }
 
 .itemList {
   display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.selectNewSocialMedia {
-  display: flex;
   align-items: center;
-  gap: 2px;
-  background-color: rgba(169, 169, 169, 0.133);
-  border-radius: 16px;
-  padding: 5px;
-  width: fit-content;
-
-  &__isActive {
-    background-color: rgba(169, 169, 169, 0.133);
-  }
-
-  &:hover {
-    background-color: rgba(169, 169, 169, 0.133);
-  }
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .username {
-  margin-block: 0 !important;
-  margin-inline: 4px !important;
+  text-align: center;
+  margin-bottom: 0 !important;
 }
 
 .dateTimeBlock {
+  margin-top: 8px;
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  width: 100%;
 }
 
-.datePicker {
-  width: 100%;
-  border-radius: 16px;
-}
-
+.datePicker,
 .timePicker {
-  width: 100%;
-  border-radius: 16px;
+  width: 50%;
+}
+
+.socialMediaAddBtn {
+  margin-bottom: 8px;
 }
 
 .text {
   margin-block: 16px;
-}
-
-.expandBtn {
-  margin-bottom: 8px;
 } 

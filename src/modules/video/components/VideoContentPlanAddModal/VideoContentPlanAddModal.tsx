@@ -33,6 +33,9 @@ import { ContentPlanPostingType } from "modules/content-plan/types";
 type TProps = {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleShowContentPlanPostsListModal?: () => void;
+  handleShowContentPlanReelsModal?: () => void;
+  handleShowContentPlanStorieModal?: () => void;
   handleShowContentPlanSocialMediaListModal?: () => void;
   selectNewVideo: TVideoData | null | undefined;
   selectedNewSocialMedias: TSocialMediaByCurrentCompanyData[];
@@ -42,6 +45,7 @@ type TProps = {
   isVideoNowLoading: boolean;
   handleVideoNow: () => void;
   isVideoPage?: boolean;
+  selectedPostType?: ContentPlanPostingType;
 };
 
 const { Title, Paragraph } = Typography;
@@ -49,6 +53,9 @@ const { Title, Paragraph } = Typography;
 export const VideoContentPlanAddModal = ({
   isModalOpen,
   setIsModalOpen,
+  handleShowContentPlanPostsListModal,
+  handleShowContentPlanReelsModal,
+  handleShowContentPlanStorieModal,
   handleShowContentPlanSocialMediaListModal,
   selectNewVideo,
   selectedNewSocialMedias,
@@ -57,7 +64,8 @@ export const VideoContentPlanAddModal = ({
   handleClearAddModalParams,
   isVideoNowLoading,
   handleVideoNow,
-  isVideoPage = true,
+  isVideoPage = false,
+  selectedPostType = ContentPlanPostingType.REELS,
 }: TProps) => {
   const { t, i18n } = useTranslation();
   const isMobile = useIsMobile();
@@ -308,27 +316,36 @@ export const VideoContentPlanAddModal = ({
             marginTop: isMobile ? "40px" : "0",
           }}
         >
-          <Button
-            key="submit"
-            type="default"
-            onClick={handleVideoNow}
-            style={{
-              borderRadius: isMobile ? "20px" : "20px 0 0 20px",
-              borderRight: "1px solid #d9d9d9",
-              width: isMobile ? "100%" : "50%",
-            }}
-            disabled={!selectNewVideo || selectedNewSocialMedias.length === 0}
-            loading={isVideoNowLoading}
-          >
-            {t("contentPlanPage.content_plan_add_post_modal.publish_now")}
-          </Button>
+          {isVideoPage ? (
+            ""
+          ) : (
+            <Button
+              key="submit"
+              type="default"
+              onClick={handleVideoNow}
+              style={{
+                borderRadius: isMobile ? "20px" : "20px 0 0 20px",
+                borderRight: "1px solid #d9d9d9",
+                width: isMobile ? "100%" : "33.33%",
+              }}
+              disabled={!selectNewVideo || selectedNewSocialMedias.length === 0}
+              loading={isVideoNowLoading}
+            >
+              {t("contentPlanPage.content_plan_add_post_modal.publish_now")}
+            </Button>
+          )}
           <Button
             key="schedule"
             type="default"
             onClick={handleSubmit}
             style={{
-              borderRadius: isMobile ? "20px" : "0 20px 20px 0",
-              width: isMobile ? "100%" : "50%",
+              borderRight: isVideoPage
+                ? "none"
+                : isMobile
+                  ? "none"
+                  : "1px solid #d9d9d9",
+              borderRadius: isVideoPage ? "20px" : isMobile ? "20px" : "0",
+              width: isVideoPage ? "100%" : isMobile ? "100%" : "33.33%",
             }}
             disabled={
               !selectedDate ||
@@ -340,9 +357,71 @@ export const VideoContentPlanAddModal = ({
           >
             {t("contentPlanPage.content_plan_add_post_modal.add_to_scheduler")}
           </Button>
+          {isVideoPage ? (
+            ""
+          ) : (
+            <Button
+              key="draft"
+              type="default"
+              onClick={() => setIsModalOpen(false)}
+              style={{
+                borderRadius: isMobile ? "20px" : "0 20px 20px 0",
+                width: isMobile ? "100%" : "33.33%",
+              }}
+            >
+              {t("contentPlanPage.content_plan_add_post_modal.draft")}
+            </Button>
+          )}
         </Button.Group>,
       ]}
     >
+      {isVideoPage ? (
+        ""
+      ) : (
+        <>
+          <Divider />
+          <div className={styles.addBtns}>
+            <Button
+              icon={<PictureOutlined />}
+              onClick={handleShowContentPlanPostsListModal}
+              className={cn(
+                styles.addBtn,
+                selectedPostType === ContentPlanPostingType.POST
+                  ? styles.addBtn__isActive
+                  : ""
+              )}
+            >
+              {t("contentPlanPage.content_plan_add_post_modal.post")}
+            </Button>
+            <Button
+              icon={<VideoCameraOutlined />}
+              onClick={handleShowContentPlanReelsModal}
+              className={cn(
+                styles.addBtn,
+                selectedPostType === ContentPlanPostingType.REELS
+                  ? styles.addBtn__isActive
+                  : ""
+              )}
+            >
+              {t("contentPlanPage.content_plan_add_post_modal.reels")}
+            </Button>
+            <Button
+              icon={<PlayCircleOutlined />}
+              onClick={handleShowContentPlanStorieModal}
+              className={cn(
+                styles.addBtn,
+                selectedPostType === ContentPlanPostingType.STORIES
+                  ? styles.addBtn__isActive
+                  : ""
+              )}
+            >
+              {t("contentPlanPage.content_plan_add_post_modal.stories")}
+            </Button>
+          </div>
+          <Divider />
+        </>
+      )}
+
       {selectNewVideo !== null ? (
         <List.Item>
           <List.Item.Meta
