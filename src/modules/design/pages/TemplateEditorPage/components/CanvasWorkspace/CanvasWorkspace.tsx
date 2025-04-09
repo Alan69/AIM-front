@@ -64,9 +64,40 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   }, []);
 
   // Parse template size
-  const templateSize = template.size ? template.size.split('x').map(Number) : [1080, 1080];
-  const canvasWidth = templateSize[0] || 1080;  // Add fallback values
-  const canvasHeight = templateSize[1] || 1080; // Add fallback values
+  console.log('Template size:', template.size);
+  // Ensure proper parsing of template size by handling specific preset dimensions explicitly
+  let templateWidth = 1080;
+  let templateHeight = 1080;
+  
+  if (template.size) {
+    // First, check for known size values directly
+    if (template.size === '1080x1920' || template.size.toUpperCase() === 'A_1080X1920') {
+      templateWidth = 1080;
+      templateHeight = 1920;
+      console.log('Using preset portrait dimensions: 1080x1920');
+    } else if (template.size === '1080x1080' || template.size.toUpperCase() === 'A_1080X1080') {
+      templateWidth = 1080;
+      templateHeight = 1080;
+      console.log('Using preset square dimensions: 1080x1080');
+    } else {
+      // Handle formats like A_1080X1920 or other variations
+      const sizeRegex = /(\d+)[xX](\d+)/;
+      const match = template.size.match(sizeRegex);
+      
+      if (match && match.length === 3) {
+        templateWidth = parseInt(match[1], 10);
+        templateHeight = parseInt(match[2], 10);
+        console.log(`Parsed dimensions from format '${template.size}': ${templateWidth}x${templateHeight}`);
+      } else {
+        console.warn(`Invalid template size format: ${template.size}, using defaults 1080x1080`);
+      }
+    }
+  }
+  
+  const canvasWidth = templateWidth;
+  const canvasHeight = templateHeight;
+  
+  console.log(`Canvas dimensions set to: ${canvasWidth}x${canvasHeight}`);
 
   // Pass the stageRef to the parent component if onStageRef is provided
   useEffect(() => {

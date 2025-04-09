@@ -768,9 +768,28 @@ const TemplateEditorPage: React.FC = () => {
     
     try {
       // Calculate center of canvas for default position if not specified
-      const templateSize = template.size.split('x').map(Number);
-      const centerX = templateSize[0] / 2;
-      const centerY = templateSize[1] / 2;
+      let centerX = 540; // Default center for 1080px width
+      let centerY = 540; // Default center for 1080px height
+      
+      if (template.size) {
+        // Parse the template size properly
+        if (template.size === '1080x1920' || template.size.toUpperCase() === 'A_1080X1920') {
+          centerX = 540; // 1080/2
+          centerY = 960; // 1920/2
+        } else if (template.size === '1080x1080' || template.size.toUpperCase() === 'A_1080X1080') {
+          centerX = 540; // 1080/2
+          centerY = 540; // 1080/2
+        } else {
+          // Handle formats like A_1080X1920 or other variations
+          const sizeRegex = /(\d+)[xX](\d+)/;
+          const match = template.size.match(sizeRegex);
+          
+          if (match && match.length === 3) {
+            centerX = parseInt(match[1], 10) / 2;
+            centerY = parseInt(match[2], 10) / 2;
+          }
+        }
+      }
       
       // Store a deep clone of the current template state
       const currentTemplate = JSON.parse(JSON.stringify(template));
@@ -1322,10 +1341,29 @@ const TemplateEditorPage: React.FC = () => {
       console.log('Capturing canvas as clean image...');
       const stage = stageRef.current;
       
-      // Parse the template size
-      const templateSize = template?.size ? template.size.split('x').map(Number) : [1080, 1080];
-      const canvasWidth = templateSize[0] || 1080;
-      const canvasHeight = templateSize[1] || 1080;
+      // Parse the template size with improved handling
+      let canvasWidth = 1080;
+      let canvasHeight = 1080;
+      
+      if (template?.size) {
+        // Check for known sizes first
+        if (template.size === '1080x1920' || template.size.toUpperCase() === 'A_1080X1920') {
+          canvasWidth = 1080;
+          canvasHeight = 1920;
+        } else if (template.size === '1080x1080' || template.size.toUpperCase() === 'A_1080X1080') {
+          canvasWidth = 1080;
+          canvasHeight = 1080;
+        } else {
+          // Handle formats like A_1080X1920 or other variations
+          const sizeRegex = /(\d+)[xX](\d+)/;
+          const match = template.size.match(sizeRegex);
+          
+          if (match && match.length === 3) {
+            canvasWidth = parseInt(match[1], 10);
+            canvasHeight = parseInt(match[2], 10);
+          }
+        }
+      }
       
       // Remove transformer temporarily if it exists to avoid including it in the capture
       const transformer = stage.findOne('Transformer');
@@ -1655,8 +1693,6 @@ const TemplateEditorPage: React.FC = () => {
       message.error(t('templateEditorPage.canvas_not_ready'));
       return;
     }
-
-
 
     try {
       setIsDownloading(true);
