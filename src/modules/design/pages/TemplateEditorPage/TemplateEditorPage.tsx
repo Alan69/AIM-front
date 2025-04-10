@@ -308,14 +308,6 @@ const TemplateEditorPage: React.FC = () => {
           const thumbnailWidth = Math.round(width * scale);
           const thumbnailHeight = Math.round(height * scale);
           
-          // Set canvas size to 0.7 and unselect all elements before generating thumbnail
-          stage.scale({ x: 0.7, y: 0.7 });
-          // stage.find('Transformer').forEach((node: Konva.Node) => {
-          //   const transformer = node as Konva.Transformer;
-          //   transformer.destroy();
-          // });
-          stage.draw();
-          
           thumbnailDataURL = stage.toDataURL({
             pixelRatio: 1,
             mimeType: 'image/png',
@@ -1444,14 +1436,6 @@ const TemplateEditorPage: React.FC = () => {
       const scale = Math.min(maxThumbnailSize / canvasWidth, maxThumbnailSize / canvasHeight);
       const thumbnailWidth = Math.round(canvasWidth * scale);
       const thumbnailHeight = Math.round(canvasHeight * scale);
-      
-      // Set canvas size to 0.7 and unselect all elements before generating thumbnail
-      tempStage.scale({ x: 0.7, y: 0.7 });
-      // tempStage.find('Transformer').forEach((node: Konva.Node) => {
-      //   const transformer = node as Konva.Transformer;
-      //   transformer.destroy();
-      // });
-      tempLayer.draw();
       
       const thumbnailDataURL = tempStage.toDataURL({
         pixelRatio: 1,
