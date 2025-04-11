@@ -146,6 +146,9 @@ export const PostDetailsPage = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
 
+  const [isTemplateModalVisible, setIsTemplateModalVisible] = useState(false);
+  const [currentMediaItem, setCurrentMediaItem] = useState<TPostMediaData | null>(null);
+
   const profileImage = user?.profile.picture
     ? `${user.profile.picture}`
     : avatar;
@@ -162,6 +165,52 @@ export const PostDetailsPage = () => {
   const formValues = watch();
   const imageOption = watch("imageOption");
   const textOption = watch("textOption");
+
+  // Helper function to get correct media image URL
+  const getMediaImageUrl = (mediaPath: string): string => {
+    if (!mediaPath) return '';
+    
+    // If it's already a full URL, return it as is
+    if (mediaPath.startsWith('http')) {
+      return mediaPath;
+    }
+    
+    // Extract host and protocol from current window location
+    const host = window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host;
+    const protocol = window.location.protocol;
+    
+    // Clean up the mediaPath: ensure it starts with a slash
+    const normalizedPath = mediaPath.startsWith('/') ? mediaPath : `/${mediaPath}`;
+    
+    // If it's already a /media path, just add the host
+    if (normalizedPath.startsWith('/media/')) {
+      return `${protocol}//${host}${normalizedPath}`;
+    }
+    
+    // For any other path, ensure it has /media prefix
+    return `${protocol}//${host}/media${normalizedPath}`;
+  };
+  
+  // Helper function to get proper API URL without duplicating /api/
+  const getApiUrl = (endpoint: string): string => {
+    // Remove leading slash if present to avoid double slashes
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    
+    // Use window.location for localhost development
+    if (window.location.hostname === 'localhost') {
+      return `${window.location.protocol}//localhost:8000/${cleanEndpoint}`;
+    }
+    
+    // For production, use the baseApiUrl but ensure no duplicate /api/
+    const apiBase = baseApiUrl.endsWith('/') ? baseApiUrl.slice(0, -1) : baseApiUrl;
+    
+    // If the endpoint already includes /api/, don't add it again
+    if (cleanEndpoint.startsWith('api/')) {
+      return `${apiBase.replace('/api', '')}/${cleanEndpoint}`;
+    }
+    
+    return `${apiBase}/${cleanEndpoint}`;
+  };
 
   // Function to load non-assignable templates
   const loadNonAssignableTemplates = async () => {
@@ -701,18 +750,25 @@ export const PostDetailsPage = () => {
       // Try to fetch the post media directly to see what the API returns
       let mediaData;
       try {
-        const response = await fetch(`${baseApiUrl}/post-media/${mediaItem.id}/`, {
+        const mediaApiUrl = getApiUrl(`post-media/${mediaItem.id}/`);
+        console.log("Fetching media data from:", mediaApiUrl);
+        
+        const response = await fetch(mediaApiUrl, {
           method: 'GET',
           credentials: 'include',
         });
+        
+        if (!response.ok) {
+          console.error(`Error fetching media data: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch media data: ${response.status}`);
+        }
+        
         mediaData = await response.json();
         console.log("Media data from API:", mediaData);
         console.log("Template from API:", mediaData.template);
       } catch (error) {
         console.error("Error fetching media data:", error);
       }
-      
-      let templateUuid;
       
       // Check if the media already has a template - use more robust checking
       if (mediaData?.template && 
@@ -721,7 +777,7 @@ export const PostDetailsPage = () => {
           mediaData.template !== null) {
         
         console.log(`Using existing template ${mediaData.template} for media ${mediaItem.id}`);
-        templateUuid = mediaData.template;
+        const templateUuid = mediaData.template;
         
         // Navigate directly to the existing template
         let url = `/design/editor/${templateUuid}?source=postMedia&postId=${post?.id}&mediaId=${mediaItem.id}`;
@@ -732,44 +788,105 @@ export const PostDetailsPage = () => {
         }
         
         navigate(url);
-        return; // Exit early since we're using the existing template
       } else {
-        // Create a new template with the media image
-        const templateName = `Edit from Post ${post?.id || ''} Media ${mediaItem.id}`;
-        const templateSize = '1080x1080'; // Default size, you might want to detect the actual image size
+        // No template exists, show the modal to select template size
+        setCurrentMediaItem(mediaItem);
+        setIsTemplateModalVisible(true);
+      }
+    } catch (error) {
+      console.error('Error opening media in designer:', error);
+      message.error(t("postDetailsPage.error_opening_in_designer"));
+    }
+  };
+
+  // Function to handle template size selection and create template
+  const handleTemplateSizeSelect = async (size: string) => {
+    if (!currentMediaItem) return;
+    
+    try {
+      setIsTemplateModalVisible(false);
         
-        // Get the media image URL
-        let mediaImageUrl = mediaItem?.media || '';
-        console.log(`Original media image URL: ${mediaImageUrl}`);
+      // Get the media image URL using our helper function
+      let mediaImageUrl = getMediaImageUrl(currentMediaItem?.media || '');
+      console.log(`Using media image URL: ${mediaImageUrl}`);
         
-        // Make sure we have the full URL path
-        if (mediaImageUrl && !mediaImageUrl.startsWith('http')) {
-          // If it's a relative URL, convert to absolute
-          const baseUrl = process.env.REACT_APP_API_URL || '';
-          const apiUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
-          
-          // If it starts with /media, append it to the API URL
-          if (mediaImageUrl.startsWith('/media/')) {
-            mediaImageUrl = `${apiUrl}${mediaImageUrl}`;
-          } else {
-            // Otherwise, assume it needs /media/ prefix
-            mediaImageUrl = `${apiUrl}/media/${mediaImageUrl}`;
-          }
-          console.log(`Converted to absolute URL: ${mediaImageUrl}`);
-        }
-        
-        // Ensure the URL is accessible by checking if it's a valid URL
+      // Default template size
+      let templateSize = size;
+      
+      // If custom size is selected, determine the image dimensions
+      if (size === 'custom') {
         try {
-          new URL(mediaImageUrl);
-        } catch (e) {
-          console.error('Invalid URL:', mediaImageUrl);
-          // Try to fix the URL
-          if (mediaImageUrl) {
-            const filename = mediaImageUrl.split('/').pop();
-            if (filename) {
-              mediaImageUrl = `http://localhost:8000/media/${filename}`;
-              console.log(`Fixed URL: ${mediaImageUrl}`);
+          // Show a loading message
+          message.loading({
+            content: t("postDetailsPage.determining_image_dimensions"),
+            key: 'imageDimensions',
+          });
+          
+          console.log('Preloading image to determine dimensions:', mediaImageUrl);
+          
+          // Use our helper function to preload the image and get dimensions
+          const dimensions = await preloadImage(mediaImageUrl);
+          
+          // Set the template size using the measured dimensions, but limit to max of 1080x1920
+          const maxWidth = 1080;
+          const maxHeight = 1920;
+          
+          let width = dimensions.width;
+          let height = dimensions.height;
+          
+          // Check if dimensions exceed maximum allowed size
+          if (width > maxWidth || height > maxHeight) {
+            console.log(`Original dimensions ${width}x${height} exceed maximum allowed (${maxWidth}x${maxHeight})`);
+            
+            // Scale down proportionally
+            if (width > height) {
+              // Landscape orientation
+              const ratio = maxWidth / width;
+              width = maxWidth;
+              height = Math.round(height * ratio);
+          } else {
+              // Portrait or square orientation
+              const ratio = maxHeight / height;
+              height = maxHeight;
+              width = Math.round(width * ratio);
             }
+            
+            console.log(`Scaled down dimensions to ${width}x${height}`);
+          }
+          
+          // Always use one of the valid template sizes
+          // Check which standard size is closest to our dimensions
+          if (width === height || Math.abs(width - height) < width * 0.1) {
+            // Square or nearly square - use 1080x1080
+            templateSize = '1080x1080';
+            console.log(`Using standard square size: ${templateSize}`);
+          } else if (width < height) {
+            // Portrait - use 1080x1920
+            templateSize = '1080x1920';
+            console.log(`Using standard portrait size: ${templateSize}`);
+          } else {
+            // Landscape - default to square for now
+            templateSize = '1080x1080';
+            console.log(`Using standard square size for landscape: ${templateSize}`);
+          }
+          
+          console.log(`Final template size: ${templateSize}`);
+          
+          message.success({
+            content: t("postDetailsPage.image_dimensions_detected", { dimensions: templateSize }),
+            key: 'imageDimensions',
+            duration: 2
+          });
+        } catch (e) {
+          console.error('Exception during image dimension detection:', e);
+          // If anything goes wrong, use default size
+          templateSize = '1080x1080';
+          
+          message.warning({
+            content: t("postDetailsPage.using_default_size"),
+            key: 'imageDimensions',
+            duration: 2
+          });
           }
         }
         
@@ -777,26 +894,42 @@ export const PostDetailsPage = () => {
         const userId = user?.profile?.user?.id;
         console.log(`Creating template with user ID: ${userId}`);
         
+      message.loading({
+        content: t("postDetailsPage.creating_template"),
+        key: 'templateCreation',
+      });
+      
+      try {
         // Create a new template with the media image as background
         const newTemplate = await createTemplate(
-          templateName, 
+          `Edit from Post ${post?.id || ''} Media ${currentMediaItem.id}`, 
           templateSize, 
           mediaImageUrl,
           userId,
           false, // isDefault
-          post?.id, // Pass the post ID to fetch the post image if needed
-          mediaItem.id // Add the mediaId parameter
+          post?.id // Pass the post ID to fetch the post image if needed
         );
         
-        if (newTemplate && mediaItem.id) {
+        console.log('Template created successfully:', newTemplate);
+        
+        if (!newTemplate || !newTemplate.uuid) {
+          throw new Error('Failed to create template - no template UUID returned');
+        }
+        
+        if (newTemplate && currentMediaItem.id) {
           // Update the media with the template UUID
           try {
             // Create form data for the request
             const formData = new URLSearchParams();
             formData.append('template_uuid', newTemplate.uuid);
             
+            console.log(`Updating media ${currentMediaItem.id} with template ${newTemplate.uuid}`);
+            
             // Send the request to update the post media with the template UUID
-            await fetch(`${baseApiUrl}/post-media/${mediaItem.id}/update-template/`, {
+            const updateUrl = getApiUrl(`post-media/${currentMediaItem.id}/update-template/`);
+            console.log("Sending update to URL:", updateUrl);
+            
+            const updateResponse = await fetch(updateUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -805,30 +938,43 @@ export const PostDetailsPage = () => {
               credentials: 'include',
             });
             
-            console.log(`Post media ${mediaItem.id} updated with template ${newTemplate.uuid}`);
+            if (!updateResponse.ok) {
+              console.error(`Error updating template: ${updateResponse.status} ${updateResponse.statusText}`);
+              const responseText = await updateResponse.text();
+              console.error('Response:', responseText);
+              // Continue anyway since we already created the template
+            } else {
+              console.log(`Post media ${currentMediaItem.id} updated with template ${newTemplate.uuid}`);
+            }
           } catch (error) {
             console.error('Error updating post media with template UUID:', error);
+            // We'll still navigate to the editor even if the update fails
           }
           
-          templateUuid = newTemplate.uuid;
-        }
-      }
-      
-      if (templateUuid) {
         // Navigate to the template editor with the template
         // Pass source=postMedia, postId, and mediaId parameters to identify where we came from
-        let url = `/design/editor/${templateUuid}?source=postMedia&postId=${post?.id}&mediaId=${mediaItem.id}`;
+          let url = `/design/editor/${newTemplate.uuid}?source=postMedia&postId=${post?.id}&mediaId=${currentMediaItem.id}`;
         
         // If we have a postQueryId, add it to the URL
         if (postQueryId) {
           url += `&postQueryId=${postQueryId}`;
         }
         
+          message.success(t("postDetailsPage.template_created_successfully"));
         navigate(url);
+        }
+      } catch (templateError) {
+        console.error('Error creating template:', templateError);
+        message.error({
+          content: t("postDetailsPage.error_creating_template"),
+          key: 'templateCreation',
+        });
+      } finally {
+        message.destroy('templateCreation');
       }
     } catch (error) {
-      console.error('Error creating template from media image:', error);
-      message.error(t("postDetailsPage.error_creating_template"));
+      console.error('Error in handleTemplateSizeSelect:', error);
+      message.error(t("postDetailsPage.error_processing_request"));
     }
   };
 
@@ -1209,6 +1355,129 @@ export const PostDetailsPage = () => {
       console.error('Error deleting media:', error);
       message.error(t('postDetailsPage.media_deleted_error'));
     }
+  };
+
+  // Render Template Size Selection Modal
+  const renderTemplateSizeModal = () => {
+    return (
+      <Modal
+        title={t("postDetailsPage.select_template_size")}
+        open={isTemplateModalVisible}
+        onCancel={() => setIsTemplateModalVisible(false)}
+        footer={null}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px', marginBottom: '20px' }}>
+          {/* Square template option */}
+          <div 
+            style={{ textAlign: 'center', cursor: 'pointer', padding: '10px', borderRadius: '4px', transition: 'all 0.3s' }}
+            onClick={() => handleTemplateSizeSelect('1080x1080')}
+          >
+            <div 
+              style={{ 
+                width: '100px', 
+                height: '100px', 
+                border: '1px solid #ddd', 
+                margin: '0 auto 10px',
+                borderRadius: '4px',
+                background: '#f9f9f9'
+              }}
+            ></div>
+            <div style={{ fontWeight: 'bold' }}>{t("postDetailsPage.size_square")}</div>
+            <div style={{ color: '#666', fontSize: '12px' }}>1080x1080</div>
+          </div>
+          
+          {/* Portrait template option */}
+          <div 
+            style={{ textAlign: 'center', cursor: 'pointer', padding: '10px', borderRadius: '4px', transition: 'all 0.3s' }}
+            onClick={() => handleTemplateSizeSelect('1080x1920')}
+          >
+            <div 
+              style={{ 
+                width: '56px', 
+                height: '100px', 
+                border: '1px solid #ddd', 
+                margin: '0 auto 10px',
+                borderRadius: '4px',
+                background: '#f9f9f9'
+              }}
+            ></div>
+            <div style={{ fontWeight: 'bold' }}>{t("postDetailsPage.size_portrait")}</div>
+            <div style={{ color: '#666', fontSize: '12px' }}>1080x1920</div>
+          </div>
+          
+          {/* Custom size template option */}
+          <div 
+            style={{ textAlign: 'center', cursor: 'pointer', padding: '10px', borderRadius: '4px', transition: 'all 0.3s' }}
+            onClick={() => handleTemplateSizeSelect('custom')}
+          >
+            <div 
+              style={{ 
+                width: '80px', 
+                height: '100px', 
+                border: '1px dashed #1890ff', 
+                margin: '0 auto 10px',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#f0f8ff'
+              }}
+            >
+              <span style={{ fontSize: '20px', color: '#1890ff' }}>?</span>
+            </div>
+            <div style={{ fontWeight: 'bold' }}>{t("postDetailsPage.size_custom")}</div>
+            <div style={{ color: '#666', fontSize: '12px' }}>{t("postDetailsPage.image_dimensions")}</div>
+          </div>
+        </div>
+      </Modal>
+    );
+  };
+
+  // Helper function to preload an image and get its dimensions
+  const preloadImage = async (url: string): Promise<{ width: number, height: number }> => {
+    return new Promise((resolve, reject) => {
+      try {
+        // Create a hidden image element
+        const img = document.createElement('img');
+        img.style.position = 'absolute';
+        img.style.left = '-9999px';
+        img.style.top = '-9999px';
+        img.crossOrigin = 'anonymous';
+        
+        // When the image loads, resolve with the dimensions
+        img.onload = () => {
+          const dimensions = {
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          };
+          document.body.removeChild(img);
+          console.log(`Image dimensions detected: ${dimensions.width}x${dimensions.height}`);
+          resolve(dimensions);
+        };
+        
+        // If there's an error, reject with it
+        img.onerror = (e) => {
+          if (document.body.contains(img)) {
+            document.body.removeChild(img);
+          }
+          reject(e);
+        };
+        
+        // Add the image to the DOM and set the source
+        document.body.appendChild(img);
+        img.src = url;
+        
+        // Set a timeout in case the image never loads
+        setTimeout(() => {
+          if (document.body.contains(img)) {
+            document.body.removeChild(img);
+          }
+          reject(new Error('Image load timeout'));
+        }, 10000);
+      } catch (error) {
+        reject(error);
+      }
+    });
   };
 
   if (isLoading)
@@ -1738,6 +2007,7 @@ export const PostDetailsPage = () => {
         </Content>
       </Layout>
       {renderTemplateModal()}
+      {renderTemplateSizeModal()}
       <ModalImageStylesList
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
