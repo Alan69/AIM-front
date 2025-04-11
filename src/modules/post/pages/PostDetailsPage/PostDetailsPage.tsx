@@ -742,7 +742,27 @@ export const PostDetailsPage = () => {
 
   const handleOpenInDesigner = async (mediaItem: TPostMediaData) => {
     try {
-      // Add more detailed logging
+      // If the media item already has a template property, skip the template selection
+      if (mediaItem?.template && 
+          mediaItem.template !== "null" && 
+          mediaItem.template !== "undefined" && 
+          mediaItem.template !== null) {
+        
+        console.log(`Media already has template ${mediaItem.template}, navigating directly to editor`);
+        
+        // Navigate directly to the existing template
+        let url = `/design/editor/${mediaItem.template}?source=postMedia&postId=${post?.id}&mediaId=${mediaItem.id}`;
+        
+        // If we have a postQueryId, add it to the URL
+        if (postQueryId) {
+          url += `&postQueryId=${postQueryId}`;
+        }
+        
+        navigate(url);
+        return;
+      }
+      
+      // Otherwise, fetch media data to double-check template status
       console.log("Full post data:", post);
       console.log("Selected media item:", mediaItem);
       console.log("Media template value:", mediaItem?.template, typeof mediaItem?.template);
