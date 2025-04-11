@@ -832,13 +832,49 @@ const TemplateEditorPage: React.FC = () => {
           const opacity = data?.opacity !== undefined ? Number(data.opacity) : 1.0;
           const borderRadius = data?.borderRadius !== undefined ? Number(data.borderRadius) : 0;
           
+          // Create an image element to check dimensions
+          const img = new Image();
+          
+          // Set up a Promise to handle image loading
+          await new Promise<void>((resolve) => {
+            img.onload = () => {
+              resolve();
+            };
+            img.onerror = () => {
+              resolve(); // Continue even if there's an error loading the image
+            };
+            img.src = image;
+          });
+          
+          // Get dimensions and calculate aspect ratio
+          let width = img.width || 200; // Default if image loading fails
+          let height = img.height || 200;
+          const aspectRatio = width / height;
+          
+          // If width or height is greater than 500px, scale down while maintaining aspect ratio
+          if (width > 500 || height > 500) {
+            if (width > height) {
+              // Width is larger, cap at 500px
+              width = 500;
+              height = Math.round(width / aspectRatio);
+            } else {
+              // Height is larger, cap at 500px
+              height = 500;
+              width = Math.round(height * aspectRatio);
+            }
+          }
+          
+          // Use the calculated dimensions or any provided in data
+          const finalWidth = data?.width !== undefined ? Number(data.width) : width;
+          const finalHeight = data?.height !== undefined ? Number(data.height) : height;
+          
           updatedTemplate = await createImageAsset(
             uuid,
             image,
             data?.positionX || 500,
             data?.positionY || 500,
-            data?.width || 200,
-            data?.height || 200,
+            finalWidth,
+            finalHeight,
             imageZIndex,
             data?.rotation || 0,
             opacity,
@@ -857,6 +893,9 @@ const TemplateEditorPage: React.FC = () => {
             if (data?.opacity !== undefined) {
               processedImage.opacity = Number(data.opacity);
             }
+            // Ensure width and height are set correctly
+            processedImage.width = finalWidth;
+            processedImage.height = finalHeight;
             
             await updateElementInTemplate(uuid, newImage.uuid, 'image', processedImage);
           }
@@ -1036,13 +1075,41 @@ const TemplateEditorPage: React.FC = () => {
             const image = data.image;
             if (!image) return;
             
+            // Create an image element to check dimensions
+            const img = new Image();
+            img.src = image;
+            
+            // Wait for the image to load to get dimensions
+            await new Promise((resolve) => {
+              img.onload = resolve;
+              img.onerror = resolve; // Continue even if there's an error loading the image
+            });
+            
+            // Get dimensions and calculate aspect ratio
+            let width = img.width || 200; // Default if image loading fails
+            let height = img.height || 200;
+            const aspectRatio = width / height;
+            
+            // If width or height is greater than 500px, scale down while maintaining aspect ratio
+            if (width > 500 || height > 500) {
+              if (width > height) {
+                // Width is larger, cap at 500px
+                width = 500;
+                height = Math.round(width / aspectRatio);
+              } else {
+                // Height is larger, cap at 500px
+                height = 500;
+                width = Math.round(height * aspectRatio);
+              }
+            }
+            
             const result = await createImageAsset(
               uuid,
               image,
               data.positionX !== undefined ? Number(data.positionX) : 500,
               data.positionY !== undefined ? Number(data.positionY) : 500,
-              data.width !== undefined ? Number(data.width) : 200,
-              data.height !== undefined ? Number(data.height) : 200,
+              width, // Use calculated width
+              height, // Use calculated height
               data.zIndex !== undefined ? Number(data.zIndex) : 0,
               data.rotation !== undefined ? Number(data.rotation) : 0,
               data.opacity !== undefined ? Number(data.opacity) : 1.0,
@@ -1060,6 +1127,9 @@ const TemplateEditorPage: React.FC = () => {
               if (data.opacity !== undefined) {
                 processedImage.opacity = Number(data.opacity);
               }
+              // Ensure width and height are set correctly
+              processedImage.width = width;
+              processedImage.height = height;
               
               // Update in the backend
               await updateElementInTemplate(uuid, newImage.uuid, 'image', processedImage);

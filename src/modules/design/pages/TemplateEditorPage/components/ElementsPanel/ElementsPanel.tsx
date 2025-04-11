@@ -381,14 +381,93 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
             // Refresh the user assets list
             loadUserAssets();
             
-          // Only add the element when we have a valid image URL
-            onAddElement(ElementType.IMAGE, { image: imageUrl });
-            message.success(t('templateEditorPage.image_added_to_canvas_and_saved', { name: file.name }));
+            // Create an image object to get dimensions
+            const img = new Image();
+            img.onload = () => {
+              // Get original dimensions
+              let width = img.width;
+              let height = img.height;
+              
+              // Calculate aspect ratio
+              const aspectRatio = width / height;
+              
+              // If width or height is greater than 500px, scale down while maintaining aspect ratio
+              if (width > 500 || height > 500) {
+                if (width > height) {
+                  // Width is larger, cap at 500px
+                  width = 500;
+                  height = Math.round(width / aspectRatio);
+                } else {
+                  // Height is larger, cap at 500px
+                  height = 500;
+                  width = Math.round(height * aspectRatio);
+                }
+              }
+              
+              // Add the image with the calculated dimensions
+              onAddElement(ElementType.IMAGE, {
+                image: imageUrl,
+                width,
+                height
+              });
+              message.success(t('templateEditorPage.image_added_to_canvas_and_saved', { name: file.name }));
+            };
+            
+            // Handle loading errors
+            img.onerror = () => {
+              // Fallback to original method without size calculation
+              onAddElement(ElementType.IMAGE, { image: imageUrl });
+              message.success(t('templateEditorPage.image_added_to_canvas_and_saved', { name: file.name }));
+            };
+            
+            // Set source to load the image
+            img.src = imageUrl;
+            
           } catch (error) {
             console.error('Error saving image asset:', error);
             // Still add the image to the canvas even if saving as asset failed
-          onAddElement(ElementType.IMAGE, { image: imageUrl });
-          message.success(t('templateEditorPage.image_added_to_canvas', { name: file.name }));
+            // Create an image object to get dimensions
+            const img = new Image();
+            img.onload = () => {
+              // Get original dimensions
+              let width = img.width;
+              let height = img.height;
+              
+              // Calculate aspect ratio
+              const aspectRatio = width / height;
+              
+              // If width or height is greater than 500px, scale down while maintaining aspect ratio
+              if (width > 500 || height > 500) {
+                if (width > height) {
+                  // Width is larger, cap at 500px
+                  width = 500;
+                  height = Math.round(width / aspectRatio);
+                } else {
+                  // Height is larger, cap at 500px
+                  height = 500;
+                  width = Math.round(height * aspectRatio);
+                }
+              }
+              
+              // Add the image with the calculated dimensions
+              onAddElement(ElementType.IMAGE, {
+                image: imageUrl,
+                width,
+                height
+              });
+              message.success(t('templateEditorPage.image_added_to_canvas', { name: file.name }));
+            };
+            
+            // Handle loading errors
+            img.onerror = () => {
+              // Fallback to original method without size calculation
+              onAddElement(ElementType.IMAGE, { image: imageUrl });
+              message.success(t('templateEditorPage.image_added_to_canvas', { name: file.name }));
+            };
+            
+            // Set source to load the image
+            img.src = imageUrl;
+            
             message.error(t('templateEditorPage.failed_to_save_image_asset'));
           }
         } else {
@@ -440,8 +519,47 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
 
   // Handle adding an image from user assets
   const handleAddUserAsset = (asset: UserAsset) => {
-    onAddElement(ElementType.IMAGE, { image: asset.image });
-    message.success(t('templateEditorPage.image_added_to_canvas'));
+    // Create a new image element to check dimensions and maintain aspect ratio
+    const img = new Image();
+    img.onload = () => {
+      // Get original dimensions
+      let width = img.width;
+      let height = img.height;
+      
+      // Calculate aspect ratio
+      const aspectRatio = width / height;
+      
+      // If width or height is greater than 500px, scale down while maintaining aspect ratio
+      if (width > 500 || height > 500) {
+        if (width > height) {
+          // Width is larger, cap at 500px
+          width = 500;
+          height = Math.round(width / aspectRatio);
+        } else {
+          // Height is larger, cap at 500px
+          height = 500;
+          width = Math.round(height * aspectRatio);
+        }
+      }
+      
+      // Add the image with the calculated dimensions
+      onAddElement(ElementType.IMAGE, { 
+        image: asset.image,
+        width,
+        height
+      });
+      message.success(t('templateEditorPage.image_added_to_canvas'));
+    };
+    
+    // Handle loading errors
+    img.onerror = () => {
+      // Fallback to original method without size calculation
+      onAddElement(ElementType.IMAGE, { image: asset.image });
+      message.success(t('templateEditorPage.image_added_to_canvas'));
+    };
+    
+    // Set source to load the image
+    img.src = asset.image;
   };
 
   // Get all elements for the Elements List
