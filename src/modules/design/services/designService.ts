@@ -771,7 +771,7 @@ export const createTemplate = async (name: string, size: string, backgroundImage
   if (mediaId) {
     try {
       // Fetch the media details to check if it already has a template
-      const response = await fetch(`${API_URL}/api/post-media/${mediaId}/`);
+      const response = await fetch(`${API_URL}post-media/${mediaId}/`);
       const mediaData = await response.json();
       
       console.log('Fetched media data:', mediaData);

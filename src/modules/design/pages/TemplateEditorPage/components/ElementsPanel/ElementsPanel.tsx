@@ -210,8 +210,19 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     }
     
     // Filter out templates with different sizes than the current template
+    // UNLESS the template has a custom size
     if (template?.size) {
-      filtered = filtered.filter(t => t.size === template.size);
+      // Check if current template has a standard size or custom size
+      const isStandardSize = template.size === '1080x1080' || template.size === '1080x1920';
+      
+      if (isStandardSize) {
+        // For standard sizes, only show templates with matching size
+        filtered = filtered.filter(t => t.size === template.size);
+      } else {
+        // For custom sizes, show all assignable templates
+        console.log('Custom template size detected:', template.size);
+        console.log('Showing all assignable templates regardless of size');
+      }
     }
     
     // Filter out the current template

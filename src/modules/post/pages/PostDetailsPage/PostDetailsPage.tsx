@@ -847,80 +847,48 @@ export const PostDetailsPage = () => {
           // Use our helper function to preload the image and get dimensions
           const dimensions = await preloadImage(mediaImageUrl);
           
-          // Set the template size using the measured dimensions, but limit to max of 1080x1920
-          const maxWidth = 1080;
-          const maxHeight = 1920;
-          
+          // Get original dimensions
           let width = dimensions.width;
           let height = dimensions.height;
           
-          // Check if dimensions exceed maximum allowed size
-          if (width > maxWidth || height > maxHeight) {
-            console.log(`Original dimensions ${width}x${height} exceed maximum allowed (${maxWidth}x${maxHeight})`);
-            
-            // Scale down proportionally
-            if (width > height) {
-              // Landscape orientation
-              const ratio = maxWidth / width;
-              width = maxWidth;
-              height = Math.round(height * ratio);
-          } else {
-              // Portrait or square orientation
-              const ratio = maxHeight / height;
-              height = maxHeight;
-              width = Math.round(width * ratio);
-            }
-            
-            console.log(`Scaled down dimensions to ${width}x${height}`);
-          }
+          console.log(`Original image dimensions: ${width}x${height}`);
           
-          // Always use one of the valid template sizes
-          // Check which standard size is closest to our dimensions
-          if (width === height || Math.abs(width - height) < width * 0.1) {
-            // Square or nearly square - use 1080x1080
-            templateSize = '1080x1080';
-            console.log(`Using standard square size: ${templateSize}`);
-          } else if (width < height) {
-            // Portrait - use 1080x1920
-            templateSize = '1080x1920';
-            console.log(`Using standard portrait size: ${templateSize}`);
-          } else {
-            // Landscape - default to square for now
-            templateSize = '1080x1080';
-            console.log(`Using standard square size for landscape: ${templateSize}`);
-          }
-          
-          console.log(`Final template size: ${templateSize}`);
+          // Use original dimensions as is - no enforced minimums
+          templateSize = `${width}x${height}`;
           
           message.success({
-            content: t("postDetailsPage.image_dimensions_detected", { dimensions: templateSize }),
+            content: t("postDetailsPage.image_dimensions_detected", { width, height }),
             key: 'imageDimensions',
-            duration: 2
           });
-        } catch (e) {
-          console.error('Exception during image dimension detection:', e);
-          // If anything goes wrong, use default size
-          templateSize = '1080x1080';
           
-          message.warning({
-            content: t("postDetailsPage.using_default_size"),
+          console.log(`Using original dimensions for template: ${templateSize}`);
+        } catch (error) {
+          console.error('Error determining image dimensions:', error);
+          message.error({
+            content: t("postDetailsPage.error_determining_dimensions"),
             key: 'imageDimensions',
-            duration: 2
           });
+          
+          // Default to 1080x1920 if we can't determine dimensions
+          templateSize = '1080x1920';
           }
         }
         
-        // Get the user ID from the user context
+      // Create template with the selected size
+      try {
+        // Create a template with our helper function
         const userId = user?.profile?.user?.id;
-        console.log(`Creating template with user ID: ${userId}`);
+        
+        if (!userId) {
+          message.error(t("postDetailsPage.error_missing_user_id"));
+          return;
+        }
         
       message.loading({
         content: t("postDetailsPage.creating_template"),
         key: 'templateCreation',
       });
       
-      try {
-        // Create a new template with the media image as background
         const newTemplate = await createTemplate(
           `Edit from Post ${post?.id || ''} Media ${currentMediaItem.id}`, 
           templateSize, 

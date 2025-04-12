@@ -65,33 +65,40 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
 
   // Parse template size
   console.log('Template size:', template.size);
-  // Ensure proper parsing of template size by handling specific preset dimensions explicitly
+  // Parse template size from any format (e.g., "960x1280" or "1080x1920")
   let templateWidth = 1080;
   let templateHeight = 1080;
   
   if (template.size) {
-    // First, check for known size values directly
-    if (template.size === '1080x1920' || template.size.toUpperCase() === 'A_1080X1920') {
-      templateWidth = 1080;
-      templateHeight = 1920;
-      console.log('Using preset portrait dimensions: 1080x1920');
-    } else if (template.size === '1080x1080' || template.size.toUpperCase() === 'A_1080X1080') {
-      templateWidth = 1080;
-      templateHeight = 1080;
-      console.log('Using preset square dimensions: 1080x1080');
+    // Extract dimensions using regex pattern to match WIDTHxHEIGHT format
+    const sizeRegex = /(\d+)[xX](\d+)/;
+    const match = template.size.match(sizeRegex);
+    
+    if (match && match.length === 3) {
+      templateWidth = parseInt(match[1], 10);
+      templateHeight = parseInt(match[2], 10);
+      console.log(`Template size: ${templateWidth}x${templateHeight}`);
     } else {
-      // Handle formats like A_1080X1920 or other variations
-      const sizeRegex = /(\d+)[xX](\d+)/;
-      const match = template.size.match(sizeRegex);
-      
-      if (match && match.length === 3) {
-        templateWidth = parseInt(match[1], 10);
-        templateHeight = parseInt(match[2], 10);
-        console.log(`Parsed dimensions from format '${template.size}': ${templateWidth}x${templateHeight}`);
+      // Handle predefined size values
+      if (template.size === '1080x1920' || template.size.toUpperCase() === 'A_1080X1920') {
+        templateWidth = 1080;
+        templateHeight = 1920;
+        console.log('Using preset portrait dimensions: 1080x1920');
+      } else if (template.size === '1080x1080' || template.size.toUpperCase() === 'A_1080X1080') {
+        templateWidth = 1080;
+        templateHeight = 1080;
+        console.log('Using preset square dimensions: 1080x1080');
+      } else if (template.size === 'custom') {
+        // For legacy 'custom' size, use default dimensions
+        templateWidth = 1080;
+        templateHeight = 1920;
+        console.log('Using default dimensions for "custom" size: 1080x1920');
       } else {
-        console.warn(`Invalid template size format: ${template.size}, using defaults 1080x1080`);
+        console.warn(`Unrecognized template size format: ${template.size}, using defaults 1080x1080`);
       }
     }
+  } else {
+    console.warn('No template size specified, using defaults 1080x1080');
   }
   
   const canvasWidth = templateWidth;
