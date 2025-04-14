@@ -7,6 +7,7 @@ import {
   UndoOutlined, 
   RedoOutlined, 
   DeleteOutlined,
+  DeleteFilled,
   CloudUploadOutlined,
   HeartOutlined,
   HeartFilled,
@@ -304,18 +305,55 @@ const TemplateEditorPage: React.FC = () => {
           // Generate a smaller thumbnail image (e.g., 300x300 max)
           const [width, height] = template.size.split('x').map(Number) || [1080, 1080];
           const maxThumbnailSize = 300;
-          const scale = Math.min(maxThumbnailSize / width, maxThumbnailSize / height);
-          const thumbnailWidth = Math.round(width * scale);
-          const thumbnailHeight = Math.round(height * scale);
           
-          thumbnailDataURL = stage.toDataURL({
-            pixelRatio: 1,
+          // Calculate the dimensions for the thumbnail maintaining aspect ratio
+          const aspectRatio = width / height;
+          let thumbnailWidth, thumbnailHeight;
+          
+          if (aspectRatio >= 1) { // Width >= Height (landscape or square)
+            thumbnailWidth = maxThumbnailSize;
+            thumbnailHeight = maxThumbnailSize / aspectRatio;
+          } else { // Height > Width (portrait)
+            thumbnailHeight = maxThumbnailSize;
+            thumbnailWidth = maxThumbnailSize * aspectRatio;
+          }
+          
+          // Round to whole pixels
+          thumbnailWidth = Math.round(thumbnailWidth);
+          thumbnailHeight = Math.round(thumbnailHeight);
+          
+          // Capture the entire stage at original size
+          const fullSizeDataURL = stage.toDataURL({
+            pixelRatio: 2,
             mimeType: 'image/png',
-            width: width,
-            height: height,
-            quality: 0.8
+            quality: 1.0
           });
-          console.log(`Generated thumbnail with dimensions: ${thumbnailWidth}x${thumbnailHeight}`);
+          
+          // Create a new canvas for the thumbnail with correct size
+          const canvas = document.createElement('canvas');
+          canvas.width = thumbnailWidth;
+          canvas.height = thumbnailHeight;
+          const ctx = canvas.getContext('2d');
+          
+          // Fill with transparent background
+          if (ctx) {
+            ctx.clearRect(0, 0, thumbnailWidth, thumbnailHeight);
+          }
+          
+          // Wait for the image to load before drawing to canvas
+          await new Promise<void>(resolve => {
+            const img = new Image();
+            img.onload = () => {
+              if (ctx) {
+                // Draw the image centered and scaled to fit the canvas
+                ctx.drawImage(img, 0, 0, thumbnailWidth, thumbnailHeight);
+                thumbnailDataURL = canvas.toDataURL('image/png');
+                console.log(`Generated thumbnail with dimensions: ${thumbnailWidth}x${thumbnailHeight}`);
+              }
+              resolve();
+            };
+            img.src = fullSizeDataURL;
+          });
         }
       }
       
@@ -1865,7 +1903,7 @@ const TemplateEditorPage: React.FC = () => {
               {t('templateEditorPage.assignable')}
             </Checkbox>
           </Tooltip>
-          <Tooltip title={isLiked ? t('templateEditorPage.remove_from_favorites') : t('templateEditorPage.add_to_favorites')}>
+          {/* <Tooltip title={isLiked ? t('templateEditorPage.remove_from_favorites') : t('templateEditorPage.add_to_favorites')}>
             <Button
               icon={isLiked ? 
                 <HeartFilled className="heart-icon filled" /> : 
@@ -1874,7 +1912,7 @@ const TemplateEditorPage: React.FC = () => {
               onClick={handleToggleLike}
               className={`header-button ${isLiked ? 'liked' : ''}`}
             />
-          </Tooltip>
+          </Tooltip> */}
           {selectedElement && (
             <>
               <Tooltip title={t('templateEditorPage.delete_element')}>
@@ -1887,7 +1925,7 @@ const TemplateEditorPage: React.FC = () => {
               </Tooltip>
             </>
           )}
-          <Tooltip title={t('templateEditorPage.undo')}>
+          {/* <Tooltip title={t('templateEditorPage.undo')}>
             <Button 
               icon={<UndoOutlined />} 
               disabled={historyIndex <= 0}
@@ -1902,10 +1940,10 @@ const TemplateEditorPage: React.FC = () => {
               onClick={handleRedo}
               className="header-button"
             />
-          </Tooltip>
+          </Tooltip> */}
           <Tooltip title={t('templateEditorPage.delete_template')}>
             <Button 
-              icon={<DeleteOutlined />} 
+              icon={<DeleteFilled />} 
               danger
               onClick={showDeleteConfirm}
               className="header-button"
