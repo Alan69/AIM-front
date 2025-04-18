@@ -216,11 +216,11 @@ export const PostDetailsPage = () => {
   const loadNonAssignableTemplates = async () => {
     try {
       setLoadingTemplates(true);
-      const allTemplates = await fetchAllTemplates();
+      const result = await fetchAllTemplates('1080x1080');
       // Filter templates to include:
       // 1. Non-assignable default templates (system templates)
       // 2. User's own assignable templates
-      const filteredTemplates = allTemplates.filter(
+      const filteredTemplates = result.templates.filter(
         (template: Template) => (
           (!template.assignable && template.isDefault) || 
           (!template.assignable && template.user === user?.profile.user.id)
