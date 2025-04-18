@@ -1113,41 +1113,52 @@ const TemplateEditorPage: React.FC = () => {
             const image = data.image;
             if (!image) return;
             
-            // Create an image element to check dimensions
-            const img = new Image();
-            img.src = image;
+            // Check if width and height are already provided in the data (from template)
+            let width = data.width;
+            let height = data.height;
             
-            // Wait for the image to load to get dimensions
-            await new Promise((resolve) => {
-              img.onload = resolve;
-              img.onerror = resolve; // Continue even if there's an error loading the image
-            });
-            
-            // Get dimensions and calculate aspect ratio
-            let width = img.width || 200; // Default if image loading fails
-            let height = img.height || 200;
-            const aspectRatio = width / height;
-            
-            // If width or height is greater than 500px, scale down while maintaining aspect ratio
-            if (width > 500 || height > 500) {
-              if (width > height) {
-                // Width is larger, cap at 500px
-                width = 500;
-                height = Math.round(width / aspectRatio);
-              } else {
-                // Height is larger, cap at 500px
-                height = 500;
-                width = Math.round(height * aspectRatio);
+            // Only calculate dimensions if they weren't explicitly provided in the template
+            if (width === undefined || height === undefined) {
+              // Create an image element to check dimensions
+              const img = new Image();
+              img.src = image;
+              
+              // Wait for the image to load to get dimensions
+              await new Promise((resolve) => {
+                img.onload = resolve;
+                img.onerror = resolve; // Continue even if there's an error loading the image
+              });
+              
+              // Get dimensions and calculate aspect ratio
+              width = img.width || 200; // Default if image loading fails
+              height = img.height || 200;
+              const aspectRatio = width / height;
+              
+              // If width or height is greater than 500px, scale down while maintaining aspect ratio
+              if (width > 500 || height > 500) {
+                if (width > height) {
+                  // Width is larger, cap at 500px
+                  width = 500;
+                  height = Math.round(width / aspectRatio);
+                } else {
+                  // Height is larger, cap at 500px
+                  height = 500;
+                  width = Math.round(height * aspectRatio);
+                }
               }
             }
+            
+            // Ensure width and height are numbers
+            width = Number(width);
+            height = Number(height);
             
             const result = await createImageAsset(
               uuid,
               image,
               data.positionX !== undefined ? Number(data.positionX) : 500,
               data.positionY !== undefined ? Number(data.positionY) : 500,
-              width, // Use calculated width
-              height, // Use calculated height
+              width, // Use calculated or provided width
+              height, // Use calculated or provided height
               data.zIndex !== undefined ? Number(data.zIndex) : 0,
               data.rotation !== undefined ? Number(data.rotation) : 0,
               data.opacity !== undefined ? Number(data.opacity) : 1.0,

@@ -264,6 +264,22 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
           // Only remove the UUID to get a new one
           delete elementCopy.uuid;
           
+          // Special handling for image elements to preserve exact dimensions
+          if (element.type === 'image') {
+            // Ensure width and height are exactly preserved as numbers
+            if ('width' in elementCopy) {
+              elementCopy.width = Number(elementCopy.width);
+            }
+            if ('height' in elementCopy) {
+              elementCopy.height = Number(elementCopy.height);
+            }
+            
+            // Ensure other image properties are maintained
+            if ('borderRadius' in elementCopy) {
+              elementCopy.borderRadius = Number(elementCopy.borderRadius);
+            }
+          }
+          
           // Ensure all properties are preserved exactly as numbers
           const numericProps = [
             'positionX', 'positionY', 'width', 'height', 
@@ -308,7 +324,13 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                   onAddElement(ElementType.SHAPE, element.data);
                   break;
                 case 'image':
-                  onAddElement(ElementType.IMAGE, element.data);
+                  // For images, ensure we're passing the exact dimensions
+                  onAddElement(ElementType.IMAGE, {
+                    ...element.data,
+                    // Force exact numeric values for dimensions
+                    width: Number(element.data.width),
+                    height: Number(element.data.height)
+                  });
                   break;
                 case 'text':
                   onAddElement(ElementType.TEXT, element.data);

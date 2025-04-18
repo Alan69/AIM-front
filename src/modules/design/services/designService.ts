@@ -3,7 +3,8 @@ import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { baseURL, graphqlURL } from 'types/baseUrl';
-import { UserAsset } from '../types';
+import { UserAsset, Template, TemplateSizeType } from '../types';
+import { gql as gqlClient } from '@apollo/client';
 
 // Create the HTTP link
 const httpLink = createHttpLink({
@@ -29,11 +30,19 @@ const authLink = setContext((_, { headers }) => {
 const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'network-only',
+    },
+    query: {
+      fetchPolicy: 'network-only',
+    },
+  },
 });
 
-// Query to get all templates
-export const GET_ALL_TEMPLATES = gql`
-  query GetAllTemplates($size: String) {
+// Query to get all templates with pagination
+export const GET_TEMPLATES = gql`
+  query GetTemplates($size: String) {
     templates(size: $size) {
       uuid
       name
@@ -41,9 +50,9 @@ export const GET_ALL_TEMPLATES = gql`
       size
       backgroundImage
       thumbnail
+      createdAt
       like
       assignable
-      createdAt
       user {
         id
         username
@@ -89,7 +98,7 @@ export const GET_ALL_TEMPLATES = gql`
 `;
 
 // Query to get a template with all its elements
-export const GET_TEMPLATE_WITH_ELEMENTS = gql`
+export const GET_TEMPLATE_WITH_ELEMENTS = gqlClient`
   query GetTemplateWithElements($uuid: UUID!) {
     template(uuid: $uuid) {
       uuid
@@ -146,7 +155,7 @@ export const GET_TEMPLATE_WITH_ELEMENTS = gql`
 `;
 
 // Mutation to create a template
-export const CREATE_TEMPLATE = gql`
+export const CREATE_TEMPLATE = gqlClient`
   mutation CreateTemplate($name: String!, $size: String!, $userId: UUID!, $isDefault: Boolean, $backgroundImage: String, $assignable: Boolean) {
     createTemplate(name: $name, size: $size, userId: $userId, isDefault: $isDefault, backgroundImage: $backgroundImage, assignable: $assignable) {
       template {
@@ -163,7 +172,7 @@ export const CREATE_TEMPLATE = gql`
 `;
 
 // Mutation to add an image to a template
-export const ADD_IMAGE_TO_TEMPLATE = gql`
+export const ADD_IMAGE_TO_TEMPLATE = gqlClient`
   mutation AddImageToTemplate(
     $templateId: UUID!, 
     $image: String!, 
@@ -209,7 +218,7 @@ export const ADD_IMAGE_TO_TEMPLATE = gql`
 `;
 
 // Mutation to add a text element to a template
-export const ADD_TEXT_TO_TEMPLATE = gql`
+export const ADD_TEXT_TO_TEMPLATE = gqlClient`
   mutation AddTextToTemplate(
     $templateId: UUID!, 
     $text: String!, 
@@ -255,7 +264,7 @@ export const ADD_TEXT_TO_TEMPLATE = gql`
 `;
 
 // Mutation to add a shape element to a template
-export const ADD_SHAPE_TO_TEMPLATE = gql`
+export const ADD_SHAPE_TO_TEMPLATE = gqlClient`
   mutation AddShapeToTemplate(
     $templateId: UUID!, 
     $shapeType: String!, 
@@ -301,7 +310,7 @@ export const ADD_SHAPE_TO_TEMPLATE = gql`
 `;
 
 // Mutation to update a template
-export const UPDATE_TEMPLATE = gql`
+export const UPDATE_TEMPLATE = gqlClient`
   mutation UpdateTemplate(
     $uuid: UUID!
     $name: String
@@ -338,7 +347,7 @@ export const UPDATE_TEMPLATE = gql`
 `;
 
 // Mutation to delete a template
-export const DELETE_TEMPLATE = gql`
+export const DELETE_TEMPLATE = gqlClient`
   mutation DeleteTemplate($uuid: UUID!) {
     deleteTemplate(uuid: $uuid) {
       success
@@ -347,7 +356,7 @@ export const DELETE_TEMPLATE = gql`
 `;
 
 // Mutation to update a template element
-export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
+export const UPDATE_ELEMENT_IN_TEMPLATE = gqlClient`
   mutation UpdateElementInTemplate(
     $templateId: UUID!, 
     $elementUuid: UUID!, 
@@ -405,7 +414,7 @@ export const UPDATE_ELEMENT_IN_TEMPLATE = gql`
 `;
 
 // Mutation to delete a template element
-export const DELETE_ELEMENT_FROM_TEMPLATE = gql`
+export const DELETE_ELEMENT_FROM_TEMPLATE = gqlClient`
   mutation DeleteElementFromTemplate(
     $templateId: UUID!
     $elementUuid: UUID!
@@ -463,7 +472,7 @@ export const DELETE_ELEMENT_FROM_TEMPLATE = gql`
 `;
 
 // Mutation to debug element properties
-export const DEBUG_ELEMENT_PROPERTIES = gql`
+export const DEBUG_ELEMENT_PROPERTIES = gqlClient`
   mutation DebugElementProperties(
     $templateId: UUID!
     $elementUuid: UUID!
@@ -579,91 +588,111 @@ export const processImageData = (imageData: string): string => {
 };
 
 // Function to fetch all templates
-export const fetchAllTemplates = async (size?: string) => {
+export const fetchAllTemplates = async (
+  size: TemplateSizeType,
+  page: number = 1,
+  pageSize: number = 12,
+  searchQuery: string = '',
+  tab: string = 'all'
+) => {
   try {
     const { data } = await client.query({
-      query: GET_ALL_TEMPLATES,
-      variables: { size },
-      fetchPolicy: 'network-only',
-    });
-    
-    // Process the data to ensure all fields are correctly formatted
-    const processedTemplates = data.templates.map((template: any) => {
-      // Process background image if it exists and is not the default
-      let backgroundImage = template.backgroundImage;
-      if (backgroundImage && backgroundImage !== 'no_image.jpg') {
-        backgroundImage = processImageData(backgroundImage);
+      query: GET_TEMPLATES,
+      variables: {
+        size
       }
+    });
+
+    // Handle client-side filtering and pagination
+    let filteredTemplates = [...data.templates];
+    
+    // Filter by search query
+    if (searchQuery) {
+      filteredTemplates = filteredTemplates.filter(template => 
+        template.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Filter by tab
+    if (tab === 'all') {
+      filteredTemplates = filteredTemplates.filter(template => 
+        template.isDefault
+      );
       
-      // Process thumbnail if it exists
-      let thumbnail = template.thumbnail;
-      if (thumbnail) {
-        // For thumbnails, we can just directly use them if they are data URLs
-        if (!thumbnail.startsWith('data:')) {
-          thumbnail = processImageData(thumbnail);
-        }
-      }
+      // Separate assignable and non-assignable templates
+      const assignableTemplates = filteredTemplates.filter(template => !!template.assignable);
+      const nonAssignableTemplates = filteredTemplates.filter(template => !template.assignable);
+      
+      // Sort assignable templates first
+      filteredTemplates = [...assignableTemplates, ...nonAssignableTemplates];
+    } else if (tab === 'my') {
+      // Get user ID from multiple sources
+      const userId = getUserIdFromMultipleSources();
+      
+      filteredTemplates = filteredTemplates.filter(template => 
+        !template.isDefault && template.user?.id === userId
+      );
+    } else if (tab === 'liked') {
+      filteredTemplates = filteredTemplates.filter(template => 
+        template.like
+      );
+    }
 
-      // Process image assets
-      const imageAssets = template.imageAssets?.map((img: any) => ({
-        uuid: img.uuid,
-        image: processImageData(img.image),
-        positionX: Number(img.positionX),
-        positionY: Number(img.positionY),
-        width: Number(img.width),
-        height: Number(img.height),
-        zIndex: Number(img.zIndex),
-        rotation: Number(img.rotation),
-        opacity: Number(img.opacity),
-        borderRadius: Number(img.borderRadius)
-      })) || [];
-
-      // Process text elements
-      const textElements = template.textElements?.map((text: any) => ({
-        uuid: text.uuid,
-        text: text.text,
-        font: text.font,
-        fontSize: Number(text.fontSize),
-        color: text.color,
-        positionX: Number(text.positionX),
-        positionY: Number(text.positionY),
-        zIndex: Number(text.zIndex),
-        rotation: Number(text.rotation),
-        opacity: Number(text.opacity)
-      })) || [];
-
-      // Process shape elements
-      const shapeElements = template.shapeElements?.map((shape: any) => ({
-        uuid: shape.uuid,
-        shapeType: shape.shapeType,
-        color: shape.color,
-        positionX: Number(shape.positionX),
-        positionY: Number(shape.positionY),
-        width: Number(shape.width),
-        height: Number(shape.height),
-        zIndex: Number(shape.zIndex),
-        rotation: Number(shape.rotation),
-        opacity: Number(shape.opacity)
-      })) || [];
-
-      // Return the processed template
-      return {
-        ...template,
-        backgroundImage,
-        thumbnail,
-        imageAssets,
-        textElements,
-        shapeElements
-      };
-    });
+    // Get total count before pagination
+    const total = filteredTemplates.length;
     
-    console.log('Processed templates from GraphQL:', processedTemplates);
-    return processedTemplates;
+    // Apply pagination
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    filteredTemplates = filteredTemplates.slice(start, end);
+
+    return {
+      templates: filteredTemplates,
+      total: total
+    };
   } catch (error) {
-    console.error('Error in fetchAllTemplates:', error);
+    console.error('Error fetching templates:', error);
     throw error;
   }
 };
+
+// Helper function to get user ID from multiple sources
+const getUserIdFromMultipleSources = (): string | null => {
+  let userId = null;
+  
+  // Try from window.__USER_ID__
+  if (typeof window !== 'undefined' && (window as any).__USER_ID__) {
+    userId = (window as any).__USER_ID__;
+  }
+  
+  // Try from localStorage
+  if (!userId) {
+    try {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const userObj = JSON.parse(userData);
+        userId = userObj.id;
+      }
+    } catch (e) {
+      console.warn('Failed to get user ID from localStorage:', e);
+    }
+  }
+  
+  // Try from cookies
+  if (!userId) {
+    const userCookie = Cookies.get('user');
+    if (userCookie) {
+      try {
+        const userObj = JSON.parse(userCookie);
+        userId = userObj.id;
+      } catch (e) {
+        console.warn('Failed to parse user cookie:', e);
+      }
+    }
+  }
+  
+  return userId;
+}
 
 // Function to fetch a template with all its elements
 export const fetchTemplateWithElements = async (uuid: string) => {
@@ -934,7 +963,7 @@ export const createImageAsset = async (
 
     // Make the GraphQL request
     const result = await client.mutate({
-      mutation: gql`
+      mutation: gqlClient`
         mutation AddImageToTemplate(
           $templateId: UUID!
           $image: String!
@@ -1683,7 +1712,7 @@ export const createUserAsset = async (
 
     // Make the GraphQL request
     const result = await client.mutate({
-      mutation: gql`
+      mutation: gqlClient`
         mutation CreateUserAsset(
           $userId: UUID!
           $image: String!
@@ -1803,7 +1832,7 @@ export const getUserAssets = async () => {
 
     // Make the GraphQL request
     const result = await client.query({
-      query: gql`
+      query: gqlClient`
         query GetUserAssets($userId: UUID!) {
           userAssets(userId: $userId) {
             uuid
@@ -1837,43 +1866,27 @@ export const getUserAssets = async () => {
 export const getTemplates = async (filterType: string = 'my') => {
   try {
     // Get user ID for filtering
-    let userId = null;
-    if (typeof window !== 'undefined') {
-      userId = (window as any).__USER_ID__;
-    }
-    
-    if (!userId) {
-      try {
-        const userData = localStorage.getItem('userData');
-        if (userData) {
-          const userObj = JSON.parse(userData);
-          userId = userObj.id;
-        }
-      } catch (e) {
-        console.warn('Failed to get user ID from localStorage:', e);
-      }
-    }
+    const userId = getUserIdFromMultipleSources();
     
     if (filterType !== 'default' && !userId) {
       console.warn('User ID not found, returning empty templates list');
       return [];
     }
     
-    // Fetch all templates with their elements
+    // Fetch all templates
     const { data } = await client.query({
-      query: GET_ALL_TEMPLATES,
-      variables: {},
-      fetchPolicy: 'network-only', // Do not use cache for this query
+      query: GET_TEMPLATES,
+      variables: { size: null }
     });
     
     if (data && data.templates) {
       // Filter templates based on the filterType
-      let filteredTemplates = data.templates;
+      let filteredTemplates;
       
       if (filterType === 'my') {
         // Filter by templates created by the current user
         filteredTemplates = data.templates.filter((template: any) => 
-          template.user && template.user.id === userId
+          template.user && template.user.id === userId && !template.isDefault
         );
       } else if (filterType === 'default') {
         // Filter by default templates that are also assignable
@@ -1885,24 +1898,19 @@ export const getTemplates = async (filterType: string = 'my') => {
         filteredTemplates = data.templates.filter((template: any) => 
           template.like === true
         );
+      } else {
+        filteredTemplates = data.templates;
       }
       
       // Process each template to ensure we have proper data for thumbnail display
       return Promise.all(filteredTemplates.map(async (template: any) => {
-        // For better thumbnail display, we need to fetch the complete template details
-        // with all elements for each template in the filtered list
         try {
           const completeTemplate = await fetchTemplateWithElements(template.uuid);
-          return {
-            ...completeTemplate,
-            // No need to set thumbnail property anymore since we'll use the elements directly
-          };
+          return completeTemplate;
         } catch (error) {
           console.warn(`Error fetching complete details for template ${template.uuid}:`, error);
-          // Return the original template if we can't fetch the complete one
           return {
             ...template,
-            // Convert imageAssets/textElements/shapeElements to images/texts/shapes for consistency
             images: template.imageAssets || [],
             texts: template.textElements || [],
             shapes: template.shapeElements || []

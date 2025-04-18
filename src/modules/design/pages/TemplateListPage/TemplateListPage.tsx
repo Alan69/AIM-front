@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message, Tooltip, Tag } from 'antd';
+import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message, Tooltip, Tag, Pagination } from 'antd';
 import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled, CheckCircleOutlined } from '@ant-design/icons';
 import { fetchAllTemplates, createTemplate, processImageData, updateTemplate, copyTemplate } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useTranslation } from 'react-i18next';
+import { debounce } from 'lodash';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
 const { Option } = Select;
+
+const PAGE_SIZE = 12; // Number of templates per page
 
 const TemplateListPage: React.FC = () => {
   const { t } = useTranslation();
@@ -20,33 +23,19 @@ const TemplateListPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const [selectedSize, setSelectedSize] = useState<TemplateSizeType>('1080x1080');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalTemplates, setTotalTemplates] = useState<number>(0);
   const navigate = useNavigate();
   const { user } = useTypedSelector((state) => state.auth);
 
-  const loadTemplates = async () => {
+  const loadTemplates = async (page: number = 1) => {
     try {
       setLoading(true);
-      const data = await fetchAllTemplates(selectedSize);
+      const response = await fetchAllTemplates(selectedSize, page, PAGE_SIZE, searchQuery, activeTab);
       
-      // Process image data for all templates
-      const processedTemplates = data.map((template: Template) => {
-        // Process background image if it exists
-        if (template.backgroundImage && template.backgroundImage !== 'no_image.jpg') {
-          template.backgroundImage = processImageData(template.backgroundImage);
-        }
-        
-        // Process image assets
-        if (template.imageAssets && template.imageAssets.length > 0) {
-          template.imageAssets = template.imageAssets.map((img: any) => ({
-            ...img,
-            image: processImageData(img.image)
-          }));
-        }
-        return template;
-      });
-      
-      setTemplates(processedTemplates);
-      setFilteredTemplates(processedTemplates);
+      setTemplates(response.templates);
+      setTotalTemplates(response.total);
+      setFilteredTemplates(response.templates);
     } catch (error) {
       console.error('Error fetching templates:', error);
       message.error(t('templateListPage.error_load_templates'));
@@ -56,53 +45,19 @@ const TemplateListPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadTemplates();
-  }, [selectedSize]);
+    loadTemplates(currentPage);
+  }, [selectedSize, currentPage]);
 
-  const filterTemplates = () => {
-    let filtered = [...templates];
-    
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(template => 
-        template.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Filter by tab
-    if (activeTab === 'all') {
-      // Show only default templates and user-created templates
-      filtered = filtered.filter(template => 
-        template.isDefault
-      );
-      
-      // Separate assignable and non-assignable templates
-      // Use !! to convert undefined to boolean, defaulting to false if undefined
-      const assignableTemplates = filtered.filter(template => !!template.assignable);
-      const nonAssignableTemplates = filtered.filter(template => !template.assignable);
-      
-      // Sort assignable templates first
-      filtered = [...assignableTemplates, ...nonAssignableTemplates];
-    } else if (activeTab === 'my') {
-      // Show only user-created templates (not default templates)
-      filtered = filtered.filter(template => 
-        !template.isDefault && template.user?.id === user?.profile?.user?.id
-      );
-    } else if (activeTab === 'liked') {
-      // Show only liked templates that are either default or created by the user
-      filtered = filtered.filter(template => 
-        template.like && (template.isDefault || template.user?.id === user?.profile?.user?.id)
-      );
-    }
-    
-    setFilteredTemplates(filtered);
-  };
+  // Debounced search handler
+  const debouncedSearch = debounce(() => {
+    setCurrentPage(1); // Reset to first page when searching
+    loadTemplates(1);
+  }, 300);
 
   useEffect(() => {
-    if (templates.length > 0) {
-      filterTemplates();
-    }
-  }, [templates, searchQuery, activeTab]);
+    debouncedSearch();
+    return () => debouncedSearch.cancel();
+  }, [searchQuery, activeTab]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -110,10 +65,16 @@ const TemplateListPage: React.FC = () => {
 
   const handleTabChange = (key: string) => {
     setActiveTab(key);
+    setCurrentPage(1); // Reset to first page when changing tabs
   };
 
   const handleSizeChange = (value: TemplateSizeType) => {
     setSelectedSize(value);
+    setCurrentPage(1); // Reset to first page when changing size
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const handleCreateTemplate = async () => {
@@ -785,6 +746,19 @@ const TemplateListPage: React.FC = () => {
                 </Col>
               )}
             </Row>
+          )}
+
+          {/* Add pagination */}
+          {totalTemplates > PAGE_SIZE && (
+            <div className="templates-pagination" style={{ textAlign: 'center', marginTop: '24px' }}>
+              <Pagination
+                current={currentPage}
+                total={totalTemplates}
+                pageSize={PAGE_SIZE}
+                onChange={handlePageChange}
+                showSizeChanger={false}
+              />
+            </div>
           )}
         </>
       )}
