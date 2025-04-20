@@ -26,6 +26,9 @@ export interface Template {
   imageAssets?: ImageAsset[];
   textElements?: TextElement[];
   shapeElements?: ShapeElement[];
+  image_assets?: ImageAsset[];
+  text_elements?: TextElement[];
+  shape_elements?: ShapeElement[];
 }
 
 export interface ImageAsset {
@@ -46,6 +49,7 @@ export interface TextElement {
   text: string;
   font: string;
   fontSize: number;
+  font_size?: number;
   color: string;
   positionX: number;
   positionY: number;

@@ -6,6 +6,7 @@ import { postReducer } from 'modules/post/redux/slices/post.slice';
 import { reelReducer } from 'modules/reel/redux/slices/reel.slice';
 import { storiesReducer } from 'modules/stories/redux/slices/stories.slice';
 import { videoReducer } from 'modules/video/redux/slices/video.slice';
+import { templatesReducer } from 'modules/design/redux/slices/templates.slice';
 
 const rootReducer = combineReducers({
   [baseApi.reducerPath]: baseApi.reducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   reel: reelReducer,
   stories: storiesReducer,
   video: videoReducer,
+  templates: templatesReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

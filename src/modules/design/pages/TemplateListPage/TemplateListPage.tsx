@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Row, Input, Tabs, Select, Typography, Spin, message, Tooltip, Tag, Pagination } from 'antd';
 import { PlusOutlined, SearchOutlined, PictureOutlined, HeartOutlined, HeartFilled, CheckCircleOutlined } from '@ant-design/icons';
-import { fetchAllTemplates, createTemplate, processImageData, updateTemplate, copyTemplate } from '../../services/designService';
 import { Template, TemplateSizeType } from '../../types';
 import './TemplateListPage.scss';
 import { useTypedSelector } from 'hooks/useTypedSelector';
 import { useTranslation } from 'react-i18next';
 import { debounce } from 'lodash';
+import { useDispatch } from 'react-redux';
+import { 
+  useGetTemplatesQuery, 
+  useCreateTemplateMutation,
+  useToggleLikeTemplateMutation,
+  templatesActions
+} from '../../redux';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -17,64 +23,54 @@ const PAGE_SIZE = 12; // Number of templates per page
 
 const TemplateListPage: React.FC = () => {
   const { t } = useTranslation();
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [filteredTemplates, setFilteredTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('all');
-  const [selectedSize, setSelectedSize] = useState<TemplateSizeType>('1080x1080');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalTemplates, setTotalTemplates] = useState<number>(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  // Get state from Redux
+  const { selectedSize, currentPage, searchQuery, activeTab } = useTypedSelector((state) => state.templates);
   const { user } = useTypedSelector((state) => state.auth);
 
-  const loadTemplates = async (page: number = 1) => {
-    try {
-      setLoading(true);
-      const response = await fetchAllTemplates(selectedSize, page, PAGE_SIZE, searchQuery, activeTab);
-      
-      setTemplates(response.templates);
-      setTotalTemplates(response.total);
-      setFilteredTemplates(response.templates);
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      message.error(t('templateListPage.error_load_templates'));
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use RTK Query for data fetching
+  const { 
+    data: templatesData, 
+    isLoading, 
+    isFetching, 
+    error 
+  } = useGetTemplatesQuery({
+    size: selectedSize,
+    page: currentPage,
+    pageSize: PAGE_SIZE,
+    searchQuery,
+    tab: activeTab
+  });
 
-  useEffect(() => {
-    loadTemplates(currentPage);
-  }, [selectedSize, currentPage]);
+  // Get templates and total from the query result or use empty values
+  const templates = templatesData?.templates || [];
+  const totalTemplates = templatesData?.total || 0;
 
-  // Debounced search handler
-  const debouncedSearch = debounce(() => {
-    setCurrentPage(1); // Reset to first page when searching
-    loadTemplates(1);
+  // Mutations
+  const [createTemplate] = useCreateTemplateMutation();
+  const [toggleLikeTemplate] = useToggleLikeTemplateMutation();
+
+  // Handle search with debounce
+  const debouncedSearch = debounce((value: string) => {
+    dispatch(templatesActions.setSearchQuery(value));
   }, 300);
 
-  useEffect(() => {
-    debouncedSearch();
-    return () => debouncedSearch.cancel();
-  }, [searchQuery, activeTab]);
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    debouncedSearch(e.target.value);
   };
 
   const handleTabChange = (key: string) => {
-    setActiveTab(key);
-    setCurrentPage(1); // Reset to first page when changing tabs
+    dispatch(templatesActions.setActiveTab(key as 'all' | 'my' | 'liked'));
   };
 
   const handleSizeChange = (value: TemplateSizeType) => {
-    setSelectedSize(value);
-    setCurrentPage(1); // Reset to first page when changing size
+    dispatch(templatesActions.setSelectedSize(value));
   };
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    dispatch(templatesActions.setCurrentPage(page));
   };
 
   const handleCreateTemplate = async () => {
@@ -87,13 +83,11 @@ const TemplateListPage: React.FC = () => {
         return;
       }
       
-      console.log(`Creating template with user ID: ${userId}`);
-      const newTemplate = await createTemplate(
-        `New Template ${new Date().toLocaleTimeString()}`, 
-        selectedSize,
-        undefined, // No background image
+      const newTemplate = await createTemplate({
+        name: `New Template ${new Date().toLocaleTimeString()}`, 
+        size: selectedSize,
         userId     // Pass the user ID
-      );
+      }).unwrap();
       
       navigate(`/design/editor/${newTemplate.uuid}`);
     } catch (error) {
@@ -114,7 +108,11 @@ const TemplateListPage: React.FC = () => {
     // If it's a default template, make a copy for the user
     if (template.isDefault) {
       try {
-        setLoading(true);
+        message.loading({
+          content: t('templateListPage.creating_template_copy'),
+          key: 'templateCopy',
+          duration: 0,
+        });
         
         // Get the user ID
         const userId = user?.profile?.user?.id;
@@ -124,45 +122,31 @@ const TemplateListPage: React.FC = () => {
           return;
         }
         
-        // Ensure we have a valid size
-        const templateSize = template.size === '1080x1920' ? '1080x1920' : '1080x1080';
-        console.log(`Creating copy of template: ${template.name} with size: ${templateSize}`);
-        
-        message.loading({
-          content: t('templateListPage.creating_template_copy'),
-          key: 'templateCopy',
-          duration: 0,
+        // Make an API request to copy the template
+        const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/designs/templates/${uuid}/copy/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            name: `Copy of ${template.name}`
+          })
         });
         
-        // Create a new template name
-        const newTemplateName = `Copy of ${template.name}`;
-        
-        // Use the copyTemplate function to create a full copy with all elements
-        const newTemplate = await copyTemplate(uuid, newTemplateName, userId);
-        
-        // Verify the size was preserved correctly
-        if (newTemplate.size !== templateSize) {
-          console.log(`Size mismatch detected. Original: ${templateSize}, New: ${newTemplate.size}`);
-          
-          // Fix the size if needed
-          await updateTemplate(newTemplate.uuid, { 
-            size: templateSize
-          });
-          
-          console.log(`Template size updated to: ${templateSize}`);
+        if (!response.ok) {
+          throw new Error('Failed to copy template');
         }
         
-        // Navigate to the new template in the editor
+        const newTemplate = await response.json();
+        
         message.success({
           content: t('templateListPage.template_copied'),
           key: 'templateCopy',
           duration: 2,
         });
         
-        // Refresh the template list to show the new template
-        loadTemplates();
-        
-        // Navigate to the new template
+        // Navigate to the new template in the editor
         navigate(`/design/editor/${newTemplate.uuid}`);
       } catch (error) {
         console.error('Error copying template:', error);
@@ -170,7 +154,6 @@ const TemplateListPage: React.FC = () => {
           content: t('templateListPage.error_copy_template'),
           key: 'templateCopy',
         });
-        setLoading(false);
       }
     } else {
       // If it's not a default template, just navigate to it
@@ -184,38 +167,19 @@ const TemplateListPage: React.FC = () => {
     try {
       const newLikeStatus = !template.like;
       
-      // Optimistically update UI
-      const updatedTemplates = templates.map(t => 
-        t.uuid === template.uuid ? { ...t, like: newLikeStatus } : t
-      );
-      setTemplates(updatedTemplates);
+      // Optimistic update using Redux action
+      dispatch(templatesActions.toggleLike({ 
+        uuid: template.uuid, 
+        like: newLikeStatus 
+      }));
       
-      // Update filtered templates as well
-      const updatedFilteredTemplates = filteredTemplates.map(t => 
-        t.uuid === template.uuid ? { ...t, like: newLikeStatus } : t
-      );
-      setFilteredTemplates(updatedFilteredTemplates);
-      
-      // Update template in the backend
-      await updateTemplate(template.uuid, { like: newLikeStatus });
+      // Use the mutation to update the backend
+      await toggleLikeTemplate({ uuid: template.uuid, like: newLikeStatus }).unwrap();
       
       // Show success message
       message.success(newLikeStatus ? t('templateListPage.added_to_favorites') : t('templateListPage.removed_from_favorites'));
     } catch (error) {
       console.error('Error toggling like status:', error);
-      
-      // Revert UI state if the API call fails
-      const revertedTemplates = templates.map(t => 
-        t.uuid === template.uuid ? { ...t, like: template.like } : t
-      );
-      setTemplates(revertedTemplates);
-      
-      // Update filtered templates as well
-      const revertedFilteredTemplates = filteredTemplates.map(t => 
-        t.uuid === template.uuid ? { ...t, like: template.like } : t
-      );
-      setFilteredTemplates(revertedFilteredTemplates);
-      
       message.error(t('templateListPage.error_toggle_favorite'));
     }
   };
@@ -243,7 +207,11 @@ const TemplateListPage: React.FC = () => {
     
     // If no thumbnail, render the traditional preview
     // Get the first image (if any)
-    const firstImage = template.imageAssets && template.imageAssets.length > 0 ? template.imageAssets[0] : null;
+    const firstImage = template.image_assets && template.image_assets.length > 0 
+      ? template.image_assets[0] 
+      : (template.imageAssets && template.imageAssets.length > 0 
+        ? template.imageAssets[0] 
+        : null);
     
     // Determine if we're dealing with portrait or square
     const isPortrait = template.size === '1080x1920';
@@ -334,7 +302,7 @@ const TemplateListPage: React.FC = () => {
           )}
 
           {/* Render shapes - scaled and positioned relative to the canvas */}
-          {template.shapeElements?.map(shape => {
+          {(template.shape_elements || template.shapeElements)?.map(shape => {
             // Get scaled dimensions and position
             const scaledLeft = (shape.positionX / originalWidth) * 100;
             const scaledTop = (shape.positionY / originalHeight) * 100;
@@ -356,7 +324,7 @@ const TemplateListPage: React.FC = () => {
                     zIndex: 100 + (shape.zIndex || 0),
                     transform: `rotate(${shape.rotation}deg)`,
                     display: 'block',
-                    opacity: 1,
+                    opacity: shape.opacity || 1,
                     visibility: 'visible'
                   }}
                 >
@@ -389,7 +357,7 @@ const TemplateListPage: React.FC = () => {
                     zIndex: 100 + (shape.zIndex || 0),
                     borderRadius: '50%',
                     display: 'block',
-                    opacity: 1,
+                    opacity: shape.opacity || 1,
                     visibility: 'visible'
                   }}
                 />
@@ -408,7 +376,7 @@ const TemplateListPage: React.FC = () => {
                     zIndex: 100 + (shape.zIndex || 0),
                     transform: `rotate(${shape.rotation}deg)`,
                     display: 'block',
-                    opacity: 1,
+                    opacity: shape.opacity || 1,
                     visibility: 'visible'
                   }}
                 >
@@ -442,7 +410,7 @@ const TemplateListPage: React.FC = () => {
                     zIndex: 100 + (shape.zIndex || 0),
                     borderRadius: '0',
                     display: 'block',
-                    opacity: 1,
+                    opacity: shape.opacity || 1,
                     visibility: 'visible'
                   }}
                 />
@@ -451,11 +419,12 @@ const TemplateListPage: React.FC = () => {
           })}
           
           {/* Render text elements - scaled and positioned relative to the canvas */}
-          {template.textElements?.map(text => {
+          {(template.text_elements || template.textElements)?.map(text => {
             // Calculate scaled positions and sizes consistently
             const scaledLeft = (text.positionX / originalWidth) * 100;
             const scaledTop = (text.positionY / originalHeight) * 100;
-            const scaledFontSize = (text.fontSize / originalWidth) * 100 * 0.5; // Scale font size relative to width
+            const fontSize = text.fontSize || text.font_size || 16;
+            const scaledFontSize = (fontSize / originalWidth) * 100 * 0.5; // Scale font size relative to width
             
             return (
               <div
@@ -471,7 +440,7 @@ const TemplateListPage: React.FC = () => {
                   transform: `rotate(${text.rotation || 0}deg)`,
                   zIndex: 200 + (text.zIndex || 0),
                   display: 'block',
-                  opacity: 1,
+                  opacity: text.opacity || 1,
                   visibility: 'visible',
                   textAlign: 'center',
                   whiteSpace: 'nowrap'
@@ -503,7 +472,7 @@ const TemplateListPage: React.FC = () => {
           <Input
             placeholder={t('templateListPage.search_placeholder')}
             prefix={<SearchOutlined />}
-            value={searchQuery}
+            defaultValue={searchQuery}
             onChange={handleSearchChange}
             style={{ width: 250, marginRight: 16 }}
           />
@@ -524,7 +493,7 @@ const TemplateListPage: React.FC = () => {
         <TabPane tab={t('templateListPage.tab_liked')} key="liked" />
       </Tabs>
 
-      {loading ? (
+      {isLoading || isFetching ? (
         <div className="templates-loading">
           <Spin size="large" />
         </div>
@@ -534,13 +503,13 @@ const TemplateListPage: React.FC = () => {
             // Separate sections for assignable and non-assignable templates in "all" tab
             <>
               {/* Assignable Templates Section */}
-              {filteredTemplates.filter(template => !!template.assignable).length > 0 && (
+              {templates.filter(template => !!template.assignable).length > 0 && (
                 <>
                   <div className="templates-section-header">
                     <Title level={4}>Шаблоны</Title>
                   </div>
                   <Row gutter={[24, 24]} className="templates-grid">
-                    {filteredTemplates
+                    {templates
                       .filter(template => !!template.assignable)
                       .map(template => (
                         <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
@@ -566,7 +535,10 @@ const TemplateListPage: React.FC = () => {
                               <div 
                                 className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
                               >
-                                {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                                {(template.thumbnail || 
+                                  (template.image_assets?.length || template.imageAssets?.length) || 
+                                  (template.text_elements?.length || template.textElements?.length) || 
+                                  (template.shape_elements?.length || template.shapeElements?.length) || 
                                   (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
                                   renderTemplatePreview(template)
                                 ) : (
@@ -602,13 +574,13 @@ const TemplateListPage: React.FC = () => {
               )}
 
               {/* Non-Assignable Templates Section */}
-              {filteredTemplates.filter(template => !template.assignable).length > 0 && (
+              {templates.filter(template => !template.assignable).length > 0 && (
                 <>
                   <div className="templates-section-header">
                     <Title level={4}>Баннер</Title>
                   </div>
                   <Row gutter={[24, 24]} className="templates-grid">
-                    {filteredTemplates
+                    {templates
                       .filter(template => !template.assignable)
                       .map(template => (
                         <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
@@ -634,7 +606,10 @@ const TemplateListPage: React.FC = () => {
                               <div 
                                 className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
                               >
-                                {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                                {(template.thumbnail || 
+                                  (template.image_assets?.length || template.imageAssets?.length) || 
+                                  (template.text_elements?.length || template.textElements?.length) || 
+                                  (template.shape_elements?.length || template.shapeElements?.length) || 
                                   (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
                                   renderTemplatePreview(template)
                                 ) : (
@@ -669,7 +644,7 @@ const TemplateListPage: React.FC = () => {
                 </>
               )}
 
-              {filteredTemplates.length === 0 && (
+              {templates.length === 0 && (
                 <Col span={24} className="no-templates">
                   <p>{t('templateListPage.no_templates')}</p>
                   <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateTemplate}>
@@ -681,8 +656,8 @@ const TemplateListPage: React.FC = () => {
           ) : (
             // Original template list for 'my' and 'liked' tabs
             <Row gutter={[24, 24]} className="templates-grid">
-              {filteredTemplates.length > 0 ? (
-                filteredTemplates.map(template => (
+              {templates.length > 0 ? (
+                templates.map(template => (
                   <Col xs={24} sm={12} md={8} lg={6} key={template.uuid}>
                     <Card
                       hoverable
@@ -706,7 +681,10 @@ const TemplateListPage: React.FC = () => {
                         <div 
                           className={`preview-container ${template.size === '1080x1920' ? 'portrait' : 'square'}`}
                         >
-                          {(template.thumbnail || template.imageAssets?.length || template.textElements?.length || template.shapeElements?.length || 
+                          {(template.thumbnail || 
+                            (template.image_assets?.length || template.imageAssets?.length) || 
+                            (template.text_elements?.length || template.textElements?.length) || 
+                            (template.shape_elements?.length || template.shapeElements?.length) || 
                             (template.backgroundImage && template.backgroundImage !== 'no_image.jpg')) ? (
                             renderTemplatePreview(template)
                           ) : (
