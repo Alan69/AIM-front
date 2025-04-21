@@ -131,6 +131,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   const [loadingTemplates, setLoadingTemplates] = React.useState(false);
   const [templateFilter, setTemplateFilter] = React.useState('default');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = React.useState('');
   
   // Get user from Redux store
   const user = useSelector((state: RootState) => state.auth.user);
@@ -178,12 +179,28 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     }
   };
 
+  // Use useEffect to debounce the search input
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500); // 500ms delay before applying the search
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Move loadTemplates into useCallback so it can be safely used in the dependency array
   const loadTemplates = useCallback(async () => {
     try {
       setLoadingTemplates(true);
       setTemplates([]); // Clear existing templates while loading
-      const fetchedTemplates = await getTemplates(templateFilter);
+      
+      // Use the updated getTemplates function which now accepts size and search parameters
+      const fetchedTemplates = await getTemplates(
+        templateFilter,
+        template?.size, // Pass the current template size as a filter
+        debouncedSearchQuery.trim() ? debouncedSearchQuery : undefined // Only pass search query if it's not empty
+      );
+      
       setTemplates(fetchedTemplates || []);
     } catch (error) {
       console.error('Error loading templates:', error);
@@ -192,53 +209,20 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     } finally {
       setLoadingTemplates(false);
     }
-  }, [templateFilter, t]); // Add templateFilter and t as dependencies
+  }, [templateFilter, t, template?.size, debouncedSearchQuery]); // Use debouncedSearchQuery instead of searchQuery
 
-  // Now use the callback in useEffect
+  // Now use the callback in useEffect with the updated dependencies
   React.useEffect(() => {
     loadTemplates();
-  }, [userId, loadTemplates]); // Include loadTemplates in the dependency array
+  }, [userId, loadTemplates]); // Keep the same dependencies
 
-  // Filter templates based on search query, size, and exclude current template
+  // Update the filteredTemplates logic to simplify since filtering is now handled by the backend
   const filteredTemplates = React.useMemo(() => {
-    let filtered = templates;
-    
-    // First apply template filter (default, my, liked)
-    if (templateFilter === 'default') {
-      // For default tab, only show templates that are both default AND assignable
-      filtered = filtered.filter(t => t.isDefault && !!t.assignable);
-    }
-    
-    // Filter out templates with different sizes than the current template
-    // UNLESS the template has a custom size
-    if (template?.size) {
-      // Check if current template has a standard size or custom size
-      const isStandardSize = template.size === '1080x1080' || template.size === '1080x1920';
-      
-      if (isStandardSize) {
-        // For standard sizes, only show templates with matching size
-        filtered = filtered.filter(t => t.size === template.size);
-      } else {
-        // For custom sizes, show all assignable templates
-        console.log('Custom template size detected:', template.size);
-        console.log('Showing all assignable templates regardless of size');
-      }
-    }
-    
-    // Filter out the current template
-    if (template?.uuid) {
-      filtered = filtered.filter(t => t.uuid !== template.uuid);
-    }
-    
-    // Apply search query filter
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(t => 
-        t.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    return filtered;
-  }, [templates, searchQuery, template?.uuid, template?.size, templateFilter]);
+    // Filter out the current template if it exists
+    return template?.uuid
+      ? templates.filter(t => t.uuid !== template.uuid)
+      : templates;
+  }, [templates, template?.uuid]);
 
   // Handle template selection
   const handleTemplateSelect = async (selectedTemplate: Template) => {
@@ -249,6 +233,8 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       try {
         // Store the message reference so we can close it later
         const loadingMessage = message.loading(t('templateEditorPage.adding_elements', { name: selectedTemplate.name }), 0);
+
+        console.log('Selected template for elements:', selectedTemplate);
 
         // Add all elements in z-index order to maintain the layering
         const allElements = [
@@ -264,45 +250,34 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
           // Only remove the UUID to get a new one
           delete elementCopy.uuid;
           
-          // Special handling for image elements to preserve exact dimensions
+          // Ensure all numeric properties are properly converted to numbers
           if (element.type === 'image') {
-            // Ensure width and height are exactly preserved as numbers
-            if ('width' in elementCopy) {
-              elementCopy.width = Number(elementCopy.width);
-            }
-            if ('height' in elementCopy) {
-              elementCopy.height = Number(elementCopy.height);
-            }
-            
-            // Ensure other image properties are maintained
-            if ('borderRadius' in elementCopy) {
-              elementCopy.borderRadius = Number(elementCopy.borderRadius);
-            }
+            elementCopy.width = Number(elementCopy.width);
+            elementCopy.height = Number(elementCopy.height);
+            elementCopy.positionX = Number(elementCopy.positionX);
+            elementCopy.positionY = Number(elementCopy.positionY);
+            elementCopy.zIndex = Number(elementCopy.zIndex);
+            elementCopy.rotation = Number(elementCopy.rotation || 0);
+            elementCopy.opacity = Number(elementCopy.opacity || 1.0);
+            elementCopy.borderRadius = Number(elementCopy.borderRadius || 0);
+          } else if (element.type === 'text') {
+            elementCopy.fontSize = Number(elementCopy.fontSize);
+            elementCopy.positionX = Number(elementCopy.positionX);
+            elementCopy.positionY = Number(elementCopy.positionY);
+            elementCopy.zIndex = Number(elementCopy.zIndex);
+            elementCopy.rotation = Number(elementCopy.rotation || 0);
+            elementCopy.opacity = Number(elementCopy.opacity || 1.0);
+          } else if (element.type === 'shape') {
+            elementCopy.width = Number(elementCopy.width);
+            elementCopy.height = Number(elementCopy.height);
+            elementCopy.positionX = Number(elementCopy.positionX);
+            elementCopy.positionY = Number(elementCopy.positionY);
+            elementCopy.zIndex = Number(elementCopy.zIndex);
+            elementCopy.rotation = Number(elementCopy.rotation || 0);
+            elementCopy.opacity = Number(elementCopy.opacity || 1.0);
           }
           
-          // Ensure all properties are preserved exactly as numbers
-          const numericProps = [
-            'positionX', 'positionY', 'width', 'height', 
-            'rotation', 'zIndex', 'opacity', 'borderRadius', 
-            'fontSize'
-          ];
-          
-          numericProps.forEach(prop => {
-            if (prop in elementCopy) {
-              elementCopy[prop] = Number(elementCopy[prop]);
-              
-              // Ensure default values for critical properties if they're invalid
-              if (prop === 'opacity' && (isNaN(elementCopy[prop]) || elementCopy[prop] === null)) {
-                elementCopy[prop] = 1.0;
-              }
-              if (prop === 'zIndex' && (isNaN(elementCopy[prop]) || elementCopy[prop] === null)) {
-                elementCopy[prop] = 1;
-              }
-              if (prop === 'borderRadius' && (isNaN(elementCopy[prop]) || elementCopy[prop] === null)) {
-                elementCopy[prop] = 0;
-              }
-            }
-          });
+          console.log(`Prepared ${element.type} element:`, elementCopy);
           
           return {
             type: element.type,

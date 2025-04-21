@@ -1459,22 +1459,24 @@ export const fetchTemplatesREST = async (size?: string) => {
       },
     });
     
-    // Process the response data to match the expected format
-    const processedTemplates = response.data.map((template: any) => {
-      // Process image assets
-      const imageAssets = template.image_assets?.map((img: any) => ({
+    // Process the response data to match the expected template format
+    const templates = response.data.map((template: any) => {
+      // Process image assets - ensure numeric properties are properly converted to numbers
+      const images = (template.image_assets || []).map((img: any) => ({
         uuid: img.uuid,
-        image: processImageData(img.image),
+        image: img.image,
         positionX: Number(img.position_x),
         positionY: Number(img.position_y),
         width: Number(img.width),
         height: Number(img.height),
         zIndex: Number(img.z_index),
-        rotation: Number(img.rotation)
-      })) || [];
-
-      // Process text elements
-      const textElements = template.text_elements?.map((text: any) => ({
+        rotation: Number(img.rotation || 0),
+        opacity: Number(img.opacity || 1.0),
+        borderRadius: Number(img.border_radius || 0)
+      }));
+      
+      // Process text elements - ensure numeric properties are properly converted to numbers
+      const texts = (template.text_elements || []).map((text: any) => ({
         uuid: text.uuid,
         text: text.text,
         font: text.font,
@@ -1483,11 +1485,12 @@ export const fetchTemplatesREST = async (size?: string) => {
         positionX: Number(text.position_x),
         positionY: Number(text.position_y),
         zIndex: Number(text.z_index),
-        rotation: Number(text.rotation)
-      })) || [];
-
-      // Process shape elements
-      const shapeElements = template.shape_elements?.map((shape: any) => ({
+        rotation: Number(text.rotation || 0),
+        opacity: Number(text.opacity || 1.0)
+      }));
+      
+      // Process shape elements - ensure numeric properties are properly converted to numbers
+      const shapes = (template.shape_elements || []).map((shape: any) => ({
         uuid: shape.uuid,
         shapeType: shape.shape_type,
         color: shape.color,
@@ -1496,10 +1499,10 @@ export const fetchTemplatesREST = async (size?: string) => {
         width: Number(shape.width),
         height: Number(shape.height),
         zIndex: Number(shape.z_index),
-        rotation: Number(shape.rotation)
-      })) || [];
-
-      // Return the processed template
+        rotation: Number(shape.rotation || 0),
+        opacity: Number(shape.opacity || 1.0)
+      }));
+      
       return {
         uuid: template.uuid,
         name: template.name,
@@ -1507,9 +1510,9 @@ export const fetchTemplatesREST = async (size?: string) => {
         size: template.size,
         backgroundImage: template.background_image,
         createdAt: template.created_at,
-        imageAssets,
-        textElements,
-        shapeElements,
+        imageAssets: images,
+        textElements: texts,
+        shapeElements: shapes,
         // For backward compatibility
         images: template.images || [],
         texts: template.texts || [],
@@ -1517,8 +1520,8 @@ export const fetchTemplatesREST = async (size?: string) => {
       };
     });
     
-    console.log('Processed templates from REST API:', processedTemplates);
-    return processedTemplates;
+    console.log('Processed templates from REST API:', templates);
+    return templates;
   } catch (error) {
     console.error('Error fetching templates from REST API:', error);
     throw error;
@@ -1862,64 +1865,127 @@ export const getUserAssets = async () => {
   }
 };
 
-// Function to get templates by filter (default, my, liked)
-export const getTemplates = async (filterType: string = 'default') => {
+/**
+ * Get templates from REST API endpoint (replacing GraphQL)
+ * @param filterType - Type of filter to apply: 'default', 'my', 'liked'
+ * @param size - Optional size filter
+ * @param search - Optional search query for template name
+ * @returns Promise<Template[]> - List of templates
+ */
+export const getTemplatesREST = async (
+  filterType: string = 'default',
+  size?: string,
+  search?: string
+): Promise<any[]> => {
   try {
-    // Get user ID for filtering
-    const userId = getUserIdFromMultipleSources();
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('tab', filterType);
     
-    if (filterType === 'liked' && !userId) {
-      console.warn('User ID not found, returning empty templates list for liked templates');
-      return [];
+    if (size) {
+      params.append('size', size);
     }
     
-    // Fetch all templates
-    const { data } = await client.query({
-      query: GET_TEMPLATES,
-      variables: { size: null }
+    if (search) {
+      params.append('search', search);
+    }
+    
+    // Get the API URL with query parameters
+    const apiUrl = `${baseURL}templates/?${params.toString()}`;
+    
+    // Get authentication token
+    const token = Cookies.get('token');
+    
+    // Make the API request
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
     
-    if (data && data.templates) {
-      // Filter templates based on the filterType
-      let filteredTemplates;
-      
-      if (filterType === 'default') {
-        // Filter by default templates that are also assignable
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.isDefault === true && template.assignable === true
-        );
-      } else if (filterType === 'liked') {
-        // Filter by templates the user has liked
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.like === true
-        );
-      } else {
-        // Return only assignable templates for any other filter type
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.assignable === true
-        );
-      }
-      
-      // Process each template to ensure we have proper data for thumbnail display
-      return Promise.all(filteredTemplates.map(async (template: any) => {
-        try {
-          const completeTemplate = await fetchTemplateWithElements(template.uuid);
-          return completeTemplate;
-        } catch (error) {
-          console.warn(`Error fetching complete details for template ${template.uuid}:`, error);
-          return {
-            ...template,
-            images: template.imageAssets || [],
-            texts: template.textElements || [],
-            shapes: template.shapeElements || []
-          };
-        }
-      }));
+    // Handle non-200 responses
+    if (!response.ok) {
+      throw new Error(`Failed to fetch templates: ${response.status} ${response.statusText}`);
     }
     
-    return [];
+    // Parse the response
+    const data = await response.json();
+    console.log('Raw template data from API:', data);
+    
+    // Process the response data to match the expected template format
+    const templates = data.map((template: any) => {
+      // Process image assets - ensure numeric properties are properly converted to numbers
+      const images = (template.image_assets || []).map((img: any) => ({
+        uuid: img.uuid,
+        image: img.image,
+        positionX: Number(img.position_x),
+        positionY: Number(img.position_y),
+        width: Number(img.width),
+        height: Number(img.height),
+        zIndex: Number(img.z_index),
+        rotation: Number(img.rotation || 0),
+        opacity: Number(img.opacity || 1.0),
+        borderRadius: Number(img.border_radius || 0)
+      }));
+      
+      // Process text elements - ensure numeric properties are properly converted to numbers
+      const texts = (template.text_elements || []).map((text: any) => ({
+        uuid: text.uuid,
+        text: text.text,
+        font: text.font,
+        fontSize: Number(text.font_size),
+        color: text.color,
+        positionX: Number(text.position_x),
+        positionY: Number(text.position_y),
+        zIndex: Number(text.z_index),
+        rotation: Number(text.rotation || 0),
+        opacity: Number(text.opacity || 1.0)
+      }));
+      
+      // Process shape elements - ensure numeric properties are properly converted to numbers
+      const shapes = (template.shape_elements || []).map((shape: any) => ({
+        uuid: shape.uuid,
+        shapeType: shape.shape_type,
+        color: shape.color,
+        positionX: Number(shape.position_x),
+        positionY: Number(shape.position_y),
+        width: Number(shape.width),
+        height: Number(shape.height),
+        zIndex: Number(shape.z_index),
+        rotation: Number(shape.rotation || 0),
+        opacity: Number(shape.opacity || 1.0)
+      }));
+      
+      return {
+        uuid: template.uuid,
+        name: template.name,
+        isDefault: template.is_default,
+        size: template.size,
+        backgroundImage: template.background_image,
+        thumbnail: template.thumbnail,
+        createdAt: template.created_at,
+        like: template.like,
+        assignable: template.assignable,
+        user: template.user,
+        // Use the properly processed arrays with numeric values
+        images,
+        texts,
+        shapes
+      };
+    });
+    
+    console.log('Processed templates with proper numeric values:', templates);
+    return templates;
   } catch (error) {
-    console.error('Error fetching templates:', error);
+    console.error('Error fetching templates via REST API:', error);
     throw error;
   }
+};
+
+// Replace the original getTemplates implementation to use the REST API instead of GraphQL
+export const getTemplates = async (filterType: string = 'default', size?: string, search?: string) => {
+  // Simply call our new REST implementation
+  return getTemplatesREST(filterType, size, search);
 }; 
