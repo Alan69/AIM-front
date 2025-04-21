@@ -1863,13 +1863,13 @@ export const getUserAssets = async () => {
 };
 
 // Function to get templates by filter (default, my, liked)
-export const getTemplates = async (filterType: string = 'my') => {
+export const getTemplates = async (filterType: string = 'default') => {
   try {
     // Get user ID for filtering
     const userId = getUserIdFromMultipleSources();
     
-    if (filterType !== 'default' && !userId) {
-      console.warn('User ID not found, returning empty templates list');
+    if (filterType === 'liked' && !userId) {
+      console.warn('User ID not found, returning empty templates list for liked templates');
       return [];
     }
     
@@ -1883,12 +1883,7 @@ export const getTemplates = async (filterType: string = 'my') => {
       // Filter templates based on the filterType
       let filteredTemplates;
       
-      if (filterType === 'my') {
-        // Filter by templates created by the current user
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.user && template.user.id === userId && !template.isDefault
-        );
-      } else if (filterType === 'default') {
+      if (filterType === 'default') {
         // Filter by default templates that are also assignable
         filteredTemplates = data.templates.filter((template: any) => 
           template.isDefault === true && template.assignable === true
@@ -1899,7 +1894,10 @@ export const getTemplates = async (filterType: string = 'my') => {
           template.like === true
         );
       } else {
-        filteredTemplates = data.templates;
+        // Return only assignable templates for any other filter type
+        filteredTemplates = data.templates.filter((template: any) => 
+          template.assignable === true
+        );
       }
       
       // Process each template to ensure we have proper data for thumbnail display

@@ -129,7 +129,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   const [loadingAssets, setLoadingAssets] = React.useState(false);
   const [templates, setTemplates] = React.useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = React.useState(false);
-  const [templateFilter, setTemplateFilter] = React.useState('my');
+  const [templateFilter, setTemplateFilter] = React.useState('default');
   const [searchQuery, setSearchQuery] = React.useState('');
   
   // Get user from Redux store
@@ -751,7 +751,6 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 size="small"
               >
                 <Radio.Button value="default">{t('templateEditorPage.default')}</Radio.Button>
-                <Radio.Button value="my">{t('templateEditorPage.my_templates')}</Radio.Button>
                 <Radio.Button value="liked">{t('templateEditorPage.liked')}</Radio.Button>
               </Radio.Group>
             </div>
@@ -796,13 +795,11 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                   description={
                     searchQuery 
                       ? t('templateEditorPage.no_templates_match_search')
-                      : templateFilter === "my" 
-                        ? t('templateEditorPage.no_created_templates')
-                        : templateFilter === "liked" 
-                          ? t('templateEditorPage.no_liked_templates')
-                          : template?.size
-                            ? t('templateEditorPage.no_templates_with_size', { size: template.size })
-                            : t('templateEditorPage.no_templates_available')
+                      : templateFilter === "liked" 
+                        ? t('templateEditorPage.no_liked_templates')
+                        : template?.size
+                          ? t('templateEditorPage.no_templates_with_size', { size: template.size })
+                          : t('templateEditorPage.no_templates_available')
                   } 
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                 />
