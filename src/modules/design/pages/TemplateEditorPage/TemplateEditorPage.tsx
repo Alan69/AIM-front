@@ -138,12 +138,6 @@ const TemplateEditorPage: React.FC = () => {
       setLoading(false);
     }
   };
-  // Load template data on mount
-  useEffect(() => {
-    if (uuid) {
-      loadTemplate(uuid);
-    }
-  }, [uuid],);
 
   // Initialize history and like status when template is loaded
   useEffect(() => {
@@ -1867,6 +1861,13 @@ const TemplateEditorPage: React.FC = () => {
         message.error(t('templateEditorPage.canvas_refresh_error'));
       });
   }, [template, uuid]);
+
+  // Load template data on mount
+  useEffect(() => {
+    if (uuid) {
+      loadTemplate(uuid);
+    }
+  }, [uuid]);
 
   if (loading) {
     return (

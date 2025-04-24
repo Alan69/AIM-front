@@ -14,6 +14,7 @@ import {
   useToggleLikeTemplateMutation,
   templatesActions
 } from '../../redux';
+import { formatApiUrl, copyDefaultTemplate } from '../../services/designService';
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -97,67 +98,93 @@ const TemplateListPage: React.FC = () => {
   };
 
   const handleTemplateClick = async (uuid: string) => {
-    // Find the template that was clicked
-    const template = templates.find(t => t.uuid === uuid);
-    
-    if (!template) {
-      console.error('Template not found:', uuid);
-      return;
-    }
-    
-    // If it's a default template, make a copy for the user
-    if (template.isDefault) {
-      try {
-        message.loading({
-          content: t('templateListPage.creating_template_copy'),
-          key: 'templateCopy',
-          duration: 0,
-        });
-        
-        // Get the user ID
-        const userId = user?.profile?.user?.id;
-        
-        if (!userId) {
-          message.error(t('templateListPage.must_be_logged_in_template'));
-          return;
-        }
-        
-        // Make an API request to copy the template
-        const response = await fetch(`${process.env.REACT_APP_API_URL || ''}/designs/templates/${uuid}/copy/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            name: `Copy of ${template.name}`
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to copy template');
-        }
-        
-        const newTemplate = await response.json();
-        
-        message.success({
-          content: t('templateListPage.template_copied'),
-          key: 'templateCopy',
-          duration: 2,
-        });
-        
-        // Navigate to the new template in the editor
-        navigate(`/design/editor/${newTemplate.uuid}`);
-      } catch (error) {
-        console.error('Error copying template:', error);
-        message.error({
-          content: t('templateListPage.error_copy_template'),
-          key: 'templateCopy',
-        });
+    try {
+      // Find the template that was clicked
+      const template = templates.find(t => t.uuid === uuid);
+      
+      if (!template) {
+        console.error('Template not found:', uuid);
+        return;
       }
-    } else {
-      // If it's not a default template, just navigate to it
-      navigate(`/design/editor/${uuid}`);
+      
+      console.log('Template clicked:', template);
+      console.log('Is default template?', template.isDefault);
+      console.log('isDefault type:', typeof template.isDefault);
+      
+      // More robust checking for isDefault - check all possible truthy conditions
+      const isTemplateDefault = 
+        template.isDefault === true || 
+        String(template.isDefault).toLowerCase() === 'true';
+        
+      console.log('Using robust isDefault check:', isTemplateDefault);
+      
+      // Always make a copy if it's a default template
+      if (isTemplateDefault) {
+        try {
+          console.log('Creating copy of default template:', template.name);
+          
+          // Show loading message
+          message.loading({
+            content: t('templateListPage.creating_template_copy'),
+            key: 'templateCopy',
+            duration: 0,
+          });
+          
+          // Get the user ID
+          const userId = user?.profile?.user?.id;
+          
+          if (!userId) {
+            console.error('User ID not found');
+            message.error({
+              content: t('templateListPage.must_be_logged_in_template'),
+              key: 'templateCopy',
+            });
+            return;
+          }
+          
+          console.log('Calling copyDefaultTemplate with UUID:', uuid);
+          // Use the dedicated function for copying default templates
+          const newTemplate = await copyDefaultTemplate(uuid, `Copy of ${template.name}`);
+          
+          console.log('Copy successful, new template:', newTemplate);
+          console.log('New template UUID:', newTemplate.uuid);
+          
+          message.success({
+            content: t('templateListPage.template_copied'),
+            key: 'templateCopy',
+            duration: 2,
+          });
+          
+          // Ensure we're using the new template UUID
+          if (!newTemplate.uuid) {
+            console.error('New template has no UUID:', newTemplate);
+            message.error({
+              content: 'Error: New template has no UUID',
+              key: 'templateCopy',
+            });
+            return;
+          }
+          
+          const newTemplateUrl = `/design/editor/${newTemplate.uuid}`;
+          console.log('Navigating to new template at:', newTemplateUrl);
+          
+          // Navigate to the new template in the editor
+          navigate(newTemplateUrl);
+        } catch (error) {
+          console.error('Error copying template:', error);
+          message.error({
+            content: t('templateListPage.error_copy_template'),
+            key: 'templateCopy',
+          });
+        }
+      } else {
+        // If it's not a default template, navigate directly to it
+        console.log('Navigating to user template:', uuid);
+        navigate(`/design/editor/${uuid}`);
+      }
+    } catch (error) {
+      console.error('Unexpected error in handleTemplateClick:', error);
+      message.error('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -454,6 +481,24 @@ const TemplateListPage: React.FC = () => {
       </div>
     );
   };
+
+  // Add this near the beginning of the component function, after templates is defined
+  useEffect(() => {
+    // Debug log to inspect templates and their isDefault property
+    if (templates && templates.length > 0) {
+      console.log('Templates loaded:', templates.length);
+      console.log('Template sample:', templates[0]);
+      
+      // Count default templates
+      const defaultTemplates = templates.filter(t => t.isDefault === true);
+      console.log(`Default templates: ${defaultTemplates.length}/${templates.length}`);
+      
+      // Log each template isDefault value
+      templates.forEach((t, i) => {
+        console.log(`Template ${i}: ${t.name}, isDefault=${t.isDefault}, type=${typeof t.isDefault}`);
+      });
+    }
+  }, [templates]);
 
   return (
     <div className="template-list-page">

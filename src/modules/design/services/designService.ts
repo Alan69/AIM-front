@@ -786,159 +786,69 @@ export const fetchTemplateWithElements = async (uuid: string) => {
 };
 
 // Function to create a template
-export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string, mediaId?: string) => {
-  const API_URL = process.env.REACT_APP_API_URL || 
-    (process.env.NODE_ENV === 'production' ? 'https://api.aimmagic.com' : 'http://localhost:8000');
-    
-  console.log(`Environment: ${process.env.NODE_ENV}, using API URL: ${API_URL}`);
-  console.log('Creating template with name:', name);
-  console.log('Background image:', backgroundImage);
-  console.log('Post ID:', postId);
-  console.log('Media ID:', mediaId);
-
-  // If mediaId is provided, check if a template already exists for this media
-  if (mediaId) {
-    try {
-      // Fetch the media details to check if it already has a template
-      const response = await fetch(`${API_URL}post-media/${mediaId}/`);
-      const mediaData = await response.json();
-      
-      console.log('Fetched media data:', mediaData);
-      
-      // If the media already has a template, return that template instead of creating a new one
-      if (mediaData.template) {
-        console.log('Media already has template:', mediaData.template);
-        
-        // Fetch existing template with its elements
-        const existingTemplate = await fetchTemplateWithElements(mediaData.template);
-        console.log('Using existing template:', existingTemplate);
-        
-        // If background image is specified, update the existing template with the new background
-        if (backgroundImage && existingTemplate.backgroundImage !== backgroundImage) {
-          console.log('Updating existing template background image');
-          await updateTemplate(mediaData.template, { backgroundImage });
-          existingTemplate.backgroundImage = backgroundImage;
-        }
-        
-        return existingTemplate;
-      }
-    } catch (error) {
-      console.error('Error checking for existing template:', error);
-      // Continue with creating a new template if there was an error
-    }
-  }
-
-  // If mediaId is provided, fetch the post media image to use as background
-  if (mediaId && !backgroundImage) {
-    try {
-      // Use the API endpoint to get the media
-      const response = await fetch(`${API_URL}/api/post-media/${mediaId}/`);
-      if (response.ok) {
-        const mediaData = await response.json();
-        console.log('Post media data received:', mediaData);
-        
-        if (mediaData.media) {
-          // Use the media URL exactly as returned by the server
-          backgroundImage = mediaData.media;
-          console.log('Using media image as background:', backgroundImage);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching post media:', error);
-    }
-  } else if (postId && !backgroundImage) {
-    // If postId is provided but no backgroundImage, fetch the post image
-    try {
-      const response = await fetch(`${API_URL}/api/posts/${postId}/`);
-      if (response.ok) {
-        const postData = await response.json();
-        
-        if (postData.picture && postData.picture !== 'no_img.jpeg') {
-          backgroundImage = postData.picture;
-          console.log('Using post image as background:', backgroundImage);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching post picture:', error);
-    }
-  }
-
-  // Get the user's ID from cookies if not provided
-  if (!userId) {
-    try {
-      const cookies = document.cookie.split(';');
-      const userCookie = cookies.find(cookie => cookie.trim().startsWith('user='));
-      if (userCookie) {
-        const userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
-        userId = userObj.id;
-      }
-    } catch (error) {
-      console.error('Error getting user ID from cookies:', error);
-    }
-  }
-
-  // If still no userId, throw an error as it's required
-  if (!userId) {
-    throw new Error('User ID is required to create a template');
-  }
-
+export const createTemplate = async (templateData: Partial<Template>): Promise<Template> => {
   try {
-    // Use the existing CREATE_TEMPLATE mutation
-    const { data } = await client.mutate({
-      mutation: CREATE_TEMPLATE,
-      variables: { 
-        name, 
-        size, 
-        userId, 
-        isDefault, 
-        backgroundImage 
-      },
-    });
+    console.log('Creating new template with data:', templateData);
+    
+    // Get token
+    const token = Cookies.get('token');
+    if (!token) {
+      console.error('Authentication token not found');
+      throw new Error('Authentication token not found');
+    }
 
-    const template = data.createTemplate.template;
-    console.log('Created template:', template);
+    // Get user info to ensure it's included in the template
+    const userInfo = getUserInfo();
+    console.log('User info for new template:', userInfo);
+    
+    if (!userInfo || !userInfo.uuid) {
+      console.error('User information missing or invalid');
+      throw new Error('User information is required to create a template');
+    }
 
-    // If created for a media item, update the media's template reference
-    if (mediaId && template) {
-      console.log('Updating media with new template:', template.uuid);
-      try {
-        const updateResponse = await fetch(`${API_URL}/api/post-media/${mediaId}/update-template/`, {
+    // Create API URL
+    const createUrl = `${baseURL}designs/templates/`;
+    console.log(`Create template API URL: ${createUrl}`);
+    
+    // Ensure user field is set in the template data
+    const enrichedTemplateData = {
+      ...templateData,
+      user: userInfo.uuid, // Make sure user field is explicitly set
+    };
+    
+    console.log('Sending template data with user:', enrichedTemplateData);
+
+    // Make the request
+    const response = await fetch(createUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ template_uuid: template.uuid }),
-        });
-        
-        if (!updateResponse.ok) {
-          console.error('Failed to update media with template reference');
-        } else {
-          console.log('Successfully updated media with template reference');
-        }
-      } catch (error) {
-        console.error('Error updating media with template reference:', error);
-      }
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(enrichedTemplateData)
+    });
+    
+    console.log(`Create template response status: ${response.status}`);
+    
+    // Handle errors
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Create template error response text: ${errorText}`);
+      throw new Error(`Failed to create template: ${response.status} ${response.statusText}`);
     }
-
-    // For compatibility with the rest of the codebase
-    const formattedTemplate = {
-      uuid: template.uuid,
-      name: template.name,
-      size: template.size,
-      backgroundImage: template.backgroundImage,
-      isDefault: template.isDefault,
-      user: { id: userId },
-      images: [],  // Initialize with empty arrays
-      texts: [],
-      shapes: []
-    };
-
-    return formattedTemplate;
+    
+    const newTemplate = await response.json();
+    console.log('Create template response:', newTemplate);
+    
+    return newTemplate;
   } catch (error) {
     console.error('Error creating template:', error);
+    if (error instanceof Error) {
+      throw new Error(`Failed to create template: ${error.message}`);
+    }
     throw error;
   }
-}
+};
 
 // Function to add an image asset to template
 export const createImageAsset = async (
@@ -1488,7 +1398,7 @@ export const fetchTemplatesREST = async (size?: string) => {
         rotation: Number(text.rotation || 0),
         opacity: Number(text.opacity || 1.0)
       }));
-      
+
       // Process shape elements - ensure numeric properties are properly converted to numbers
       const shapes = (template.shape_elements || []).map((shape: any) => ({
         uuid: shape.uuid,
@@ -1502,7 +1412,7 @@ export const fetchTemplatesREST = async (size?: string) => {
         rotation: Number(shape.rotation || 0),
         opacity: Number(shape.opacity || 1.0)
       }));
-      
+
       return {
         uuid: template.uuid,
         name: template.name,
@@ -1866,6 +1776,36 @@ export const getUserAssets = async () => {
 };
 
 /**
+ * Helper function to construct consistent API URLs
+ * @param baseUrl - The base URL from environment
+ * @param endpoint - The API endpoint path
+ * @returns Properly formatted URL
+ */
+export const formatApiUrl = (baseUrl: string, endpoint: string): string => {
+  // Clean up input values
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  console.log(`formatApiUrl: base="${cleanBase}", endpoint="${cleanEndpoint}"`);
+  
+  // Check if baseUrl already includes the API path
+  const apiPrefix = '/api';
+  const hasApiPrefix = cleanBase.endsWith(apiPrefix);
+  
+  let resultUrl;
+  if (hasApiPrefix) {
+    // Base already includes /api, just append the endpoint
+    resultUrl = `${cleanBase}${cleanEndpoint}`;
+  } else {
+    // Add /api before the endpoint
+    resultUrl = `${cleanBase}${apiPrefix}${cleanEndpoint}`;
+  }
+  
+  console.log(`formatApiUrl result: ${resultUrl}`);
+  return resultUrl;
+};
+
+/**
  * Get templates from REST API endpoint (replacing GraphQL)
  * @param filterType - Type of filter to apply: 'default', 'my', 'liked'
  * @param size - Optional size filter
@@ -1890,8 +1830,9 @@ export const getTemplatesREST = async (
       params.append('search', search);
     }
     
-    // Get the API URL with query parameters
-    const apiUrl = `${baseURL}templates/?${params.toString()}`;
+    // Get the API URL with query parameters using the helper
+    const apiUrl = formatApiUrl(baseURL, `templates/?${params.toString()}`);
+    console.log('API URL for templates:', apiUrl);
     
     // Get authentication token
     const token = Cookies.get('token');
@@ -1988,4 +1929,86 @@ export const getTemplatesREST = async (
 export const getTemplates = async (filterType: string = 'default', size?: string, search?: string) => {
   // Simply call our new REST implementation
   return getTemplatesREST(filterType, size, search);
+};
+
+/**
+ * Copy a default template and return the new template
+ * @param templateUuid - UUID of the template to copy
+ * @param newName - Name for the new template
+ * @returns Promise<Template> - New template created
+ */
+export const copyDefaultTemplate = async (templateUuid: string, newName?: string): Promise<any> => {
+  try {
+    console.log(`Copying default template ${templateUuid} with name "${newName}"`);
+    
+    // Get token
+    const token = Cookies.get('token');
+    if (!token) {
+      console.error('Authentication token not found');
+      throw new Error('Authentication token not found');
+    }
+    
+    // Fix the URL construction to ensure it's correct - using direct format
+    // We're seeing an issue with the formatApiUrl function, so let's construct it directly
+    const copyUrl = `${baseURL}designs/templates/${templateUuid}/copy/`;
+    console.log(`Copy template API URL: ${copyUrl}`);
+    
+    // Make the request
+    const response = await fetch(copyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: newName || `Copy of template ${templateUuid}`
+      })
+    });
+    
+    console.log(`Copy template response status: ${response.status}`);
+    console.log('Copy template response headers:', { 
+      'content-type': response.headers.get('content-type'),
+      'content-length': response.headers.get('content-length')
+    });
+    
+    // Handle errors
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Copy template error response text: ${errorText}`);
+      throw new Error(`Failed to copy template: ${response.status} ${response.statusText}`);
+    }
+    
+    // Get full response text for debugging
+    const responseText = await response.text();
+    console.log(`Copy template raw response: ${responseText}`);
+    
+    // Parse the response text to JSON (twice since we already consumed the body)
+    let newTemplate;
+    try {
+      newTemplate = JSON.parse(responseText);
+      console.log(`Copy template parsed JSON:`, newTemplate);
+        } catch (error) {
+      const parseError = error as Error;
+      console.error(`Error parsing JSON response:`, parseError);
+      console.error(`Response that failed to parse:`, responseText);
+      throw new Error(`Failed to parse template copy response: ${parseError.message}`);
+    }
+    
+    // Validate the response
+    if (!newTemplate || !newTemplate.uuid) {
+      console.error('Invalid template copy response, missing UUID:', newTemplate);
+      throw new Error('Template copy response is missing UUID');
+    }
+    
+    console.log(`Copy template successful. New template UUID: ${newTemplate.uuid}`);
+    
+    return newTemplate;
+  } catch (error) {
+    console.error('Error copying default template:', error);
+    // Rethrow with more details
+    if (error instanceof Error) {
+      throw new Error(`Failed to copy template: ${error.message}`);
+    }
+    throw error;
+  }
 }; 
