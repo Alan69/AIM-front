@@ -694,6 +694,16 @@ const getUserIdFromMultipleSources = (): string | null => {
   return userId;
 }
 
+// Helper function to get user info object
+const getUserInfo = () => {
+  const userId = getUserIdFromMultipleSources();
+  if (!userId) return null;
+  
+  return {
+    uuid: userId
+  };
+}
+
 // Function to fetch a template with all its elements
 export const fetchTemplateWithElements = async (uuid: string) => {
   console.log(`Fetching template with uuid: ${uuid}`);
@@ -813,7 +823,7 @@ export const createTemplate = async (templateData: Partial<Template>): Promise<T
     // Ensure user field is set in the template data
     const enrichedTemplateData = {
       ...templateData,
-      user: userInfo.uuid, // Make sure user field is explicitly set
+      userId: userInfo.uuid, // Make sure userId field is explicitly set
     };
     
     console.log('Sending template data with user:', enrichedTemplateData);
@@ -1451,14 +1461,20 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
     const templateSize = sourceTemplate.size === '1080x1920' ? '1080x1920' : '1080x1080';
     console.log('Using template size:', templateSize);
     
+    // Get user info
+    const userInfo = getUserInfo();
+    if (!userInfo) {
+      throw new Error('User information is required to copy a template');
+    }
+    
     // Create a new template with the same properties
-    const newTemplate = await createTemplate(
-      newName,
-      templateSize, // Use our validated size
-      sourceTemplate.backgroundImage,
-      userId,
-      false // Not a default template
-    );
+    const newTemplate = await createTemplate({
+      name: newName,
+      size: templateSize, // Use our validated size
+      backgroundImage: sourceTemplate.backgroundImage,
+      user: { id: userId }, // Pass as object with id field based on the type error
+      isDefault: false // Not a default template
+    });
     
     console.log('New template created with ID:', newTemplate.uuid);
     console.log('New template size after creation:', newTemplate.size);
