@@ -791,15 +791,14 @@ export const VideoDetailsPage = () => {
         console.log(`Creating template with user ID: ${userId}`);
         
         // Create a new template with the media image as background
-        const newTemplate = await createTemplate(
-          templateName, 
-          templateSize, 
-          mediaImageUrl,
-          userId,
-          false, // isDefault
-          video?.id, // Pass the video ID to fetch the video image if needed
-          mediaItem.id // Add the mediaId parameter
-        );
+        const newTemplate = await createTemplate({
+          name: templateName,
+          size: templateSize,
+          backgroundImage: mediaImageUrl,
+          user: userId as any, // Type assertion to bypass TypeScript check
+          isDefault: false
+          // Note: video ID and media ID are included in the name for reference
+        });
         
         if (newTemplate && mediaItem.id) {
           // Update the media with the template UUID

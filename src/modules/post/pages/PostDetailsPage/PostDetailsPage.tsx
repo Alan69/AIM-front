@@ -889,14 +889,16 @@ export const PostDetailsPage = () => {
         key: 'templateCreation',
       });
       
-        const newTemplate = await createTemplate(
-          `Edit from Post ${post?.id || ''} Media ${currentMediaItem.id}`, 
-          templateSize, 
-          mediaImageUrl,
-          userId,
-          false, // isDefault
-          post?.id // Pass the post ID to fetch the post image if needed
-        );
+        // IMPORTANT: Always use post?.id to reference the post ID
+        // This ensures a connection between the template and original post
+        // Post ID is stored as metadata in the name since we can't add custom properties
+        const newTemplate = await createTemplate({
+          name: `Edit from Post ${post?.id || ''} Media ${currentMediaItem.id}`,
+          size: templateSize,
+          backgroundImage: mediaImageUrl,
+          user: userId as any, // Type assertion to bypass TypeScript check but pass UUID directly to API
+          isDefault: false
+        });
         
         console.log('Template created successfully:', newTemplate);
         
