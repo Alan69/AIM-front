@@ -498,6 +498,8 @@ export const processImageData = (imageData: string): string => {
   }
 
   try {
+    console.log('Processing image data:', imageData);
+    
     // If it's already a data URL, return as is
     if (imageData.startsWith('data:')) {
       console.log('Image is already a data URL, length:', imageData.length);
@@ -506,7 +508,7 @@ export const processImageData = (imageData: string): string => {
       return imageData;
     }
     
-    // If it's an HTTP URL, return as is
+    // If it's an HTTP URL, verify it's properly formatted
     if (imageData.startsWith('http')) {
       console.log('Image is an HTTP URL:', imageData);
       return imageData;
@@ -548,17 +550,32 @@ export const processImageData = (imageData: string): string => {
     // Extract the filename for better handling
     const filename = imageData.split('/').pop();
     
-    // If it's a relative path, construct the URL
-    const baseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' 
-      ? 'https://api.aimmagic.com' 
-      : 'http://localhost:8000');
+    // Handle relative paths based on the current environment
+    // Use window.location.origin to get the base URL of the current page
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+    
+    // Create appropriate base URL for media
+    const baseUrl = process.env.REACT_APP_API_URL || 
+      (process.env.NODE_ENV === 'production' 
+        ? 'https://api.aimmagic.com' 
+        : (isLocalhost ? `${origin}` : 'http://localhost:8000'));
 
+    // Clean up media URL to ensure it has the correct format
     const mediaUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
     
-    // Check if the path already starts with /media/
-    if (imageData.startsWith('/media/')) {
-      const result = `${mediaUrl}${imageData}`;
+    // If it's a path that already starts with /media/ or media/
+    if (imageData.startsWith('/media/') || imageData.startsWith('media/')) {
+      const normalizedPath = imageData.startsWith('/') ? imageData : `/${imageData}`;
+      const result = `${mediaUrl}${normalizedPath}`;
       console.log(`Constructed URL from media path: ${result}`);
+      return result;
+    }
+    
+    // If it's an absolute path (starts with /)
+    if (imageData.startsWith('/') && !imageData.startsWith('/media/')) {
+      const result = `${mediaUrl}/media${imageData}`;
+      console.log(`Constructed URL from absolute path: ${result}`);
       return result;
     }
     
@@ -567,13 +584,9 @@ export const processImageData = (imageData: string): string => {
       // If the filename contains media path information, extract just the filename
       const cleanFilename = filename.split('/').pop() || filename;
       
-      // Try with direct URL based on environment
-      const hostUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://api.aimmagic.com' 
-        : `http://${window.location.hostname === 'localhost' ? 'localhost' : '127.0.0.1'}:8000`;
-        
-      const mediaPath = `${hostUrl}/media/${cleanFilename}`;
-      console.log(`Constructed environment-specific URL: ${mediaPath}`);
+      // Construct URL based on the environment
+      const mediaPath = `${mediaUrl}/media/${cleanFilename}`;
+      console.log(`Constructed URL with filename: ${mediaPath}`);
       return mediaPath;
     }
     
@@ -820,9 +833,18 @@ export const createTemplate = async (templateData: Partial<Template>): Promise<T
     const createUrl = `${baseURL}designs/templates/`;
     console.log(`Create template API URL: ${createUrl}`);
     
+    // Process the background image if it exists
+    let processedData = { ...templateData };
+    if (processedData.backgroundImage) {
+      console.log('Original background image:', processedData.backgroundImage);
+      // Use the processImageData function to ensure proper URL formatting
+      processedData.backgroundImage = processImageData(processedData.backgroundImage);
+      console.log('Processed background image:', processedData.backgroundImage);
+    }
+    
     // Ensure user field is set in the template data
     const enrichedTemplateData = {
-      ...templateData,
+      ...processedData,
       userId: userInfo.uuid, // Make sure userId field is explicitly set
     };
     

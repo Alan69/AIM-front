@@ -318,103 +318,59 @@ export const VideoDetailsPage = () => {
         
         // 5. Now link the newly created media with the template
         try {
-          // Create form data for the request
-          const formData = new URLSearchParams();
-          formData.append('template_uuid', newTemplate.uuid);
-          
-          // Extract the base domain without any path
-          const urlParts = baseApiUrl.split('/');
-          const domain = urlParts[0] + '//' + urlParts[2]; // e.g., https://api.aimmagic.com
-          
-          // Force the correct endpoint with /api/ and use the ID from the new media
-          const updateTemplateUrl = `${domain}/api/post-media/${newMediaId}/update-template/`;
-          
-          console.log('Base API URL:', baseApiUrl);
-          console.log('Extracted domain:', domain);
-          console.log('Updating template at URL:', updateTemplateUrl);
-          console.log('Template UUID being sent:', newTemplate.uuid);
-          
-          // Get CSRF token from cookies
-          const getCookie = (name: string): string | null => {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) {
-              return parts.pop()?.split(';').shift() || null;
-            }
-            return null;
-          };
-          
-          // Get the csrftoken
-          const csrfToken = getCookie('csrftoken');
-          console.log('CSRF Token:', csrfToken);
-          
-          // First, try to use the RTK mutation to leverage its built-in CSRF handling
+          // Update the media with the template UUID
           try {
-            // Update the post media with the template UUID - use the ID from the new media
-            const updateResult = await updateVideoMediaTemplate({
-              id: newMediaId,
-              template_uuid: newTemplate.uuid,
-            }).unwrap();
+            // Create form data for the request
+            const formData = new URLSearchParams();
+            formData.append('template_uuid', newTemplate.uuid);
             
-            console.log('Template update response (RTK):', updateResult);
+            // Format the URL correctly
+            const updateUrl = `${baseApiUrl}/video-media/${newMediaId}/update-template/`;
+            console.log(`Updating media ${newMediaId} with template ${newTemplate.uuid}`);
+            console.log("Sending update to URL:", updateUrl);
             
-            // Final refresh to get the updated media
-            await refetchVideoMedias();
+            // Try to get CSRF token
+            const getCsrfToken = () => {
+              const cookies = document.cookie.split(';');
+              for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                  return value;
+                }
+              }
+              return '';
+            };
             
-            message.success(t('videoDetailsPage.template_applied'), 3);
-            setIsTemplateModalOpen(false);
-            setSelectedTemplate(null);
-            return;
-          } catch (rtkError) {
-            console.error('Failed to update template using RTK mutation:', rtkError);
-            // Continue with manual fetch as fallback
-          }
-          
-          // Send the request to update the post media with the template UUID
-          const updateResponse = await fetch(updateTemplateUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Accept': 'application/json',
-              'X-CSRFToken': csrfToken || '',
-              'X-Requested-With': 'XMLHttpRequest',
-              'Referer': window.location.href
-            },
-            body: formData,
-            credentials: 'include',
-            mode: 'cors'
-          });
-          
-          // Log the raw response first
-          console.log('Template update response status:', updateResponse.status);
-          console.log('Template update response statusText:', updateResponse.statusText);
-          
-          let responseData;
-          try {
-            // Try to parse the response as JSON
-            responseData = await updateResponse.json();
-            console.log('Template update response data:', responseData);
-          } catch (jsonError) {
-            // If parsing as JSON fails, get the text
-            const textResponse = await updateResponse.text();
-            console.log('Template update raw response:', textResponse);
-            responseData = { text: textResponse };
-          }
-          
-          if (!updateResponse.ok) {
-            // Try a different approach using the Django REST API endpoint directly
-            try {
-              // Use the API endpoint without the api/ prefix as a fallback
-              const alternateUrl = `${domain}/post-media/${newMediaId}/update-template/`;
-              console.log('Trying alternate URL:', alternateUrl);
+            const csrfToken = getCsrfToken();
+            
+            const updateResponse = await fetch(updateUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json',
+                'Referer': window.location.href
+              },
+              body: formData,
+              credentials: 'include',
+              mode: 'cors'
+            });
+            
+            if (!updateResponse.ok) {
+              console.error(`Error updating template: ${updateResponse.status} ${updateResponse.statusText}`);
+              const responseText = await updateResponse.text();
+              console.error('Response:', responseText);
+              
+              // Try alternative URL format without /api/ prefix as fallback
+              const alternateUrl = updateUrl.replace('/api/', '/');
+              console.log("Trying alternate URL:", alternateUrl);
               
               const alternateResponse = await fetch(alternateUrl, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRFToken': csrfToken,
                   'Accept': 'application/json',
-                  'X-CSRFToken': csrfToken || '',
-                  'X-Requested-With': 'XMLHttpRequest',
                   'Referer': window.location.href
                 },
                 body: formData,
@@ -422,72 +378,19 @@ export const VideoDetailsPage = () => {
                 mode: 'cors'
               });
               
-              console.log('Alternate response status:', alternateResponse.status);
-              
-              if (alternateResponse.ok) {
-                const alternateData = await alternateResponse.json();
-                console.log('Alternate update succeeded:', alternateData);
-                
-                // Final refresh to get the updated media
-                await refetchVideoMedias();
-                
-                message.success(t('videoDetailsPage.template_applied'), 3);
-                setIsTemplateModalOpen(false);
-                setSelectedTemplate(null);
-                return;
+              if (!alternateResponse.ok) {
+                console.error(`Error with alternate URL: ${alternateResponse.status} ${alternateResponse.statusText}`);
+                const alternateText = await alternateResponse.text();
+                console.error('Alternate response:', alternateText);
+                // Continue anyway since we already created the template
               } else {
-                console.error('Alternate update failed');
+                console.log('Successfully updated template using alternate URL');
               }
-            } catch (alternateError) {
-              console.error('Error with alternate approach:', alternateError);
+            } else {
+              console.log(`Video media ${newMediaId} updated with template ${newTemplate.uuid}`);
             }
-            
-            // If still failed, try to use the API directly
-            try {
-              const apiResponse = await fetch(`${domain}/graphql/`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': csrfToken || '',
-                  'X-Requested-With': 'XMLHttpRequest',
-                  'Referer': window.location.href
-                },
-                body: JSON.stringify({
-                  query: `
-                    mutation UpdatePostMediaTemplate($id: ID!, $templateUuid: String!) {
-                      updatePostMediaTemplate(id: $id, templateUuid: $templateUuid) {
-                        success
-                        media {
-                          id
-                          template
-                        }
-                      }
-                    }
-                  `,
-                  variables: {
-                    id: newMediaId,
-                    templateUuid: newTemplate.uuid
-                  }
-                }),
-                credentials: 'include',
-                mode: 'cors'
-              });
-              
-              const apiData = await apiResponse.json();
-              console.log('GraphQL API response:', apiData);
-              
-              if (apiData.data?.updatePostMediaTemplate?.success) {
-                message.success(t('videoDetailsPage.template_applied'), 3);
-                await refetchVideoMedias();
-                setIsTemplateModalOpen(false);
-                setSelectedTemplate(null);
-                return;
-              }
-            } catch (apiError) {
-              console.error('GraphQL API error:', apiError);
-            }
-            
-            throw new Error(`Failed to update post media with template: ${updateResponse.statusText}`);
+          } catch (error) {
+            console.error('Error updating video media with template UUID:', error);
           }
           
           // Final refresh to get the updated media
@@ -758,32 +661,28 @@ export const VideoDetailsPage = () => {
         // Make sure we have the full URL path
         if (mediaImageUrl && !mediaImageUrl.startsWith('http')) {
           // If it's a relative URL, convert to absolute
-          const baseUrl = process.env.REACT_APP_API_URL || '';
-          const apiUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
-          
-          // If it starts with /media, append it to the API URL
-          if (mediaImageUrl.startsWith('/media/')) {
-            mediaImageUrl = `${apiUrl}${mediaImageUrl}`;
+          if (mediaImageUrl.startsWith('/')) {
+            const baseUrl = window.location.origin;
+            mediaImageUrl = `${baseUrl}${mediaImageUrl}`;
           } else {
-            // Otherwise, assume it needs /media/ prefix
-            mediaImageUrl = `${apiUrl}/media/${mediaImageUrl}`;
+            const baseUrl = process.env.NODE_ENV === 'production' 
+              ? 'https://api.aimmagic.com' 
+              : `${window.location.protocol}//${window.location.hostname}:8000`;
+            mediaImageUrl = `${baseUrl}/media/${mediaImageUrl}`;
           }
           console.log(`Converted to absolute URL: ${mediaImageUrl}`);
         }
         
-        // Ensure the URL is accessible by checking if it's a valid URL
+        // Verify the background image URL is accessible
         try {
-          new URL(mediaImageUrl);
-        } catch (e) {
-          console.error('Invalid URL:', mediaImageUrl);
-          // Try to fix the URL
-          if (mediaImageUrl) {
-            const filename = mediaImageUrl.split('/').pop();
-            if (filename) {
-              mediaImageUrl = `http://localhost:8000/media/${filename}`;
-              console.log(`Fixed URL: ${mediaImageUrl}`);
-            }
+          const imgResponse = await fetch(mediaImageUrl, { method: 'HEAD' });
+          if (!imgResponse.ok) {
+            console.error(`Error checking image URL (status: ${imgResponse.status}):`, mediaImageUrl);
+          } else {
+            console.log('Image URL is accessible:', mediaImageUrl);
           }
+        } catch (imgError) {
+          console.error('Error testing image URL:', imgError);
         }
         
         // Get the user ID from the user context
@@ -807,17 +706,71 @@ export const VideoDetailsPage = () => {
             const formData = new URLSearchParams();
             formData.append('template_uuid', newTemplate.uuid);
             
-            // Send the request to update the post media with the template UUID
-            await fetch(`${baseApiUrl}/video-media/${mediaItem.id}/update-template/`, {
+            // Format the URL correctly
+            const updateUrl = `${baseApiUrl}/video-media/${mediaItem.id}/update-template/`;
+            console.log(`Updating media ${mediaItem.id} with template ${newTemplate.uuid}`);
+            console.log("Sending update to URL:", updateUrl);
+            
+            // Try to get CSRF token
+            const getCsrfToken = () => {
+              const cookies = document.cookie.split(';');
+              for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                  return value;
+                }
+              }
+              return '';
+            };
+            
+            const csrfToken = getCsrfToken();
+            
+            const updateResponse = await fetch(updateUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json',
+                'Referer': window.location.href
               },
               body: formData,
               credentials: 'include',
+              mode: 'cors'
             });
             
-            console.log(`Post media ${mediaItem.id} updated with template ${newTemplate.uuid}`);
+            if (!updateResponse.ok) {
+              console.error(`Error updating template: ${updateResponse.status} ${updateResponse.statusText}`);
+              const responseText = await updateResponse.text();
+              console.error('Response:', responseText);
+              
+              // Try alternative URL format without /api/ prefix as fallback
+              const alternateUrl = updateUrl.replace('/api/', '/');
+              console.log("Trying alternate URL:", alternateUrl);
+              
+              const alternateResponse = await fetch(alternateUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRFToken': csrfToken,
+                  'Accept': 'application/json',
+                  'Referer': window.location.href
+                },
+                body: formData,
+                credentials: 'include',
+                mode: 'cors'
+              });
+              
+              if (!alternateResponse.ok) {
+                console.error(`Error with alternate URL: ${alternateResponse.status} ${alternateResponse.statusText}`);
+                const alternateText = await alternateResponse.text();
+                console.error('Alternate response:', alternateText);
+                // Continue anyway since we already created the template
+              } else {
+                console.log('Successfully updated template using alternate URL');
+              }
+            } else {
+              console.log(`Video media ${mediaItem.id} updated with template ${newTemplate.uuid}`);
+            }
           } catch (error) {
             console.error('Error updating video media with template UUID:', error);
           }

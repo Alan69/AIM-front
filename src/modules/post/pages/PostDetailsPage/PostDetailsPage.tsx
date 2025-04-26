@@ -140,7 +140,7 @@ export const PostDetailsPage = () => {
   const [selectedMedias, setSelectedMedias] = useState<string[]>([]);
   const [fileList, setFileList] = useState<File[]>([]);
 
-  // New state for template selector
+  // New state for template
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -825,11 +825,27 @@ export const PostDetailsPage = () => {
     
     try {
       setIsTemplateModalVisible(false);
-        
+      
       // Get the media image URL using our helper function
       let mediaImageUrl = getMediaImageUrl(currentMediaItem?.media || '');
       console.log(`Using media image URL: ${mediaImageUrl}`);
-        
+      
+      // Debug the media image URL to ensure it's fully qualified
+      if (!mediaImageUrl.startsWith('http')) {
+        console.warn('Media image URL does not start with http, fixing:', mediaImageUrl);
+        // Force to be a fully qualified URL if it's not already
+        if (mediaImageUrl.startsWith('/')) {
+          const baseUrl = window.location.origin;
+          mediaImageUrl = `${baseUrl}${mediaImageUrl}`;
+        } else {
+          const baseUrl = process.env.NODE_ENV === 'production' 
+            ? 'https://api.aimmagic.com' 
+            : `${window.location.protocol}//${window.location.hostname}:8000`;
+          mediaImageUrl = `${baseUrl}/media/${mediaImageUrl}`;
+        }
+        console.log('Fixed media image URL:', mediaImageUrl);
+      }
+      
       // Default template size
       let templateSize = size;
       
@@ -871,9 +887,9 @@ export const PostDetailsPage = () => {
           
           // Default to 1080x1920 if we can't determine dimensions
           templateSize = '1080x1920';
-          }
         }
-        
+      }
+      
       // Create template with the selected size
       try {
         // Create a template with our helper function
@@ -883,12 +899,27 @@ export const PostDetailsPage = () => {
           message.error(t("postDetailsPage.error_missing_user_id"));
           return;
         }
+
+        message.loading({
+          content: t("postDetailsPage.creating_template"),
+          key: 'templateCreation',
+        });
         
-      message.loading({
-        content: t("postDetailsPage.creating_template"),
-        key: 'templateCreation',
-      });
-      
+        // Verify the background image URL is fully qualified and accessible
+        console.log('Final background image URL for template:', mediaImageUrl);
+        
+        // Test if the image is accessible with a fetch before using it
+        try {
+          const imgResponse = await fetch(mediaImageUrl, { method: 'HEAD' });
+          if (!imgResponse.ok) {
+            console.error(`Error checking image URL (status: ${imgResponse.status}):`, mediaImageUrl);
+          } else {
+            console.log('Image URL is accessible:', mediaImageUrl);
+          }
+        } catch (imgError) {
+          console.error('Error testing image URL:', imgError);
+        }
+        
         // IMPORTANT: Always use post?.id to reference the post ID
         // This ensures a connection between the template and original post
         // Post ID is stored as metadata in the name since we can't add custom properties
@@ -919,20 +950,63 @@ export const PostDetailsPage = () => {
             const updateUrl = getApiUrl(`post-media/${currentMediaItem.id}/update-template/`);
             console.log("Sending update to URL:", updateUrl);
             
+            // Try to get CSRF token
+            const getCsrfToken = () => {
+              const cookies = document.cookie.split(';');
+              for (const cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                  return value;
+                }
+              }
+              return '';
+            };
+            
+            const csrfToken = getCsrfToken();
+            
             const updateResponse = await fetch(updateUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json',
+                'Referer': window.location.href
               },
               body: formData,
               credentials: 'include',
+              mode: 'cors'
             });
             
             if (!updateResponse.ok) {
               console.error(`Error updating template: ${updateResponse.status} ${updateResponse.statusText}`);
               const responseText = await updateResponse.text();
               console.error('Response:', responseText);
-              // Continue anyway since we already created the template
+              
+              // Try alternative URL format without /api/ prefix as fallback
+              const alternateUrl = updateUrl.replace('/api/', '/');
+              console.log("Trying alternate URL:", alternateUrl);
+              
+              const alternateResponse = await fetch(alternateUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'X-CSRFToken': csrfToken,
+                  'Accept': 'application/json',
+                  'Referer': window.location.href
+                },
+                body: formData,
+                credentials: 'include',
+                mode: 'cors'
+              });
+              
+              if (!alternateResponse.ok) {
+                console.error(`Error with alternate URL: ${alternateResponse.status} ${alternateResponse.statusText}`);
+                const alternateText = await alternateResponse.text();
+                console.error('Alternate response:', alternateText);
+                // Continue anyway since we already created the template
+              } else {
+                console.log('Successfully updated template using alternate URL');
+              }
             } else {
               console.log(`Post media ${currentMediaItem.id} updated with template ${newTemplate.uuid}`);
             }
@@ -941,17 +1015,17 @@ export const PostDetailsPage = () => {
             // We'll still navigate to the editor even if the update fails
           }
           
-        // Navigate to the template editor with the template
-        // Pass source=postMedia, postId, and mediaId parameters to identify where we came from
+          // Navigate to the template editor with the template
+          // Pass source=postMedia, postId, and mediaId parameters to identify where we came from
           let url = `/design/editor/${newTemplate.uuid}?source=postMedia&postId=${post?.id}&mediaId=${currentMediaItem.id}`;
-        
-        // If we have a postQueryId, add it to the URL
-        if (postQueryId) {
-          url += `&postQueryId=${postQueryId}`;
-        }
-        
+          
+          // If we have a postQueryId, add it to the URL
+          if (postQueryId) {
+            url += `&postQueryId=${postQueryId}`;
+          }
+          
           message.success(t("postDetailsPage.template_created_successfully"));
-        navigate(url);
+          navigate(url);
         }
       } catch (templateError) {
         console.error('Error creating template:', templateError);
