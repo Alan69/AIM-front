@@ -31,7 +31,13 @@ const TemplateListPage: React.FC = () => {
   const loadTemplates = async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await fetchAllTemplates(selectedSize, page, PAGE_SIZE, searchQuery, activeTab);
+      const response = await fetchAllTemplates(
+        selectedSize, 
+        page, 
+        PAGE_SIZE, 
+        searchQuery, 
+        activeTab
+      );
       
       setTemplates(response.templates);
       setTotalTemplates(response.total);

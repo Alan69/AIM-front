@@ -42,8 +42,22 @@ const client = new ApolloClient({
 
 // Query to get all templates with pagination
 export const GET_TEMPLATES = gql`
-  query GetTemplates($size: String) {
-    templates(size: $size) {
+  query GetTemplates(
+    $size: String, 
+    $page: Int = 1, 
+    $pageSize: Int = 12, 
+    $search: String = "", 
+    $tab: String = "all",
+    $userId: ID
+  ) {
+    templates(
+      size: $size, 
+      page: $page, 
+      pageSize: $pageSize, 
+      search: $search, 
+      tab: $tab,
+      userId: $userId
+    ) {
       uuid
       name
       isDefault
@@ -57,6 +71,11 @@ export const GET_TEMPLATES = gql`
         id
         username
       }
+      # Use count fields when full data is not needed
+      imageCount
+      textCount
+      shapeCount
+      # Only request assets for preview when necessary (limit to one for thumbnail preview)
       imageAssets {
         uuid
         image
@@ -69,37 +88,19 @@ export const GET_TEMPLATES = gql`
         opacity
         borderRadius
       }
-      textElements {
-        uuid
-        text
-        font
-        fontSize
-        color
-        positionX
-        positionY
-        zIndex
-        rotation
-        opacity
-      }
-      shapeElements {
-        uuid
-        shapeType
-        color
-        positionX
-        positionY
-        width
-        height
-        zIndex
-        rotation
-        opacity
-      }
     }
+    templatesCount(
+      size: $size, 
+      search: $search, 
+      tab: $tab,
+      userId: $userId
+    )
   }
 `;
 
 // Query to get a template with all its elements
 export const GET_TEMPLATE_WITH_ELEMENTS = gqlClient`
-  query GetTemplateWithElements($uuid: UUID!) {
+  query GetTemplateWithElements($uuid: ID!) {
     template(uuid: $uuid) {
       uuid
       name
@@ -596,62 +597,49 @@ export const fetchAllTemplates = async (
   tab: string = 'all'
 ) => {
   try {
+    // For "my" tab, we need to send the current user ID
+    const userId = tab === 'my' ? getUserIdFromMultipleSources() : null;
+    
+    console.log('Fetching templates with params:', { size, page, pageSize, search: searchQuery, tab, userId });
+    
+    // Use server-side pagination, filtering and searching
     const { data } = await client.query({
       query: GET_TEMPLATES,
       variables: {
-        size
-      }
+        size,
+        page,
+        pageSize,
+        search: searchQuery,
+        tab,
+        userId
+      },
+      fetchPolicy: 'network-only', // Don't use cache for most accurate results
     });
 
-    // Handle client-side filtering and pagination
-    let filteredTemplates = [...data.templates];
+    console.log('Templates response:', data);
     
-    // Filter by search query
-    if (searchQuery) {
-      filteredTemplates = filteredTemplates.filter(template => 
-        template.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+    // Process the templates returned from the server
+    let filteredTemplates = data?.templates || [];
     
-    // Filter by tab
-    if (tab === 'all') {
-      filteredTemplates = filteredTemplates.filter(template => 
-        template.isDefault
-      );
-      
-      // Separate assignable and non-assignable templates
-      const assignableTemplates = filteredTemplates.filter(template => !!template.assignable);
-      const nonAssignableTemplates = filteredTemplates.filter(template => !template.assignable);
-      
-      // Sort assignable templates first
-      filteredTemplates = [...assignableTemplates, ...nonAssignableTemplates];
-    } else if (tab === 'my') {
-      // Get user ID from multiple sources
-      const userId = getUserIdFromMultipleSources();
-      
-      filteredTemplates = filteredTemplates.filter(template => 
-        !template.isDefault && template.user?.id === userId
-      );
-    } else if (tab === 'liked') {
-      filteredTemplates = filteredTemplates.filter(template => 
-        template.like
-      );
-    }
-
-    // Get total count before pagination
-    const total = filteredTemplates.length;
-    
-    // Apply pagination
-    const start = (page - 1) * pageSize;
-    const end = start + pageSize;
-    filteredTemplates = filteredTemplates.slice(start, end);
-
+    // Return the templates and total count from server
     return {
       templates: filteredTemplates,
-      total: total
+      total: data?.templatesCount || 0
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching templates:', error);
+    
+    // More detailed error logging
+    if (error.graphQLErrors) {
+      console.error('GraphQL Errors:', error.graphQLErrors);
+    }
+    if (error.networkError) {
+      console.error('Network Error:', error.networkError);
+      if (error.networkError.result) {
+        console.error('Error result:', error.networkError.result);
+      }
+    }
+    
     throw error;
   }
 };
