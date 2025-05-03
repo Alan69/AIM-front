@@ -183,16 +183,32 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     try {
       setLoadingTemplates(true);
       setTemplates([]); // Clear existing templates while loading
-      const fetchedTemplates = await getTemplates(templateFilter);
-      setTemplates(fetchedTemplates || []);
-    } catch (error) {
-      console.error('Error loading templates:', error);
+      console.log('Calling getTemplates with filter:', templateFilter);
+      console.log('Current userId:', userId);
+      try {
+        const fetchedTemplates = await getTemplates(templateFilter);
+        console.log('Templates fetched successfully:', fetchedTemplates);
+        setTemplates(fetchedTemplates || []);
+      } catch (error: any) {
+        console.error('Error in getTemplates:', error);
+        // Show full error details
+        if (error.networkError) {
+          console.error('Network error details:', error.networkError);
+        }
+        if (error.graphQLErrors) {
+          console.error('GraphQL errors:', error.graphQLErrors);
+        }
+        message.error(t('templateEditorPage.failed_to_load_templates'));
+        setTemplates([]); // Ensure templates is empty if there was an error
+      }
+    } catch (error: any) {
+      console.error('Outer error loading templates:', error);
       message.error(t('templateEditorPage.failed_to_load_templates'));
       setTemplates([]); // Ensure templates is empty if there was an error
     } finally {
       setLoadingTemplates(false);
     }
-  }, [templateFilter, t]); // Add templateFilter and t as dependencies
+  }, [templateFilter, t, userId]); // Add userId as dependency
 
   // Now use the callback in useEffect
   React.useEffect(() => {
@@ -203,10 +219,33 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   const filteredTemplates = React.useMemo(() => {
     let filtered = templates;
     
+    // Debug: log all templates
+    console.log('All templates:', templates);
+    console.log('Template filter:', templateFilter);
+    
     // First apply template filter (default, my, liked)
     if (templateFilter === 'default') {
       // For default tab, only show templates that are both default AND assignable
       filtered = filtered.filter(t => t.isDefault && !!t.assignable);
+    } else if (templateFilter === 'liked') {
+      // Debug: Show all liked templates before additional filtering
+      const onlyLiked = filtered.filter(t => t.like === true);
+      console.log('Templates with like=true:', onlyLiked);
+      
+      // Filter by templates the user has liked
+      filtered = filtered.filter((template: any) => 
+        template.like === true
+      );
+      
+      console.log('After like filter:', filtered);
+      
+      // Remove the strict filters for now - let's just see what liked templates exist
+      // We can add back the other filters one by one
+      /* 
+      template.isDefault === false &&
+      template.assignable === true &&
+      template.user && userId && template.user.id === userId
+      */
     }
     
     // Filter out templates with different sizes than the current template

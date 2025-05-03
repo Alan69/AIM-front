@@ -1821,7 +1821,7 @@ export const getUserAssets = async () => {
     // Make the GraphQL request
     const result = await client.query({
       query: gqlClient`
-        query GetUserAssets($userId: UUID!) {
+        query GetUserAssets($userId: ID!) {
           userAssets(userId: $userId) {
             uuid
             image
@@ -1855,61 +1855,97 @@ export const getTemplates = async (filterType: string = 'my') => {
   try {
     // Get user ID for filtering
     const userId = getUserIdFromMultipleSources();
+    console.log('getTemplates called with filter:', filterType);
+    console.log('User ID from sources:', userId);
     
     if (filterType !== 'default' && !userId) {
       console.warn('User ID not found, returning empty templates list');
       return [];
     }
     
-    // Fetch all templates
-    const { data } = await client.query({
-      query: GET_TEMPLATES,
-      variables: { size: null }
-    });
+    // Log token for authentication debugging (be careful not to log the full token in production!)
+    const token = Cookies.get('token');
+    console.log('Authentication token exists:', !!token, token ? `(starts with ${token.substring(0, 5)}...)` : '(no token)');
     
-    if (data && data.templates) {
-      // Filter templates based on the filterType
-      let filteredTemplates;
+    // Fetch all templates
+    try {
+      console.log('Making GraphQL query with variables:', { size: null, tab: filterType, userId });
+      const { data } = await client.query({
+        query: GET_TEMPLATES,
+        variables: { 
+          size: null,
+          tab: filterType, // Send filterType as tab to the backend
+          userId: userId   // Always send userId
+        },
+        fetchPolicy: 'network-only', // Don't use cache for most accurate results
+      });
       
-      if (filterType === 'my') {
-        // Filter by templates created by the current user
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.user && template.user.id === userId && !template.isDefault
-        );
-      } else if (filterType === 'default') {
-        // Filter by default templates that are also assignable
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.isDefault === true && template.assignable === true
-        );
-      } else if (filterType === 'liked') {
-        // Filter by templates the user has liked
-        filteredTemplates = data.templates.filter((template: any) => 
-          template.like === true
-        );
-      } else {
-        filteredTemplates = data.templates;
+      console.log('Raw templates data from API:', data);
+      
+      if (data && data.templates) {
+        // Filter templates based on the filterType
+        let filteredTemplates;
+        
+        if (filterType === 'my') {
+          // Filter by templates created by the current user
+          filteredTemplates = data.templates.filter((template: any) => 
+            template.user && template.user.id === userId && !template.isDefault
+          );
+          console.log('My templates after filtering:', filteredTemplates);
+        } else if (filterType === 'default') {
+          // Filter by default templates that are also assignable
+          filteredTemplates = data.templates.filter((template: any) => 
+            template.isDefault === true && template.assignable === true
+          );
+          console.log('Default templates after filtering:', filteredTemplates);
+        } else if (filterType === 'liked') {
+          // First just show all templates with like=true
+          const allLikedTemplates = data.templates.filter((template: any) => 
+            template.like === true
+          );
+          console.log('All templates with like=true:', allLikedTemplates);
+          
+          // Now apply the full filter
+          filteredTemplates = data.templates.filter((template: any) => 
+            template.like === true
+          );
+          console.log('Liked templates after filtering:', filteredTemplates);
+        } else {
+          filteredTemplates = data.templates;
+          console.log('All templates (no filter):', filteredTemplates);
+        }
+        
+        // Process each template to ensure we have proper data for thumbnail display
+        return Promise.all(filteredTemplates.map(async (template: any) => {
+          try {
+            const completeTemplate = await fetchTemplateWithElements(template.uuid);
+            return completeTemplate;
+          } catch (error) {
+            console.warn(`Error fetching complete details for template ${template.uuid}:`, error);
+            return {
+              ...template,
+              images: template.imageAssets || [],
+              texts: template.textElements || [],
+              shapes: template.shapeElements || []
+            };
+          }
+        }));
       }
       
-      // Process each template to ensure we have proper data for thumbnail display
-      return Promise.all(filteredTemplates.map(async (template: any) => {
-        try {
-          const completeTemplate = await fetchTemplateWithElements(template.uuid);
-          return completeTemplate;
-        } catch (error) {
-          console.warn(`Error fetching complete details for template ${template.uuid}:`, error);
-          return {
-            ...template,
-            images: template.imageAssets || [],
-            texts: template.textElements || [],
-            shapes: template.shapeElements || []
-          };
-        }
-      }));
+      console.log('No templates found in data');
+      return [];
+    } catch (queryError: any) {
+      console.error('GraphQL query error:', queryError);
+      if (queryError.networkError) {
+        console.error('Network details:', queryError.networkError);
+      }
+      if (queryError.graphQLErrors) {
+        console.error('GraphQL errors:', queryError.graphQLErrors);
+      }
+      throw queryError;
     }
-    
-    return [];
   } catch (error) {
-    console.error('Error fetching templates:', error);
+    console.error('Error in getTemplates:', error);
     throw error;
   }
 }; 
