@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Tabs, List, Button, Card, Upload, message, Spin, Empty, Input, Radio } from 'antd';
 import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, ArrowUpOutlined, ArrowDownOutlined, LayoutOutlined, SearchOutlined } from '@ant-design/icons';
 import { ElementType, Template, DesignElement, UserAsset } from '../../../../types';
-import { getUserAssets, createUserAsset, updateElementInTemplate, getTemplates } from '../../../../services/designService';
+import { getUserAssets, createUserAsset, updateElementInTemplate, getTemplates, debugGetDefaultTemplates } from '../../../../services/designService';
 import './ElementsPanel.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
@@ -229,6 +229,17 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     loadTemplates();
   }, [userId, loadTemplates]); // Include loadTemplates in the dependency array
 
+  // Debug effect for default templates
+  React.useEffect(() => {
+    if (templateFilter === 'default') {
+      debugGetDefaultTemplates().then(templates => {
+        console.log('DEBUG - Default templates direct from server:', templates);
+        const validDefaultTemplates = templates.filter((t: any) => t.isDefault === true && !!t.assignable);
+        console.log('DEBUG - Valid default templates (isDefault=true AND assignable=true):', validDefaultTemplates);
+      });
+    }
+  }, [templateFilter]);
+
   // Filter templates based on search query and exclude current template
   const filteredTemplates = React.useMemo(() => {
     let filtered = templates;
@@ -239,7 +250,29 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     
     // Filter for default templates - only show templates with isDefault=true AND assignable=true
     if (templateFilter === 'default') {
-      filtered = filtered.filter(t => t.isDefault === true && !!t.assignable);
+      console.log('Templates before default filtering:', filtered.map(t => ({
+        uuid: t.uuid,
+        name: t.name,
+        isDefault: t.isDefault,
+        assignable: t.assignable
+      })));
+      
+      filtered = filtered.filter(t => {
+        const isValidDefault = t.isDefault === true && !!t.assignable;
+        if (!isValidDefault) {
+          console.log(`Template ${t.name} (${t.uuid}) filtered out because:`, {
+            isDefault: t.isDefault,
+            assignable: t.assignable,
+            result: isValidDefault
+          });
+        } else {
+          console.log(`Template ${t.name} (${t.uuid}) MATCHES default criteria:`, {
+            isDefault: t.isDefault,
+            assignable: t.assignable
+          });
+        }
+        return isValidDefault;
+      });
       console.log('After default filter:', filtered);
     }
     

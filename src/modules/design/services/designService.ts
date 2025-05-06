@@ -1922,4 +1922,30 @@ export const getTemplates = async (filterType: string = 'my', size?: string) => 
     console.error('Error in getTemplates:', error);
     throw error;
   }
+};
+
+// Function to get all default templates for debugging
+export const debugGetDefaultTemplates = async () => {
+  try {
+    const { data } = await client.query({
+      query: gql`
+        query GetDefaultTemplates {
+          templates(tab: "default") {
+            uuid
+            name
+            isDefault
+            assignable
+            size
+          }
+        }
+      `,
+      fetchPolicy: 'network-only',
+    });
+    
+    console.log('DEBUG - All default templates from server:', data.templates);
+    return data.templates;
+  } catch (error) {
+    console.error('Error fetching default templates for debug:', error);
+    return [];
+  }
 }; 
