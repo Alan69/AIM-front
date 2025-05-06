@@ -185,8 +185,22 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       setTemplates([]); // Clear existing templates while loading
       console.log('Calling getTemplates with filter:', templateFilter);
       console.log('Current userId:', userId);
+      console.log('Current template size:', template?.size);
+      
       try {
-        const fetchedTemplates = await getTemplates(templateFilter);
+        let templateSize = template?.size;
+        
+        // Check if we're in a template with standard size
+        const isStandardSize = template?.size && 
+          (template.size === '1080x1080' || template.size === '1080x1920');
+        
+        if (!isStandardSize) {
+          // If custom size or no template, don't filter by size
+          templateSize = undefined;
+        }
+        
+        // Pass template size to the backend for filtering
+        const fetchedTemplates = await getTemplates(templateFilter, templateSize);
         console.log('Templates fetched successfully:', fetchedTemplates);
         setTemplates(fetchedTemplates || []);
       } catch (error: any) {
@@ -208,14 +222,14 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     } finally {
       setLoadingTemplates(false);
     }
-  }, [templateFilter, t, userId]); // Add userId as dependency
+  }, [templateFilter, t, userId, template?.size]); // Add template.size as dependency
 
   // Now use the callback in useEffect
   React.useEffect(() => {
     loadTemplates();
   }, [userId, loadTemplates]); // Include loadTemplates in the dependency array
 
-  // Filter templates based on search query, size, and exclude current template
+  // Filter templates based on search query and exclude current template
   const filteredTemplates = React.useMemo(() => {
     let filtered = templates;
     
@@ -223,45 +237,10 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     console.log('All templates:', templates);
     console.log('Template filter:', templateFilter);
     
-    // First apply template filter (default, my, liked)
+    // Filter for default templates - only show templates with isDefault=true AND assignable=true
     if (templateFilter === 'default') {
-      // For default tab, only show templates that are both default AND assignable
-      filtered = filtered.filter(t => t.isDefault && !!t.assignable);
-    } else if (templateFilter === 'liked') {
-      // Debug: Show all liked templates before additional filtering
-      const onlyLiked = filtered.filter(t => t.like === true);
-      console.log('Templates with like=true:', onlyLiked);
-      
-      // Filter by templates the user has liked
-      filtered = filtered.filter((template: any) => 
-        template.like === true
-      );
-      
-      console.log('After like filter:', filtered);
-      
-      // Remove the strict filters for now - let's just see what liked templates exist
-      // We can add back the other filters one by one
-      /* 
-      template.isDefault === false &&
-      template.assignable === true &&
-      template.user && userId && template.user.id === userId
-      */
-    }
-    
-    // Filter out templates with different sizes than the current template
-    // UNLESS the template has a custom size
-    if (template?.size) {
-      // Check if current template has a standard size or custom size
-      const isStandardSize = template.size === '1080x1080' || template.size === '1080x1920';
-      
-      if (isStandardSize) {
-        // For standard sizes, only show templates with matching size
-        filtered = filtered.filter(t => t.size === template.size);
-      } else {
-        // For custom sizes, show all assignable templates
-        console.log('Custom template size detected:', template.size);
-        console.log('Showing all assignable templates regardless of size');
-      }
+      filtered = filtered.filter(t => t.isDefault === true && !!t.assignable);
+      console.log('After default filter:', filtered);
     }
     
     // Filter out the current template
@@ -277,7 +256,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     }
     
     return filtered;
-  }, [templates, searchQuery, template?.uuid, template?.size, templateFilter]);
+  }, [templates, searchQuery, template?.uuid, templateFilter]);
 
   // Handle template selection
   const handleTemplateSelect = async (selectedTemplate: Template) => {

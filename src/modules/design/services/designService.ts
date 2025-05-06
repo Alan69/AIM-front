@@ -50,6 +50,11 @@ export const GET_TEMPLATES = gql`
     $tab: String = "all",
     $userId: ID
   ) {
+    # tab parameter handles server-side filtering:
+    # - "default": returns templates where isDefault=true AND assignable=true
+    # - "my": returns templates created by the user with userId
+    # - "liked": returns templates that the user has liked
+    # - "all": returns all templates (with optional size filter)
     templates(
       size: $size, 
       page: $page, 
@@ -598,7 +603,7 @@ export const fetchAllTemplates = async (
 ) => {
   try {
     // For "my" tab, we need to send the current user ID
-    const userId = tab === 'my' ? getUserIdFromMultipleSources() : null;
+    const userId = getUserIdFromMultipleSources();
     
     console.log('Fetching templates with params:', { size, page, pageSize, search: searchQuery, tab, userId });
     
@@ -618,7 +623,7 @@ export const fetchAllTemplates = async (
 
     console.log('Templates response:', data);
     
-    // Process the templates returned from the server
+    // Templates are already filtered by the server based on the tab parameter
     let filteredTemplates = data?.templates || [];
     
     // Return the templates and total count from server
@@ -1851,12 +1856,13 @@ export const getUserAssets = async () => {
 };
 
 // Function to get templates by filter (default, my, liked)
-export const getTemplates = async (filterType: string = 'my') => {
+export const getTemplates = async (filterType: string = 'my', size?: string) => {
   try {
     // Get user ID for filtering
     const userId = getUserIdFromMultipleSources();
     console.log('getTemplates called with filter:', filterType);
     console.log('User ID from sources:', userId);
+    console.log('Size filter:', size);
     
     if (filterType !== 'default' && !userId) {
       console.warn('User ID not found, returning empty templates list');
@@ -1867,14 +1873,14 @@ export const getTemplates = async (filterType: string = 'my') => {
     const token = Cookies.get('token');
     console.log('Authentication token exists:', !!token, token ? `(starts with ${token.substring(0, 5)}...)` : '(no token)');
     
-    // Fetch all templates
+    // Fetch templates with server-side filtering
     try {
-      console.log('Making GraphQL query with variables:', { size: null, tab: filterType, userId });
+      console.log('Making GraphQL query with variables:', { size, tab: filterType, userId });
       const { data } = await client.query({
         query: GET_TEMPLATES,
         variables: { 
-          size: null,
-          tab: filterType, // Send filterType as tab to the backend
+          size: size,
+          tab: filterType, // Server will filter based on this tab value
           userId: userId   // Always send userId
         },
         fetchPolicy: 'network-only', // Don't use cache for most accurate results
@@ -1883,40 +1889,8 @@ export const getTemplates = async (filterType: string = 'my') => {
       console.log('Raw templates data from API:', data);
       
       if (data && data.templates) {
-        // Filter templates based on the filterType
-        let filteredTemplates;
-        
-        if (filterType === 'my') {
-          // Filter by templates created by the current user
-          filteredTemplates = data.templates.filter((template: any) => 
-            template.user && template.user.id === userId && !template.isDefault
-          );
-          console.log('My templates after filtering:', filteredTemplates);
-        } else if (filterType === 'default') {
-          // Filter by default templates that are also assignable
-          filteredTemplates = data.templates.filter((template: any) => 
-            template.isDefault === true && template.assignable === true
-          );
-          console.log('Default templates after filtering:', filteredTemplates);
-        } else if (filterType === 'liked') {
-          // First just show all templates with like=true
-          const allLikedTemplates = data.templates.filter((template: any) => 
-            template.like === true
-          );
-          console.log('All templates with like=true:', allLikedTemplates);
-          
-          // Now apply the full filter
-          filteredTemplates = data.templates.filter((template: any) => 
-            template.like === true
-          );
-          console.log('Liked templates after filtering:', filteredTemplates);
-        } else {
-          filteredTemplates = data.templates;
-          console.log('All templates (no filter):', filteredTemplates);
-        }
-        
         // Process each template to ensure we have proper data for thumbnail display
-        return Promise.all(filteredTemplates.map(async (template: any) => {
+        return Promise.all(data.templates.map(async (template: any) => {
           try {
             const completeTemplate = await fetchTemplateWithElements(template.uuid);
             return completeTemplate;
