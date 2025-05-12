@@ -1753,12 +1753,13 @@ export const createUserAsset = async (
 // Function to get templates by filter (default, my, liked)
 export const getTemplates = async (filterType: string = 'my', size?: string) => {
   try {
-    // Get user ID from API for filtering
-    const userId = await getCurrentUser();
+    // Get user ID from API for filtering (but don't require it for default templates)
+    const userId = filterType === 'default' ? undefined : await getCurrentUser();
     console.log('getTemplates called with filter:', filterType);
     console.log('User ID from API:', userId);
     console.log('Size filter:', size);
     
+    // Only check for userId if we're not looking for default templates
     if (filterType !== 'default' && !userId) {
       console.warn('User ID not found, returning empty templates list');
       return [];
@@ -1770,8 +1771,8 @@ export const getTemplates = async (filterType: string = 'my', size?: string) => 
       tab: filterType
     };
     
-    // Only add userId if it's not null - this avoids TypeScript errors
-    if (userId !== null) {
+    // Only add userId if we're not looking for default templates
+    if (filterType !== 'default' && userId !== undefined) {
       variables.userId = userId;
     }
     
@@ -1834,6 +1835,10 @@ export const debugGetDefaultTemplates = async () => {
             isDefault
             assignable
             size
+            user {
+              id
+              username
+            }
           }
         }
       `,
