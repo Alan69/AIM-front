@@ -266,13 +266,20 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
         size: t.size
       })));
       
-      // For default tab, show templates that are either isDefault OR assignable
-      // This matches how TemplateListPage works
-      filtered = filtered.filter(t => t.isDefault === true || !!t.assignable);
-      console.log('After default filter:', filtered);
+      // For default tab, try to filter by isDefault OR assignable
+      const defaultFiltered = filtered.filter(t => t.isDefault === true || !!t.assignable);
+      console.log('After default filter attempt:', defaultFiltered);
+      
+      // If no templates pass the filter, just show all templates in the Default tab
+      // This handles the case where admin UI shows "IS DEFAULT" but API returns isDefault: false
+      if (defaultFiltered.length === 0) {
+        console.log('No templates pass default/assignable filter, showing all templates');
+        // Keep all templates instead of none
+      } else {
+        filtered = defaultFiltered;
+      }
       
       // Important: do NOT filter by size for default templates!
-      // This ensures all default templates show regardless of size
     } else {
       // For non-default tabs, apply size filtering if needed
       if (template?.size) {
