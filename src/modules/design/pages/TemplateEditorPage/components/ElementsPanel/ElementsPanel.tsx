@@ -190,13 +190,20 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       try {
         let templateSize = template?.size;
         
-        // Check if we're in a template with standard size
-        const isStandardSize = template?.size && 
-          (template.size === '1080x1080' || template.size === '1080x1920');
-        
-        if (!isStandardSize) {
-          // If custom size or no template, don't filter by size
+        // For default templates, always pass undefined for size
+        // This ensures we get ALL default templates regardless of size
+        if (templateFilter === 'default') {
           templateSize = undefined;
+          console.log('Fetching ALL default templates without size filtering');
+        } else {
+          // Check if current template has a standard size or custom size
+          const isStandardSize = template?.size && 
+            (template.size === '1080x1080' || template.size === '1080x1920');
+          
+          if (!isStandardSize) {
+            // If custom size or no template, don't filter by size
+            templateSize = undefined;
+          }
         }
         
         // Pass template size to the backend for filtering
@@ -250,30 +257,27 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     
     // Filter for default templates - only show templates with isDefault=true AND assignable=true
     if (templateFilter === 'default') {
+      // Debug before filtering
       console.log('Templates before default filtering:', filtered.map(t => ({
         uuid: t.uuid,
         name: t.name,
         isDefault: t.isDefault,
-        assignable: t.assignable
+        assignable: t.assignable,
+        size: t.size
       })));
       
-      filtered = filtered.filter(t => {
-        const isValidDefault = t.isDefault === true && !!t.assignable;
-        if (!isValidDefault) {
-          console.log(`Template ${t.name} (${t.uuid}) filtered out because:`, {
-            isDefault: t.isDefault,
-            assignable: t.assignable,
-            result: isValidDefault
-          });
-        } else {
-          console.log(`Template ${t.name} (${t.uuid}) MATCHES default criteria:`, {
-            isDefault: t.isDefault,
-            assignable: t.assignable
-          });
-        }
-        return isValidDefault;
-      });
+      // For default tab, ONLY filter by isDefault and assignable, NOT by size
+      filtered = filtered.filter(t => t.isDefault === true && !!t.assignable);
       console.log('After default filter:', filtered);
+      
+      // Important: do NOT filter by size for default templates!
+      // This ensures all default templates show regardless of size
+    } else {
+      // For non-default tabs, apply size filtering if needed
+      if (template?.size) {
+        console.log(`Filtering by size ${template.size} for non-default templates`);
+        filtered = filtered.filter(t => t.size === template.size);
+      }
     }
     
     // Filter out the current template
@@ -288,8 +292,9 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       );
     }
     
+    console.log('Final filtered templates:', filtered);
     return filtered;
-  }, [templates, searchQuery, template?.uuid, templateFilter]);
+  }, [templates, searchQuery, template?.uuid, template?.size, templateFilter]);
 
   // Handle template selection
   const handleTemplateSelect = async (selectedTemplate: Template) => {

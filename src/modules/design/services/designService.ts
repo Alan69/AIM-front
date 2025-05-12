@@ -1753,32 +1753,39 @@ export const createUserAsset = async (
 // Function to get templates by filter (default, my, liked)
 export const getTemplates = async (filterType: string = 'my', size?: string) => {
   try {
-    // Get user ID from API for filtering (but don't require it for default templates)
+    // Get user ID from API for filtering
+    // For 'default' tab, we don't need the userId since default templates are global
     const userId = filterType === 'default' ? undefined : await getCurrentUser();
+    
     console.log('getTemplates called with filter:', filterType);
     console.log('User ID from API:', userId);
     console.log('Size filter:', size);
     
     // Only check for userId if we're not looking for default templates
     if (filterType !== 'default' && !userId) {
-      console.warn('User ID not found, returning empty templates list');
+      console.warn('User ID not found and not in default tab, returning empty templates list');
       return [];
     }
     
     // Prepare variables for the query
     const variables: any = { 
-      size: size,
       tab: filterType
     };
+    
+    // Only add size if we're not looking for default templates or size is explicitly specified
+    if (size) {
+      variables.size = size;
+    }
     
     // Only add userId if we're not looking for default templates
     if (filterType !== 'default' && userId !== undefined) {
       variables.userId = userId;
     }
     
+    console.log('Making GraphQL query for templates with variables:', variables);
+    
     // Fetch templates with server-side filtering
     try {
-      console.log('Making GraphQL query with variables:', variables);
       const { data } = await client.query({
         query: GET_TEMPLATES,
         variables: variables,
@@ -1786,6 +1793,21 @@ export const getTemplates = async (filterType: string = 'my', size?: string) => 
       });
       
       console.log('Raw templates data from API:', data);
+      console.log('Number of templates returned:', data?.templates?.length || 0);
+      
+      // Debug: Log templates details if in default tab 
+      if (filterType === 'default' && data?.templates) {
+        console.log('Default templates details:');
+        data.templates.forEach((t: any, index: number) => {
+          console.log(`Template ${index + 1}: ${t.name}`, {
+            uuid: t.uuid,
+            isDefault: t.isDefault,
+            assignable: t.assignable,
+            size: t.size,
+            userId: t.user?.id
+          });
+        });
+      }
       
       if (data && data.templates) {
         // Process each template to ensure we have proper data for thumbnail display
