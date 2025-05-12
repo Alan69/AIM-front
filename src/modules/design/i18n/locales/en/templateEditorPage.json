@@ -90,7 +90,7 @@
   "no_templates_match_search": "No templates match your search",
   "no_created_templates": "You haven't created any templates yet",
   "no_liked_templates": "You haven't liked any templates yet",
-  "no_templates_with_size": "No templates available with size {size}",
+  "no_templates_with_size": "No templates available with size {{size}}",
   "no_templates_available": "No templates available",
   "confirm_add_elements": "Do you want to add elements from template {{name}} to your current canvas?",
   "adding_elements": "Adding elements from {{name}}...",
