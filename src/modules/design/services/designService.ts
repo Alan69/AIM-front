@@ -607,7 +607,7 @@ const getCurrentUser = async (): Promise<string | undefined> => {
     const API_URL = process.env.REACT_APP_API_URL || 
       (process.env.NODE_ENV === 'production' ? 'https://api.aimmagic.com' : 'http://localhost:8000');
     
-    const response = await fetch(`${API_URL}/api/user/current/`, {
+    const response = await fetch(`${API_URL}/api/auth/user/`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
