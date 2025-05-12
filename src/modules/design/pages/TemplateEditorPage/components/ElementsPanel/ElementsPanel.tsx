@@ -190,19 +190,13 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       try {
         let templateSize = template?.size;
         
-        // For default templates, don't filter by size so we show all default templates
-        if (templateFilter === 'default') {
+        // Check if we're in a template with standard size
+        const isStandardSize = template?.size && 
+          (template.size === '1080x1080' || template.size === '1080x1920');
+        
+        if (!isStandardSize) {
+          // If custom size or no template, don't filter by size
           templateSize = undefined;
-          console.log('Fetching all default templates regardless of size');
-        } else {
-          // For non-default templates, check if we're in a template with standard size
-          const isStandardSize = template?.size && 
-            (template.size === '1080x1080' || template.size === '1080x1920');
-          
-          if (!isStandardSize) {
-            // If custom size or no template, don't filter by size
-            templateSize = undefined;
-          }
         }
         
         // Pass template size to the backend for filtering
