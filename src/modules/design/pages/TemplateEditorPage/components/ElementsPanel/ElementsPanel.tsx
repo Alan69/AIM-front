@@ -129,7 +129,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
   const [loadingAssets, setLoadingAssets] = React.useState(false);
   const [templates, setTemplates] = React.useState<Template[]>([]);
   const [loadingTemplates, setLoadingTemplates] = React.useState(false);
-  const [templateFilter, setTemplateFilter] = React.useState('default');
+  const [templateFilter, setTemplateFilter] = React.useState('liked');
   const [searchQuery, setSearchQuery] = React.useState('');
   
   // Get user from Redux store
@@ -190,20 +190,13 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       try {
         let templateSize = template?.size;
         
-        // For default templates, always pass undefined for size
-        // This ensures we get ALL default templates regardless of size
-        if (templateFilter === 'default') {
+        // Check if current template has a standard size or custom size
+        const isStandardSize = template?.size && 
+          (template.size === '1080x1080' || template.size === '1080x1920');
+        
+        if (!isStandardSize) {
+          // If custom size or no template, don't filter by size
           templateSize = undefined;
-          console.log('Fetching ALL default templates without size filtering');
-        } else {
-          // Check if current template has a standard size or custom size
-          const isStandardSize = template?.size && 
-            (template.size === '1080x1080' || template.size === '1080x1920');
-          
-          if (!isStandardSize) {
-            // If custom size or no template, don't filter by size
-            templateSize = undefined;
-          }
         }
         
         // Pass template size to the backend for filtering
@@ -236,17 +229,6 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     loadTemplates();
   }, [userId, loadTemplates]); // Include loadTemplates in the dependency array
 
-  // Debug effect for default templates
-  React.useEffect(() => {
-    if (templateFilter === 'default') {
-      debugGetDefaultTemplates().then(templates => {
-        console.log('DEBUG - Default templates direct from server:', templates);
-        const validDefaultTemplates = templates.filter((t: any) => t.isDefault === true && !!t.assignable);
-        console.log('DEBUG - Valid default templates (isDefault=true AND assignable=true):', validDefaultTemplates);
-      });
-    }
-  }, [templateFilter]);
-
   // Filter templates based on search query and exclude current template
   const filteredTemplates = React.useMemo(() => {
     let filtered = templates;
@@ -255,6 +237,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     console.log('All templates:', templates);
     console.log('Template filter:', templateFilter);
     
+    /* Default tab logic removed
     // Filter for default templates - show templates that are either default OR assignable
     if (templateFilter === 'default') {
       // Debug before filtering
@@ -281,12 +264,14 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
       
       // Important: do NOT filter by size for default templates!
     } else {
-      // For non-default tabs, apply size filtering if needed
-      if (template?.size) {
-        console.log(`Filtering by size ${template.size} for non-default templates`);
-        filtered = filtered.filter(t => t.size === template.size);
-      }
+    */
+    
+    // For non-default tabs, apply size filtering if needed
+    if (template?.size) {
+      console.log(`Filtering by size ${template.size} for templates`);
+      filtered = filtered.filter(t => t.size === template.size);
     }
+    // } - removed the closing bracket from the commented-out if statement
     
     // Filter out the current template
     if (template?.uuid) {
@@ -814,7 +799,8 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
                 buttonStyle="solid"
                 size="small"
               >
-                <Radio.Button value="default">{t('templateEditorPage.default')}</Radio.Button>
+                {/* Default tab removed - only showing liked templates */}
+                {/* <Radio.Button value="default">{t('templateEditorPage.default')}</Radio.Button> */}
                 <Radio.Button value="liked">{t('templateEditorPage.liked')}</Radio.Button>
               </Radio.Group>
             </div>
