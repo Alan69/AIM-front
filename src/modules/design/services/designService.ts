@@ -593,6 +593,50 @@ export const processImageData = (imageData: string): string => {
   }
 };
 
+// Helper function to get user ID from API instead of cookies/localStorage
+const getCurrentUser = async (): Promise<string | undefined> => {
+  try {
+    // Get token from cookies (we still need the token for authentication)
+    const token = Cookies.get('token');
+    if (!token) {
+      console.warn('No authentication token found');
+      return undefined;
+    }
+    
+    // Use the current_user_view endpoint to get the current authenticated user
+    const API_URL = process.env.REACT_APP_API_URL || 
+      (process.env.NODE_ENV === 'production' ? 'https://api.aimmagic.com' : 'http://localhost:8000');
+    
+    const response = await fetch(`${API_URL}/api/user/current/`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch current user:', await response.text());
+      return undefined;
+    }
+    
+    const userData = await response.json();
+    console.log('Current user data from API:', userData);
+    
+    // Extract user ID from the response
+    const userId = userData?.profile?.user?.id;
+    
+    if (!userId) {
+      console.warn('No user ID found in current user data');
+      return undefined;
+    }
+    
+    console.log('Using verified user ID from API:', userId);
+    return userId;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return undefined;
+  }
+};
+
 // Function to fetch all templates
 export const fetchAllTemplates = async (
   size: TemplateSizeType,
@@ -602,22 +646,29 @@ export const fetchAllTemplates = async (
   tab: string = 'all'
 ) => {
   try {
-    // For "my" tab, we need to send the current user ID
-    const userId = getUserIdFromMultipleSources();
+    // Get userId from the API (current authenticated user)
+    const userId = await getCurrentUser();
     
     console.log('Fetching templates with params:', { size, page, pageSize, search: searchQuery, tab, userId });
+    
+    // Prepare variables for the query
+    const variables: any = {
+      size,
+      page,
+      pageSize,
+      search: searchQuery,
+      tab
+    };
+    
+    // Only add userId if it's not null
+    if (userId !== null) {
+      variables.userId = userId;
+    }
     
     // Use server-side pagination, filtering and searching
     const { data } = await client.query({
       query: GET_TEMPLATES,
-      variables: {
-        size,
-        page,
-        pageSize,
-        search: searchQuery,
-        tab,
-        userId
-      },
+      variables,
       fetchPolicy: 'network-only', // Don't use cache for most accurate results
     });
 
@@ -648,44 +699,6 @@ export const fetchAllTemplates = async (
     throw error;
   }
 };
-
-// Helper function to get user ID from multiple sources
-const getUserIdFromMultipleSources = (): string | null => {
-  let userId = null;
-  
-  // Try from window.__USER_ID__
-  if (typeof window !== 'undefined' && (window as any).__USER_ID__) {
-    userId = (window as any).__USER_ID__;
-  }
-  
-  // Try from localStorage
-  if (!userId) {
-    try {
-      const userData = localStorage.getItem('userData');
-      if (userData) {
-        const userObj = JSON.parse(userData);
-        userId = userObj.id;
-      }
-    } catch (e) {
-      console.warn('Failed to get user ID from localStorage:', e);
-    }
-  }
-  
-  // Try from cookies
-  if (!userId) {
-    const userCookie = Cookies.get('user');
-    if (userCookie) {
-      try {
-        const userObj = JSON.parse(userCookie);
-        userId = userObj.id;
-      } catch (e) {
-        console.warn('Failed to parse user cookie:', e);
-      }
-    }
-  }
-  
-  return userId;
-}
 
 // Function to fetch a template with all its elements
 export const fetchTemplateWithElements = async (uuid: string) => {
@@ -856,23 +869,17 @@ export const createTemplate = async (name: string, size: string, backgroundImage
     }
   }
 
-  // Get the user's ID from cookies if not provided
+  // Get the user's ID from API if not provided
   if (!userId) {
     try {
-      const cookies = document.cookie.split(';');
-      const userCookie = cookies.find(cookie => cookie.trim().startsWith('user='));
-      if (userCookie) {
-        const userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
-        userId = userObj.id;
+      userId = await getCurrentUser();
+      if (!userId) {
+        throw new Error('Failed to get current user ID');
       }
     } catch (error) {
-      console.error('Error getting user ID from cookies:', error);
+      console.error('Error getting user ID:', error);
+      throw new Error('User ID is required to create a template');
     }
-  }
-
-  // If still no userId, throw an error as it's required
-  if (!userId) {
-    throw new Error('User ID is required to create a template');
   }
 
   try {
@@ -1624,6 +1631,57 @@ export const copyTemplate = async (sourceTemplateId: string, newName: string, us
   }
 };
 
+// Function to get all user assets
+export const getUserAssets = async () => {
+  try {
+    // Ensure the user is authenticated
+    const token = Cookies.get('token');
+    if (!token) {
+      console.error('User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    // Get userId from API
+    const userId = await getCurrentUser();
+    
+    // If we still don't have a user ID, return an empty array
+    if (!userId) {
+      console.warn('User ID not found, returning empty assets list');
+      return [];
+    }
+
+    // Make the GraphQL request with non-null userId
+    const result = await client.query({
+      query: gqlClient`
+        query GetUserAssets($userId: ID!) {
+          userAssets(userId: $userId) {
+            uuid
+            image
+            name
+            thumbnail
+            createdAt
+          }
+        }
+      `,
+      variables: {
+        userId // We already checked userId is not null
+      },
+      context: {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      },
+      fetchPolicy: 'network-only' // Don't use cache for this query
+    });
+
+    return result.data.userAssets as UserAsset[];
+  } catch (error) {
+    console.error('Error fetching user assets:', error);
+    // Return empty array instead of throwing to avoid breaking the UI
+    return [];
+  }
+};
+
 // Function to create a user asset (independent of templates)
 export const createUserAsset = async (
   imageUrl: string,
@@ -1638,76 +1696,20 @@ export const createUserAsset = async (
       throw new Error('User not authenticated');
     }
 
-    // Try multiple sources to get the user ID
-    let userId;
+    // Get user ID from API
+    const userId = await getCurrentUser();
     
-    // First try from the user_id cookie
-    const userIdCookie = Cookies.get('user_id');
-    if (userIdCookie) {
-      userId = userIdCookie;
-    } else {
-      // Try from the window.__USER_ID__ property that may be set by components
-      if (typeof window !== 'undefined' && (window as any).__USER_ID__) {
-        userId = (window as any).__USER_ID__;
-      }
-      
-      // Try from userData cookie (which contains the user object)
-      if (!userId) {
-        const userDataCookie = Cookies.get('userData');
-        if (userDataCookie) {
-          try {
-            const userData = JSON.parse(userDataCookie);
-            if (userData && userData.id) {
-              userId = userData.id;
-            }
-          } catch (error) {
-            console.warn('Error parsing userData cookie:', error);
-          }
-        }
-      }
-      
-      // If still no user ID, try to get it from localStorage
-      if (!userId) {
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-          try {
-            const userData = JSON.parse(userDataString);
-            if (userData && userData.id) {
-              userId = userData.id;
-            }
-          } catch (error) {
-            console.warn('Error parsing userData from localStorage:', error);
-          }
-        }
-      }
-      
-      // Try to get from auth Redux store via window.__REDUX_STATE__
-      if (!userId && typeof window !== 'undefined' && (window as any).__REDUX_STATE__) {
-        try {
-          const reduxState = (window as any).__REDUX_STATE__;
-          if (reduxState.auth && reduxState.auth.user && 
-              reduxState.auth.user.profile && 
-              reduxState.auth.user.profile.user && 
-              reduxState.auth.user.profile.user.id) {
-            userId = reduxState.auth.user.profile.user.id;
-          }
-        } catch (error) {
-          console.warn('Error accessing Redux state:', error);
-        }
-      }
-    }
-    
-    // If we still don't have a user ID, we can't create the asset
+    // If we don't have a user ID, we can't create the asset
     if (!userId) {
-      console.error('User ID not found in any storage location, cannot create asset');
+      console.error('User ID not found, cannot create asset');
       throw new Error('User ID not found');
     }
 
-    // Make the GraphQL request
+    // Make the GraphQL request with non-null userId
     const result = await client.mutate({
       mutation: gqlClient`
         mutation CreateUserAsset(
-          $userId: UUID!
+          $userId: ID!
           $image: String!
           $name: String
           $thumbnail: String
@@ -1729,7 +1731,7 @@ export const createUserAsset = async (
         }
       `,
       variables: {
-        userId,
+        userId, // We already checked userId is not null
         image: imageUrl,
         name,
         thumbnail
@@ -1748,120 +1750,13 @@ export const createUserAsset = async (
   }
 };
 
-// Function to get all user assets
-export const getUserAssets = async () => {
-  try {
-    // Ensure the user is authenticated
-    const token = Cookies.get('token');
-    if (!token) {
-      console.error('User not authenticated');
-      throw new Error('User not authenticated');
-    }
-
-    // Try multiple sources to get the user ID
-    let userId;
-    
-    // First try from the user_id cookie
-    const userIdCookie = Cookies.get('user_id');
-    if (userIdCookie) {
-      userId = userIdCookie;
-    } else {
-      // Try from the window.__USER_ID__ property that may be set by components
-      if (typeof window !== 'undefined' && (window as any).__USER_ID__) {
-        userId = (window as any).__USER_ID__;
-      }
-      
-      // Try from userData cookie (which contains the user object)
-      if (!userId) {
-        const userDataCookie = Cookies.get('userData');
-        if (userDataCookie) {
-          try {
-            const userData = JSON.parse(userDataCookie);
-            if (userData && userData.id) {
-              userId = userData.id;
-            }
-          } catch (error) {
-            console.warn('Error parsing userData cookie:', error);
-          }
-        }
-      }
-      
-      // If still no user ID, try to get it from localStorage
-      if (!userId) {
-        const userDataString = localStorage.getItem('userData');
-        if (userDataString) {
-          try {
-            const userData = JSON.parse(userDataString);
-            if (userData && userData.id) {
-              userId = userData.id;
-            }
-          } catch (error) {
-            console.warn('Error parsing userData from localStorage:', error);
-          }
-        }
-      }
-      
-      // Try to get from auth Redux store via window.__REDUX_STATE__
-      if (!userId && typeof window !== 'undefined' && (window as any).__REDUX_STATE__) {
-        try {
-          const reduxState = (window as any).__REDUX_STATE__;
-          if (reduxState.auth && reduxState.auth.user && 
-              reduxState.auth.user.profile && 
-              reduxState.auth.user.profile.user && 
-              reduxState.auth.user.profile.user.id) {
-            userId = reduxState.auth.user.profile.user.id;
-          }
-        } catch (error) {
-          console.warn('Error accessing Redux state:', error);
-        }
-      }
-    }
-    
-    // If we still don't have a user ID, return an empty array
-    if (!userId) {
-      console.warn('User ID not found in any storage location, returning empty assets list');
-      return [];
-    }
-
-    // Make the GraphQL request
-    const result = await client.query({
-      query: gqlClient`
-        query GetUserAssets($userId: ID!) {
-          userAssets(userId: $userId) {
-            uuid
-            image
-            name
-            thumbnail
-            createdAt
-          }
-        }
-      `,
-      variables: {
-        userId
-      },
-      context: {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      },
-      fetchPolicy: 'network-only' // Don't use cache for this query
-    });
-
-    return result.data.userAssets as UserAsset[];
-  } catch (error) {
-    console.error('Error fetching user assets:', error);
-    // Return empty array instead of throwing to avoid breaking the UI
-    return [];
-  }
-};
-
 // Function to get templates by filter (default, my, liked)
 export const getTemplates = async (filterType: string = 'my', size?: string) => {
   try {
-    // Get user ID for filtering
-    const userId = getUserIdFromMultipleSources();
+    // Get user ID from API for filtering
+    const userId = await getCurrentUser();
     console.log('getTemplates called with filter:', filterType);
-    console.log('User ID from sources:', userId);
+    console.log('User ID from API:', userId);
     console.log('Size filter:', size);
     
     if (filterType !== 'default' && !userId) {
@@ -1869,20 +1764,23 @@ export const getTemplates = async (filterType: string = 'my', size?: string) => 
       return [];
     }
     
-    // Log token for authentication debugging (be careful not to log the full token in production!)
-    const token = Cookies.get('token');
-    console.log('Authentication token exists:', !!token, token ? `(starts with ${token.substring(0, 5)}...)` : '(no token)');
+    // Prepare variables for the query
+    const variables: any = { 
+      size: size,
+      tab: filterType
+    };
+    
+    // Only add userId if it's not null - this avoids TypeScript errors
+    if (userId !== null) {
+      variables.userId = userId;
+    }
     
     // Fetch templates with server-side filtering
     try {
-      console.log('Making GraphQL query with variables:', { size, tab: filterType, userId });
+      console.log('Making GraphQL query with variables:', variables);
       const { data } = await client.query({
         query: GET_TEMPLATES,
-        variables: { 
-          size: size,
-          tab: filterType, // Server will filter based on this tab value
-          userId: userId   // Always send userId
-        },
+        variables: variables,
         fetchPolicy: 'network-only', // Don't use cache for most accurate results
       });
       
