@@ -255,7 +255,7 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
     console.log('All templates:', templates);
     console.log('Template filter:', templateFilter);
     
-    // Filter for default templates - only show templates with isDefault=true AND assignable=true
+    // Filter for default templates - show templates that are either default OR assignable
     if (templateFilter === 'default') {
       // Debug before filtering
       console.log('Templates before default filtering:', filtered.map(t => ({
@@ -266,8 +266,9 @@ const ElementsPanel: React.FC<ElementsPanelProps> = ({
         size: t.size
       })));
       
-      // For default tab, ONLY filter by isDefault and assignable, NOT by size
-      filtered = filtered.filter(t => t.isDefault === true && !!t.assignable);
+      // For default tab, show templates that are either isDefault OR assignable
+      // This matches how TemplateListPage works
+      filtered = filtered.filter(t => t.isDefault === true || !!t.assignable);
       console.log('After default filter:', filtered);
       
       // Important: do NOT filter by size for default templates!

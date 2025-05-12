@@ -1868,6 +1868,11 @@ export const debugGetDefaultTemplates = async () => {
     });
     
     console.log('DEBUG - All default templates from server:', data.templates);
+    
+    // Check templates that are either default OR assignable (how it should work)
+    const validDefaultTemplates = data.templates.filter((t: any) => t.isDefault === true || !!t.assignable);
+    console.log('DEBUG - Valid templates (isDefault=true OR assignable=true):', validDefaultTemplates);
+    
     return data.templates;
   } catch (error) {
     console.error('Error fetching default templates for debug:', error);
