@@ -1,2 +1,2 @@
-export const baseURL = 'https://api.aimmagic.com/api/';
-export const graphqlURL = 'https://api.aimmagic.com/graphql/';
+export const baseURL = 'http://127.0.0.1:8000/api/';
+export const graphqlURL = 'http://127.0.0.1:8000/graphql/';

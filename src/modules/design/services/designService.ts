@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { baseURL, graphqlURL } from 'types/baseUrl';
-import { UserAsset, Template, TemplateSizeType } from '../types';
+import { UserAsset, TemplateSizeType } from '../types';
 import { gql as gqlClient } from '@apollo/client';
 
 // Create the HTTP link

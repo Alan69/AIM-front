@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Tabs, List, Button, Card, Upload, message, Spin, Empty, Input, Radio } from 'antd';
 import { PictureOutlined, FontSizeOutlined, BorderOutlined, UploadOutlined, UnorderedListOutlined, ArrowUpOutlined, ArrowDownOutlined, LayoutOutlined, SearchOutlined } from '@ant-design/icons';
 import { ElementType, Template, DesignElement, UserAsset } from '../../../../types';
-import { getUserAssets, createUserAsset, updateElementInTemplate, getTemplates, debugGetDefaultTemplates } from '../../../../services/designService';
+import { getUserAssets, createUserAsset, updateElementInTemplate, getTemplates } from '../../../../services/designService';
 import './ElementsPanel.scss';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/rootReducer';
