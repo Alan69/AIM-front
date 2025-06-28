@@ -15,9 +15,13 @@ RUN npm install axios @babel/plugin-proposal-private-property-in-object --legacy
 # Copy source code
 COPY . .
 
+# Copy production environment file
+COPY env.production .env.production
+
 # Set environment for production build
 ENV NODE_ENV=production
 ENV REACT_APP_ENVIRONMENT=production
+ENV REACT_APP_API_URL=https://aimmagic.com
 
 # Build the React app
 RUN npm run build
