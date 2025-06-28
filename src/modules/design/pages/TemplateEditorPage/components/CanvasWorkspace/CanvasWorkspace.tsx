@@ -173,9 +173,9 @@ const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 // Base URLs that will be used in our alternative URLs
                 const isProd = process.env.NODE_ENV === 'production';
                 const baseUrls = [
-                  isProd ? 'https://api.aimmagic.com' : 'http://localhost:8000',
-                  isProd ? 'https://api.aimmagic.com' : 'http://127.0.0.1:8000',
-                  process.env.REACT_APP_API_URL || (isProd ? 'https://api.aimmagic.com' : 'http://localhost:8000')
+                  isProd ? 'https://aimmagic.com' : 'http://localhost:8000',
+                  isProd ? 'https://aimmagic.com' : 'http://127.0.0.1:8000',
+                  process.env.REACT_APP_API_URL || (isProd ? 'https://aimmagic.com' : 'http://localhost:8000')
                 ];
                 
                 console.log(`Environment: ${process.env.NODE_ENV}, using base URLs:`, baseUrls);

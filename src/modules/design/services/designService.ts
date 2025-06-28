@@ -9,7 +9,7 @@ import { gql as gqlClient } from '@apollo/client';
 // Create the HTTP link
 const httpLink = createHttpLink({
   uri: graphqlURL || (process.env.NODE_ENV === 'production' 
-    ? 'https://api.aimmagic.com/graphql/' 
+    ? 'https://aimmagic.com/graphql/' 
     : 'http://127.0.0.1:8000/graphql/'),
 });
 
@@ -555,8 +555,8 @@ export const processImageData = (imageData: string): string => {
     const filename = imageData.split('/').pop();
     
     // If it's a relative path, construct the URL
-    const baseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production' 
-      ? 'https://api.aimmagic.com' 
+        const baseUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'production'
+      ? 'https://aimmagic.com' 
       : 'http://localhost:8000');
 
     const mediaUrl = baseUrl.replace('/api/', '').replace('/graphql/', '');
@@ -575,7 +575,7 @@ export const processImageData = (imageData: string): string => {
       
       // Try with direct URL based on environment
       const hostUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://api.aimmagic.com' 
+        ? 'https://aimmagic.com' 
         : `http://${window.location.hostname === 'localhost' ? 'localhost' : '127.0.0.1'}:8000`;
         
       const mediaPath = `${hostUrl}/media/${cleanFilename}`;
@@ -605,7 +605,7 @@ const getCurrentUser = async (): Promise<string | undefined> => {
     
     // Use the current_user_view endpoint to get the current authenticated user
     const API_URL = process.env.REACT_APP_API_URL || 
-      (process.env.NODE_ENV === 'production' ? 'https://api.aimmagic.com' : 'http://localhost:8000');
+      (process.env.NODE_ENV === 'production' ? 'https://aimmagic.com' : 'http://localhost:8000');
     
     const response = await fetch(`${API_URL}/api/auth/user/`, {
       headers: {
@@ -793,8 +793,8 @@ export const fetchTemplateWithElements = async (uuid: string) => {
 
 // Function to create a template
 export const createTemplate = async (name: string, size: string, backgroundImage?: string, userId?: string, isDefault: boolean = false, postId?: string, mediaId?: string) => {
-  const API_URL = process.env.REACT_APP_API_URL || 
-    (process.env.NODE_ENV === 'production' ? 'https://api.aimmagic.com' : 'http://localhost:8000');
+      const API_URL = process.env.REACT_APP_API_URL ||
+      (process.env.NODE_ENV === 'production' ? 'https://aimmagic.com' : 'http://localhost:8000');
     
   console.log(`Environment: ${process.env.NODE_ENV}, using API URL: ${API_URL}`);
   console.log('Creating template with name:', name);

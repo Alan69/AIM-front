@@ -1045,8 +1045,8 @@ export const VideoDetailsPage = () => {
         // For local development, use localhost:8000 directly
         host = '127.0.0.1:8000';
       } else {
-        // For production, use the API domain
-      host = 'api.aimmagic.com';
+        // For production, use the main domain
+        host = 'aimmagic.com';
       }
         
       const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
@@ -1087,7 +1087,7 @@ export const VideoDetailsPage = () => {
           if (process.env.NODE_ENV === 'development') {
             apiHost = '127.0.0.1:8000';
           } else {
-          apiHost = 'api.aimmagic.com';
+            apiHost = 'aimmagic.com';
           }
           
           // Get the current image URL, ensuring it's a full URL for comparison
