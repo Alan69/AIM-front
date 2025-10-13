@@ -364,7 +364,7 @@ export const PostDetailsPage = () => {
           
           // Extract the base domain without any path
           const urlParts = baseApiUrl.split('/');
-          const domain = urlParts[0] + '//' + urlParts[2]; // e.g., https://api.aimmagic.com
+          const domain = urlParts[0] + '//' + urlParts[2]; // e.g., http://34.135.112.39
           
           // Force the correct endpoint with /api/ and use the ID from the new media
           const updateTemplateUrl = `${domain}/api/post-media/${newMediaId}/update-template/`;
@@ -839,7 +839,7 @@ export const PostDetailsPage = () => {
           mediaImageUrl = `${baseUrl}${mediaImageUrl}`;
         } else {
           const baseUrl = process.env.NODE_ENV === 'production' 
-            ? 'https://api.aimmagic.com' 
+            ? 'http://34.135.112.39' 
             : `${window.location.protocol}//${window.location.hostname}:8000`;
           mediaImageUrl = `${baseUrl}/media/${mediaImageUrl}`;
         }
@@ -1243,7 +1243,7 @@ export const PostDetailsPage = () => {
         host = '127.0.0.1:8000';
       } else {
         // For production, use the API domain
-      host = 'api.aimmagic.com';
+      host = '34.135.112.39';
       }
         
       const wsUrl = `${protocol}//${host}/ws/post/${id}/`;
@@ -1284,7 +1284,7 @@ export const PostDetailsPage = () => {
           if (process.env.NODE_ENV === 'development') {
             apiHost = '127.0.0.1:8000';
           } else {
-          apiHost = 'api.aimmagic.com';
+          apiHost = '34.135.112.39';
           }
           
           // Get the current image URL, ensuring it's a full URL for comparison

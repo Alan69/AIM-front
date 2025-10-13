@@ -9,7 +9,7 @@ import { gql as gqlClient } from '@apollo/client';
 // Create the HTTP link
 const httpLink = createHttpLink({
   uri: graphqlURL || (process.env.NODE_ENV === 'production' 
-    ? 'https://api.aimmagic.com/graphql/' 
+    ? 'http://34.135.112.39/graphql/' 
     : 'http://127.0.0.1:8000/graphql/'),
 });
 
@@ -558,7 +558,7 @@ export const processImageData = (imageData: string): string => {
     // Create appropriate base URL for media
     const baseUrl = process.env.REACT_APP_API_URL || 
       (process.env.NODE_ENV === 'production' 
-        ? 'https://api.aimmagic.com' 
+        ? 'http://34.135.112.39' 
         : (isLocalhost ? `${origin}` : 'http://localhost:8000'));
 
     // Clean up media URL to ensure it has the correct format

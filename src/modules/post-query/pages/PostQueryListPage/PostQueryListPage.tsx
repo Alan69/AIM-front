@@ -122,7 +122,7 @@ export const PostQueryListPage = () => {
         onOpen={openModal}
         onClose={closeModal}
         playerRef={playerRef}
-        src="https://api.aimmagic.com/media/posts.mov"
+        src="http://34.135.112.39/media/posts.mov"
       />
     </Layout>
   );
